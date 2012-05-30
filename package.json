@@ -1,0 +1,44 @@
+{
+  "name": "titanium",
+  "description": "Appcelerator Titanium command line",
+  "keywords": [
+    "appcelerator",
+    "titanium",
+	"mobile",
+	"ios",
+	"iphone",
+	"android",
+	"blackberry",
+	"html5",
+	"mobileweb"
+  ],
+  "version": "0.1.0",
+  "author": "Appcelerator, Inc. <info@appcelerator.com>",
+  "maintainers": [
+  	"Bill Dawson <bdawson@appcelerator.com>",
+    "Jeff Haynie <jhaynie@appcelerator.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/appcelerator/titanium.git"
+  },
+  "preferGlobal": true,
+  "dependencies": {
+    "colors": "0.6.0-1",
+    "optimist": "0.3.4",
+    "pkginfo": "0.2.2",
+    "semver": "1.0.x",
+    "request": "2.9.x",
+    "async": "0.1.x",
+    "temp":"0.4.0",
+    "zip":"0.0.6"
+  },
+  "license":"Apache Public License v2",
+  "bin": {
+    "titanium": "./bin/titanium"
+  },
+  "main": "./lib/titanium",
+  "engines": {
+    "node": ">= 0.4.0"
+  }
+}
