@@ -106,5 +106,6 @@
 	"Project directory is not a valid project": "Project directory is not a valid project",
 	"Invalid platform \"%s\"": "Invalid platform \"%s\"",
 	"Available platforms are: %s": "Available platforms are: %s",
-	"Project cleaned successfully in %s": "Project cleaned successfully in %s"
+	"Project cleaned successfully in %s": "Project cleaned successfully in %s",
+	"Command \"%s\" not support by SDK version %s": "Command \"%s\" not support by SDK version %s"
 }
