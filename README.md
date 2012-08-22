@@ -1,31 +1,40 @@
 ## Overview
 
-[Titanium](https://github.com/appcelerator/titanium) is a [Command Line Tool (CLI)](http://en.wikipedia.org/wiki/Command-line_interface) for managing and deploying Titanium mobile applications and modules. It's open-source and easy to use. [We've](https://github.com/appcelertor) designed `titanium` to be suitable for command line beginners, but still be powerful and extensible enough for production usage.
+[Titanium](https://github.com/appcelerator/titanium) is a [Command Line Tool (CLI)](http://en.wikipedia.org/wiki/Command-line_interface)
+for managing and deploying Titanium Mobile applications and modules. It's open-source and easy to use. [We've](https://github.com/appcelertor)
+designed Titanium to be suitable for command line beginners, but still be powerful and extensible enough for production usage.
 
-`titanium` requires `npm`, the [node package manager](http://npmjs.org).
-
-## One-line npm install
-
-    [sudo] curl http://npmjs.org/install.sh | sh
-
-
-## One-line titanium install
+## Local Installation
 
     [sudo] npm install titanium -g
 
-<a name="Libraries"></a>
-## Libraries
-`titanium` is built on a few well developed, well maintained Node.js libraries. 
+## Bleeding Edge
 
-- [npm](http://npmjs.org) - Node Package Manager
-- [colors](https://github.com/marak/colors.js) - Terminal Colors module
-- [optimist](https://github.com/substack/node-optimist) - CLI Options Parsing
+    // do this once
+    git clone https://github.com/appcelerator/titanium.git
+    
+    // do this frequently
+    cd /path/to/titanium
+    git pull origin master
+    [sudo] npm install -g .
 
+## Commands
 
-<a name="License"></a>
+* config - Configure your CLI settings
+* help - Displays help or help for a specific command
+* login - Logs into the Appcelerator Network
+* logout - Logs out of the Appcelerator Network
+* sdk - Download and install Titanium SDKs
+* status - Check authentication, SDK, and project status
+* version - Titanium CLI version
+
+## Usage
+
+    titanium <command> [options]
+
 ## License
 
 This project is open source and provided under the Apache Public License (version 2). Please make sure you see the `LICENSE` file
 included in this distribution for more details on the license.  Also, please take notice of the privacy notice at the end of the file.
 
-#### (C) Copyright 2012, [Appcelerator](http://www.appcelerator.com) Inc. All Rights Reserved.
+#### (C) Copyright 2012, [Appcelerator](http://www.appcelerator.com/) Inc. All Rights Reserved.

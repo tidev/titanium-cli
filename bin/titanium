@@ -1,22 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --no-deprecation
+// --debug-brk
 
-var titanium = require('../lib/titanium');
-
-titanium.start(function (err) 
-{
-
-  process.stdout.on('drain', function () {
-//    process.exit(err ? 1 : 0);
-  })
-  
-  function onexit (code, status) {
-    if (err) {
-      process.removeListener('exit', onexit);
-      process.exit(code);
-    }
-  }
-  
-  process.on('exit', onexit);
-
-});
-
+require('../lib/titanium');
