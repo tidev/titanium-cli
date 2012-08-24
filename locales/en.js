@@ -107,5 +107,29 @@
 	"Invalid platform \"%s\"": "Invalid platform \"%s\"",
 	"Available platforms are: %s": "Available platforms are: %s",
 	"Project cleaned successfully in %s": "Project cleaned successfully in %s",
-	"Command \"%s\" not support by SDK version %s": "Command \"%s\" not support by SDK version %s"
+	"Command \"%s\" not support by SDK version %s": "Command \"%s\" not support by SDK version %s",
+	"Unable to find command \"%s\"": "Unable to find command \"%s\"",
+	"Invalid project directory \"%s\"": "Invalid project directory \"%s\"",
+	"Invalid Titanium SDK \"%s\"": "Invalid Titanium SDK \"%s\"",
+	"Run '%s' for available SDKs.": "Run '%s' for available SDKs.",
+	"Missing required option \"%s\"": "Missing required option \"%s\"",
+	"Target platforms <%s>": "Target platforms <%s>",
+	"Target platforms": "Target platforms",
+	"Invalid list of target platforms": "Invalid list of target platforms",
+	"Project name": "Project name",
+	"Invalid project name": "Invalid project name",
+	"Missing some required options": "Missing some required options",
+	"Directory to place project": "Directory to place project",
+	"Specified directory does not exist": "Specified directory does not exist",
+	"Invalid directory": "Invalid directory",
+	"Specified directory not writable": "Specified directory not writable",
+	"the App ID in the format 'com.companyname.appname'": "the App ID in the format 'com.companyname.appname'",
+	"App ID": "App ID",
+	"Invalid App ID": "Invalid App ID",
+	"Missing subcommand": "Missing subcommand",
+	"Invalid platform: %%s": {
+		"one": "Invalid platform: %%s",
+		"other": "Invalid platforms: %%s"
+	},
+	"Use the %s property to specify the project's directory": "Use the %s property to specify the project's directory"
 }
