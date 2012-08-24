@@ -131,5 +131,9 @@
 		"one": "Invalid platform: %%s",
 		"other": "Invalid platforms: %%s"
 	},
-	"Use the %s property to specify the project's directory": "Use the %s property to specify the project's directory"
+	"Use the %s property to specify the project's directory": "Use the %s property to specify the project's directory",
+	"Invalid platform: %s": "Invalid platform: %s",
+	"Target platform [%s]": "Target platform [%s]",
+	"Invalid platform": "Invalid platform",
+	"Project built successfully in %s": "Project built successfully in %s"
 }
