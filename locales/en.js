@@ -135,5 +135,8 @@
 	"Invalid platform: %s": "Invalid platform: %s",
 	"Target platform [%s]": "Target platform [%s]",
 	"Invalid platform": "Invalid platform",
-	"Project built successfully in %s": "Project built successfully in %s"
+	"Project built successfully in %s": "Project built successfully in %s",
+	"the type of build to perform": "the type of build to perform",
+	"type": "type",
+	"the destination to build for": "the destination to build for"
 }
