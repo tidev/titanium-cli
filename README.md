@@ -1,7 +1,7 @@
 ## Overview
 
 [Titanium](https://github.com/appcelerator/titanium) is a [Command Line Tool (CLI)](http://en.wikipedia.org/wiki/Command-line_interface)
-for managing and deploying Titanium Mobile applications and modules. It's open-source and easy to use. [We've](https://github.com/appcelertor)
+for managing and deploying Titanium Mobile applications and modules. It's open-source and easy to use. [We've](https://github.com/appcelerator)
 designed Titanium to be suitable for command line beginners, but still be powerful and extensible enough for production usage.
 
 ## Local Installation
