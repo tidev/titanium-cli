@@ -39,6 +39,7 @@
 		"adm-zip": "0.1.x",
 		"colors": "0.6.x",
 		"i18n": "0.3.x",
+		"longjohn": ">=0.0.3",
 		"node-appc": "git://github.com/appcelerator/node-appc.git",
 		"prompt": "0.2.x",
 		"request": "2.9.x",
@@ -57,6 +58,6 @@
 		"lib": "./lib"
 	},
 	"engines": {
-		"node": ">= 0.8.2"
+		"node": ">=0.6.6"
 	}
 }
