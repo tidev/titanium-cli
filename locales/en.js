@@ -181,12 +181,13 @@
 		"other": "%s modules"
 	},
 	"Processing i18n strings": "Processing i18n strings",
-	"Reading i18n directory: %s": "Reading i18n directory: %s",
 	"Deleting existing build directory": "Deleting existing build directory",
 	"Touching tiapp.xml": "Touching tiapp.xml",
 	"Deleting all platform build directories": "Deleting all platform build directories",
 	"Deleting %s": "Deleting %s",
 	"Found module %s in %s": "Found module %s in %s",
 	"Using %s theme": "Using %s theme",
-	"Copying %s => %s": "Copying %s => %s"
+	"Copying %s => %s": "Copying %s => %s",
+	"Loading i18n XML file: %s": "Loading i18n XML file: %s",
+	"Assembling titanium.js": "Assembling titanium.js"
 }
