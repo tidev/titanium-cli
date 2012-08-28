@@ -194,5 +194,8 @@
 	"Assembling titanium.css": "Assembling titanium.css",
 	"Creating favicon and Apple touch icons": "Creating favicon and Apple touch icons",
 	"Creating the filesystem registry": "Creating the filesystem registry",
-	"Creating the index.html": "Creating the index.html"
+	"Creating the index.html": "Creating the index.html",
+	"Processing splash screen": "Processing splash screen",
+	"Minifying include %s": "Minifying include %s",
+	"Minifying JavaScript": "Minifying JavaScript"
 }
