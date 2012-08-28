@@ -189,5 +189,10 @@
 	"Using %s theme": "Using %s theme",
 	"Copying %s => %s": "Copying %s => %s",
 	"Loading i18n XML file: %s": "Loading i18n XML file: %s",
-	"Assembling titanium.js": "Assembling titanium.js"
+	"Assembling titanium.js": "Assembling titanium.js",
+	"Assembling splash screen": "Assembling splash screen",
+	"Assembling titanium.css": "Assembling titanium.css",
+	"Creating favicon and Apple touch icons": "Creating favicon and Apple touch icons",
+	"Creating the filesystem registry": "Creating the filesystem registry",
+	"Creating the index.html": "Creating the index.html"
 }
