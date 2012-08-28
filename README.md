@@ -18,19 +18,123 @@ designed Titanium to be suitable for command line beginners, but still be powerf
     git pull origin master
     [sudo] npm install -g .
 
-## Commands
-
-* config - Configure your CLI settings
-* help - Displays help or help for a specific command
-* login - Logs into the Appcelerator Network
-* logout - Logs out of the Appcelerator Network
-* sdk - Download and install Titanium SDKs
-* status - Check authentication, SDK, and project status
-* version - Titanium CLI version
-
 ## Usage
 
     titanium <command> [options]
+
+## Built-in Commands
+
+### config
+
+Configure your CLI settings.
+
+**Implementation not complete**
+
+    titanium config <setting> <value>
+
+### help
+
+Displays help or help for a specific command.
+
+    titanium
+
+    titanium help
+
+    titanium --help
+
+    titanium help <command>
+
+    titanium <command> --help
+
+### login
+
+Logs into the Appcelerator Network
+
+**Implementation not complete**
+
+Login requires both user and password options to be passed in.
+
+    titanium login --user <username> --password <password>
+
+If you omit an option, the CLI will prompt you for the value.
+
+    titanium login
+
+### logout
+
+Logs out of the Appcelerator Network
+
+**Implementation not complete**
+
+    titanium logout
+
+### sdk
+
+Download and install Titanium SDKs
+
+#### sdk install
+
+Installs a specific version of the Titanium SDK. If no version is specified, it assumes the latest.
+
+    titanium sdk install
+
+    titanium sdk install <version>
+
+    titanium sdk install <version> --force
+
+Download, install <version>, and set as default SDK.
+
+    titanium sdk install <version> --default
+
+Download and install the latest version for the specified branch
+
+    titanium sdk install --branch master
+
+#### sdk list
+
+Lists all installed Titanium SDKs. Optionally lists all branches and releases.
+
+    titanium sdk list
+
+    titanium sdk list -b
+    titanium sdk list --branches
+
+    titanium sdk list -r
+    titanium sdk list --releases
+
+    titanium sdk list -br
+    titanium sdk list --branches --releases
+
+#### sdk update
+
+Checks if there is a new version of the Titanium SDK available.
+
+    titanium sdk update
+
+Download and install the latest version.
+
+    titanium sdk update --force
+
+Download and install the latest version for the specified branch if not already installed.
+
+    titanium sdk update --branch master
+
+### status
+
+Checks authentication, SDK, and project status.
+
+**Implementation not complete**
+
+    titanium status
+
+    titanium status --dir /path/to/project
+
+### version
+
+Displays the current version of the CLI and exits.
+
+    titanium version
+    titanium --version
 
 ## License
 
