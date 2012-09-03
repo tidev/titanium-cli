@@ -197,5 +197,13 @@
 	"Creating the index.html": "Creating the index.html",
 	"Processing splash screen": "Processing splash screen",
 	"Minifying include %s": "Minifying include %s",
-	"Minifying JavaScript": "Minifying JavaScript"
+	"Minifying JavaScript": "Minifying JavaScript",
+	"get and set config options": "get and set config options",
+	"the key to get or set": "the key to get or set",
+	"the value to set the specified key": "the value to set the specified key",
+	"remove the specified config key and all its descendants": "remove the specified config key and all its descendants",
+	"Gets and sets config options. If no key is specified, then all key/values are returned.\n\nThe config file is located at: %s": "Gets and sets config options. If no key is specified, then all key/values are returned.\n\nThe config file is located at: %s",
+	"%s removed": "%s removed",
+	"%s saved": "%s saved",
+	"Invalid key \"%s\"": "Invalid key \"%s\""
 }
