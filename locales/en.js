@@ -205,5 +205,13 @@
 	"Gets and sets config options. If no key is specified, then all key/values are returned.\n\nThe config file is located at: %s": "Gets and sets config options. If no key is specified, then all key/values are returned.\n\nThe config file is located at: %s",
 	"%s removed": "%s removed",
 	"%s saved": "%s saved",
-	"Invalid key \"%s\"": "Invalid key \"%s\""
+	"Invalid key \"%s\"": "Invalid key \"%s\"",
+	"Xcode installation: %s": "Xcode installation: %s",
+	"Installed iOS SDKs: %s": "Installed iOS SDKs: %s",
+	"Installed iOS Simulators: %s": "Installed iOS Simulators: %s",
+	"iOS development certificates: %s": "iOS development certificates: %s",
+	"iOS distribution certificates: %s": "iOS distribution certificates: %s",
+	"iOS WWDR certificate: %s": "iOS WWDR certificate: %s",
+	"installed": "installed",
+	"not found": "not found"
 }
