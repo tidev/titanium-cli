@@ -213,5 +213,13 @@
 	"iOS distribution certificates: %s": "iOS distribution certificates: %s",
 	"iOS WWDR certificate: %s": "iOS WWDR certificate: %s",
 	"installed": "installed",
-	"not found": "not found"
+	"not found": "not found",
+	"the target to build for": "the target to build for",
+	"the type of target": "the type of target",
+	"the path to the Android SDK": "the path to the Android SDK",
+	"the target device family type": "the target device family type",
+	"path": "path",
+	"Android SDK path": "Android SDK path",
+	"Invalid Android SDK path": "Invalid Android SDK path",
+	"Invalid Android SDK installation: unable to find adb": "Invalid Android SDK installation: unable to find adb"
 }
