@@ -221,5 +221,8 @@
 	"path": "path",
 	"Android SDK path": "Android SDK path",
 	"Invalid Android SDK path": "Invalid Android SDK path",
-	"Invalid Android SDK installation: unable to find adb": "Invalid Android SDK installation: unable to find adb"
+	"Invalid Android SDK installation: unable to find adb": "Invalid Android SDK installation: unable to find adb",
+	"Setting Xcode target to \"%s\"": "Setting Xcode target to \"%s\"",
+	"Setting Xcode build OS to \"iphone%s\"": "Setting Xcode build OS to \"iphone%s\"",
+	"Invalid target \"%s\"": "Invalid target \"%s\""
 }
