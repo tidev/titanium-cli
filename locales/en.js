@@ -224,5 +224,20 @@
 	"Invalid Android SDK installation: unable to find adb": "Invalid Android SDK installation: unable to find adb",
 	"Setting Xcode target to \"%s\"": "Setting Xcode target to \"%s\"",
 	"Setting Xcode build OS to \"iphone%s\"": "Setting Xcode build OS to \"iphone%s\"",
-	"Invalid target \"%s\"": "Invalid target \"%s\""
+	"Invalid target \"%s\"": "Invalid target \"%s\"",
+	"Unrecognized command \"%s\"": "Unrecognized command \"%s\"",
+	"Titanium SDK %s installed, but with errors.": "Titanium SDK %s installed, but with errors.",
+	"Building Info.plist": "Building Info.plist",
+	"Titanium iOS SDK directory: %s": "Titanium iOS SDK directory: %s",
+	"Copying Xcode iOS files": "Copying Xcode iOS files",
+	"Processing %s": "Processing %s",
+	"Creating Xcode project directory: %s": "Creating Xcode project directory: %s",
+	"Writing Xcode project data file: %s": "Writing Xcode project data file: %s",
+	"Writing Xcode project configuration: %s": "Writing Xcode project configuration: %s",
+	"Writing Xcode module configuration: %s": "Writing Xcode module configuration: %s",
+	"force a full rebuild": "force a full rebuild",
+	"Performing full rebuild": "Performing full rebuild",
+	"Forcing rebuild: --force flag was set": "Forcing rebuild: --force flag was set",
+	"Forcing rebuild: %s does not exist": "Forcing rebuild: %s does not exist",
+	"Forcing rebuild: last build was under Titanium SDK version %s and we're compiling for version %s": "Forcing rebuild: last build was under Titanium SDK version %s and we're compiling for version %s"
 }
