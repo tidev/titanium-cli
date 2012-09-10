@@ -247,5 +247,6 @@
 		"one": "Searching for %s Titanium Module",
 		"other": "Searching for %s Titanium Modules"
 	},
-	"No Titanium Modules required, continuing": "No Titanium Modules required, continuing"
+	"No Titanium Modules required, continuing": "No Titanium Modules required, continuing",
+	"Installing module: %s": "Installing module: %s"
 }
