@@ -239,5 +239,13 @@
 	"Performing full rebuild": "Performing full rebuild",
 	"Forcing rebuild: --force flag was set": "Forcing rebuild: --force flag was set",
 	"Forcing rebuild: %s does not exist": "Forcing rebuild: %s does not exist",
-	"Forcing rebuild: last build was under Titanium SDK version %s and we're compiling for version %s": "Forcing rebuild: last build was under Titanium SDK version %s and we're compiling for version %s"
+	"Forcing rebuild: last build was under Titanium SDK version %s and we're compiling for version %s": "Forcing rebuild: last build was under Titanium SDK version %s and we're compiling for version %s",
+	"Detecting modules in %s": "Detecting modules in %s",
+	"Detected module for %s: %s %s @ %s": "Detected module for %s: %s %s @ %s",
+	"Looking for Titanium Module id: %s, version: %s, platform: %s": "Looking for Titanium Module id: %s, version: %s, platform: %s",
+	"Searching for %s Titanium Module": {
+		"one": "Searching for %s Titanium Module",
+		"other": "Searching for %s Titanium Modules"
+	},
+	"No Titanium Modules required, continuing": "No Titanium Modules required, continuing"
 }
