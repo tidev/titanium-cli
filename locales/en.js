@@ -248,5 +248,8 @@
 		"other": "Searching for %s Titanium Modules"
 	},
 	"No Titanium Modules required, continuing": "No Titanium Modules required, continuing",
-	"Installing module: %s": "Installing module: %s"
+	"Installing module: %s": "Installing module: %s",
+	"Could not find Titanium Module id: %s, version: %s, platform: %s": "Could not find Titanium Module id: %s, version: %s, platform: %s",
+	"Could not all required Titanium Modules:": "Could not all required Titanium Modules:",
+	"Missing the following modules:": "Missing the following modules:"
 }
