@@ -251,5 +251,10 @@
 	"Installing module: %s": "Installing module: %s",
 	"Could not find Titanium Module id: %s, version: %s, platform: %s": "Could not find Titanium Module id: %s, version: %s, platform: %s",
 	"Could not all required Titanium Modules:": "Could not all required Titanium Modules:",
-	"Missing the following modules:": "Missing the following modules:"
+	"Missing the following modules:": "Missing the following modules:",
+	"install and run an app": "install and run an app",
+	"logs into the Appcelerator network": "logs into the Appcelerator network",
+	"logs out of the Appcelerator network": "logs out of the Appcelerator network",
+	"displays session and project information": "displays session and project information",
+	"get and set tiapp.xml settings": "get and set tiapp.xml settings"
 }
