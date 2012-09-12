@@ -112,7 +112,7 @@
 	"Invalid project directory \"%s\"": "Invalid project directory \"%s\"",
 	"Invalid Titanium SDK \"%s\"": "Invalid Titanium SDK \"%s\"",
 	"Run '%s' for available SDKs.": "Run '%s' for available SDKs.",
-	"Missing required option \"%s\"": "Missing required option \"%s\"",
+	"Missing required option \"--%s\"": "Missing required option \"--%s\"",
 	"Target platforms <%s>": "Target platforms <%s>",
 	"Target platforms": "Target platforms",
 	"Invalid list of target platforms": "Invalid list of target platforms",
@@ -256,5 +256,10 @@
 	"logs into the Appcelerator network": "logs into the Appcelerator network",
 	"logs out of the Appcelerator network": "logs out of the Appcelerator network",
 	"displays session and project information": "displays session and project information",
-	"get and set tiapp.xml settings": "get and set tiapp.xml settings"
+	"get and set tiapp.xml settings": "get and set tiapp.xml settings",
+	"Missing required argument \"%s\"": "Missing required argument \"%s\"",
+	"Username": "Username",
+	"Invalid username": "Invalid username",
+	"Password": "Password",
+	"Invalid password": "Invalid password"
 }
