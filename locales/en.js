@@ -250,7 +250,7 @@
 	"No Titanium Modules required, continuing": "No Titanium Modules required, continuing",
 	"Installing module: %s": "Installing module: %s",
 	"Could not find Titanium Module id: %s, version: %s, platform: %s": "Could not find Titanium Module id: %s, version: %s, platform: %s",
-	"Could not all required Titanium Modules:": "Could not all required Titanium Modules:",
+	"Could not find all required Titanium Modules:": "Could not find all required Titanium Modules:",
 	"Missing the following modules:": "Missing the following modules:",
 	"install and run an app": "install and run an app",
 	"logs into the Appcelerator network": "logs into the Appcelerator network",
@@ -261,5 +261,14 @@
 	"Username": "Username",
 	"Invalid username": "Invalid username",
 	"Password": "Password",
-	"Invalid password": "Invalid password"
+	"Invalid password": "Invalid password",
+	"Searching for %s Titanium plugin": {
+		"one": "Searching for %s Titanium plugin",
+		"other": "Searching for %s Titanium plugins"
+	},
+	"Detecting plugins in %s": "Detecting plugins in %s",
+	"Detected plugin: %s %s @ %s": "Detected plugin: %s %s @ %s",
+	"Looking for Titanium plugin id: %s, version: %s": "Looking for Titanium plugin id: %s, version: %s",
+	"Could not find Titanium plugin id: %s, version: %s, platform: %s": "Could not find Titanium plugin id: %s, version: %s, platform: %s",
+	"Could not find all required Titanium plugins:": "Could not find all required Titanium plugins:"
 }
