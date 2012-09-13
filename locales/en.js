@@ -311,5 +311,7 @@
 	"Logged in successfully": "Logged in successfully",
 	"Logout failed: %s": "Logout failed: %s",
 	"Login failed: %s": "Login failed: %s",
-	"You are not currently logged in. Offline support available for %s.": "You are not currently logged in. Offline support available for %s."
+	"You are not currently logged in. Offline support available for %s.": "You are not currently logged in. Offline support available for %s.",
+	"You are not currently logged in. You must log in before using authenticated commands.": "You are not currently logged in. You must log in before using authenticated commands.",
+	"display development environment information": "display development environment information"
 }
