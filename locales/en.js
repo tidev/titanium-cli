@@ -296,5 +296,6 @@
 	"Use 'xcode-select' to select one of the Xcode versions:": "Use 'xcode-select' to select one of the Xcode versions:",
 	"Minimum iOS version: %s": "Minimum iOS version: %s",
 	"Setting Xcode target to %s": "Setting Xcode target to %s",
-	"Setting Xcode build OS to %s": "Setting Xcode build OS to %s"
+	"Setting Xcode build OS to %s": "Setting Xcode build OS to %s",
+	"output format": "output format"
 }
