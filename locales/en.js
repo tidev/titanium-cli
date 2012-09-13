@@ -262,6 +262,10 @@
 	"Invalid username": "Invalid username",
 	"Password": "Password",
 	"Invalid password": "Invalid password",
+	"displays session information": "displays session information",
+	"You are currently logged in": "You are currently logged in",
+	"You are not currently logged in. Offline support available for %s": "You are not currently logged in. Offline support available for %s",
+	"You are not currently logged in. You must log in before using authenticated commands": "You are not currently logged in. You must log in before using authenticated commands",
 	"Searching for %s Titanium plugin": {
 		"one": "Searching for %s Titanium plugin",
 		"other": "Searching for %s Titanium plugins"
