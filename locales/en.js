@@ -301,5 +301,15 @@
 	"Minimum iOS version: %s": "Minimum iOS version: %s",
 	"Setting Xcode target to %s": "Setting Xcode target to %s",
 	"Setting Xcode build OS to %s": "Setting Xcode build OS to %s",
-	"output format": "output format"
+	"output format": "output format",
+	"prompt for missing options": "prompt for missing options",
+	"Invalid value \"%s\"": "Invalid value \"%s\"",
+	"Possible values:": "Possible values:",
+	"Invalid %s value '%s'": "Invalid %s value '%s'",
+	"Accepted values:": "Accepted values:",
+	"Logged out successfully": "Logged out successfully",
+	"Logged in successfully": "Logged in successfully",
+	"Logout failed: %s": "Logout failed: %s",
+	"Login failed: %s": "Login failed: %s",
+	"You are not currently logged in. Offline support available for %s.": "You are not currently logged in. Offline support available for %s."
 }
