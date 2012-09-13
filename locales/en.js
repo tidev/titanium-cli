@@ -261,5 +261,9 @@
 	"Username": "Username",
 	"Invalid username": "Invalid username",
 	"Password": "Password",
-	"Invalid password": "Invalid password"
+	"Invalid password": "Invalid password",
+	"displays session information": "displays session information",
+	"You are currently logged in": "You are currently logged in",
+	"You are not currently logged in. Offline support available for %s": "You are not currently logged in. Offline support available for %s",
+	"You are not currently logged in. You must log in before using authenticated commands": "You are not currently logged in. You must log in before using authenticated commands"
 }
