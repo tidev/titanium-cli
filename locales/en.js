@@ -314,5 +314,8 @@
 	"You are not currently logged in. Offline support available for %s.": "You are not currently logged in. Offline support available for %s.",
 	"You are not currently logged in. You must log in before using authenticated commands.": "You are not currently logged in. You must log in before using authenticated commands.",
 	"display development environment information": "display development environment information",
-	"run the setup wizard": "run the setup wizard"
+	"run the setup wizard": "run the setup wizard",
+	"Unable to find iOS SDK %s": "Unable to find iOS SDK %s",
+	"Please download and install an iOS SDK (version %s or newer), then try again": "Please download and install an iOS SDK (version %s or newer), then try again",
+	"displays Titanium version banner": "displays Titanium version banner"
 }
