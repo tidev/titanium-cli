@@ -317,5 +317,9 @@
 	"run the setup wizard": "run the setup wizard",
 	"Unable to find iOS SDK %s": "Unable to find iOS SDK %s",
 	"Please download and install an iOS SDK (version %s or newer), then try again": "Please download and install an iOS SDK (version %s or newer), then try again",
-	"displays Titanium version banner": "displays Titanium version banner"
+	"displays Titanium version banner": "displays Titanium version banner",
+	"Building for the following architectures: %s": "Building for the following architectures: %s",
+	"Building for iOS %s": "Building for iOS %s",
+	"Available iOS SDK versions:": "Available iOS SDK versions:",
+	"Building for device %s": "Building for device %s"
 }
