@@ -330,7 +330,6 @@
 	"Name of the iOS Distribution Certificate to use": "Name of the iOS Distribution Certificate to use",
 	"Invalid distribution name": "Invalid distribution name",
 	"the device family to build for": "the device family to build for",
-	"path to the distribution keychain; only used when target is %s, %s, or %s": "path to the distribution keychain; only used when target is %s, %s, or %s",
 	"the provisioning profile uuid; required when target is %s, %s, or %s": "the provisioning profile uuid; required when target is %s, %s, or %s",
 	"Provisioning profile UUID": "Provisioning profile UUID",
 	"Invalid provisioning profile UUID": "Invalid provisioning profile UUID",
@@ -345,5 +344,8 @@
 	"Unable to find an Provisioning Profile UUID \"%s\"": "Unable to find an Provisioning Profile UUID \"%s\"",
 	"Invalid debug host \"%s\"": "Invalid debug host \"%s\"",
 	"The debug host must be in the format \"host:port:airkey\".": "The debug host must be in the format \"host:port:airkey\".",
-	"Debugging enabled via debug host: %s": "Debugging enabled via debug host: %s"
+	"Debugging enabled via debug host: %s": "Debugging enabled via debug host: %s",
+	"Unable to find keychain \"%s\"": "Unable to find keychain \"%s\"",
+	"Available keychains:": "Available keychains:",
+	"path to the distribution keychain to use instead of the system default; only used when target is %s, %s, or %s": "path to the distribution keychain to use instead of the system default; only used when target is %s, %s, or %s"
 }
