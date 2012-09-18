@@ -358,5 +358,9 @@
 	"path to the distribution keychain; only used when target is %s, %s, or %s": "path to the distribution keychain; only used when target is %s, %s, or %s",
 	"the directory of the project to analyze": "the directory of the project to analyze",
 	"Deployment Targets:": "Deployment Targets:",
-	"Project Properties:": "Project Properties:"
+	"Project Properties:": "Project Properties:",
+	"%s was successfully set to %s": "%s was successfully set to %s",
+	"Android %s (API level %s)": "Android %s (API level %s)",
+	"You are currently %s": "You are currently %s",
+	"You are currently %s. Offline support available for %s.": "You are currently %s. Offline support available for %s."
 }
