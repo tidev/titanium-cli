@@ -347,5 +347,11 @@
 	"Debugging enabled via debug host: %s": "Debugging enabled via debug host: %s",
 	"Unable to find keychain \"%s\"": "Unable to find keychain \"%s\"",
 	"Available keychains:": "Available keychains:",
-	"path to the distribution keychain to use instead of the system default; only used when target is %s, %s, or %s": "path to the distribution keychain to use instead of the system default; only used when target is %s, %s, or %s"
+	"path to the distribution keychain to use instead of the system default; only used when target is %s, %s, or %s": "path to the distribution keychain to use instead of the system default; only used when target is %s, %s, or %s",
+	"Unable to find an iOS Developer Certificate for \"%s\"": "Unable to find an iOS Developer Certificate for \"%s\"",
+	"Available names: %s": "Available names: %s",
+	"Processing %s => %s": "Processing %s => %s",
+	"the type of deployment to build for": "the type of deployment to build for",
+	"Invalid Provisioning Profile UUID \"%s\"": "Invalid Provisioning Profile UUID \"%s\"",
+	"Available Provisioning Profile UUIDs:": "Available Provisioning Profile UUIDs:"
 }
