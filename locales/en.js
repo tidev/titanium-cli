@@ -353,5 +353,10 @@
 	"Processing %s => %s": "Processing %s => %s",
 	"the type of deployment to build for": "the type of deployment to build for",
 	"Invalid Provisioning Profile UUID \"%s\"": "Invalid Provisioning Profile UUID \"%s\"",
-	"Available Provisioning Profile UUIDs:": "Available Provisioning Profile UUIDs:"
+	"Available Provisioning Profile UUIDs:": "Available Provisioning Profile UUIDs:",
+	"the directory of the project to analyze.": "the directory of the project to analyze.",
+	"path to the distribution keychain; only used when target is %s, %s, or %s": "path to the distribution keychain; only used when target is %s, %s, or %s",
+	"the directory of the project to analyze": "the directory of the project to analyze",
+	"Deployment Targets:": "Deployment Targets:",
+	"Project Properties:": "Project Properties:"
 }
