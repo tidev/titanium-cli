@@ -1,2 +1,2 @@
 @echo off
-node %~dp0..\..\titanium
+node %~dp0..\..\titanium %*
