@@ -3,8 +3,7 @@
 		"name": "Titanium Command-Line Interface",
 		"author": "Appcelerator",
 		"copyright": "Copyright (c) 2012, Appcelerator, Inc.  All Rights Reserved.",
-		"id": "com.appcelerator.titanium.cli",
-		"guid": "cf5c67ed-1c3b-494b-afe0-01b958ef0f40"
+		"id": "com.appcelerator.titanium.cli"
 	},
 	"name": "titanium",
 	"description": "Appcelerator Titanium Command line",
