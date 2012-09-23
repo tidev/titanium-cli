@@ -10,13 +10,7 @@ designed Titanium to be suitable for command line beginners, but still be powerf
 
 ## Bleeding Edge
 
-    // do this once
-    git clone https://github.com/appcelerator/titanium.git
-    
-    // do this frequently
-    cd /path/to/titanium
-    git pull origin master
-    [sudo] npm install -g .
+    [sudo] npm install -g git+https://github.com/appcelerator/titanium.git
 
 ## Usage
 
