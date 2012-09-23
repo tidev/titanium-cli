@@ -362,5 +362,10 @@
 	"%s was successfully set to %s": "%s was successfully set to %s",
 	"Android %s (API level %s)": "Android %s (API level %s)",
 	"You are currently %s": "You are currently %s",
-	"You are currently %s. Offline support available for %s.": "You are currently %s. Offline support available for %s."
+	"You are currently %s. Offline support available for %s.": "You are currently %s. Offline support available for %s.",
+	"only perform the build; if true, does not install or run the app": "only perform the build; if true, does not install or run the app",
+	"the type of deployment; only used with target is %s or %s": "the type of deployment; only used with target is %s or %s",
+	"the type of deployment; production performs optimizations": "the type of deployment; production performs optimizations",
+	"Get and set tiapp.xml settings.\n\nRun %s to see all available entries that can be changed.\n\nWhen setting the %s entry, it will non-destructively copy each specified platform's default resources into your project's Resources folder. For example, if your app currently supports %s and you wish to add Android support, you must specify %s, otherwise only specifying %s will remove support for iPhone.": "Get and set tiapp.xml settings.\n\nRun %s to see all available entries that can be changed.\n\nWhen setting the %s entry, it will non-destructively copy each specified platform's default resources into your project's Resources folder. For example, if your app currently supports %s and you wish to add Android support, you must specify %s, otherwise only specifying %s will remove support for iPhone.",
+	"Run %s for available commands.": "Run %s for available commands."
 }
