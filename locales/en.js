@@ -379,5 +379,8 @@
 	"Detected third-party native iOS module: %s version %s": "Detected third-party native iOS module: %s version %s",
 	"Writing properties to ApplicationDefaults.m": "Writing properties to ApplicationDefaults.m",
 	"Forcing rebuild: %s flag was set": "Forcing rebuild: %s flag was set",
-	"Cleaning old build directory": "Cleaning old build directory"
+	"Cleaning old build directory": "Cleaning old build directory",
+	"Creating symlinks for simulator build": "Creating symlinks for simulator build",
+	"Walking directory %s": "Walking directory %s",
+	"Symlinking %s => %s": "Symlinking %s => %s"
 }
