@@ -367,5 +367,17 @@
 	"the type of deployment; only used with target is %s or %s": "the type of deployment; only used with target is %s or %s",
 	"the type of deployment; production performs optimizations": "the type of deployment; production performs optimizations",
 	"Get and set tiapp.xml settings.\n\nRun %s to see all available entries that can be changed.\n\nWhen setting the %s entry, it will non-destructively copy each specified platform's default resources into your project's Resources folder. For example, if your app currently supports %s and you wish to add Android support, you must specify %s, otherwise only specifying %s will remove support for iPhone.": "Get and set tiapp.xml settings.\n\nRun %s to see all available entries that can be changed.\n\nWhen setting the %s entry, it will non-destructively copy each specified platform's default resources into your project's Resources folder. For example, if your app currently supports %s and you wish to add Android support, you must specify %s, otherwise only specifying %s will remove support for iPhone.",
-	"Run %s for available commands.": "Run %s for available commands."
+	"Run %s for available commands.": "Run %s for available commands.",
+	"Forcing rebuild: githash changed since last build": "Forcing rebuild: githash changed since last build",
+	"Was: %s": "Was: %s",
+	"Now: %s": "Now: %s",
+	"Detected custom font: %s": "Detected custom font: %s",
+	"Compiling localization files": "Compiling localization files",
+	"Processing i18n file: %s": "Processing i18n file: %s",
+	"Legacy plugins currently not supported": "Legacy plugins currently not supported",
+	"Looking for Titanium Module id: %s version: %s platform: %s": "Looking for Titanium Module id: %s version: %s platform: %s",
+	"Detected third-party native iOS module: %s version %s": "Detected third-party native iOS module: %s version %s",
+	"Writing properties to ApplicationDefaults.m": "Writing properties to ApplicationDefaults.m",
+	"Forcing rebuild: %s flag was set": "Forcing rebuild: %s flag was set",
+	"Cleaning old build directory": "Cleaning old build directory"
 }

@@ -4,19 +4,19 @@
 for managing and deploying Titanium Mobile applications and modules. It's open-source and easy to use. [We've](https://github.com/appcelerator)
 designed Titanium to be suitable for command line beginners, but still be powerful and extensible enough for production usage.
 
-## Local Installation
+## Installation
 
     [sudo] npm install titanium -g
 
+After npm download and installs the Titanium CLI, then you need to download the latest unstable Titanium Mobile SDK:
+
+    titanium sdk install --branch master
+
 ## Bleeding Edge
 
-    // do this once
-    git clone https://github.com/appcelerator/titanium.git
-    
-    // do this frequently
-    cd /path/to/titanium
-    git pull origin master
-    [sudo] npm install -g .
+You can download the latest and greatest *unstable* code by running the following:
+
+    [sudo] npm install git://github.com/appcelerator/titanium.git -g
 
 ## Usage
 
