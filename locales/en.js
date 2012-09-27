@@ -382,5 +382,12 @@
 	"Cleaning old build directory": "Cleaning old build directory",
 	"Creating symlinks for simulator build": "Creating symlinks for simulator build",
 	"Walking directory %s": "Walking directory %s",
-	"Symlinking %s => %s": "Symlinking %s => %s"
+	"Symlinking %s => %s": "Symlinking %s => %s",
+	"Copying resources %s => %s": "Copying resources %s => %s",
+	"Invalid Titanium Mobile Module \"%s\": missing manifest": "Invalid Titanium Mobile Module \"%s\": missing manifest",
+	"Unsupported deployment target \"%s\"": "Unsupported deployment target \"%s\"",
+	"Available deployment targets are:": "Available deployment targets are:",
+	"Template %s is not supported by platform %s": "Template %s is not supported by platform %s",
+	"Template \"%s\" is not supported by platform %s": "Template \"%s\" is not supported by platform %s",
+	"Building for iOS %s; using %s as minimum iOS version": "Building for iOS %s; using %s as minimum iOS version"
 }
