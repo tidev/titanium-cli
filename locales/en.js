@@ -409,5 +409,9 @@
 	"Invalid output directory": "Invalid output directory",
 	"the password for the keystore": "the password for the keystore",
 	"Keystore password": "Keystore password",
-	"Invalid keystore password": "Invalid keystore password"
+	"Invalid keystore password": "Invalid keystore password",
+	"Writing application modules file: %d": "Writing application modules file: %d",
+	"Writing application modules file: %s": "Writing application modules file: %s",
+	"Writing module xcconfig file: %s": "Writing module xcconfig file: %s",
+	"Invalid deploy type \"%s\"": "Invalid deploy type \"%s\""
 }
