@@ -413,5 +413,12 @@
 	"Writing application modules file: %d": "Writing application modules file: %d",
 	"Writing application modules file: %s": "Writing application modules file: %s",
 	"Writing module xcconfig file: %s": "Writing module xcconfig file: %s",
-	"Invalid deploy type \"%s\"": "Invalid deploy type \"%s\""
+	"Invalid deploy type \"%s\"": "Invalid deploy type \"%s\"",
+	"Writing properties to %s": "Writing properties to %s",
+	"Copying iTunes artwork": "Copying iTunes artwork",
+	"Copying module resources": "Copying module resources",
+	"Copying CommonJS modules": "Copying CommonJS modules",
+	"Adding native modules to Xcode project": "Adding native modules to Xcode project",
+	"Injecting native libraries into Xcode project file": "Injecting native libraries into Xcode project file",
+	"Writing %s": "Writing %s"
 }
