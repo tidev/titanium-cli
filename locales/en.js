@@ -420,5 +420,16 @@
 	"Copying CommonJS modules": "Copying CommonJS modules",
 	"Adding native modules to Xcode project": "Adding native modules to Xcode project",
 	"Injecting native libraries into Xcode project file": "Injecting native libraries into Xcode project file",
-	"Writing %s": "Writing %s"
+	"Writing %s": "Writing %s",
+	"uninstall a specific Titanium SDK version": "uninstall a specific Titanium SDK version",
+	"the version to uninstall": "the version to uninstall",
+	"No version specified": "No version specified",
+	"Version %s is not installed": "Version %s is not installed",
+	"Removing SDK directory: %s": "Removing SDK directory: %s",
+	"Successfully uninstalled Titanium SDK %s": "Successfully uninstalled Titanium SDK %s",
+	"Updated default Titanium SDK to %s": "Updated default Titanium SDK to %s",
+	"Removing SDK directory %s": "Removing SDK directory %s",
+	"An error occurred trying to remove the Titanium SDK folder": "An error occurred trying to remove the Titanium SDK folder",
+	"Loading and parsing JSS files": "Loading and parsing JSS files",
+	"Parsing JSS file: %s": "Parsing JSS file: %s"
 }
