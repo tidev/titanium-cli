@@ -431,5 +431,10 @@
 	"Removing SDK directory %s": "Removing SDK directory %s",
 	"An error occurred trying to remove the Titanium SDK folder": "An error occurred trying to remove the Titanium SDK folder",
 	"Loading and parsing JSS files": "Loading and parsing JSS files",
-	"Parsing JSS file: %s": "Parsing JSS file: %s"
+	"Parsing JSS file: %s": "Parsing JSS file: %s",
+	"Bundling Titanium Mobile Module %s": "Bundling Titanium Mobile Module %s",
+	"Modules": "Modules",
+	"manages installed Titanium Modules": "manages installed Titanium Modules",
+	"print a list of installed modules": "print a list of installed modules",
+	"No modules installed": "No modules installed"
 }
