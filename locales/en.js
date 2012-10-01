@@ -436,5 +436,12 @@
 	"Modules": "Modules",
 	"manages installed Titanium Modules": "manages installed Titanium Modules",
 	"print a list of installed modules": "print a list of installed modules",
-	"No modules installed": "No modules installed"
+	"No modules installed": "No modules installed",
+	"Performing Xcode pre-compile phase": "Performing Xcode pre-compile phase",
+	"Processing module images": "Processing module images",
+	"Writing Titanium symbol file: %s": "Writing Titanium symbol file: %s",
+	"Optimizing all images": "Optimizing all images",
+	"Removing empty directories": "Removing empty directories",
+	"Project failed to build after %s": "Project failed to build after %s",
+	"Forcing rebuild: app id changed from %s to %s": "Forcing rebuild: app id changed from %s to %s"
 }
