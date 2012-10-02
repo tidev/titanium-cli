@@ -443,5 +443,17 @@
 	"Optimizing all images": "Optimizing all images",
 	"Removing empty directories": "Removing empty directories",
 	"Project failed to build after %s": "Project failed to build after %s",
-	"Forcing rebuild: app id changed from %s to %s": "Forcing rebuild: app id changed from %s to %s"
+	"Forcing rebuild: app id changed from %s to %s": "Forcing rebuild: app id changed from %s to %s",
+	"iOS Distribution Certificate: %s": "iOS Distribution Certificate: %s",
+	"Writing application routing header: %s": "Writing application routing header: %s",
+	"Removing %s from production build": "Removing %s from production build",
+	"Writing minified CSS file: %s": "Writing minified CSS file: %s",
+	"Writing JavaScript file: %s": "Writing JavaScript file: %s",
+	"Excluding %s from minification": "Excluding %s from minification",
+	"Writing minifying JavaScript file: %s": "Writing minifying JavaScript file: %s",
+	"Running titanium_prep: %s": "Running titanium_prep: %s",
+	"Application routing header already up-to-date: %s": "Application routing header already up-to-date: %s",
+	"Writing application routing source file: %s": "Writing application routing source file: %s",
+	"Titanium symbol file already up-to-date: %s": "Titanium symbol file already up-to-date: %s",
+	"Writing application modules source file: %s": "Writing application modules source file: %s"
 }
