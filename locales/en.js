@@ -320,7 +320,6 @@
 	"Building for iOS %s": "Building for iOS %s",
 	"Available iOS SDK versions:": "Available iOS SDK versions:",
 	"Building for device %s": "Building for device %s",
-	"debug connection info; airkey required for %s and %s, ignored for %s": "debug connection info; airkey required for %s and %s, ignored for %s",
 	"the iOS Developer Certificate to use; required when target is %s": "the iOS Developer Certificate to use; required when target is %s",
 	"Name of the iOS Developer Certificate to use": "Name of the iOS Developer Certificate to use",
 	"Invalid developer name": "Invalid developer name",
@@ -466,5 +465,8 @@
 	"Initiating iTunes sync": "Initiating iTunes sync",
 	"Failed to initiate iTunes sync": "Failed to initiate iTunes sync",
 	"Removing old log file: %s": "Removing old log file: %s",
-	"An error occurred running the iOS Simulator": "An error occurred running the iOS Simulator"
+	"An error occurred running the iOS Simulator": "An error occurred running the iOS Simulator",
+	"debug connection info; airkey and hosts required for %s and %s, ignored for %s": "debug connection info; airkey and hosts required for %s and %s, ignored for %s",
+	"Packaging complete": "Packaging complete",
+	"Package location: %s": "Package location: %s"
 }
