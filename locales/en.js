@@ -472,5 +472,7 @@
 	"Minifying app:// JavaScript file: %s": "Minifying app:// JavaScript file: %s",
 	"Finding Titanium symbols in file %s": "Finding Titanium symbols in file %s",
 	"Default Titanium SDK %s is not installed": "Default Titanium SDK %s is not installed",
-	"Run %s to set the default Titanium SDK": "Run %s to set the default Titanium SDK"
+	"Run %s to set the default Titanium SDK": "Run %s to set the default Titanium SDK",
+	"Archiving app bundle to %s": "Archiving app bundle to %s",
+	"Archiving debug symbols to %s": "Archiving debug symbols to %s"
 }
