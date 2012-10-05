@@ -54,7 +54,7 @@ Logs into the Appcelerator Network
 
 Login requires both user and password options to be passed in.
 
-    titanium login --user <username> --password <password>
+    titanium login <username> <password>
 
 If you omit an option, the CLI will prompt you for the value.
 
@@ -89,6 +89,12 @@ Download, install <version>, and set as default SDK.
 Download and install the latest version for the specified branch
 
     titanium sdk install --branch master
+
+#### sdk uninstall
+
+Uninstalls a Titanium SDK.
+
+    titanium sdk uninstall <version>
 
 #### sdk list
 
@@ -135,6 +141,12 @@ Displays the current version of the CLI and exits.
 
     titanium version
     titanium --version
+
+## Looking for the old CLI?
+
+Don't worry, it's still around. You can install it by running:
+
+    sudo npm install –g titanium@0.0.26
 
 ## License
 

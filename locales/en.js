@@ -445,7 +445,6 @@
 	"Removing %s from production build": "Removing %s from production build",
 	"Writing minified CSS file: %s": "Writing minified CSS file: %s",
 	"Writing JavaScript file: %s": "Writing JavaScript file: %s",
-	"Excluding %s from minification": "Excluding %s from minification",
 	"Writing minifying JavaScript file: %s": "Writing minifying JavaScript file: %s",
 	"Running titanium_prep: %s": "Running titanium_prep: %s",
 	"Application routing header already up-to-date: %s": "Application routing header already up-to-date: %s",
@@ -468,5 +467,12 @@
 	"An error occurred running the iOS Simulator": "An error occurred running the iOS Simulator",
 	"debug connection info; airkey and hosts required for %s and %s, ignored for %s": "debug connection info; airkey and hosts required for %s and %s, ignored for %s",
 	"Packaging complete": "Packaging complete",
-	"Package location: %s": "Package location: %s"
+	"Package location: %s": "Package location: %s",
+	"Finished building the application in %s": "Finished building the application in %s",
+	"Minifying app:// JavaScript file: %s": "Minifying app:// JavaScript file: %s",
+	"Finding Titanium symbols in file %s": "Finding Titanium symbols in file %s",
+	"Default Titanium SDK %s is not installed": "Default Titanium SDK %s is not installed",
+	"Run %s to set the default Titanium SDK": "Run %s to set the default Titanium SDK",
+	"Archiving app bundle to %s": "Archiving app bundle to %s",
+	"Archiving debug symbols to %s": "Archiving debug symbols to %s"
 }
