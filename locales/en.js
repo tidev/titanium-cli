@@ -98,7 +98,7 @@
 	"Invalid platforms: %s": "Invalid platforms: %s",
 	"Missing required \"id\" argument": "Missing required \"id\" argument",
 	"force project creation even if path already exists": "force project creation even if path already exists",
-	"Project directory alread exists: %s": "Project directory alread exists: %s",
+	"Project directory already exists: %s": "Project directory already exists: %s",
 	"Run '%s' to overwrite existing project.": "Run '%s' to overwrite existing project.",
 	"Project '%s' created successfully in %s": "Project '%s' created successfully in %s",
 	"a platform to clean": "a platform to clean",
