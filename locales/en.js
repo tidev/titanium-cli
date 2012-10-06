@@ -474,5 +474,18 @@
 	"Default Titanium SDK %s is not installed": "Default Titanium SDK %s is not installed",
 	"Run %s to set the default Titanium SDK": "Run %s to set the default Titanium SDK",
 	"Archiving app bundle to %s": "Archiving app bundle to %s",
-	"Archiving debug symbols to %s": "Archiving debug symbols to %s"
+	"Archiving debug symbols to %s": "Archiving debug symbols to %s",
+	"activate a module, deactivating any active versions of the module in the process": "activate a module, deactivating any active versions of the module in the process",
+	"the name of the module to activate": "the name of the module to activate",
+	"the version of the module to activate": "the version of the module to activate",
+	"deactivate a module, making all versions of the module unavailable": "deactivate a module, making all versions of the module unavailable",
+	"Module name and version are required": "Module name and version are required",
+	"Invalid module version %s": "Invalid module version %s",
+	"Module %s version %s was activated successfully": "Module %s version %s was activated successfully",
+	"Preparing %s": "Preparing %s",
+	"Application routing source file already up-to-date: %s": "Application routing source file already up-to-date: %s",
+	"Failed during titanium_prep": "Failed during titanium_prep",
+	"Setting non-production device build version to %s": "Setting non-production device build version to %s",
+	"the type of deployment; only used with target is %s": "the type of deployment; only used with target is %s",
+	"No project level plugins to load": "No project level plugins to load"
 }
