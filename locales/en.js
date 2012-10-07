@@ -512,5 +512,11 @@
 	"Removing %s": "Removing %s",
 	"Copying Info.plist": "Copying Info.plist",
 	"No module resources to copy": "No module resources to copy",
-	"No CommonJS modules to copy": "No CommonJS modules to copy"
+	"No CommonJS modules to copy": "No CommonJS modules to copy",
+	"Incompatible plugin hooks:": "Incompatible plugin hooks:",
+	"Command incompatible with this version of the Titanium CLI": "Command incompatible with this version of the Titanium CLI",
+	"Requires version %s, currently %s": "Requires version %s, currently %s",
+	"Command \"%s\" incompatible with this version of the Titanium CLI": "Command \"%s\" incompatible with this version of the Titanium CLI",
+	"Titanium CLI has not yet been configured": "Titanium CLI has not yet been configured",
+	"Run %s to run the setup wizard": "Run %s to run the setup wizard"
 }
