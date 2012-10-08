@@ -518,5 +518,11 @@
 	"Requires version %s, currently %s": "Requires version %s, currently %s",
 	"Command \"%s\" incompatible with this version of the Titanium CLI": "Command \"%s\" incompatible with this version of the Titanium CLI",
 	"Titanium CLI has not yet been configured": "Titanium CLI has not yet been configured",
-	"Run %s to run the setup wizard": "Run %s to run the setup wizard"
+	"Run %s to run the setup wizard": "Run %s to run the setup wizard",
+	"Please report bugs to %s": "Please report bugs to %s",
+	"Please report bugs to %s.": "Please report bugs to %s.",
+	"prompts for all configuration options": "prompts for all configuration options",
+	"Enter %s to quit at any time": "Enter %s to quit at any time",
+	"Configuration saved": "Configuration saved",
+	"Enter %s at any time to quit": "Enter %s at any time to quit"
 }
