@@ -209,6 +209,8 @@
 	"Xcode installation: %s": "Xcode installation: %s",
 	"Installed iOS SDKs: %s": "Installed iOS SDKs: %s",
 	"Installed iOS Simulators: %s": "Installed iOS Simulators: %s",
+	"iOS development certificates: %s": "iOS development certificates: %s",
+	"iOS distribution certificates: %s": "iOS distribution certificates: %s",
 	"iOS WWDR certificate: %s": "iOS WWDR certificate: %s",
 	"installed": "installed",
 	"not found": "not found",
@@ -451,6 +453,9 @@
 	"Writing application routing source file: %s": "Writing application routing source file: %s",
 	"Titanium symbol file already up-to-date: %s": "Titanium symbol file already up-to-date: %s",
 	"Writing application modules source file: %s": "Writing application modules source file: %s",
+	"Invalid required option \"--output-dir\"": "Invalid required option \"--output-dir\"",
+	"The debug host must be in the format \"host:port\".": "The debug host must be in the format \"host:port\".",
+	"Failed to create icons": "Failed to create icons",
 	"use the retina version of the iOS Simulator": "use the retina version of the iOS Simulator",
 	"Running application in iOS Simulator": "Running application in iOS Simulator",
 	"Terminating all iOS simulators": "Terminating all iOS simulators",
@@ -518,5 +523,6 @@
 	"Requires version %s, currently %s": "Requires version %s, currently %s",
 	"Command \"%s\" incompatible with this version of the Titanium CLI": "Command \"%s\" incompatible with this version of the Titanium CLI",
 	"Titanium CLI has not yet been configured": "Titanium CLI has not yet been configured",
-	"Run %s to run the setup wizard": "Run %s to run the setup wizard"
+	"Run %s to run the setup wizard": "Run %s to run the setup wizard",
+	"debug connection info; airkey and hosts required for %s and %s, ignored for %s": "debug connection info; airkey and hosts required for %s and %s, ignored for %s"
 }
