@@ -36,7 +36,6 @@
 	"dependencies": {
 		"async": "0.1.x",
 		"colors": "0.6.x",
-		"i18n": "git://github.com/appcelerator/i18n-node.git",
 		"longjohn": ">=0.0.3",
 		"node-appc": "git://github.com/appcelerator/node-appc.git",
 		"prompt": "0.2.x",
