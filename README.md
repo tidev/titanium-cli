@@ -150,6 +150,11 @@ Don't worry, it's still around. You can install it by running:
 
     sudo npm install –g titanium@0.0.26
 
+## NPM Tips
+
+When receiving build errors from npm first try to clear npms cache before installing
+    npm cache clean
+
 ## License
 
 This project is open source and provided under the Apache Public License (version 2). Please make sure you see the `LICENSE` file
