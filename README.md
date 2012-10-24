@@ -4,6 +4,8 @@
 for managing and deploying Titanium Mobile applications and modules. It's open-source and easy to use. [We've](https://github.com/appcelerator)
 designed Titanium to be suitable for command line beginners, but still be powerful and extensible enough for production usage.
 
+__Requires Node Version >=8.0__
+
 ## Installation
 
     [sudo] npm install titanium -g
