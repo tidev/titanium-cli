@@ -1,3 +1,7 @@
+3.0.15 (11/7/2012)
+-------------------
+ * Fixed bug with duplicate abbreviation aliases were conflicting
+
 3.0.14 (11/7/2012)
 -------------------
  * Changed behavior to only list commands for the active Titanium SDK
