@@ -1,3 +1,7 @@
+3.0.16 (11/8/2012)
+-------------------
+ * Reduced "sdk" command's download progress bar width to reduce possibility of rendering artifacts [TIMOB-11470]
+
 3.0.15 (11/7/2012)
 -------------------
  * Fixed bug with duplicate abbreviation aliases were conflicting
