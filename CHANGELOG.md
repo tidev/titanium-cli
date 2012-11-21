@@ -1,3 +1,7 @@
+3.0.18 (11/21/2012)
+-------------------
+ * Added support for searching for modules using both the module search path from the config file as well as the root of the selected Titanium SDK [TIMOB-11776]
+
 3.0.17 (11/20/2012)
 -------------------
  * Added better support for config values that are lists. Now you can set entire lists, append items to lists, and remove items from lists [TIMOB-11753]
