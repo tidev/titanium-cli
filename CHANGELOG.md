@@ -1,3 +1,8 @@
+3.0.17 (11/20/2012)
+-------------------
+ * Added better support for config values that are lists. Now you can set entire lists, append items to lists, and remove items from lists [TIMOB-11753]
+ * Updated I18N strings
+
 3.0.16 (11/8/2012)
 -------------------
  * Reduced "sdk" command's download progress bar width to reduce possibility of rendering artifacts [TIMOB-11470]
