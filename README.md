@@ -10,7 +10,7 @@ designed Titanium to be suitable for command line beginners, but still be powerf
 
 After npm download and installs the Titanium CLI, then you need to download the latest unstable Titanium Mobile SDK:
 
-    titanium sdk install --branch master
+    titanium sdk install --branch 3_0_X --default
 
 ## Bleeding Edge
 
