@@ -1,3 +1,7 @@
+3.0.19 (11/30/2012)
+-------------------
+ * Fixed bug with --sdk not properly overriding the SDK from the config file [TIMOB-11883]
+
 3.0.18 (11/21/2012)
 -------------------
  * Added support for searching for modules using both the module search path from the config file as well as the root of the selected Titanium SDK [TIMOB-11776]
