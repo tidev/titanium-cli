@@ -1,3 +1,7 @@
+3.0.20 (12/6/2012)
+-------------------
+ * Updated i18n strings [TIMOB-11825]
+
 3.0.19 (11/30/2012)
 -------------------
  * Fixed bug with --sdk not properly overriding the SDK from the config file [TIMOB-11883]
