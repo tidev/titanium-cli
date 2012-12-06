@@ -1,6 +1,5 @@
 {
 	"Invalid Titanium SDK \"%s\"": "Невірний Titanium SDK \"%s\"",
-	"Command \"%s\" not support by SDK version %s": "Команда \"%s\" не підтримується SDK версії %s",
 	"Unable to find command \"%s\"": "Не можливо знайти команду \"%s\"",
 	"Missing required option": "Відсутня необхідна опція",
 	"Missing required argument": "Відсутній необхідний аргумент",
@@ -27,7 +26,6 @@
 	"suppress all output": "заглушити всі вихідні повідомлення",
 	"prompt for missing options": "запросити відсутні опції",
 	"displays Titanium version banner": "виводить баннер з версією Titanium",
-	"remove the specified config key and all its descendants": "видалити вказаний ключ з усіма його нащадками",
 	"output format": "формат виведення",
 	"the key to get or set": "ключ",
 	"the value to set the specified key": "значення для вказанного ключа",
