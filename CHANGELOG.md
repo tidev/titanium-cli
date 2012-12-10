@@ -1,3 +1,7 @@
+3.0.21 (12/10/2012)
+-------------------
+ * In the advanced setup wizard, fixed iOS developer cert name validation to allow names with and without an ID [TIMOB-12003]
+
 3.0.20 (12/6/2012)
 -------------------
  * Updated i18n strings [TIMOB-11825]
