@@ -1,3 +1,8 @@
+3.0.22 (12/21/2012)
+-------------------
+ * Added the sdk select 'command' to the sdk's help screen [TIMOB-12113]
+ * Tiny i18n string update
+
 3.0.21 (12/10/2012)
 -------------------
  * In the advanced setup wizard, fixed iOS developer cert name validation to allow names with and without an ID [TIMOB-12003]
