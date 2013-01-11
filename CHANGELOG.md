@@ -1,3 +1,7 @@
+3.0.X
+-------------------
+ * Fixed bug with setup command where an error occurs when a previously saved active SDK version is invalid [TIMOB-12268]
+
 3.0.22 (12/21/2012)
 -------------------
  * Added the sdk select 'command' to the sdk's help screen [TIMOB-12113]
