@@ -1,6 +1,7 @@
 3.0.X
 -------------------
  * Fixed bug with setup command where an error occurs when a previously saved active SDK version is invalid [TIMOB-12268]
+ * Updated info command to output iOS certs by keychain based on a fix in node-appc [TIMOB-12033]
 
 3.0.22 (12/21/2012)
 -------------------
