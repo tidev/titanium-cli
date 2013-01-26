@@ -1,3 +1,7 @@
+3.0.x
+-------------------
+ * Enabled padding for non-log() messages such as info, debug, etc [TIMOB-12436]
+
 3.0.23 (1/21/2013)
 -------------------
  * Fixed bug with setup command where an error occurs when a previously saved active SDK version is invalid [TIMOB-12268]
