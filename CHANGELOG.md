@@ -1,3 +1,7 @@
+3.0.x
+-------------------
+ * Fixed config saving to automatically create the ~/.titanium directory if it doesn't exist. [TIMOB-12437]
+
 3.0.23 (1/21/2013)
 -------------------
  * Fixed bug with setup command where an error occurs when a previously saved active SDK version is invalid [TIMOB-12268]
