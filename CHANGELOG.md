@@ -1,4 +1,4 @@
-3.0.x
+3.0.24
 -------------------
  * Enabled padding for non-log() messages such as info, debug, etc [TIMOB-12436]
  * Fixed config saving to automatically create the ~/.titanium directory if it doesn't exist. [TIMOB-12437]
