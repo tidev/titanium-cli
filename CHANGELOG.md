@@ -1,3 +1,7 @@
+3.0.25
+-------------------
+ * Fixed scoping in hooks system. Added better error handling for bad hooks [TIMOB-13040]
+
 3.0.24 (2/19/2013)
 -------------------
  * Enabled padding for non-log() messages such as info, debug, etc [TIMOB-12436]
