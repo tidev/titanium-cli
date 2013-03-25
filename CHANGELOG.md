@@ -1,6 +1,8 @@
 3.0.25
 -------------------
  * Fixed scoping in hooks system. Added better error handling for bad hooks [TIMOB-13040]
+ * Fixed bug with "titanium config cli.logLevel" outputting as a log message [TIMOB-13194]
+ * Changed default log level to "trace" [TIMOB-13194]
 
 3.0.24 (2/19/2013)
 -------------------
