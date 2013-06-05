@@ -2,6 +2,7 @@
 -------------------
  * Added better error handling with logging in and out of the Appc network; saving cli config [TIMOB-13908]
  * Added ID for each installed Android SDK and add-on to info command output [TIMOB-13797]
+ * Fixed bug with CLI argument parser not properly removing the node process from the arguments [TIMOB-14074]
 
 3.1.1
 -------------------
