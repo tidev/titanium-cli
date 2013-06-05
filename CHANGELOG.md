@@ -1,3 +1,7 @@
+3.2.0
+-------------------
+ * Added better error handling with logging in and out of the Appc network; saving cli config [TIMOB-13908]
+
 3.1.1
 -------------------
  * Added support for code processor plugin paths [TIMOB-13118]
