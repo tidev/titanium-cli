@@ -1,6 +1,7 @@
 3.2.0
 -------------------
  * Added better error handling with logging in and out of the Appc network; saving cli config [TIMOB-13908]
+ * Added ID for each installed Android SDK and add-on to info command output [TIMOB-13797]
 
 3.1.1
 -------------------
