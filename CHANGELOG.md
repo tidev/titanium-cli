@@ -1,3 +1,7 @@
+3.1.1
+-------------------
+ * Added support for code processor plugin paths [TIMOB-13118]
+
 3.1.0 (4/16/2013)
 -------------------
  * Fixed scoping in hooks system. Added better error handling for bad hooks [TIMOB-13040]
