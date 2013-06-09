@@ -1,5 +1,8 @@
 .DS_Store
 .git*
+docs
 node_modules
+test
+tools
 *.sublime-project
 *.sublime-workspace

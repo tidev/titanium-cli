@@ -36,11 +36,10 @@
 	"dependencies": {
 		"async": "0.1.x",
 		"colors": "0.6.x",
+		"fields": "0.1.x",
 		"longjohn": ">=0.0.3",
-		"node-appc": "0.1.30",
-		"prompt": "0.2.x",
+		"node-appc": "0.2.0",
 		"request": "2.9.x",
-		"revalidator": "0.1.x",
 		"semver": ">=1.0.14",
 		"sprintf": ">=0.1.1",
 		"temp": "0.4.0",

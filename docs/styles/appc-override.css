@@ -1,0 +1,21 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans);
+
+body {
+	font: 14px Open Sans;
+}
+
+.details li p:first-child {
+	margin: 0;
+}
+
+.details li p {
+	margin-top: 5px;
+}
+
+header {
+	padding: 0;
+}
+
+.container-overview .description {
+	margin-left: 0;
+}
