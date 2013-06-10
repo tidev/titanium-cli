@@ -38,6 +38,7 @@
 		"colors": "0.6.x",
 		"fields": "0.1.x",
 		"longjohn": ">=0.0.3",
+		"moment": "2.0.x",
 		"node-appc": "0.2.0",
 		"request": "2.9.x",
 		"semver": ">=1.0.14",
