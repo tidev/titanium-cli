@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>Titanium CLI API Documentation: Module: lib/commands/config</title>
+	<title>Titanium CLI API Documentation: Module: lib/commands/sdk</title>
 	<link rel="shortcut icon" href="favicon.ico"/>
 	<script src="scripts/prettify/prettify.js"> </script>
 	<script src="scripts/prettify/lang-css.js"> </script>
@@ -16,7 +16,7 @@
 <body>
 
 <div id="main">
-	<h1 class="page-title">Module: lib/commands/config</h1>
+	<h1 class="page-title">Module: lib/commands/sdk</h1>
 	
 
 
@@ -25,7 +25,7 @@
     
 <header>
     <h2>
-    lib/commands/config
+    lib/commands/sdk
     </h2>
     
 </header>  
@@ -60,7 +60,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="global.html#commands/config.js">commands/config.js</a>, <a href="global.html#commands/config.js#line3">line 3</a>
+        <a href="global.html#commands/sdk.js">commands/sdk.js</a>, <a href="global.html#commands/sdk.js#line3">line 3</a>
     </li></ul></dd>
     
     
@@ -99,7 +99,7 @@
 <dd>
     
     <div class="description">
-        Config command description.
+        SDK command description.
     </div>
     
     
@@ -128,7 +128,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="global.html#commands/config.js">commands/config.js</a>, <a href="global.html#commands/config.js#line24">line 24</a>
+        <a href="global.html#commands/sdk.js">commands/sdk.js</a>, <a href="global.html#commands/sdk.js#line39">line 39</a>
     </li></ul></dd>
     
     
@@ -146,14 +146,14 @@
         
             
 <dt>
-    <h4 class="name" id="extendedDesc"><span class="type-signature">&lt;static> </span>extendedDesc<span class="type-signature"></span></h4>
+    <h4 class="name" id="title"><span class="type-signature">&lt;static> </span>title<span class="type-signature"></span></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        Config command extended description.
+        SDK command title.
     </div>
     
     
@@ -182,7 +182,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="global.html#commands/config.js">commands/config.js</a>, <a href="global.html#commands/config.js#line27">line 27</a>
+        <a href="global.html#commands/sdk.js">commands/sdk.js</a>, <a href="global.html#commands/sdk.js#line36">line 36</a>
     </li></ul></dd>
     
     
@@ -214,7 +214,7 @@
     
     
     <div class="description">
-        <p>Returns the configuration for the config command.</p>
+        <p>Returns the configuration for the SDK command.</p>
     </div>
     
 
@@ -341,7 +341,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="global.html#commands/config.js">commands/config.js</a>, <a href="global.html#commands/config.js#line38">line 38</a>
+        <a href="global.html#commands/sdk.js">commands/sdk.js</a>, <a href="global.html#commands/sdk.js#line48">line 48</a>
     </li></ul></dd>
     
     
@@ -366,7 +366,7 @@
     
             
 <div class="param-desc">
-    Config command configuration
+    SDK command configuration
 </div>
 
 
@@ -399,7 +399,7 @@
     
     
     <div class="description">
-        <p>Displays config settings or sets a config value.</p>
+        <p>Displays all installed Titanium SDKs or installs a new SDK.</p>
     </div>
     
 
@@ -549,170 +549,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="global.html#commands/config.js">commands/config.js</a>, <a href="global.html#commands/config.js#line116">line 116</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="validate"><span class="type-signature">&lt;static> </span>validate<span class="signature">(logger, config, cli)</span><span class="type-signature"></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Validates command line arguments.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>logger</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">The logger instance</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>config</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">The CLI config object</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>cli</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type"><a href="CLI.html">CLI</a></span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">The CLI instance</td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl>
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="global.html#commands/config.js">commands/config.js</a>, <a href="global.html#commands/config.js#line79">line 79</a>
+        <a href="global.html#commands/sdk.js">commands/sdk.js</a>, <a href="global.html#commands/sdk.js#line160">line 160</a>
     </li></ul></dd>
     
     
