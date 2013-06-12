@@ -188,6 +188,145 @@
         <dl>
             
 <dt>
+    <h4 class="name" id="applyArgs"><span class="type-signature"></span>applyArgs<span class="signature">(args)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Takes the context's args and sets by name each passed in arg value to the<br/>resulting argv object.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>args</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Array of args minus the program and command name</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl>
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        context.js, line 225
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    The parsed arguments
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">Object</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="command"><span class="type-signature"></span>command<span class="signature">(name, conf)</span><span class="type-signature"> &rarr; {Context}</span></h4>
     
     
@@ -300,7 +439,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        context.js, line 127
+        context.js, line 129
     </li></ul></dd>
     
     
@@ -463,7 +602,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        context.js, line 98
+        context.js, line 100
     </li></ul></dd>
     
     
@@ -642,7 +781,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        context.js, line 115
+        context.js, line 117
     </li></ul></dd>
     
     
@@ -698,7 +837,7 @@
         
             
 <dt>
-    <h4 class="name" id="parse"><span class="type-signature"></span>parse<span class="signature">(args, <span class="optional">commands</span>, <span class="optional">skipOptionCallbacks</span>)</span><span class="type-signature"> &rarr; {Context}</span></h4>
+    <h4 class="name" id="parse"><span class="type-signature"></span>parse<span class="signature">(args, <span class="optional">commands</span>, <span class="optional">skipOptionCallbacks</span>)</span><span class="type-signature"> &rarr; {Object}</span></h4>
     
     
 </dt>
@@ -706,7 +845,7 @@
     
     
     <div class="description">
-        <p>Parses an array of command line arguments. This function is called multiple<br/>times to determine specific bits of information:</p><p>1. Determine the SDK version<br/>2. Detect what command is being run<br/>3. Fully parse the args now that we know all possible flags/options</p><p>It's worth noting that unknown --key are treated as options. It's possible<br/>that the parse will encounter a scenario like "ti --build-only build" where<br/>it doesn't know what --build-only is, so that's why we allow an array of<br/>commands being passed in.</p>
+        <p>Parses an array of command line arguments. This function is called multiple<br/>times to determine certain info:</p><p>1. global context to find SDK version<br/>2. global context to find the command<br/>3. command context to determine if we are a subcommand<br/>4. subcommand context, if needed</p><p>It's worth noting that unknown --key are treated as options. It's possible<br/>that the parse will encounter a scenario like "ti --build-only build" where<br/>it doesn't know what --build-only is, so that's why we allow an array of<br/>commands being passed in.</p>
     </div>
     
 
@@ -863,7 +1002,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        context.js, line 213
+        context.js, line 261
     </li></ul></dd>
     
     
@@ -887,6 +1026,10 @@
     <h5>Returns:</h5>
     
             
+<div class="param-desc">
+    The parsed arguments
+</div>
+
 
 
 <dl>
@@ -895,7 +1038,7 @@
 	</dt>
 	<dd>
 		
-<span class="param-type">Context</span>
+<span class="param-type">Object</span>
 
 
 	</dd>
@@ -906,7 +1049,7 @@
     
         <h5>Example</h5>
         
-    <pre class="prettyprint"><code>ctx.parse(process.argv);</code></pre>
+    <pre class="prettyprint"><code>var argv = ctx.parse(process.argv);</code></pre>
 
     
 </dd>
@@ -1026,7 +1169,147 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        context.js, line 154
+        context.js, line 180
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="subcommand"><span class="type-signature"></span>subcommand<span class="signature">(name, conf)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Add a subcommand to this context.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The subcommand name</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>conf</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The subcommand configuration</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl>
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        context.js, line 159
     </li></ul></dd>
     
     
@@ -1067,13 +1350,13 @@
 </div>
 
 <nav>
-	<h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="cli_.html">lib/cli</a></li><li><a href="config.html">lib/commands/config</a></li><li><a href="help.html">lib/commands/help</a></li><li><a href="info.html">lib/commands/info</a></li><li><a href="login.html">lib/commands/login</a></li><li><a href="logout.html">lib/commands/logout</a></li><li><a href="sdk.html">lib/commands/sdk</a></li><li><a href="status.html">lib/commands/status</a></li><li><a href="config_.html">lib/config</a></li><li><a href="context.html">lib/context</a></li><li><a href="hook.html">lib/hook</a></li><li><a href="titanium.html">lib/titanium</a></li></ul><h3>Classes</h3><ul><li><a href="cli-CLI.html">CLI</a></li><li><a href="context-Context.html">Context</a></li><li><a href="hook-Hook.html">Hook</a></li></ul><h3>Events</h3><ul><li><a href="CLI.html#event:cli:command-args-parsed">cli:command-args-parsed</a></li><li><a href="CLI.html#event:cli:command-config-loaded">cli:command-config-loaded</a></li><li><a href="CLI.html#event:cli:command-loaded">cli:command-loaded</a></li><li><a href="CLI.html#event:cli:global-args-parsed">cli:global-args-parsed</a></li><li><a href="CLI.html#event:cli:post-execute">cli:post-execute</a></li><li><a href="CLI.html#event:cli:post-validate">cli:post-validate</a></li><li><a href="CLI.html#event:cli:pre-execute">cli:pre-execute</a></li><li><a href="CLI.html#event:cli:pre-validate">cli:pre-validate</a></li></ul>
+	<h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="cli_.html">lib/cli</a></li><li><a href="config.html">lib/commands/config</a></li><li><a href="help.html">lib/commands/help</a></li><li><a href="info.html">lib/commands/info</a></li><li><a href="login.html">lib/commands/login</a></li><li><a href="logout.html">lib/commands/logout</a></li><li><a href="sdk.html">lib/commands/sdk</a></li><li><a href="status.html">lib/commands/status</a></li><li><a href="config_.html">lib/config</a></li><li><a href="context.html">lib/context</a></li><li><a href="hook.html">lib/hook</a></li><li><a href="titanium.html">lib/titanium</a></li></ul><h3>Classes</h3><ul><li><a href="cli-CLI.html">CLI</a></li><li><a href="context-Context.html">Context</a></li><li><a href="hook-Hook.html">Hook</a></li></ul><h3>Events</h3><ul><li><a href="CLI.html#event:cli:command-args-parsed">cli:command-args-parsed</a></li><li><a href="CLI.html#event:cli:command-config-loaded">cli:command-config-loaded</a></li><li><a href="CLI.html#event:cli:command-loaded">cli:command-loaded</a></li><li><a href="CLI.html#event:cli:global-args-parsed">cli:global-args-parsed</a></li><li><a href="CLI.html#event:cli:post-execute">cli:post-execute</a></li><li><a href="CLI.html#event:cli:post-validate">cli:post-validate</a></li><li><a href="CLI.html#event:cli:pre-execute">cli:pre-execute</a></li><li><a href="CLI.html#event:cli:pre-validate">cli:pre-validate</a></li></ul><h3>Namespaces</h3><ul><li><a href="SdkSubCommands.html">SdkSubCommands</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Tue Jun 11 2013 00:36:46 GMT-0700 (PDT)
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Tue Jun 11 2013 22:46:23 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
