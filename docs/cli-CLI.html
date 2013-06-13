@@ -329,7 +329,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        cli.js, line 123
+        cli.js, line 139
     </li></ul></dd>
     
     
@@ -446,7 +446,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        cli.js, line 368
+        cli.js, line 370
     </li></ul></dd>
     
     
@@ -568,7 +568,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        cli.js, line 685
+        cli.js, line 688
     </li></ul></dd>
     
     
@@ -715,7 +715,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        cli.js, line 134
+        cli.js, line 150
     </li></ul></dd>
     
     
@@ -869,7 +869,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        cli.js, line 232
+        cli.js, line 248
     </li></ul></dd>
     
     
@@ -986,7 +986,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        cli.js, line 156
+        cli.js, line 172
     </li></ul></dd>
     
     
@@ -1103,7 +1103,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        cli.js, line 264
+        cli.js, line 304
     </li></ul></dd>
     
     
@@ -1227,7 +1227,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        cli.js, line 443
+        cli.js, line 446
     </li></ul></dd>
     
     
@@ -1367,7 +1367,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        cli.js, line 146
+        cli.js, line 162
     </li></ul></dd>
     
     
@@ -1509,7 +1509,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        cli.js, line 250
+        cli.js, line 266
     </li></ul></dd>
     
     
@@ -1631,7 +1631,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        cli.js, line 428
+        cli.js, line 431
     </li></ul></dd>
     
     
@@ -1659,7 +1659,7 @@
         
             
 <dt>
-    <h4 class="name" id="prompt"><span class="type-signature"></span>prompt<span class="signature">(items, done)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="prompt"><span class="type-signature">&lt;private> </span>prompt<span class="signature">(items, done)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -1771,7 +1771,309 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        cli.js, line 724
+        cli.js, line 728
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="renderColumns"><span class="type-signature"></span>renderColumns<span class="signature">(items, margin, maxwidth)</span><span class="type-signature"> &rarr; {String}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Helper function to renders an array of items into columns.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>items</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The items to render</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>margin</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The left margin</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>maxwidth</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The the maximum width before wrapping</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl>
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        cli.js, line 798
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    The rendered columns
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">String</span>
+
+
+	</dd>
+</dl>
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="scanCommands"><span class="type-signature">&lt;private> </span>scanCommands<span class="signature">(dir)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Scans a directory for all commands or a single file.</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>dir</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The directory to scan</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl>
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        cli.js, line 278
     </li></ul></dd>
     
     
@@ -1888,7 +2190,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        cli.js, line 550
+        cli.js, line 553
     </li></ul></dd>
     
     
@@ -1942,7 +2244,7 @@
 <br clear="both">
 
 <footer>
-	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Wed Jun 12 2013 13:35:48 GMT-0700 (PDT)
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Thu Jun 13 2013 07:04:20 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>

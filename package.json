@@ -34,10 +34,11 @@
 	},
 	"preferGlobal": true,
 	"dependencies": {
+		"adm-zip": "0.4.x",
 		"async": "0.1.x",
 		"colors": "0.6.x",
 		"fields": "0.1.x",
-		"http-status-codes": "1.0.x",
+		"humanize": "0.0.x",
 		"longjohn": ">=0.0.3",
 		"moment": "2.0.x",
 		"node-appc": "0.2.0",
