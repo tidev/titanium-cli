@@ -19,7 +19,7 @@
 		"mobileweb",
 		"mobile web"
 	],
-	"version": "3.1.1",
+	"version": "3.1.2",
 	"author": {
 		"name": "Appcelerator, Inc.",
 		"email": "info@appcelerator.com"
@@ -37,7 +37,7 @@
 		"async": "0.1.x",
 		"colors": "0.6.x",
 		"longjohn": ">=0.0.3",
-		"node-appc": "0.1.29",
+		"node-appc": "0.1.30",
 		"prompt": "0.2.x",
 		"request": "2.9.x",
 		"revalidator": "0.1.x",
