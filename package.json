@@ -26,7 +26,8 @@
 	},
 	"maintainers": [
 		{"name": "Jeff Haynie", "email": "jhaynie@appcelerator.com"},
-		{"name": "Chris Barber", "email": "cbarber@appcelerator.com"}
+		{"name": "Chris Barber", "email": "cbarber@appcelerator.com"},
+		{"name": "Bryan Hughes", "email": "bhughes@appcelerator.com"}
 	],
 	"repository": {
 		"type": "git",
@@ -42,12 +43,17 @@
 		"longjohn": "~0.2.0",
 		"moment": "~2.0.0",
 		"node-appc": "~0.2.0",
+		"optimist": "~0.6.0",
 		"request": "~2.21.0",
 		"semver": "~2.0.8",
 		"sprintf": "~0.1.1",
 		"temp": "~0.5.0",
 		"winston": "0.6.x",
 		"wrench": "~1.5.1"
+	},
+	"devDependencies": {
+		"mocha": "*",
+		"should": "*"
 	},
 	"license": "Apache Public License v2",
 	"bin": {
