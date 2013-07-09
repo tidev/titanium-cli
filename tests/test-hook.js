@@ -7,7 +7,7 @@
 
 var assert = require('assert'),
 	path = require('path'),
-	hook = require('../lib/hook');
+	hook = require(__lib('hook'));
 
 describe('hook', function () {
 	it('namespace exists', function () {

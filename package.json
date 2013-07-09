@@ -40,6 +40,7 @@
 		"colors": "~0.6.0",
 		"fields": "~0.1.x",
 		"humanize": "~0.0.7",
+		"jade": "~0.31.2",
 		"longjohn": "~0.2.0",
 		"moment": "~2.0.0",
 		"node-appc": "~0.2.0",

@@ -13,8 +13,8 @@ var fs = require('fs'),
 	path = require('path'),
 	colors = require('colors'),
 	should = require('should'),
-	Mocha = require(__dirname + '/../node_modules/mocha/lib/mocha.js'),
-	Base = require(__dirname + '/../node_modules/mocha/lib/reporters/base'),
+	Mocha = require('../node_modules/mocha/lib/mocha.js'),
+	Base = require('../node_modules/mocha/lib/reporters/base'),
 	mocha = new Mocha,
 	optimist = require('optimist'),
 	reporter = 'spec';
@@ -69,8 +69,16 @@ if (confFile) {
 	}
 }
 
+global.__lib = function (file) {
+	return path.join(__dirname, '..', 'lib', file);
+};
+
 // if we're running coverage testing, then we need to use our custom reporter
 if (process.env.APPC_COV) {
+	global.__lib = function (file) {
+		return path.join(__dirname, '..', 'lib-cov', file);
+	};
+
 	reporter = function (runner) {
 		var jade = require('jade'),
 			JSONCov = require(__dirname + '/../node_modules/mocha/lib/reporters/json-cov'),
