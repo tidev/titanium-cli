@@ -1,5 +1,5 @@
 /**
- * node-appc - Appcelerator Common Library for Node.js
+ * Titanium CLI
  * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
@@ -7,17 +7,17 @@
 
 var assert = require('assert'),
 	path = require('path'),
-	hook = require(__lib('hook'));
+	Hook = require(__lib('hook'));
 
 describe('hook', function () {
 	it('namespace exists', function () {
-		assert(typeof hook === 'function', 'expected hook API to be a function, not a ' + (typeof hook));
+		assert(typeof Hook === 'function', 'expected hook API to be a function, not a ' + (typeof Hook));
 	});
 
 	describe('#scanHooks()', function () {
 		it('should find test hook', function () {
 			var dir = path.join(__dirname, 'resources', 'hooks'),
-				h = new hook;
+				h = new Hook;
 
 			h.version = '3.2.0';
 			h.scanHooks(dir);
@@ -31,7 +31,7 @@ describe('hook', function () {
 
 	describe('#on()', function () {
 		it('should register pre and post hooks', function () {
-			var h = new hook;
+			var h = new Hook;
 			h.on('test', function () {});
 			h.on('test', {
 				post: function () {}
@@ -60,7 +60,7 @@ describe('hook', function () {
 
 	describe('#emit()', function () {
 		it('should fire pre and post hooks', function (done) {
-			var h = new hook,
+			var h = new Hook,
 				counter = 0;
 
 			h.on('test', {
@@ -79,7 +79,7 @@ describe('hook', function () {
 		});
 
 		it('should fire pre and post hooks that have callbacks', function (done) {
-			var h = new hook,
+			var h = new Hook,
 				counter = 0;
 
 			h.on('test', {
@@ -101,12 +101,12 @@ describe('hook', function () {
 	});
 
 	describe('#createHook()', function () {
-		it('should create a function hook and fire it', function (done) {
+		it('should create a function hook with null context and fire it', function (done) {
 			// this test will multiply 2 * 3, but the pre-hook will multiple those by 2,
 			// so this means 4 * 6 = 24. The post-hook then divides the result by 10 with
 			// a final value of 2.4.
 
-			var h = new hook,
+			var h = new Hook,
 				fn = h.createHook('test', null, function (x, y, cb) {
 					cb(x * y);
 				});
@@ -123,6 +123,52 @@ describe('hook', function () {
 
 			fn(2, 3, function (err, data, result) {
 				result.should.equal(2.4);
+				done();
+			});
+		});
+
+		it('should create a function hook without a context and fire it', function (done) {
+			// this test will multiply 2 * 3, but the pre-hook will multiple those by 2,
+			// so this means 4 * 6 = 24. The post-hook then divides the result by 10 with
+			// a final value of 2.4.
+
+			var h = new Hook,
+				fn = h.createHook('test', function (x, y, cb) {
+					cb(x * y);
+				});
+
+			h.on('test', {
+				pre: function (data) {
+					data.args[0] *= 2;
+					data.args[1] *= 2;
+				},
+				post: function (data) {
+					data.result /= 10;
+				}
+			});
+
+			fn(2, 3, function (err, data, result) {
+				result.should.equal(2.4);
+				done();
+			});
+		});
+
+		it('should create a event hook', function (done) {
+			// this test will multiply 2 * 3, but the pre-hook will multiple those by 2,
+			// so this means 4 * 6 = 24. The post-hook then divides the result by 10 with
+			// a final value of 2.4.
+
+			var h = new Hook,
+				fn = h.createHook('test', { payload: 10 });
+
+			h.on('test', function (data) {
+				data.payload *= 2;
+			});
+
+			fn(function (err, data) {
+				data.should.be.an.instanceOf(Array);
+				data[0].should.have.ownProperty('payload');
+				data[0].payload.should.equal(20);
 				done();
 			});
 		});

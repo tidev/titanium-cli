@@ -11,11 +11,18 @@
 
 module.exports = function () {
 	var spawn = require('child_process').spawn,
-		path = require('path');
+		path = require('path'),
+		args = Array.prototype.slice.call(arguments),
+		p = args.indexOf('--debug');
 
-	spawn(process.execPath, [
-		path.join(rootDir, 'tests', 'run.js')
-	].concat(Array.prototype.slice.call(arguments)), {
+	if (p != -1) {
+		args.splice(p, 1);
+		args.unshift('debug', path.join(rootDir, 'tests', 'run.js'));
+	} else {
+		args.unshift(path.join(rootDir, 'tests', 'run.js'));
+	}
+
+	spawn(process.execPath, args, {
 		cwd: rootDir,
 		stdio: 'inherit'
 	});
