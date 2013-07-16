@@ -567,7 +567,11 @@ describe('context', function () {
 						$_: ['--platform', 'ios'],
 						_: [],
 						$command: 'bar'
-					}
+					},
+					sdk: {
+						path: __dirname
+					},
+					scanHooks: function () {}
 				};
 
 			c.load(logger, {}, cli, function (err, ctx) {
@@ -783,6 +787,38 @@ describe('context', function () {
 				_: [],
 				foo1: true,
 				foo2: true
+			});
+		});
+
+		// --flag true
+		it('should parse --foo true', function () {
+			var c = new Context;
+			c.parse(['--foo', 'true']).should.eql({
+				_: [],
+				foo: 'true'
+			});
+
+			c = new Context;
+			c.flag('foo');
+			c.parse(['--foo', 'true']).should.eql({
+				_: [],
+				foo: true
+			});
+		});
+
+		// --flag false
+		it('should parse --foo true', function () {
+			var c = new Context;
+			c.parse(['--foo', 'false']).should.eql({
+				_: [],
+				foo: 'false'
+			});
+
+			c = new Context;
+			c.flag('foo');
+			c.parse(['--foo', 'false']).should.eql({
+				_: [],
+				foo: false
 			});
 		});
 
