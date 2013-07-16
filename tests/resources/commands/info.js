@@ -3,7 +3,8 @@ exports.config = function (logger, config, cli) {
 		noAuth: true,
 		skipBanner: true,
 		flags: {
-			legacy: {}
+			legacy: {},
+			dummyflag: {}
 		},
 		options: {
 			output: {
