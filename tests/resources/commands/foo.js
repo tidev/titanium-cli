@@ -1,3 +1,5 @@
+exports.desc = 'foo!';
+
 exports.config = function () {
 	return {
 		noAuth: true,
@@ -19,6 +21,7 @@ exports.config = function () {
 			target: null
 		},
 		platforms: {
+			android: {},
 			ios: {}
 		},
 		subcommands: {

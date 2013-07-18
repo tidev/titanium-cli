@@ -557,6 +557,31 @@ describe('context', function () {
 			});
 		});
 
+		it('should load module without cli arg --platform', function (done) {
+			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'foo.js') }),
+				logger = new MockLogger,
+				cli = {
+					argv: {
+						$0: 'node titanium',
+						$: 'titanium',
+						$_: [],
+						_: [],
+						$command: 'bar'
+					},
+					sdk: {
+						path: __dirname
+					},
+					scanHooks: function () {}
+				};
+
+			c.load(logger, {}, cli, function (err, ctx) {
+				assert(!err, 'expected "foo" to load without error');
+				ctx.platforms.should.haveOwnProperty('android');
+				ctx.platforms.should.haveOwnProperty('ios');
+				done();
+			});
+		});
+
 		it('should load module with cli arg --platform', function (done) {
 			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'foo.js') }),
 				logger = new MockLogger,
@@ -579,6 +604,73 @@ describe('context', function () {
 				cli.argv.should.have.ownProperty('platform');
 				cli.argv.platform.should.equal('ios');
 				done();
+			});
+		});
+	});
+
+	describe('#loadModuleOnly()', function () {
+		it('should fail if path is undefined', function (done) {
+			var c = new Context({ name: 'foo' });
+			c.loadModuleOnly(function (err, ctx) {
+				assert(err, 'expected "foo" to load with error');
+				done();
+			});
+		});
+
+		it('should fail if path is invalid', function (done) {
+			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'doesnotexist.js') });
+			c.loadModuleOnly(function (err, ctx) {
+				assert(err, 'expected "foo" to load with error');
+				done();
+			});
+		});
+
+		it('should load command module only', function (done) {
+			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'foo.js') });
+
+			c.loadModuleOnly(function (err, ctx) {
+				assert(!err, 'expected "foo" to load without error');
+				ctx.should.have.ownProperty('module');
+				ctx.module.should.have.ownProperty('desc');
+				ctx.module.desc.should.equal('foo!');
+				done();
+			});
+		});
+
+		it('should fail if command module has syntax error', function (done) {
+			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'badcommand.js') });
+			c.loadModuleOnly(function (err, ctx) {
+				assert(err, 'expected "foo" to load with error');
+				done();
+			});
+		});
+
+		it('should return immediately if already loaded', function (done) {
+			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'foo.js') }),
+				logger = new MockLogger,
+				cli = {
+					argv: {
+						$0: 'node titanium',
+						$: 'titanium',
+						$_: [],
+						_: [],
+						$command: 'bar'
+					},
+					sdk: {
+						path: __dirname
+					},
+					scanHooks: function () {}
+				};
+
+			c.load(logger, {}, cli, function (err, ctx) {
+				assert(!err, 'expected "foo" to load without error');
+				c.loadModuleOnly(function (err, ctx) {
+					assert(!err, 'expected "foo" to load without error');
+					ctx.should.have.ownProperty('module');
+					ctx.module.should.have.ownProperty('desc');
+					ctx.module.desc.should.equal('foo!');
+					done();
+				});
 			});
 		});
 	});
@@ -787,6 +879,76 @@ describe('context', function () {
 				_: [],
 				foo1: true,
 				foo2: true
+			});
+		});
+
+		// -a -b
+		it('should parse -a -b', function () {
+			var c = new Context;
+			c.parse(['-a', '-b']).should.eql({
+				_: [],
+				a: true,
+				b: true
+			});
+
+			c = new Context;
+			c.flag('foo1', { abbr: 'a' });
+			c.flag('foo2', { abbr: 'b' });
+			c.parse(['-a', '-b']).should.eql({
+				_: [],
+				foo1: true,
+				foo2: true
+			});
+		});
+
+		// -ab
+		it('should parse -ab', function () {
+			var c = new Context;
+			c.parse(['-ab']).should.eql({
+				_: [],
+				a: true,
+				b: true
+			});
+
+			c = new Context;
+			c.flag('foo1', { abbr: 'a' });
+			c.flag('foo2', { abbr: 'b' });
+			c.parse(['-ab']).should.eql({
+				_: [],
+				foo1: true,
+				foo2: true
+			});
+		});
+
+		// -a bar
+		it('should parse -a bar', function () {
+			var c = new Context;
+			c.parse(['-a', 'bar']).should.eql({
+				_: [],
+				a: 'bar'
+			});
+
+			c = new Context;
+			c.flag('foo', { abbr: 'a' });
+			c.parse(['-a', 'bar']).should.eql({
+				_: ['bar'],
+				foo: true
+			});
+		});
+
+		// -a true
+		it('should parse -a true', function () {
+			var c = new Context;
+			c.parse(['-a', 'true']).should.eql({
+				_: [],
+				a: 'true'
+			});
+
+			c = new Context;
+			c.flag('foo', { abbr: 'a' });
+			c.parse(['-a', 'true']).should.eql({
+				_: [],
+				foo: true
 			});
 		});
 
@@ -1282,7 +1444,6 @@ describe('context', function () {
 					prompt: true,
 					'progress-bars': true,
 					banner: true,
-					dummyflag: true,
 					legacy: true,
 					dummyflag: true
 				});
@@ -1290,16 +1451,235 @@ describe('context', function () {
 		});
 
 		// <command> <arg>
-		// --global-flag <command> <arg>
-		// <command> --global-flag <arg>
-		// --global-flag <command> --global-flag <arg>
-		// <command> --command-flag <arg>
-		// --global-flag <command> --command-flag <arg>
-		// --command-flag <command> --command-flag <arg>
-		// --global-flag --command-flag <command> --command-flag <arg>
-		// --command-flag <command> --global-flag --command-flag <arg>
+		it('should parse <command> <arg>', function () {
+			var c = createGlobalContext(),
+				logger = new MockLogger;
 
-		// <command>
+			c.commands.config.load(logger, {}, {}, function (err, cmd) {
+				cmd.parse(['config', 'test'], Object.keys(c.commands)).should.eql({
+					_: ['test'],
+					help: false,
+					version: false,
+					colors: true,
+					quiet: false,
+					prompt: true,
+					'progress-bars': true,
+					banner: true,
+					append: false,
+					remove: false,
+					key: 'test',
+					value: undefined
+				});
+			});
+		});
+
+		// <command> <arg1> <arg2>
+		it('should parse <command> <arg1> <arg2>', function () {
+			var c = createGlobalContext(),
+				logger = new MockLogger;
+
+			c.commands.config.load(logger, {}, {}, function (err, cmd) {
+				cmd.parse(['config', 'test', 'dummy'], Object.keys(c.commands)).should.eql({
+					_: ['test', 'dummy'],
+					help: false,
+					version: false,
+					colors: true,
+					quiet: false,
+					prompt: true,
+					'progress-bars': true,
+					banner: true,
+					append: false,
+					remove: false,
+					key: 'test',
+					value: 'dummy'
+				});
+			});
+		});
+
+		// --global-flag <command> <arg>
+		it('should parse --global-flag <command> <arg>', function () {
+			var c = createGlobalContext(),
+				logger = new MockLogger;
+
+			c.commands.config.load(logger, {}, {}, function (err, cmd) {
+				cmd.parse(['--quiet', 'config', 'test'], Object.keys(c.commands)).should.eql({
+					_: ['test'],
+					help: false,
+					version: false,
+					colors: true,
+					quiet: true,
+					prompt: true,
+					'progress-bars': true,
+					banner: true,
+					append: false,
+					remove: false,
+					key: 'test',
+					value: undefined
+				});
+			});
+		});
+
+		// <command> --global-flag <arg>
+		it('should parse --global-flag <command> <arg>', function () {
+			var c = createGlobalContext(),
+				logger = new MockLogger;
+
+			c.commands.config.load(logger, {}, {}, function (err, cmd) {
+				cmd.parse(['config', '--quiet', 'test'], Object.keys(c.commands)).should.eql({
+					_: ['test'],
+					help: false,
+					version: false,
+					colors: true,
+					quiet: true,
+					prompt: true,
+					'progress-bars': true,
+					banner: true,
+					append: false,
+					remove: false,
+					key: 'test',
+					value: undefined
+				});
+			});
+		});
+
+		// --global-flag <command> --global-flag <arg>
+		it('should parse --global-flag <command> --global-flag <arg>', function () {
+			var c = createGlobalContext(),
+				logger = new MockLogger;
+
+			c.commands.config.load(logger, {}, {}, function (err, cmd) {
+				cmd.parse(['--no-colors', 'config', '--quiet', 'test'], Object.keys(c.commands)).should.eql({
+					_: ['test'],
+					help: false,
+					version: false,
+					colors: false,
+					quiet: true,
+					prompt: true,
+					'progress-bars': true,
+					banner: true,
+					append: false,
+					remove: false,
+					key: 'test',
+					value: undefined
+				});
+			});
+		});
+
+		// <command> --command-flag <arg>
+		it('should parse <command> --command-flag <arg>', function () {
+			var c = createGlobalContext(),
+				logger = new MockLogger;
+
+			c.commands.config.load(logger, {}, {}, function (err, cmd) {
+				cmd.parse(['config', '--append', 'test'], Object.keys(c.commands)).should.eql({
+					_: ['test'],
+					help: false,
+					version: false,
+					colors: true,
+					quiet: false,
+					prompt: true,
+					'progress-bars': true,
+					banner: true,
+					append: true,
+					remove: false,
+					key: 'test',
+					value: undefined
+				});
+			});
+		});
+
+		// --global-flag <command> --command-flag <arg>
+		it('should parse --global-flag <command> --command-flag <arg>', function () {
+			var c = createGlobalContext(),
+				logger = new MockLogger;
+
+			c.commands.config.load(logger, {}, {}, function (err, cmd) {
+				cmd.parse(['--quiet', 'config', '--append', 'test'], Object.keys(c.commands)).should.eql({
+					_: ['test'],
+					help: false,
+					version: false,
+					colors: true,
+					quiet: true,
+					prompt: true,
+					'progress-bars': true,
+					banner: true,
+					append: true,
+					remove: false,
+					key: 'test',
+					value: undefined
+				});
+			});
+		});
+
+		// --command-flag <command> --command-flag <arg>
+		it('should parse --command-flag <command> --command-flag <arg>', function () {
+			var c = createGlobalContext(),
+				logger = new MockLogger;
+
+			c.commands.config.load(logger, {}, {}, function (err, cmd) {
+				cmd.parse(['--append', 'config', '--remove', 'test'], Object.keys(c.commands)).should.eql({
+					_: ['test'],
+					help: false,
+					version: false,
+					colors: true,
+					quiet: false,
+					prompt: true,
+					'progress-bars': true,
+					banner: true,
+					append: true,
+					remove: true,
+					key: 'test',
+					value: undefined
+				});
+			});
+		});
+
+		// --global-flag --command-flag <command> --command-flag <arg>
+		it('should parse --global-flag --command-flag <command> --command-flag <arg>', function () {
+			var c = createGlobalContext(),
+				logger = new MockLogger;
+
+			c.commands.config.load(logger, {}, {}, function (err, cmd) {
+				cmd.parse(['--quiet', '--append', 'config', '--remove', 'test'], Object.keys(c.commands)).should.eql({
+					_: ['test'],
+					help: false,
+					version: false,
+					colors: true,
+					quiet: true,
+					prompt: true,
+					'progress-bars': true,
+					banner: true,
+					append: true,
+					remove: true,
+					key: 'test',
+					value: undefined
+				});
+			});
+		});
+
+		// --command-flag <command> --global-flag --command-flag <arg>
+		it('should parse --command-flag <command> --global-flag --command-flag <arg>', function () {
+			var c = createGlobalContext(),
+				logger = new MockLogger;
+
+			c.commands.config.load(logger, {}, {}, function (err, cmd) {
+				cmd.parse(['--append', 'config', '--quiet', '--remove', 'test'], Object.keys(c.commands)).should.eql({
+					_: ['test'],
+					help: false,
+					version: false,
+					colors: true,
+					quiet: true,
+					prompt: true,
+					'progress-bars': true,
+					banner: true,
+					append: true,
+					remove: true,
+					key: 'test',
+					value: undefined
+				});
+			});
+		});
+
 		// --global-option value <command>
 		// <command> --global-option value
 		// --global-option value <command> --global-option value
@@ -1309,7 +1689,6 @@ describe('context', function () {
 		// --global-option value --command-option value <command> --command-option value
 		// --command-option value <command> --global-option value --command-option value
 
-		// <command> <arg>
 		// --global-option value <command> <arg>
 		// <command> --global-option value <arg>
 		// --global-option value <command> --global-option value <arg>
@@ -1320,12 +1699,9 @@ describe('context', function () {
 		// --command-option value <command> --global-option value --command-option value <arg>
 
 
-
-
 		// --platform
 		// <command> <subcommand>
-		// parse(args, commands, skipCallbacks)
-		// nested contexts!
+		// nested contexts
 	});
 
 	describe('#printHelp()', function () {
