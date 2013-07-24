@@ -936,6 +936,44 @@ describe('context', function () {
 			});
 		});
 
+		// -ab bar
+		it('should parse -ab bar as flags', function () {
+			var c = new Context;
+			c.parse(['-ab', 'bar']).should.eql({
+				_: [],
+				a: true,
+				b: 'bar'
+			});
+
+			c = new Context;
+			c.flag('foo1', { abbr: 'a' });
+			c.flag('foo2', { abbr: 'b' });
+			c.parse(['-ab', 'bar']).should.eql({
+				_: ['bar'],
+				foo1: true,
+				foo2: true
+			});
+		});
+
+		// -ab bar
+		it('should parse -ab bar as options', function () {
+			var c = new Context;
+			c.parse(['-ab', 'bar']).should.eql({
+				_: [],
+				a: true,
+				b: 'bar'
+			});
+
+			c = new Context;
+			c.option('foo1', { abbr: 'a' });
+			c.option('foo2', { abbr: 'b' });
+			c.parse(['-ab', 'bar']).should.eql({
+				_: [],
+				foo1: true,
+				foo2: 'bar'
+			});
+		});
+
 		// -a true
 		it('should parse -a true', function () {
 			var c = new Context;
