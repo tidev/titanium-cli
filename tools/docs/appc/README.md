@@ -1,1 +1,0 @@
-Appcelerator branded JSDoc template. This is based on the "default" JSDoc template.
