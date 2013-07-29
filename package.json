@@ -39,7 +39,7 @@
 		"longjohn": ">=0.0.3",
 		"node-appc": "0.1.30",
 		"prompt": "0.2.x",
-		"request": "2.9.x",
+		"request": "~2.25.0",
 		"revalidator": "0.1.x",
 		"semver": ">=1.0.14",
 		"sprintf": ">=0.1.1",
