@@ -36,7 +36,7 @@ are not recommended for production use, but should work for development.
 
     # unstable next release
     titanium sdk install --branch 3_1_X --default
-    
+
     # bleeding edge
     titanium sdk install --branch master --default
 
@@ -168,7 +168,7 @@ Reconfigures the Titanium CLI by asking you a series of questions.
 Indicates whether you are logged in or not.
 
     titanium status
-    
+
     titanium status --output json
 
 ### version
@@ -176,7 +176,7 @@ Indicates whether you are logged in or not.
 Displays the current version of the CLI and exits.
 
     titanium -v
-    
+
     titanium --version
 
 ### info
@@ -185,7 +185,7 @@ Displays information about your development environment including Xcode installs
 iOS SDKs, Android SDKs, and so on.
 
     titanium info
-    
+
     titanium info -o json
 
 ## Hacking the Titanium CLI
@@ -206,14 +206,29 @@ You just need to pull the code and resolve the dependendencies.
     npm install
     sudo npm link
 
-### Building the API Documentation
+### Running Unit Tests
 
-The internal APIs in the Titanium CLI are written in JSDoc and can be compiled
-into HTML pages.
+To run the unit tests, simply run:
 
-    node tools/docs/build
+    node forge test
 
-They will be generated into the "docs" directory.
+### Running Code Coverage
+
+To generate the code coverage, you first must install
+[node-jscoverage](https://github.com/visionmedia/node-jscoverage). The easist
+way to do this is run:
+
+    git clone git@github.com:visionmedia/node-jscoverage.git
+    cd node-jscoverage
+    ./configure
+    make
+    sudo make install
+
+Then run:
+
+	node forge test-cov
+
+It will generate a file called _coverage.html_ in the Titanium CLI directory.
 
 ## Looking for the really old CLI?
 
@@ -235,7 +250,7 @@ straightforward - it requires that the contributions you make to any
 Appcelerator open source project are properly licensed and that you have the
 legal authority to make those changes. This helps us significantly reduce future
 legal risk for everyone involved. It is easy, helps everyone, takes only a few
-minutes, and only needs to be completed once. 
+minutes, and only needs to be completed once.
 
 [You can digitally sign the CLA](http://bit.ly/app_cla) online. Please indicate
 your e-mail address in your first pull request so that we can make sure that
