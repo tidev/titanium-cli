@@ -1,0 +1,20 @@
+Gets and sets config options. If no key is specified, then all key/values are
+returned.
+
+When specifying only the __<key>__ and using the __--remove__ flag, the
+specified key and all of its descendents are removed.
+
+The __path.*__ config settings allow lists of values. You can specify multiple
+__<value>__'s following the __<key>__. Use the __--append__ flag to append a new
+value and the __--remove__ flag to remove an existing value.
+
+Set the SDK path overwriting the previous values
+  __titanium config paths.sdks /path/to/sdk__
+
+Add another SDK path
+  __titanium config paths.sdks --append /path/to/another/sdk__
+
+Remove an SDK path
+  __titanium config paths.sdks --remove /path/to/sdk__
+
+The config file is located at: __{{configPath}}__

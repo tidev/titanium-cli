@@ -1,0 +1,63 @@
+#!/usr/bin/env node
+
+/**
+ * forge - make-like tool
+ *
+ * @copyright
+ * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
+ *
+ * @license
+ * Licensed under the terms of the Apache Public License
+ * Please see the LICENSE included with this distribution for details.
+ */
+
+var toolsDir = './forge-tools',
+	spawn = require('child_process').spawn,
+	fs = require('fs'),
+	path = require('path'),
+	colors = require('colors');
+
+global.which = function which(program, fn) {
+	if (process.platform == 'win32') {
+		fn(); // no 'which' on windows
+	} else {
+		spawn('which', [ program ]).on('exit', fn);
+	}
+};
+
+global.rootDir = __dirname;
+
+var tools = {};
+fs.readdirSync(toolsDir = path.resolve(toolsDir)).forEach(function (name) {
+	var m, file = path.join(toolsDir, name);
+	if (fs.statSync(file).isDirectory()) {
+		if (fs.existsSync(m = path.join(file, 'index.js'))) {
+			tools[name] = m;
+		}
+	} else if (m = name.match(/^(?!\.|_)(.+)\.js$/)) {
+		tools[m[1]] = file;
+	}
+});
+
+function help(err) {
+	console.log('Forge'.cyan.bold + ' - Copyright (c) 2012-' + (new Date).getFullYear() + ', Appcelerator, Inc.  All Rights Reserved.\n');
+	console.log('Usage: ' + 'forge <tool> [options]'.cyan + '\n');
+	err && console.error(err.red + '\n');
+	console.error('Available tools:');
+	Object.keys(tools).sort().forEach(function (t) {
+		console.log('   ' + t.cyan);
+	});
+	console.log();
+	process.exit(err ? 1 : 0);
+}
+
+var args = process.argv.slice(2),
+	tool = args.shift();
+
+if (tool && !tools[tool]) {
+	help('ERROR: Invalid tool "' + tool + '"');
+} else if (!tool) {
+	help();
+}
+
+require(tools[tool]).apply(null, args);
