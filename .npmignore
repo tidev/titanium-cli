@@ -3,3 +3,9 @@
 node_modules
 *.sublime-project
 *.sublime-workspace
+docs
+tests
+lib-cov
+coverage.html
+forge
+forge-tools
