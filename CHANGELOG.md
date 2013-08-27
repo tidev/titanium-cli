@@ -3,8 +3,20 @@
  * Added better error handling with logging in and out of the Appc network; saving cli config [TIMOB-13908]
  * Added ID for each installed Android SDK and add-on to info command output [TIMOB-13797]
  * Fixed bug with CLI argument parser not properly removing the node process from the arguments [TIMOB-14074]
+ * Added CLI hook to fix deploy type bug in Titanium SDK 3.0.0-3.1.X where deploy type not correctly set for iOS dist builds [TIMOB-14961]
+ * Updated all afs.exists() calls to fs.existsSync() calls since we no longer support Node.js 0.6
+ * Fixed bug when running quick setup when no SDKs installed [TIMOB-14965]
+ * Adjusted placement of post-valdiate event hook
+ * Fixed bug with option callbacks not being called for prompted options
+ * Updated info command to use latest platform-specific detect() signature
+ * Fixed minor bug with multiple options with same name not being converted to an array
+ * Fixed all places where broken symlinks would cause errors
 
-3.1.1
+3.1.2 (8/15/2013)
+-------------------
+ * Updated "request" module to 2.25.0 [TIMOB-11267]
+
+3.1.1 (6/17/2013)
 -------------------
  * Added support for code processor plugin paths [TIMOB-13118]
 
@@ -77,7 +89,7 @@
 3.0.12 (10/29/2012)
 -------------------
  * Added support for specifying additional Titanium SDK home directory paths in the CLI config
- 
+
 3.0.11 (10/24/2012)
 -------------------
  * Added "ti" alias
