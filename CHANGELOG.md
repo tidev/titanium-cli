@@ -11,6 +11,7 @@
  * Updated info command to use latest platform-specific detect() signature
  * Fixed minor bug with multiple options with same name not being converted to an array
  * Fixed all places where broken symlinks would cause errors
+ * Fixed bug with detecting if CLI is being invoked by node.exe instead of titanium.cmd on Windows [TIMOB-14933]
 
 3.1.2 (8/15/2013)
 -------------------
