@@ -1,4 +1,12 @@
-3.1.1
+3.1.3
+-------------------
+ * Fixed bug with detecting if CLI is being invoked by node.exe instead of titanium.cmd on Windows [TIMOB-14933]
+
+3.1.2 (8/15/2013)
+-------------------
+ * Updated "request" module to 2.25.0 [TIMOB-11267]
+
+3.1.1 (6/17/2013)
 -------------------
  * Added support for code processor plugin paths [TIMOB-13118]
 
@@ -71,7 +79,7 @@
 3.0.12 (10/29/2012)
 -------------------
  * Added support for specifying additional Titanium SDK home directory paths in the CLI config
- 
+
 3.0.11 (10/24/2012)
 -------------------
  * Added "ti" alias
