@@ -42,7 +42,7 @@
 		"jade": "~0.31.2",
 		"longjohn": "~0.2.0",
 		"moment": "~2.0.0",
-		"node-appc": "~0.2.0",
+		"node-appc": "git://github.com/appcelerator/node-appc.git",
 		"optimist": "~0.6.0",
 		"request": "~2.25.0",
 		"semver": "~2.0.8",
