@@ -523,6 +523,9 @@ describe('context', function () {
 						$_: ['help'],
 						_: [],
 						$command: 'help'
+					},
+					sdk: {
+						path: 'foo/bar'
 					}
 				};
 
