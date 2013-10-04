@@ -7,6 +7,8 @@ open-source and easy to use. [We've](https://github.com/appcelerator)
 designed Titanium to be suitable for command line beginners, but still be
 powerful and extensible enough for production usage.
 
+[![NPM](https://nodei.co/npm/titanium.png?downloads=true&stars=true)](https://nodei.co/npm/titanium/)
+
 ## Prerequisites
 
 The Titanium CLI requires [Node.js 0.8.x](http://nodejs.org/dist/). You can
