@@ -134,6 +134,7 @@
 	"Display": "Display",
 	"DPI": "DPI",
 	"OpenGL Acceleration": "OpenGL Acceleration",
+	"unknown, emulator not running": "unknown, emulator not running",
 	"Connected Android Devices": "Connected Android Devices",
 	"ID": "ID",
 	"logs into the Appcelerator network": "logs into the Appcelerator network",
