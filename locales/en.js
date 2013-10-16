@@ -259,6 +259,7 @@
 	"(examples: \"en\", \"en-us\", \"de\", \"fr\")": "(examples: \"en\", \"en-us\", \"de\", \"fr\")",
 	"Invalid locale format": "Invalid locale format",
 	"Path to your workspace where your projects should be created:": "Path to your workspace where your projects should be created:",
+	"Please specify a workspace directory": "Please specify a workspace directory",
 	"Invalid workspace directory": "Invalid workspace directory",
 	"What Titanium SDK would you like to use by default?": "What Titanium SDK would you like to use by default?",
 	"Enter # or SDK name": "Enter # or SDK name",
