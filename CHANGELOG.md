@@ -1,5 +1,7 @@
 3.2.0
 -------------------
+ * Completely overhauled entire CLI architecture
+ * Brand new setup command with 'check environment' and 'quick setup' sections
  * Added better error handling with logging in and out of the Appc network; saving cli config [TIMOB-13908]
  * Added ID for each installed Android SDK and add-on to info command output [TIMOB-13797]
  * Fixed bug with CLI argument parser not properly removing the node process from the arguments [TIMOB-14074]
@@ -12,6 +14,24 @@
  * Fixed minor bug with multiple options with same name not being converted to an array
  * Fixed all places where broken symlinks would cause errors
  * Fixed bug with detecting if CLI is being invoked by node.exe instead of titanium.cmd on Windows [TIMOB-14933]
+ * Removed node-appc version check
+ * Improved invalid and missing option handling
+ * Refactored info command to call platform specific environment detection and info rendering
+ * When a Titanium SDK 3.2 or newer is selected, info command displays much more info such as cert validity, installation issues, etc
+ * Fixed bug in logger where errors were not honoring the --no-colors flag
+ * Fixed escaping of default global ignoreDirs/ignoreFiles
+ * Added ability to hide flag default values
+ * Added --no-progress-bars flag to control display of progress bars and busy indicators which are enabled by default
+ * Fixed a few places where --no-prompt was not being honored
+ * Fixed sdk install command would fail when --no-prompt is set [TIMOB-15431]
+ * Fixed bug when installing a Titanium SDK and the temp directory does not exist
+ * Fixed bug when selected SDK is pre-3.0 or does not exist [TIMOB-15507]
+ * Added CLI tools information to info and setup check commands on Mac OS X
+ * Fixed command line argument parser to accept empty option values [TIMOB-15608]
+ * Added ampersand checks to the setup command's Android SDK path prompt on Windows
+ * Fixed bug where --quiet, --no-prompt, and --no-progress-bars when setting a value on via ti config or running ti setup would save those flags to the cli config
+ * Added alias --no-color for --no-colors because I can never remember which one it is
+ * Updated third party Node.js module dependency version where safe to do so
 
 3.1.2 (8/15/2013)
 -------------------
