@@ -32,6 +32,9 @@
  * Fixed bug where --quiet, --no-prompt, and --no-progress-bars when setting a value on via ti config or running ti setup would save those flags to the cli config
  * Added alias --no-color for --no-colors because I can never remember which one it is
  * Updated third party Node.js module dependency version where safe to do so
+ * Added support for config option cli.rejectUnauthorized to skip SSL cert validation [TIMOB-15743]
+ * Updated the 'setup check' command to work offline and display connection diagnostics
+ * Fixed bug when --username and --password are supplied at the command line
 
 3.1.2 (8/15/2013)
 -------------------
