@@ -308,7 +308,6 @@
 	"\"javac\" executable not found; please reinstall JDK 1.6": "\"javac\" executable not found; please reinstall JDK 1.6",
 	"\"keytool\" executable not found; please reinstall JDK 1.6": "\"keytool\" executable not found; please reinstall JDK 1.6",
 	"\"jarsigner\" executable not found; please reinstall JDK 1.6": "\"jarsigner\" executable not found; please reinstall JDK 1.6",
-	"version %s is not supported; please install JDK 1.6": "version %s is not supported; please install JDK 1.6",
 	"compatible": "compatible",
 	"unsupported, requires an Intel® CPU": "unsupported, requires an Intel® CPU",
 	"not found; install HAXM to use Android x86 emulator": "not found; install HAXM to use Android x86 emulator",
