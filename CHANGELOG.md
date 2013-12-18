@@ -1,4 +1,4 @@
-3.1.X
+3.1.4 (12/18/2013)
 -------------------
  * Fixed bug with detecting if CLI is being invoked by node.exe instead of titanium.cmd on Windows [TIMOB-14933]
  * Added support for config option cli.rejectUnauthorized to skip SSL cert validation [TIMOB-15783]
