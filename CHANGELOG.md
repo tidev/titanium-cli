@@ -32,9 +32,12 @@
  * Fixed bug where --quiet, --no-prompt, and --no-progress-bars when setting a value on via ti config or running ti setup would save those flags to the cli config
  * Added alias --no-color for --no-colors because I can never remember which one it is
  * Updated third party Node.js module dependency version where safe to do so
- * Added support for config option cli.rejectUnauthorized to skip SSL cert validation [TIMOB-15743]
  * Updated the 'setup check' command to work offline and display connection diagnostics
  * Fixed bug when --username and --password are supplied at the command line
+ * Fixed bug with the paths.sdks config setting continuously appending the default Titanium SDK install location [TIMOB-15813]
+ * Fixed bug with 'npm outdated' returning a version of 'missing' [TIMOB-15842]
+ * Removed Java 1.7 warning from the 'setup check' command
+ * Fixed bug where options that have valid values but don't have a validate function never have their callbacks fired [TIMOB-15935]
 
 3.1.4 (12/18/2013)
 -------------------
