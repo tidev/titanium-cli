@@ -36,6 +36,11 @@
  * Updated the 'setup check' command to work offline and display connection diagnostics
  * Fixed bug when --username and --password are supplied at the command line
 
+3.1.4 (12/18/2013)
+-------------------
+ * Fixed bug with detecting if CLI is being invoked by node.exe instead of titanium.cmd on Windows [TIMOB-14933]
+ * Added support for config option cli.rejectUnauthorized to skip SSL cert validation [TIMOB-15783]
+
 3.1.2 (8/15/2013)
 -------------------
  * Updated "request" module to 2.25.0 [TIMOB-11267]
