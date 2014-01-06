@@ -1,4 +1,4 @@
-3.2.0
+3.2.0 (12/20/2013)
 -------------------
  * Completely overhauled entire CLI architecture
  * Brand new setup command with 'check environment' and 'quick setup' sections
