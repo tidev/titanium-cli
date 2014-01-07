@@ -1,3 +1,7 @@
+3.2.1
+-------------------
+ * Fixed bug where npm version was not being displayed due to race condition [TIMOB-15962]
+
 3.2.0 (12/20/2013)
 -------------------
  * Completely overhauled entire CLI architecture
