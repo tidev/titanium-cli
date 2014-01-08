@@ -1,3 +1,7 @@
+3.2.x
+-------------------
+ * When installing a Titanium SDK using the CI version name, but omitting the branch, it now automatically scans all branches [TIMOB-15899]
+
 3.2.1
 -------------------
  * Fixed bug where npm version was not being displayed due to race condition [TIMOB-15962]
