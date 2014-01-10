@@ -13,7 +13,7 @@
 
 var appc = require('node-appc');
 
-exports.cliVersion = '>=3.X';
+exports.cliVersion = '>=3.2';
 
 exports.init = function (logger, config, cli) {
 	cli.on('cli:post-validate', function (data, finished) {
@@ -30,6 +30,17 @@ exports.init = function (logger, config, cli) {
 					data.command.platform.options['deploy-type'].values = ['production'];
 			}
 		}
+
+		if (sdk && appc.version.eq(sdk, '3.2.0')) {
+			cli._fireHookCallback = function (callback, err, data) {
+				if (err) {
+					callback(err);
+				} else {
+					callback(err, {}, data.result.shift());
+				}
+			};
+		}
+
 		finished();
 	});
 };
