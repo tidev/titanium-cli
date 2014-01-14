@@ -16,7 +16,21 @@ var appc = require('node-appc');
 exports.cliVersion = '>=3.2';
 
 exports.init = function (logger, config, cli) {
-	cli.on('cli:post-validate', function (data, finished) {
+	cli.on('cli:go', function () {
+		var sdk = (cli.sdk && cli.sdk.name) || (cli.manifest && cli.manifest.version);
+
+		if (sdk && appc.version.eq(sdk, '3.2.0')) {
+			cli._fireHookCallback = function (callback, err, data) {
+				if (err) {
+					callback(err);
+				} else {
+					callback(err, {}, data.result.shift());
+				}
+			};
+		}
+	});
+
+	cli.on('cli:post-validate', function (data) {
 		var sdk = (cli.sdk && cli.sdk.name) || (cli.manifest && cli.manifest.version);
 
 		if (sdk && appc.version.gte(sdk, '3.0.0') && appc.version.lt(sdk, '3.2.0') && data.command.platform && /^ios|iphone$/.test(data.command.platform.name)) {
@@ -30,17 +44,5 @@ exports.init = function (logger, config, cli) {
 					data.command.platform.options['deploy-type'].values = ['production'];
 			}
 		}
-
-		if (sdk && appc.version.eq(sdk, '3.2.0')) {
-			cli._fireHookCallback = function (callback, err, data) {
-				if (err) {
-					callback(err);
-				} else {
-					callback(err, {}, data.result.shift());
-				}
-			};
-		}
-
-		finished();
 	});
 };
