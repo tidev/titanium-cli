@@ -1,10 +1,13 @@
 3.2.x
 -------------------
  * When installing a Titanium SDK using the CI version name, but omitting the branch, it now automatically scans all branches [TIMOB-15899]
+ * Fixed 'sdk' command to display custom Titanium SDK paths in SDK Install Locations. [TIMOB-16141]
 
 3.2.1
 -------------------
  * Fixed bug where npm version was not being displayed due to race condition [TIMOB-15962]
+ * Fixed bug where if the node executable is not called "node", the CLI would error because argv[0] != process.execPath. [TIMOB-15804]
+ * Fixed bug when running "ti help" for a command that doesn't have 'platforms' [TIMOB-16233]
 
 3.2.0 (12/20/2013)
 -------------------
