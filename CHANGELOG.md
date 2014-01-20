@@ -1,10 +1,8 @@
-3.2.X
--------------------
- * Fixed bug where if the node executable is not called "node", the CLI would error because argv[0] != process.execPath. [TIMOB-15804]
-
 3.2.1
 -------------------
  * Fixed bug where npm version was not being displayed due to race condition [TIMOB-15962]
+ * Fixed bug where if the node executable is not called "node", the CLI would error because argv[0] != process.execPath. [TIMOB-15804]
+ * Fixed bug when running "ti help" for a command that doesn't have 'platforms' [TIMOB-16233]
 
 3.2.0 (12/20/2013)
 -------------------
