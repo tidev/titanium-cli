@@ -2,7 +2,7 @@
 	"about": {
 		"name": "Titanium Command-Line Interface",
 		"author": "Appcelerator",
-		"copyright": "Copyright (c) 2012-2013, Appcelerator, Inc.  All Rights Reserved.",
+		"copyright": "Copyright (c) 2012-2014, Appcelerator, Inc.  All Rights Reserved.",
 		"id": "com.appcelerator.titanium.cli"
 	},
 	"name": "titanium",
