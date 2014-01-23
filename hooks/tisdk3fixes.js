@@ -19,7 +19,7 @@ exports.init = function (logger, config, cli) {
 	cli.on('cli:go', function () {
 		var sdk = (cli.sdk && cli.sdk.name) || (cli.manifest && cli.manifest.version);
 
-		if (sdk && appc.version.eq(sdk, '3.2.0')) {
+		if (sdk && appc.version.lte(sdk, '3.2.0')) {
 			cli._fireHookCallback = function (callback, err, data) {
 				if (err) {
 					callback(err);
