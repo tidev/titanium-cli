@@ -3,6 +3,7 @@
  * Fixed bug where npm version was not being displayed due to race condition [TIMOB-15962]
  * Fixed bug where if the node executable is not called "node", the CLI would error because argv[0] != process.execPath. [TIMOB-15804]
  * Fixed bug when running "ti help" for a command that doesn't have 'platforms' [TIMOB-16233]
+ * Fixed bug where CLI commands that require a minimum version of the Titanium CLI were not being checked properly. [TIMOB-16361]
 
 3.2.0 (12/20/2013)
 -------------------
