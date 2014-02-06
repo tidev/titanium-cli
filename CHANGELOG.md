@@ -2,6 +2,7 @@
 -------------------
  * When installing a Titanium SDK using the CI version name, but omitting the branch, it now automatically scans all branches [TIMOB-15899]
  * Fixed 'sdk' command to display custom Titanium SDK paths in SDK Install Locations. [TIMOB-16141]
+ * Fixed bug when a SDK >=3.2.0 build is run with --password instead of --store-password. [TIMOB-16354]
  * Fixed command and hook loading when comparing the minimum required CLI version in which the version has a -beta suffix. [TIMOB-16365]
 
 3.2.1
