@@ -22,12 +22,11 @@
 	"version": "3.3.0",
 	"author": {
 		"name": "Appcelerator, Inc.",
-		"email": "info@appcelerator.com"
+		"email": "npmjs@appcelerator.com"
 	},
 	"maintainers": [
 		{"name": "Jeff Haynie", "email": "jhaynie@appcelerator.com"},
-		{"name": "Chris Barber", "email": "cbarber@appcelerator.com"},
-		{"name": "Bryan Hughes", "email": "bhughes@appcelerator.com"}
+		{"name": "Chris Barber", "email": "cbarber@appcelerator.com"}
 	],
 	"repository": {
 		"type": "git",
