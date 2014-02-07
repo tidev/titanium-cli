@@ -1,3 +1,9 @@
+3.2.x
+-------------------
+ * When installing a Titanium SDK using the CI version name, but omitting the branch, it now automatically scans all branches [TIMOB-15899]
+ * Fixed 'sdk' command to display custom Titanium SDK paths in SDK Install Locations [TIMOB-16141]
+ * Fixed bug where the password was not being discarded after logging in and ends up confusing the Android build [TIMOB-16422]
+
 3.2.1
 -------------------
  * Fixed bug where npm version was not being displayed due to race condition [TIMOB-15962]
