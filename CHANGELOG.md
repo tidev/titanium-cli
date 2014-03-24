@@ -1,5 +1,6 @@
 3.2.x
 -------------------
+ * Added temp directory checking to the 'setup check' command [TIMOB-16671]
  * Fixed list of options being displayed in help screen when colors are enabled on Windows [TIMOB-12759]
  * When installing a Titanium SDK using the CI version name, but omitting the branch, it now automatically scans all branches [TIMOB-15899]
  * Fixed 'sdk' command to display custom Titanium SDK paths in SDK Install Locations [TIMOB-16141]
