@@ -1,6 +1,10 @@
 3.2.x
 -------------------
  * Added temp directory checking to the 'setup check' command [TIMOB-16671]
+ * Fixed list of options being displayed in help screen when colors are enabled on Windows [TIMOB-12759]
+ * When installing a Titanium SDK using the CI version name, but omitting the branch, it now automatically scans all branches [TIMOB-15899]
+ * Fixed 'sdk' command to display custom Titanium SDK paths in SDK Install Locations [TIMOB-16141]
+ * Fixed bug where the password was not being discarded after logging in and ends up confusing the Android build [TIMOB-16422]
 
 3.2.1 (2/10/2014)
 -------------------
