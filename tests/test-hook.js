@@ -108,7 +108,7 @@ describe('hook', function () {
 
 			var h = new Hook,
 				fn = h.createHook('test', null, function (x, y, cb) {
-					cb(x * y);
+					cb(null, x * y);
 				});
 
 			h.on('test', {
@@ -117,11 +117,11 @@ describe('hook', function () {
 					data.args[1] *= 2;
 				},
 				post: function (data) {
-					data.result /= 10;
+					data.result[1] /= 10;
 				}
 			});
 
-			fn(2, 3, function (err, data, result) {
+			fn(2, 3, function (err, result) {
 				result.should.equal(2.4);
 				done();
 			});
@@ -134,7 +134,7 @@ describe('hook', function () {
 
 			var h = new Hook,
 				fn = h.createHook('test', function (x, y, cb) {
-					cb(x * y);
+					cb(null, x * y);
 				});
 
 			h.on('test', {
@@ -143,11 +143,11 @@ describe('hook', function () {
 					data.args[1] *= 2;
 				},
 				post: function (data) {
-					data.result /= 10;
+					data.result[1] /= 10;
 				}
 			});
 
-			fn(2, 3, function (err, data, result) {
+			fn(2, 3, function (err, result) {
 				result.should.equal(2.4);
 				done();
 			});
@@ -165,10 +165,9 @@ describe('hook', function () {
 				data.payload *= 2;
 			});
 
-			fn(function (err, data) {
-				data.should.be.an.instanceOf(Array);
-				data[0].should.have.ownProperty('payload');
-				data[0].payload.should.equal(20);
+			fn(function (err, result) {
+				this.should.have.ownProperty('payload');
+				this.payload.should.equal(20);
 				done();
 			});
 		});
