@@ -1,3 +1,7 @@
+3.2.x
+-------------------
+ * Fixed 'sdk' command to display custom Titanium SDK paths in SDK Install Locations. [TIMOB-16141]
+
 3.2.1 (2/10/2014)
 -------------------
  * Fixed bug where npm version was not being displayed due to race condition [TIMOB-15962]
