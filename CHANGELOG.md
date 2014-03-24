@@ -1,6 +1,7 @@
 3.2.x
 -------------------
  * Fixed 'sdk' command to display custom Titanium SDK paths in SDK Install Locations. [TIMOB-16141]
+ * When installing a Titanium SDK using the CI version name, but omitting the branch, it now automatically scans all branches [TIMOB-15899]
 
 3.2.1 (2/10/2014)
 -------------------
