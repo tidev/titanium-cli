@@ -4,7 +4,7 @@
  * Fixed 'sdk' command to display custom Titanium SDK paths in SDK Install Locations [TIMOB-16141]
  * Fixed bug where the password was not being discarded after logging in and ends up confusing the Android build [TIMOB-16422]
 
-3.2.1
+3.2.1 (2/10/2014)
 -------------------
  * Fixed bug where npm version was not being displayed due to race condition [TIMOB-15962]
  * Fixed bug where if the node executable is not called "node", the CLI would error because argv[0] != process.execPath. [TIMOB-15804]
