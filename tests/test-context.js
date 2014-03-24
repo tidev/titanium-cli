@@ -15,6 +15,7 @@ function MockLogger() {
 	this.info = function (s) { this.buffer += s + '\n'; };
 	this.warn = function (s) { this.buffer += s + '\n'; };
 	this.error = function (s) { this.buffer += s + '\n'; };
+	this.banner = function() {};
 }
 
 function createGlobalContext() {
@@ -855,7 +856,7 @@ describe('context', function () {
 			var c = new Context;
 			c.parse(['--foo']).should.eql({
 				_: [],
-				foo: true
+				foo: ''
 			});
 
 			c = new Context;
@@ -871,8 +872,8 @@ describe('context', function () {
 			var c = new Context;
 			c.parse(['--foo1', '--foo2']).should.eql({
 				_: [],
-				foo1: true,
-				foo2: true
+				foo1: '',
+				foo2: ''
 			});
 
 			c = new Context;
@@ -1030,7 +1031,7 @@ describe('context', function () {
 			var c = new Context;
 			c.parse(['--foo1', '--', '--foo2']).should.eql({
 				_: ['--foo2'],
-				foo1: true
+				foo1: ''
 			});
 
 			c = new Context;
@@ -1164,7 +1165,7 @@ describe('context', function () {
 			var c = new Context;
 			c.parse(['--foo', '--baz', 'qux']).should.eql({
 				_: [],
-				foo: true,
+				foo: '',
 				baz: 'qux'
 			});
 
@@ -1183,7 +1184,7 @@ describe('context', function () {
 			var c = new Context;
 			c.parse(['--foo', '--baz', 'qux', 'arg']).should.eql({
 				_: ['arg'],
-				foo: true,
+				foo: '',
 				baz: 'qux'
 			});
 
@@ -1221,7 +1222,7 @@ describe('context', function () {
 			var c = new Context;
 			c.parse(['--baz', 'qux', '--foo']).should.eql({
 				_: [],
-				foo: true,
+				foo: '',
 				baz: 'qux'
 			});
 
@@ -1240,7 +1241,7 @@ describe('context', function () {
 			var c = new Context;
 			c.parse(['--baz', 'qux', 'arg', '--foo']).should.eql({
 				_: ['arg'],
-				foo: true,
+				foo: '',
 				baz: 'qux'
 			});
 

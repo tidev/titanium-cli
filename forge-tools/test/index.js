@@ -22,8 +22,11 @@ module.exports = function () {
 		args.unshift(path.join(rootDir, 'tests', 'run.js'));
 	}
 
-	spawn(process.execPath, args, {
+	var child = spawn(process.execPath, args, {
 		cwd: rootDir,
 		stdio: 'inherit'
+	});
+	child.on('close', function (code) {
+		process.exit(code);
 	});
 };

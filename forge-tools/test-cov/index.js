@@ -69,13 +69,15 @@ module.exports = function () {
 
 					test.stderr.pipe(process.stderr);
 
-					test.on('exit', function (code) {
+					test.on('close', function (code) {
 						if (!code) {
 							fs.writeFileSync(coverageFile, output);
 							console.log('coverage.html generated successfully in ' + (Date.now() - startTime) + ' ms\n');
 						} else {
 							console.error(output);
 						}
+
+						process.exit(code);
 					});
 				}
 			});
