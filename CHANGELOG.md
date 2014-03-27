@@ -1,3 +1,7 @@
+3.3.0
+-------------------
+ * Fixed bug with 'ti setup' when the selected Titanium SDK does not exist [TIMOB-12268]
+
 3.2.3
 -------------------
  * When installing a Titanium SDK using the CI version name, but omitting the branch, it now automatically scans all branches [TIMOB-15899]
