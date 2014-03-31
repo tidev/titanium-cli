@@ -1,6 +1,7 @@
 3.3.0
 -------------------
  * Fixed bug with 'ti setup' when the selected Titanium SDK does not exist [TIMOB-12268]
+ * Added wp8 publisher guid to 'ti setup' [TIMOB-16748]
 
 3.2.3
 -------------------
