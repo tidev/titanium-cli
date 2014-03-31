@@ -3,6 +3,7 @@
  * Fixed bug with 'ti setup' when the selected Titanium SDK does not exist [TIMOB-12268]
  * Added Genymotion environment information to 'ti info' command [TIMOB-16349]
  * Fixed bug where OS and Node.js info was always being returned in 'ti info'
+ * Added wp8 publisher guid to 'ti setup' [TIMOB-16748]
 
 3.2.3
 -------------------
