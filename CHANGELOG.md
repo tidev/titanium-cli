@@ -4,6 +4,7 @@
  * Added Genymotion environment information to 'ti info' command [TIMOB-16349]
  * Fixed bug where OS and Node.js info was always being returned in 'ti info'
  * Added wp8 publisher guid to 'ti setup' [TIMOB-16748]
+ * Added conflicting hook detection and improved hook error reporting [TIMOB-13847]
 
 3.2.3
 -------------------
