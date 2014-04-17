@@ -5,6 +5,7 @@
  * Fixed bug where OS and Node.js info was always being returned in 'ti info'
  * Added wp8 publisher guid to 'ti setup' [TIMOB-16748]
  * Added conflicting hook detection and improved hook error reporting [TIMOB-13847]
+ * Added support for an array of hook events to emit; needed for [TIMOB-10752]
 
 3.2.3
 -------------------
