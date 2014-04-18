@@ -13,6 +13,7 @@
  * Fixed bug where the password was not being discarded after logging in and ends up confusing the Android build [TIMOB-16422]
  * Fixed list of options being displayed in help screen when colors are enabled on Windows [TIMOB-12759]
  * Added temp directory checking to the 'setup check' command [TIMOB-16671]
+ * Fixed disabling of colors for 'setup' command. Also fixed --no-color flag [TIMOB-16853]
 
 3.2.2
 -------------------
