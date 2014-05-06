@@ -1,4 +1,4 @@
-3.2.3
+3.2.3 (5/1/2014)
 -------------------
  * Added temp directory checking to the 'setup check' command [TIMOB-16671]
  * Fixed list of options being displayed in help screen when colors are enabled on Windows [TIMOB-12759]
