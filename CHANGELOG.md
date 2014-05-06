@@ -8,7 +8,7 @@
  * Added support for an array of hook events to emit; needed for [TIMOB-10752]
  * Updated Appcelerator API URLs to api.appcelerator.com [TIMOB-16282]
 
-3.2.3
+3.2.3 (5/1/2014)
 -------------------
  * When installing a Titanium SDK using the CI version name, but omitting the branch, it now automatically scans all branches [TIMOB-15899]
  * Fixed 'sdk' command to display custom Titanium SDK paths in SDK Install Locations [TIMOB-16141]
