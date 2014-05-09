@@ -17,7 +17,7 @@ exports.cliVersion = '>=3.2';
 
 exports.init = function (logger, config, cli) {
 	cli.on('cli:go', function () {
-		var sdk = (cli.sdk && cli.sdk.name) || (cli.manifest && cli.manifest.version);
+		var sdk = (cli.sdk && (cli.sdk.manifest && cli.sdk.manifest.version || cli.sdk.name)) || (cli.manifest && cli.manifest.version);
 
 		// starting in 3.2.1, we "fixed" the hook system, but 3.2.0 and older use the
 		// old hook syntax, so we need to preserve it
@@ -33,7 +33,7 @@ exports.init = function (logger, config, cli) {
 	});
 
 	cli.on('cli:pre-validate', function (data) {
-		var sdk = (cli.sdk && cli.sdk.name) || (cli.manifest && cli.manifest.version);
+		var sdk = (cli.sdk && (cli.sdk.manifest && cli.sdk.manifest.version || cli.sdk.name)) || (cli.manifest && cli.manifest.version);
 
 		// there was a bug in 3.2.0 where the --store-password was being forced to
 		// --password when forking the correct SDK command with a SDK >= 3.2.0, so we
@@ -44,7 +44,7 @@ exports.init = function (logger, config, cli) {
 	});
 
 	cli.on('cli:post-validate', function (data) {
-		var sdk = (cli.sdk && cli.sdk.name) || (cli.manifest && cli.manifest.version);
+		var sdk = (cli.sdk && (cli.sdk.manifest && cli.sdk.manifest.version || cli.sdk.name)) || (cli.manifest && cli.manifest.version);
 
 		if (sdk && appc.version.gte(sdk, '3.0.0') && appc.version.lt(sdk, '3.2.0') && data.command.platform && /^ios|iphone$/.test(data.command.platform.name)) {
 			// in the iOS build for SDK 3.0.0 through 3.1.x, the valid deploy types
