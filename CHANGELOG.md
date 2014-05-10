@@ -8,6 +8,7 @@
  * Added support for an array of hook events to emit; needed for [TIMOB-10752]
  * Updated Appcelerator API URLs to api.appcelerator.com [TIMOB-16282]
  * Added support for Titanium SDKs that can be named anything [TIMOB-16052]
+ * Improved error handling when sdk command requests list of releases [TIMOB-16917]
 
 3.2.3 (5/1/2014)
 -------------------
