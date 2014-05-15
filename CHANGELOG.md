@@ -9,6 +9,7 @@
  * Updated Appcelerator API URLs to api.appcelerator.com [TIMOB-16282]
  * Added support for Titanium SDKs that can be named anything [TIMOB-16052]
  * Improved error handling when sdk command requests list of releases [TIMOB-16917]
+ * Fixed bug with prompting for missing or invalid options that use generic prompting
 
 3.2.3 (5/1/2014)
 -------------------
