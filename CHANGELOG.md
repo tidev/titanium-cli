@@ -10,6 +10,7 @@
  * Added support for Titanium SDKs that can be named anything [TIMOB-16052]
  * Improved error handling when sdk command requests list of releases [TIMOB-16917]
  * Fixed bug with prompting for missing or invalid options that use generic prompting
+ * Fixed sorting of Titanium SDKs in the 'sdk select' command to only list valid SDKs and order by their actual version number [TIMOB-16974]
 
 3.2.3 (5/1/2014)
 -------------------
