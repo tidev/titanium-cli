@@ -176,6 +176,7 @@
 	"Run '%s' to set the selected Titanium SDK.": "Run '%s' to set the selected Titanium SDK.",
 	"used to select which installed Titanium SDK is the selected SDK": "used to select which installed Titanium SDK is the selected SDK",
 	"the version to select": "the version to select",
+	"Found invalid Titanium SDK \"%s\" [%s]": "Found invalid Titanium SDK \"%s\" [%s]",
 	"No suitable Titanium SDKs installed": "No suitable Titanium SDKs installed",
 	"Configuration saved": "Configuration saved",
 	"Invalid Titanium SDK \"%s\"": "Invalid Titanium SDK \"%s\"",
