@@ -11,6 +11,7 @@
  * Improved error handling when sdk command requests list of releases [TIMOB-16917]
  * Fixed bug with prompting for missing or invalid options that use generic prompting
  * Fixed sorting of Titanium SDKs in the 'sdk select' command to only list valid SDKs and order by their actual version number [TIMOB-16974]
+ * Fixed bug where integer config values were being saved as strings instead of numbers [TIMOB-17000]
 
 3.2.3 (5/1/2014)
 -------------------
