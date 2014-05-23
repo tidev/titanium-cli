@@ -12,6 +12,7 @@
  * Fixed bug with prompting for missing or invalid options that use generic prompting
  * Fixed sorting of Titanium SDKs in the 'sdk select' command to only list valid SDKs and order by their actual version number [TIMOB-16974]
  * Fixed bug where integer config values were being saved as strings instead of numbers [TIMOB-17000]
+ * Fixed 'setup check' command when fetching available Node.js and NPM releases [TIMOB-16996]
 
 3.2.3 (5/1/2014)
 -------------------
