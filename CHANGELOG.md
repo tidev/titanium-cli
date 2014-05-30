@@ -1,3 +1,7 @@
+3.3.1
+-------------------
+ * Moved the sending of analytics from the 'exit' event to the command finished callback [TIMOB-17046]
+
 3.3.0
 -------------------
  * Fixed bug with 'ti setup' when the selected Titanium SDK does not exist [TIMOB-12268]
