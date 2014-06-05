@@ -1,6 +1,5 @@
 ## Titanium CLI Release Notes
 
-
 ### 3.3.0
 -------------------
  * Fixed bug with 'ti setup' when the selected Titanium SDK does not exist [TIMOB-12268]
