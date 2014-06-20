@@ -1,7 +1,3 @@
-3.3.1
--------------------
- * Moved the sending of analytics from the 'exit' event to the command finished callback [TIMOB-17046]
-
 3.3.0
 -------------------
  * Fixed bug with 'ti setup' when the selected Titanium SDK does not exist [TIMOB-12268]
@@ -18,6 +14,7 @@
  * Fixed bug where integer config values were being saved as strings instead of numbers [TIMOB-17000]
  * Fixed 'setup check' command when fetching available Node.js and NPM releases [TIMOB-16996]
  * Fixed bug with boolean config setting values being saved as integers [TIMOB-17087]
+ * Moved the sending of analytics from the 'exit' event to the command finished callback [TIMOB-17046]
 
 3.2.3 (5/1/2014)
 -------------------
