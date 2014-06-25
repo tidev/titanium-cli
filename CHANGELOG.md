@@ -15,6 +15,7 @@
  * Fixed 'setup check' command when fetching available Node.js and NPM releases [TIMOB-16996]
  * Fixed bug with boolean config setting values being saved as integers [TIMOB-17087]
  * Moved the sending of analytics from the 'exit' event to the command finished callback [TIMOB-17046]
+ * Fixed bug where the CLI would wait for analytics to send [TIMOB-17206]
 
 3.2.3 (5/1/2014)
 -------------------
