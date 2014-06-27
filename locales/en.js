@@ -297,6 +297,7 @@
 	"distribution cert": "distribution cert",
 	"dev provisioning": "dev provisioning",
 	"Android Environment": "Android Environment",
+	"untested version %s; may or may not work": "untested version %s; may or may not work",
 	"unsupported version %s": "unsupported version %s",
 	"\"adb\" executable not found; please reinstall Android SDK": "\"adb\" executable not found; please reinstall Android SDK",
 	"\"android\" executable not found; please reinstall Android SDK": "\"android\" executable not found; please reinstall Android SDK",
