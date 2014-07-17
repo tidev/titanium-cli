@@ -1,4 +1,4 @@
-3.3.0
+3.3.0 (7/17/14)
 -------------------
  * Fixed bug with 'ti setup' when the selected Titanium SDK does not exist [TIMOB-12268]
  * Added Genymotion environment information to 'ti info' command [TIMOB-16349]
