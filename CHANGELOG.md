@@ -1,3 +1,7 @@
+3.3.1 
+-------------------
+ * Added support for selecting latest stable SDK [TIMOB-17378]
+
 3.3.0 (7/17/2014)
 -------------------
  * Fixed bug with 'ti setup' when the selected Titanium SDK does not exist [TIMOB-12268]
