@@ -1,6 +1,11 @@
-3.3.1 
+3.4.0
 -------------------
  * Added support for selecting latest stable SDK [TIMOB-17378]
+ * Fixed issues with config.json being overwritten at the same time [TIMOB-17346]
+ * Improved handling of corrupt a config.json file [TIMOB-17346]
+ * Fixed backwards compatibility with Titanium SDK 3.3.0 and older when building an iOS app and Xcode 6 or newer is installed
+ * Added support for a "helpNoPrompt()" callback when a missing option is encountered
+ * Fixed bug with abbreviated options that don't have a value being set to true
 
 3.3.0 (7/17/14)
 -------------------
