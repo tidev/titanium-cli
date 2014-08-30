@@ -4,18 +4,20 @@
  * commands and hooks.
  *
  * @copyright
- * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2014 by Appcelerator, Inc. All Rights Reserved.
  *
  * @license
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
 
-var appc = require('node-appc');
+var appc = require('node-appc'),
+	fs = require('fs'),
+	path = require('path');
 
 exports.cliVersion = '>=3.2';
 
-exports.init = function (logger, config, cli) {
+exports.init = function (logger, config, cli, appc) {
 	cli.on('cli:go', function () {
 		var sdk = (cli.sdk && (cli.sdk.manifest && cli.sdk.manifest.version || cli.sdk.name)) || (cli.manifest && cli.manifest.version);
 
@@ -56,6 +58,30 @@ exports.init = function (logger, config, cli) {
 				case 'dist-appstore':
 					data.command.platform.options['deploy-type'].values = ['production'];
 			}
+		}
+	});
+
+	cli.on('build.config', {
+		pre: function (data, done) {
+			var sdk = (cli.sdk && (cli.sdk.manifest && cli.sdk.manifest.version || cli.sdk.name)) || (cli.manifest && cli.manifest.version);
+
+			if (cli.sdk && appc.version.lt(sdk, '3.4.0') && /^(ios|iphone|ipad)$/.test(cli.argv.platform || cli.argv.p)) {
+				// Titanium SDK 3.3.x and older does not support Xcode 6, so we try to remove it as if it never existed
+				var detectFile = path.join(cli.sdk.platforms.iphone.path, 'cli', 'lib', 'detect.js');
+				if (fs.existsSync(detectFile)) {
+					require(detectFile).detect(config, null, function (iosInfo) {
+						Object.keys(iosInfo.xcode).forEach(function (ver) {
+							if (appc.version.gte(iosInfo.xcode[ver].version, '6.0.0')) {
+								delete iosInfo.xcode[ver];
+							}
+						});
+						done();
+					});
+					return;
+				}
+			}
+
+			done();
 		}
 	});
 };
