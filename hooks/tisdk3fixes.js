@@ -13,7 +13,8 @@
 
 var appc = require('node-appc'),
 	fs = require('fs'),
-	path = require('path');
+	path = require('path'),
+	__ = appc.i18n(__dirname).__;
 
 exports.cliVersion = '>=3.2';
 
@@ -77,11 +78,32 @@ exports.init = function (logger, config, cli, appc) {
 		}
 
 		require(detectFile).detect(config, null, function (iosInfo) {
+			var validXcodes = 0;
+
+			// remove all Xcodes that are 6.0 or newer
 			Object.keys(iosInfo.xcode).forEach(function (ver) {
 				if (appc.version.gte(iosInfo.xcode[ver].version, '6.0.0')) {
 					delete iosInfo.xcode[ver];
+				} else if (iosInfo.xcode[ver].supported) {
+					validXcodes++;
 				}
 			});
+
+			// remove all IOS_XCODE_TOO_NEW warnings
+			for (var i = 0; i < iosInfo.issues.length; i++) {
+				if (iosInfo.issues[i].id === 'IOS_XCODE_TOO_NEW') {
+					iosInfo.issues.splice(i--, 1);
+				}
+			}
+
+			if (!validXcodes) {
+				iosInfo.issues.unshift({
+					id: 'IOS_NO_SUPPORTED_XCODE_FOUND',
+					type: 'warning',
+					message: __('There are no supported Xcode installations found.')
+				});
+			}
+
 			callback();
 		});
 	}
