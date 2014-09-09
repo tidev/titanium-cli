@@ -13,13 +13,18 @@
 
 var appc = require('node-appc'),
 	fs = require('fs'),
-	path = require('path');
+	path = require('path'),
+	__ = appc.i18n(__dirname).__;
 
 exports.cliVersion = '>=3.2';
 
 exports.init = function (logger, config, cli, appc) {
+	function getSDK() {
+		return (cli.sdk && (cli.sdk.manifest && cli.sdk.manifest.version || cli.sdk.name)) || (cli.manifest && cli.manifest.version);
+	}
+
 	cli.on('cli:go', function () {
-		var sdk = (cli.sdk && (cli.sdk.manifest && cli.sdk.manifest.version || cli.sdk.name)) || (cli.manifest && cli.manifest.version);
+		var sdk = getSDK();
 
 		// starting in 3.2.1, we "fixed" the hook system, but 3.2.0 and older use the
 		// old hook syntax, so we need to preserve it
@@ -35,7 +40,7 @@ exports.init = function (logger, config, cli, appc) {
 	});
 
 	cli.on('cli:pre-validate', function (data) {
-		var sdk = (cli.sdk && (cli.sdk.manifest && cli.sdk.manifest.version || cli.sdk.name)) || (cli.manifest && cli.manifest.version);
+		var sdk = getSDK();
 
 		// there was a bug in 3.2.0 where the --store-password was being forced to
 		// --password when forking the correct SDK command with a SDK >= 3.2.0, so we
@@ -46,7 +51,7 @@ exports.init = function (logger, config, cli, appc) {
 	});
 
 	cli.on('cli:post-validate', function (data) {
-		var sdk = (cli.sdk && (cli.sdk.manifest && cli.sdk.manifest.version || cli.sdk.name)) || (cli.manifest && cli.manifest.version);
+		var sdk = getSDK();
 
 		if (sdk && appc.version.gte(sdk, '3.0.0') && appc.version.lt(sdk, '3.2.0') && data.command.platform && /^ios|iphone$/.test(data.command.platform.name)) {
 			// in the iOS build for SDK 3.0.0 through 3.1.x, the valid deploy types
@@ -61,27 +66,63 @@ exports.init = function (logger, config, cli, appc) {
 		}
 	});
 
-	cli.on('build.config', {
-		pre: function (data, done) {
-			var sdk = (cli.sdk && (cli.sdk.manifest && cli.sdk.manifest.version || cli.sdk.name)) || (cli.manifest && cli.manifest.version);
+	// Titanium SDK 3.3.x and older does not support Xcode 6, so we try to remove it as if it never existed
+	function removeXcode6(callback) {
+		if (!cli.sdk || appc.version.gte(getSDK(), '3.4.0')) {
+			return callback();
+		}
 
-			if (cli.sdk && appc.version.lt(sdk, '3.4.0') && /^(ios|iphone|ipad)$/.test(cli.argv.platform || cli.argv.p)) {
-				// Titanium SDK 3.3.x and older does not support Xcode 6, so we try to remove it as if it never existed
-				var detectFile = path.join(cli.sdk.platforms.iphone.path, 'cli', 'lib', 'detect.js');
-				if (fs.existsSync(detectFile)) {
-					require(detectFile).detect(config, null, function (iosInfo) {
-						Object.keys(iosInfo.xcode).forEach(function (ver) {
-							if (appc.version.gte(iosInfo.xcode[ver].version, '6.0.0')) {
-								delete iosInfo.xcode[ver];
-							}
-						});
-						done();
-					});
-					return;
+		var detectFile = path.join(cli.sdk.platforms.iphone.path, 'cli', 'lib', 'detect.js');
+		if (!fs.existsSync(detectFile)) {
+			return callback();
+		}
+
+		require(detectFile).detect(config, null, function (iosInfo) {
+			var validXcodes = 0;
+
+			// remove all Xcodes that are 6.0 or newer
+			Object.keys(iosInfo.xcode).forEach(function (ver) {
+				if (appc.version.gte(iosInfo.xcode[ver].version, '6.0.0')) {
+					delete iosInfo.xcode[ver];
+				} else if (iosInfo.xcode[ver].supported) {
+					validXcodes++;
+				}
+			});
+
+			// remove all IOS_XCODE_TOO_NEW warnings
+			for (var i = 0; i < iosInfo.issues.length; i++) {
+				if (iosInfo.issues[i].id === 'IOS_XCODE_TOO_NEW') {
+					iosInfo.issues.splice(i--, 1);
 				}
 			}
 
+			if (!validXcodes) {
+				iosInfo.issues.unshift({
+					id: 'IOS_NO_SUPPORTED_XCODE_FOUND',
+					type: 'warning',
+					message: __('There are no supported Xcode installations found.')
+				});
+			}
+
+			callback();
+		});
+	}
+
+	cli.on('cli:command-loaded', function (data, done) {
+		if (data.command.name === 'info') {
+			removeXcode6(done);
+		} else {
 			done();
+		}
+	});
+
+	cli.on('build.config', {
+		pre: function (data, done) {
+			if (/^(ios|iphone|ipad)$/.test(cli.argv.platform || cli.argv.p)) {
+				removeXcode6(done);
+			} else {
+				done();
+			}
 		}
 	});
 };
