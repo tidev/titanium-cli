@@ -7,6 +7,7 @@
  * Added support for a "helpNoPrompt()" callback when a missing option is encountered
  * Fixed bug with abbreviated options that don't have a value being set to true
  * Fixed bug where Xcode 6 was not being removed from Titanium SDK 3.3.0 and older from the "ti info" results [TIMOB-17649]
+ * Fixed bug where "ti info" failed when an invalid Titanium SDK is selected [TIMOB-17666]
 
 3.3.0 (7/17/14)
 -------------------
