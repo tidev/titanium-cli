@@ -128,7 +128,7 @@ exports.init = function (logger, config, cli, appc) {
 		},
 		post: function (data) {
 			var sdk = getSDK();
-			if (sdk && appc.version.lt(sdk, '3.4.0') && /^(ios|iphone|ipad)$/.test(cli.argv.platform || cli.argv.p)) {
+			if (sdk && appc.version.lt(sdk, '3.4.0')) {
 				// the plan is to wrap the project-dir callback and add the check to see if
 				// we're using the correct SDK so we can fork as soon as possible
 				// note: this logic was fixed in 3.4.0
