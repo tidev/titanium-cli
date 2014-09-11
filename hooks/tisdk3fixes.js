@@ -118,10 +118,17 @@ exports.init = function (logger, config, cli, appc) {
 		}
 	});
 
-	cli.on('build.config', function (data, done) {
-		if (/^(ios|iphone|ipad)$/.test(cli.argv.platform || cli.argv.p)) {
+	cli.on('build.config', {
+		pre: function (data, done) {
+			if (/^(ios|iphone|ipad)$/.test(cli.argv.platform || cli.argv.p)) {
+				return removeXcode6(done);
+			} else {
+				done();
+			}
+		},
+		post: function (data) {
 			var sdk = getSDK();
-			if (sdk && appc.version.lt(sdk, '3.4.0')) {
+			if (sdk && appc.version.lt(sdk, '3.4.0') && /^(ios|iphone|ipad)$/.test(cli.argv.platform || cli.argv.p)) {
 				// the plan is to wrap the project-dir callback and add the check to see if
 				// we're using the correct SDK so we can fork as soon as possible
 				// note: this logic was fixed in 3.4.0
@@ -148,10 +155,7 @@ exports.init = function (logger, config, cli, appc) {
 						}
 					};
 				}
-
-				return removeXcode6(done);
 			}
 		}
-		done();
 	});
 };
