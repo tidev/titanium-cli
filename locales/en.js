@@ -1,4 +1,5 @@
 {
+	"There are no supported Xcode installations found.": "There are no supported Xcode installations found.",
 	"Global": "Global",
 	"\"%s\" is an unrecognized command.": "\"%s\" is an unrecognized command.",
 	"Run '%s' for available commands.": "Run '%s' for available commands.",
@@ -80,6 +81,7 @@
 	"Revision": "Revision",
 	"Skins": "Skins",
 	"ABIs": "ABIs",
+	"none": "none",
 	"Path": "Path",
 	"Vendor": "Vendor",
 	"Description": "Description",
@@ -375,7 +377,7 @@
 	"You are currently %s as %s": "You are currently %s as %s",
 	"You are currently %s": "You are currently %s",
 	"Unable to open config file \"%s\"": "Unable to open config file \"%s\"",
-	"Unable to parse config file": "Unable to parse config file",
+	"Unable to parse config file \"%s\"": "Unable to parse config file \"%s\"",
 	"Unable to write config file %s": "Unable to write config file %s",
 	"Please ensure the Titanium CLI has access to modify this file.": "Please ensure the Titanium CLI has access to modify this file.",
 	"An error occurred trying to save the Titanium CLI config file.": "An error occurred trying to save the Titanium CLI config file.",
