@@ -1,4 +1,4 @@
-3.4.0
+3.4.0 (9/29/14)
 -------------------
  * Added support for selecting latest stable SDK [TIMOB-17378]
  * Fixed issues with config.json being overwritten at the same time [TIMOB-17346]
