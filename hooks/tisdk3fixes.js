@@ -109,7 +109,7 @@ exports.init = function (logger, config, cli, appc) {
 	}
 
 	cli.on('cli:command-loaded', function (data, done) {
-		if (data.command.name === 'info') {
+		if (process.platform === 'darwin' && data.command.name === 'info') {
 			// if we're running the 'info' command, then run the iOS detection and remove
 			// Xcode 6 even if we're not displaying iOS info
 			removeXcode6(done);
@@ -120,7 +120,7 @@ exports.init = function (logger, config, cli, appc) {
 
 	cli.on('build.config', {
 		pre: function (data, done) {
-			if (/^(ios|iphone|ipad)$/.test(cli.argv.platform || cli.argv.p)) {
+			if (process.platform === 'darwin' && /^(ios|iphone|ipad)$/.test(cli.argv.platform || cli.argv.p)) {
 				return removeXcode6(done);
 			} else {
 				done();
