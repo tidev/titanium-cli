@@ -1,3 +1,7 @@
+3.4.1
+-------------------
+ * Fixed bug in Titanium SDK 3 bug fix hook where Xcode should only be removed when running on OS X [TIMOB-17808]
+
 3.4.0 (9/29/14)
 -------------------
  * Added support for selecting latest stable SDK [TIMOB-17378]
