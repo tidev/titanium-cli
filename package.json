@@ -41,7 +41,7 @@
 		"jade": "~0.35.0",
 		"longjohn": "~0.2.2",
 		"moment": "~2.4.0",
-		"node-appc": "0.2.14",
+		"node-appc": "0.2.21",
 		"optimist": "~0.6.0",
 		"request": "~2.27.0",
 		"semver": "~2.2.1",
