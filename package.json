@@ -36,7 +36,7 @@
 	"dependencies": {
 		"async": "~0.2.9",
 		"colors": "~0.6.2",
-		"fields": "~0.1.11",
+		"fields": "~0.1.22",
 		"humanize": "~0.0.9",
 		"jade": "~0.35.0",
 		"longjohn": "~0.2.2",
