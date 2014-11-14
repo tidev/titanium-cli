@@ -2,7 +2,7 @@ Unversioned
 -------------------
  * Added support for generic Titanium SDK-level info [TIMOB-17836]
 
-3.4.1
+3.4.1 (11/14/14)
 -------------------
  * Fixed bug in Titanium SDK 3 bug fix hook where Xcode should only be removed when running on OS X [TIMOB-17808]
 
