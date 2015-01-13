@@ -9,3 +9,4 @@ lib-cov
 coverage.html
 forge
 forge-tools
+lib/commands/lib/*.java
