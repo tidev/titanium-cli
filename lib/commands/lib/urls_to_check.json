@@ -1,7 +1,7 @@
 [
 	"https://api.appcelerator.com/p/v1/release-list",
-	"https://api.appcelerator.net/p/v1/release-list",
 	"https://api.cloud.appcelerator.com",
+	"https://dashboard.appcelerator.com",
 	"http://developer.appcelerator.com",
 	"https://preview.appcelerator.com",
 	"http://preview.appcelerator.com",
