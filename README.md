@@ -11,8 +11,7 @@ powerful and extensible enough for production usage.
 
 ## Prerequisites
 
-The Titanium CLI requires [Node.js 0.8.x](http://nodejs.org/dist/). You can
-download Node.js 0.10.x, but only Titanium SDK 3.1.0 and later will work.
+The Titanium CLI requires [Node.js 0.10.x](http://nodejs.org/dist/) or newer.
 
 ## Installation
 
