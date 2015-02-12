@@ -1,4 +1,17 @@
 language: node_js
 node_js:
-  - "0.10"
-  - "0.12"
+- '0.10'
+- '0.12'
+sudo: false
+install:
+- npm install
+script:
+- npm test
+deploy:
+  provider: npm
+  email: npmjs@appcelerator.com
+  api_key:
+    secure: bfQn/AaDtF5KRh1pb6OGrJHuzn2Vj3kmDpNROXqB2Up1lNP+57dvTBn3LwffNm4MIbQ2D1CFj/4xi/BcWxvRptDc2X0LNmO8X4lqKkLitbfdomaMqw0PuIA9pG2i3zFreDLqsWIcTjEU0BxHS8N63xjA5+fN9JbJ0YTOvAjZDX0=
+  on:
+    tags: true
+    repo: appcelerator/titanium
