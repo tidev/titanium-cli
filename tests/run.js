@@ -95,9 +95,9 @@ if (process.env.APPC_COV) {
 				version: packageJson.version,
 				cov: self.cov,
 				coverageClass: function (n) {
-					if (n >= 75) return 'high';
-					if (n >= 50) return 'medium';
-					if (n >= 25) return 'low';
+					if (n >= 75) {return 'high';}
+					if (n >= 50) {return 'medium';}
+					if (n >= 25) {return 'low';}
 					return 'terrible';
 				}
 			}));

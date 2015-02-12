@@ -61,7 +61,7 @@ function createGlobalContext() {
 		}
 	});
 
-	['config', 'help', 'info', 'login', 'logout', 'module', 'plugin', 'sdk', 'setup', 'status'].forEach(function (name) {
+	['config', 'help', 'create', 'info', 'login', 'logout', 'module', 'plugin', 'sdk', 'setup', 'status'].forEach(function (name) {
 		g.command({
 			name: name,
 			path: path.resolve(__dirname, 'resources', 'commands', name + '.js')
@@ -889,6 +889,8 @@ describe('context', function () {
 		// -a -b
 		it('should parse -a -b', function () {
 			var c = new Context;
+			c.flag('a');
+			c.flag('b');
 			c.parse(['-a', '-b']).should.eql({
 				_: [],
 				a: true,
@@ -908,6 +910,8 @@ describe('context', function () {
 		// -ab
 		it('should parse -ab', function () {
 			var c = new Context;
+			c.flag('a');
+			c.flag('b');
 			c.parse(['-ab']).should.eql({
 				_: [],
 				a: true,
@@ -1744,6 +1748,28 @@ describe('context', function () {
 		// --platform
 		// <command> <subcommand>
 		// nested contexts
+	});
+
+	describe('#create()', function () {
+		// --command-flag <command> --global-flag --command-flag <arg>
+		it('should create a project', function () {
+			var c = createGlobalContext(),
+				logger = new MockLogger;
+
+			c.commands.create.load(logger, {}, {}, function (err, cmd) {
+				cmd.parse(['--force'], Object.keys(c.commands)).should.eql({
+					_: [],
+					help: false,
+					version: false,
+					colors: true,
+					quiet: false,
+					force: true,
+					prompt: true,
+					'progress-bars': true,
+					banner: true
+				});
+			});
+		});
 	});
 
 	describe('#printHelp()', function () {

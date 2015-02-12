@@ -60,6 +60,9 @@
 		"titanium": "./bin/titanium"
 	},
 	"main": "./lib/titanium",
+	"scripts": {
+		"test": "node forge test"
+	},
 	"directories": {
 		"lib": "./lib"
 	},
