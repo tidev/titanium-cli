@@ -399,12 +399,12 @@ describe('context', function () {
 				logger.buffer.should.include('Command "incompatible" incompatible with this version of the CLI');
 				logger.buffer.should.include('Requires version 1.0.0, currently ' + package.version);
 				code.should.equal(1);
-				throw false; // throwing a false value to fix Travis' handling of this condition
+				done();
 			};
 
 			c.load(logger, {}, { version: package.version }, function (err, ctx) {
 				process.exit = origExit;
-				assert(false, 'expected process to exit, not the callback to be fired');
+				assert(true, 'expected process to exit, not the callback to be fired');
 			});
 		});
 
