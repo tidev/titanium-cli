@@ -7,7 +7,8 @@
 
 var assert = require('assert'),
 	path = require('path'),
-	Context = require(__lib('context'));
+	Context = require(__lib('context')),
+	package = require('../package.json');
 
 function MockLogger() {
 	this.buffer = '';
@@ -396,12 +397,12 @@ describe('context', function () {
 			process.exit = function (code) {
 				process.exit = origExit;
 				logger.buffer.should.include('Command "incompatible" incompatible with this version of the CLI');
-				logger.buffer.should.include('Requires version 1.0.0, currently 3.2.0');
+				logger.buffer.should.include('Requires version 1.0.0, currently ' + package.version);
 				code.should.equal(1);
-				throw '';
+				throw false; // throwing a false value to fix Travis' handling of this condition
 			};
 
-			c.load(logger, {}, { version: '3.2.0' }, function (err, ctx) {
+			c.load(logger, {}, { version: package.version }, function (err, ctx) {
 				process.exit = origExit;
 				assert(false, 'expected process to exit, not the callback to be fired');
 			});
