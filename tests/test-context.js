@@ -5,7 +5,8 @@
  * Please see the LICENSE included with this distribution for details.
  */
 
-var assert = require('assert'),
+var appc = require('node-appc'),
+	assert = require('assert'),
 	path = require('path'),
 	Context = require(__lib('context')),
 	package = require('../package.json');
@@ -62,7 +63,7 @@ function createGlobalContext() {
 		}
 	});
 
-	['config', 'help', 'create', 'info', 'login', 'logout', 'module', 'plugin', 'sdk', 'setup', 'status'].forEach(function (name) {
+	['config', 'help', 'info', 'login', 'logout', 'module', 'plugin', 'sdk', 'setup', 'status'].forEach(function (name) {
 		g.command({
 			name: name,
 			path: path.resolve(__dirname, 'resources', 'commands', name + '.js')
@@ -1749,28 +1750,6 @@ describe('context', function () {
 		// --platform
 		// <command> <subcommand>
 		// nested contexts
-	});
-
-	describe('#create()', function () {
-		// --command-flag <command> --global-flag --command-flag <arg>
-		it('should create a project', function () {
-			var c = createGlobalContext(),
-				logger = new MockLogger;
-
-			c.commands.create.load(logger, {}, {}, function (err, cmd) {
-				cmd.parse(['--force'], Object.keys(c.commands)).should.eql({
-					_: [],
-					help: false,
-					version: false,
-					colors: true,
-					quiet: false,
-					force: true,
-					prompt: true,
-					'progress-bars': true,
-					banner: true
-				});
-			});
-		});
 	});
 
 	describe('#printHelp()', function () {
