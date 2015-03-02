@@ -3,6 +3,7 @@
  * Added support for generic Titanium SDK-level info [TIMOB-17836]
  * Allow the colors to be controlled explicitly regardless if attached or detached from a TTY
  * Fixed bug where abbreviated options without values passed in before the last argument being treated as a boolean [TIMOB-18067]
+ * Added Node.js version check when using a Titanium SDK [TIMOB-18629]
 
 3.4.1 (11/14/14)
 -------------------
