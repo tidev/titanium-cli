@@ -1,4 +1,4 @@
-3.4.2
+3.4.2 (03/06/15)
 -------------------
  * Fixed compatibility issues with Node 0.12 [TIMOB-18538]
  * Added Node.js version check when using a Titanium SDK [TIMOB-18629]
