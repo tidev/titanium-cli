@@ -17,7 +17,8 @@
 		"blackberry",
 		"html5",
 		"mobileweb",
-		"mobile web"
+		"mobile web",
+		"appc-client"
 	],
 	"version": "3.6.0-dev",
 	"author": {
