@@ -1,3 +1,7 @@
+Unreleased
+-------------------
+ * Ripped out all authentication requirements. Analytics are now anonymous. Login and logout are no ops. [TIMOB-18711]
+
 3.5.0
 -------------------
  * Added support for generic Titanium SDK-level info [TIMOB-17836]
