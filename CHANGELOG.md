@@ -1,9 +1,6 @@
-Unreleased
+4.0.0
 -------------------
  * Ripped out all authentication requirements. Analytics are now anonymous. Login and logout are no ops. [TIMOB-18711]
-
-3.5.0
--------------------
  * Added support for generic Titanium SDK-level info [TIMOB-17836]
  * Allow the colors to be controlled explicitly regardless if attached or detached from a TTY
  * Fixed bug where abbreviated options without values passed in before the last argument being treated as a boolean [TIMOB-18067]
