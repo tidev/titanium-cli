@@ -45,7 +45,7 @@ exports.init = function (logger, config, cli, appc) {
 		// there was a bug in 3.2.0 where the --store-password was being forced to
 		// --password when forking the correct SDK command with a SDK >= 3.2.0, so we
 		// need to reverse it
-		if (sdk && appc.version.gte(sdk, '3.2.0') && cli.argv.platform == 'android' && !cli.argv['store-password'] && cli.argv.password) {
+		if (sdk && appc.version.gte(sdk, '3.2.0') && appc.version.lt(sdk, '4.0.0') && cli.argv.platform === 'android' && !cli.argv['store-password'] && cli.argv.password) {
 			cli.argv['store-password'] = cli.argv.password;
 		}
 	});
