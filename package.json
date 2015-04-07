@@ -20,7 +20,7 @@
 		"mobile web",
 		"appc-client"
 	],
-	"version": "3.6.0-dev",
+	"version": "4.1.0-dev",
 	"author": {
 		"name": "Appcelerator, Inc.",
 		"email": "npmjs@appcelerator.com"
