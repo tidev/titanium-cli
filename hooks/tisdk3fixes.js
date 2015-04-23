@@ -64,11 +64,10 @@ exports.init = function (logger, config, cli, appc) {
 					data.command.platform.options['deploy-type'].values = ['production'];
 			}
 		}
-		if (appc.version.lt(sdk, '3.2.0')) {
+		if (cli.argv.output !== 'json' && sdk && appc.version.lt(sdk, '3.2.0')) {
 			logger.log('');
 			logger.warn(__('Titanium ' + sdk + ' has been deprecated and will not work with future releases.'));
 			logger.warn(__('Please use Titanium 3.2 or newer.'));
-
 		}
 	});
 
