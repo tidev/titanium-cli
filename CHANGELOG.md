@@ -1,3 +1,7 @@
+4.0.1 (Unreleased)
+-------------------
+ * Fixed bug with building an app that had a different Titanium SDK version than the selected SDK and abbreviated option names were being used [TIMOB-18826]
+
 4.0.0 (Unreleased)
 -------------------
  * Added support for generic Titanium SDK-level info [TIMOB-17836]
