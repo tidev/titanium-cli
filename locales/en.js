@@ -369,7 +369,7 @@
 	"(only valid, non-expired distribution certs are listed)": "(only valid, non-expired distribution certs are listed)",
 	"Invalid iOS distribution certificate": "Invalid iOS distribution certificate",
 	"Path to the Android NDK": "Path to the Android NDK",
-	"Only required for building native Titainum Modules.": "Only required for building native Titainum Modules.",
+	"Only required for building native Titanium Modules.": "Only required for building native Titanium Modules.",
 	"Invalid Android NDK path": "Invalid Android NDK path",
 	"What is your Publisher GUID?": "What is your Publisher GUID?",
 	"Search Paths": "Search Paths",
