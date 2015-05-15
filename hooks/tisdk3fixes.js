@@ -139,33 +139,53 @@ exports.init = function (logger, config, cli, appc) {
 				return;
 			}
 
-			var titaniumFile = path.join(cli.sdk.path, 'node_modules', 'titanium-sdk', 'lib', 'titanium.js'),
-				ti = require(titaniumFile),
+			// Pretty much all versions of Titanium SDK incorrectly handle the situation where the <sdk-version>
+			// in the tiapp.xml differs from selected SDK.
+			//
+			// 3.3.x and older calls ti.validateCorrectSDK() from the build command's validate() function
+			// instead of the --project-dir validate() function.
+			//
+			// 3.4.0 and newer incorrectly call ti.validateCorrectSDK() from the --project-dir callback()
+			// function instead of the validate() function. This is bad since the callback() function
+			// will throw a GracefulShutdown exception in the middle of parsing args.
+			//
+			// To fix this, we noop the function for Ti SDK 3.4.0+ to prevent the GracefulShutdown exception
+			// from being thrown. Then for all versions we augment the --project-dir validate() function to
+			// call ti.validateCorrectSDK().
+			//
+			// Now, after we validate the project dir, we check if the tiapp.xml's <sdk-version> matches
+			// the select Titanium SDK and if so, runs the build, otherwise it will fork the correct command
+			// as initially intended.
+
+			var pd = data.result[1].options['project-dir'],
+				ti = require(path.join(cli.sdk.path, 'node_modules', 'titanium-sdk', 'lib', 'titanium.js')),
 				realValidateCorrectSDK = ti.validateCorrectSDK;
 
-			ti.validateCorrectSDK = function () {
-				return true;
-			};
+			if (pd && typeof pd.validate === 'function') {
+				ti.validateCorrectSDK = function () {
+					// just return true to trick the Titanium SDK 3.4.0+ build command --project-dir option's
+					// callback into succeeding
+					return true;
+				};
 
-			if (appc.version.gte(sdk, '3.4.0')) {
-				var pd = data.result[1].options['project-dir'];
-				if (pd && typeof pd.validate === 'function') {
-					var validate = pd.validate;
-					pd.validate = function (projectDir, callback) {
-						return validate(projectDir, function (err, projectDir) {
-							if (!err) {
-								// first call the callback
+				var origValidate = pd.validate;
+				pd.validate = function (projectDir, callback) {
+					return origValidate(projectDir, function (err, projectDir) {
+						if (!err) {
+							// if we don't have a tiapp loaded, then the --project-dir callback() wasn't
+							// called, so just call it now
+							if (!cli.tiapp) {
 								projectDir = pd.callback(projectDir);
-
-								// now validate the sdk
-								if (!realValidateCorrectSDK(logger, config, cli, 'build')) {
-									throw new cli.GracefulShutdown();
-								}
 							}
-							callback(err, projectDir);
-						});
-					};
-				}
+
+							// now validate the sdk
+							if (!realValidateCorrectSDK(logger, config, cli, 'build')) {
+								throw new cli.GracefulShutdown();
+							}
+						}
+						callback(err, projectDir);
+					});
+				};
 			}
 		}
 	});
