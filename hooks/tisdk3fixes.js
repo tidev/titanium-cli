@@ -135,31 +135,35 @@ exports.init = function (logger, config, cli, appc) {
 		},
 		post: function (data) {
 			var sdk = getSDK();
-			if (sdk && appc.version.lt(sdk, '3.4.0')) {
-				// the plan is to wrap the project-dir callback and add the check to see if
-				// we're using the correct SDK so we can fork as soon as possible
-				// note: this logic was fixed in 3.4.0
+			if (!sdk) {
+				return;
+			}
 
-				var titaniumFile = path.join(cli.sdk.path, 'node_modules', 'titanium-sdk', 'lib', 'titanium.js');
+			var titaniumFile = path.join(cli.sdk.path, 'node_modules', 'titanium-sdk', 'lib', 'titanium.js'),
+				ti = require(titaniumFile),
+				realValidateCorrectSDK = ti.validateCorrectSDK;
 
-				// In Titanium SDK 3.2.3, the validateCorrectSDK() function call was moved from the --project-dir
-				// callback into the validate() function because we needed to make sure all command line arguments
-				// were processed before forking the correct SDK. In Titanium CLI 3.3.0, the command line parser
-				// was completely rewritten and now properly handles arguments, so the validateCorrectSDK() can
-				// be moved back into the callback() where it belongs. This has been corrected in Titanium SDK
-				// 3.4.0, but needs to be monkey patched in 3.2.3 and 3.3.x.
-				if (appc.version.gte(sdk, '3.2.3') && fs.existsSync(titaniumFile)) {
-					var pd = data.result[1].options['project-dir'],
-						orig = pd.callback;
+			ti.validateCorrectSDK = function () {
+				return true;
+			};
 
-					pd.callback = function (projectDir) {
-						if (orig) {
-							projectDir = orig(projectDir);
-						}
-						var ti = require(titaniumFile);
-						if (!ti.validateCorrectSDK(logger, config, cli, 'build')) {
-							throw new cli.GracefulShutdown;
-						}
+			if (appc.version.gte(sdk, '3.4.0')) {
+				var pd = data.result[1].options['project-dir'];
+				if (pd && typeof pd.validate === 'function') {
+					var validate = pd.validate;
+					pd.validate = function (projectDir, callback) {
+						return validate(projectDir, function (err, projectDir) {
+							if (!err) {
+								// first call the callback
+								projectDir = pd.callback(projectDir);
+
+								// now validate the sdk
+								if (!realValidateCorrectSDK(logger, config, cli, 'build')) {
+									throw new cli.GracefulShutdown();
+								}
+							}
+							callback(err, projectDir);
+						});
 					};
 				}
 			}
