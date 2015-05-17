@@ -1,7 +1,3 @@
-4.0.1 (Unreleased)
--------------------
- * Fixed bug with building an app that had a different Titanium SDK version than the selected SDK and abbreviated option names were being used [TIMOB-18826]
-
 4.0.0 (Unreleased)
 -------------------
  * Added support for generic Titanium SDK-level info [TIMOB-17836]
@@ -9,6 +5,7 @@
  * Fixed bug where abbreviated options without values passed in before the last argument being treated as a boolean [TIMOB-18067]
  * Ripped out all authentication requirements. Analytics are now anonymous. Login and logout are no ops. [TIMOB-18711]
  * Capped SDK version monkey patch for which --password is converted to --store-password for Android [TIMOB-18783]
+ * Fixed bug with building an app that had a different Titanium SDK version than the selected SDK and abbreviated option names were being used [TIMOB-18826]
 
 3.4.2 (3/6/2015)
 -------------------
