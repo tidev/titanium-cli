@@ -133,33 +133,57 @@ exports.init = function (logger, config, cli, appc) {
 		},
 		post: function (data) {
 			var sdk = getSDK();
-			if (sdk && appc.version.lt(sdk, '3.4.0')) {
-				// the plan is to wrap the project-dir callback and add the check to see if
-				// we're using the correct SDK so we can fork as soon as possible
-				// note: this logic was fixed in 3.4.0
+			if (!sdk) {
+				return;
+			}
 
-				var titaniumFile = path.join(cli.sdk.path, 'node_modules', 'titanium-sdk', 'lib', 'titanium.js');
+			// Pretty much all versions of Titanium SDK incorrectly handle the situation where the <sdk-version>
+			// in the tiapp.xml differs from selected SDK.
+			//
+			// 3.3.x and older calls ti.validateCorrectSDK() from the build command's validate() function
+			// instead of the --project-dir validate() function.
+			//
+			// 3.4.0 and newer incorrectly call ti.validateCorrectSDK() from the --project-dir callback()
+			// function instead of the validate() function. This is bad since the callback() function
+			// will throw a GracefulShutdown exception in the middle of parsing args.
+			//
+			// To fix this, we noop the function for Ti SDK 3.4.0+ to prevent the GracefulShutdown exception
+			// from being thrown. Then for all versions we augment the --project-dir validate() function to
+			// call ti.validateCorrectSDK().
+			//
+			// Now, after we validate the project dir, we check if the tiapp.xml's <sdk-version> matches
+			// the select Titanium SDK and if so, runs the build, otherwise it will fork the correct command
+			// as initially intended.
 
-				// In Titanium SDK 3.2.3, the validateCorrectSDK() function call was moved from the --project-dir
-				// callback into the validate() function because we needed to make sure all command line arguments
-				// were processed before forking the correct SDK. In Titanium CLI 3.3.0, the command line parser
-				// was completely rewritten and now properly handles arguments, so the validateCorrectSDK() can
-				// be moved back into the callback() where it belongs. This has been corrected in Titanium SDK
-				// 3.4.0, but needs to be monkey patched in 3.2.3 and 3.3.x.
-				if (appc.version.gte(sdk, '3.2.3') && fs.existsSync(titaniumFile)) {
-					var pd = data.result[1].options['project-dir'],
-						orig = pd.callback;
+			var pd = data.result[1].options['project-dir'],
+				ti = require(path.join(cli.sdk.path, 'node_modules', 'titanium-sdk', 'lib', 'titanium.js')),
+				realValidateCorrectSDK = ti.validateCorrectSDK;
 
-					pd.callback = function (projectDir) {
-						if (orig) {
-							projectDir = orig(projectDir);
+			if (pd && typeof pd.validate === 'function') {
+				ti.validateCorrectSDK = function () {
+					// just return true to trick the Titanium SDK 3.4.0+ build command --project-dir option's
+					// callback into succeeding
+					return true;
+				};
+
+				var origValidate = pd.validate;
+				pd.validate = function (projectDir, callback) {
+					return origValidate(projectDir, function (err, projectDir) {
+						if (!err) {
+							// if we don't have a tiapp loaded, then the --project-dir callback() wasn't
+							// called, so just call it now
+							if (!cli.tiapp) {
+								projectDir = pd.callback(projectDir);
+							}
+
+							// now validate the sdk
+							if (!realValidateCorrectSDK(logger, config, cli, 'build')) {
+								throw new cli.GracefulShutdown();
+							}
 						}
-						var ti = require(titaniumFile);
-						if (!ti.validateCorrectSDK(logger, config, cli, 'build')) {
-							throw new cli.GracefulShutdown;
-						}
-					};
-				}
+						callback(err, projectDir);
+					});
+				};
 			}
 		}
 	});
