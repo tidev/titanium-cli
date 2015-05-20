@@ -1,4 +1,4 @@
-4.0.0 (Unreleased)
+4.0.0 (05/21/15)
 -------------------
  * Added support for generic Titanium SDK-level info [TIMOB-17836]
  * Allow the colors to be controlled explicitly regardless if attached or detached from a TTY
