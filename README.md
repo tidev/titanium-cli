@@ -149,20 +149,6 @@ Lists all installed Titanium SDKs. Optionally lists all branches and releases.
     titanium sdk list -br
     titanium sdk list --branches --releases
 
-#### sdk update
-
-Checks if there is a new version of the Titanium SDK available.
-
-    titanium sdk update
-
-Download and install the latest version.
-
-    titanium sdk update --force
-
-Download and install the latest version for the specified branch if not already installed.
-
-    titanium sdk update --branch master
-
 ### setup
 
 Reconfigures the Titanium CLI by asking you a series of questions.
