@@ -4,7 +4,7 @@
 [![Dependency Status](https://david-dm.org/appcelerator/titanium.svg)](https://david-dm.org/appcelerator/titanium)
 [![devDependency Status](https://david-dm.org/appcelerator/titanium/dev-status.svg)](https://david-dm.org/appcelerator/titanium#info=devDependencies)
 [![NPM version](https://badge.fury.io/js/titanium.svg)](http://badge.fury.io/js/grunt-appc-js)
-u
+
 [![NPM](https://nodei.co/npm-dl/titanium.png)](https://nodei.co/npm/titanium/)
 
 [Titanium CLI](https://github.com/appcelerator/titanium) is a
