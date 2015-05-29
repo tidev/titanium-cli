@@ -1,3 +1,7 @@
+4.0.1 (05/29/15)
+-------------------
+ * Fixed bug with appending values to configuration hooks
+
 4.0.0 (05/21/15)
 -------------------
  * Added support for generic Titanium SDK-level info [TIMOB-17836]
