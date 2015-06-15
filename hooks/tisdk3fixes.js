@@ -66,7 +66,7 @@ exports.init = function (logger, config, cli, appc) {
 		}
 
 		// dont show warnings if output type is json
-		if (cli.argv.output !== 'json' && sdk && appc.version.lt(sdk, '3.2.0')) {
+		if (cli.argv.output !== 'json' && data.command.name === 'build' && sdk && appc.version.lt(sdk, '3.2.0')) {
 			logger.log('');
 			logger.warn(__('Titanium ' + sdk + ' has been deprecated and will not work with future releases.'));
 			logger.warn(__('Please use Titanium 3.2 or newer.'));
