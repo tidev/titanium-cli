@@ -1,4 +1,11 @@
-## Overview
+## Titanium CLI
+
+> [Titanium CLI](https://github.com/appcelerator/titanium) is a
+[Command Line Tool](http://en.wikipedia.org/wiki/Command-line_interface)
+for creating and building Titanium Mobile applications and modules. It's
+open-source and easy to use. [We've](https://github.com/appcelerator)
+designed Titanium to be suitable for command line beginners, but still be
+powerful and extensible enough for production usage.
 
 [![Build Status](https://travis-ci.org/appcelerator/titanium.svg?branch=master)](https://travis-ci.org/appcelerator/titanium)
 [![Dependency Status](https://david-dm.org/appcelerator/titanium.svg)](https://david-dm.org/appcelerator/titanium)
@@ -6,13 +13,6 @@
 [![NPM version](https://badge.fury.io/js/titanium.svg)](http://badge.fury.io/js/grunt-appc-js)
 
 [![NPM](https://nodei.co/npm-dl/titanium.png)](https://nodei.co/npm/titanium/)
-
-[Titanium CLI](https://github.com/appcelerator/titanium) is a
-[Command Line Tool](http://en.wikipedia.org/wiki/Command-line_interface)
-for creating and building Titanium Mobile applications and modules. It's
-open-source and easy to use. [We've](https://github.com/appcelerator)
-designed Titanium to be suitable for command line beginners, but still be
-powerful and extensible enough for production usage.
 
 ## Prerequisites
 
