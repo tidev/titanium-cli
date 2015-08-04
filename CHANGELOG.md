@@ -1,3 +1,7 @@
+4.1.x (Unreleased)
+-------------------
+ * Fixed bug where the command line args weren't being parsed again after handling a branching option [TIMOB-19281]
+
 4.0.1 (Unreleased)
 -------------------
  * Fixed bug with building an app that had a different Titanium SDK version than the selected SDK and abbreviated option names were being used [TIMOB-18826]
