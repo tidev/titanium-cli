@@ -1,12 +1,12 @@
-4.1.x (Unreleased)
+4.1.4 (8/4/2015)
 -------------------
  * Fixed bug where the command line args weren't being parsed again after handling a branching option [TIMOB-19281]
 
-4.0.1 (Unreleased)
+4.0.1 (5/29/2015)
 -------------------
  * Fixed bug with building an app that had a different Titanium SDK version than the selected SDK and abbreviated option names were being used [TIMOB-18826]
 
-4.0.0 (Unreleased)
+4.0.0 (5/20/2015)
 -------------------
  * Added support for generic Titanium SDK-level info [TIMOB-17836]
  * Allow the colors to be controlled explicitly regardless if attached or detached from a TTY
