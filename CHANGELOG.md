@@ -1,3 +1,7 @@
+4.1.5 (8/18/2015)
+-------------------
+ * Fixed console colors when running in PowerShell [TIMOB-19126]
+
 4.1.4 (8/4/2015)
 -------------------
  * Fixed bug where the command line args weren't being parsed again after handling a branching option [TIMOB-19281]
