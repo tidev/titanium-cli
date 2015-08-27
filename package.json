@@ -34,6 +34,9 @@
 		"url": "git://github.com/appcelerator/titanium.git"
 	},
 	"preferGlobal": true,
+	"scripts": {
+	    "test": "grunt"
+	},
 	"dependencies": {
 		"async": "~0.2.9",
 		"colors": "~0.6.2",
@@ -53,7 +56,11 @@
 	},
 	"devDependencies": {
 		"mocha": "*",
-		"should": "~1.3.0"
+		"should": "~1.3.0",
+		"grunt-cli": "*",
+		"grunt-contrib-jshint": "^0.10.0",
+		"grunt-jscs": "^1.5.0",
+		"jscs-jsdoc": "^0.4.5"		
 	},
 	"license": "Apache-2.0",
 	"bin": {
