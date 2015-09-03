@@ -1,3 +1,7 @@
+5.0.1 (9/3/2015)
+-------------------
+ * Updated to node-appc 0.2.31 which fixes a bug with the JDK detection
+
 5.0.0 (9/3/2015)
 -------------------
  * Updated to node-appc 0.2.30
