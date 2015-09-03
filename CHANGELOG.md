@@ -1,3 +1,7 @@
+5.0.0 (9/3/2015)
+-------------------
+ * Updated to node-appc 0.2.30
+
 4.1.5 (8/18/2015)
 -------------------
  * Fixed console colors when running in PowerShell [TIMOB-19126]
