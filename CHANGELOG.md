@@ -1,3 +1,7 @@
+5.0.2 (9/9/2015)
+-------------------
+ * Fixed bug where 'ti setup check' was reporting the latest NPM version, not the latest stable version [TIMOB-19470]
+
 5.0.1 (9/3/2015)
 -------------------
  * Updated to node-appc 0.2.31 which fixes a bug with the JDK detection
