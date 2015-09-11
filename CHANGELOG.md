@@ -1,3 +1,8 @@
+5.0.3 (9/9/2015)
+-------------------
+ * No longer display latest Node.js and NPM version as it confusing may imply the Titanium CLI supports them [TIMOB-19470]
+ * Updated NPM dependencies
+
 5.0.2 (9/9/2015)
 -------------------
  * Fixed bug where 'ti setup check' was reporting the latest NPM version, not the latest stable version [TIMOB-19470]
