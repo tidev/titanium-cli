@@ -1,3 +1,8 @@
+5.0.4 (9/17/2015)
+-------------------
+ * Added actual SDK version to `ti sdk list` output as well as SDK details to `ti sdk list -o json` [TIMOB-19541]
+ * Updated NPM dependencies
+
 5.0.3 (9/9/2015)
 -------------------
  * No longer display latest Node.js and NPM version as it confusing may imply the Titanium CLI supports them [TIMOB-19470]

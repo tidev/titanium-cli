@@ -20,7 +20,7 @@
 		"mobile web",
 		"appc-client"
 	],
-	"version": "5.0.3",
+	"version": "5.0.4",
 	"author": {
 		"name": "Appcelerator, Inc.",
 		"email": "npmjs@appcelerator.com"
@@ -39,11 +39,11 @@
 		"colors": "1.1.2",
 		"fields": "0.1.24",
 		"humanize": "0.0.9",
-		"longjohn": "0.2.8",
+		"longjohn": "0.2.9",
 		"moment": "2.10.6",
 		"node-appc": "0.2.31",
-		"request": "2.61.0",
-		"semver": "5.0.2",
+		"request": "2.62.0",
+		"semver": "5.0.3",
 		"sprintf": "0.1.5",
 		"temp": "0.8.3",
 		"winston": "1.0.x",
