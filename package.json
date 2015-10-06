@@ -20,7 +20,7 @@
 		"mobile web",
 		"appc-client"
 	],
-	"version": "5.0.4",
+	"version": "5.0.5",
 	"author": {
 		"name": "Appcelerator, Inc.",
 		"email": "npmjs@appcelerator.com"
@@ -29,6 +29,9 @@
 		{"name": "Jeff Haynie", "email": "jhaynie@appcelerator.com"},
 		{"name": "Chris Barber", "email": "cbarber@appcelerator.com"}
 	],
+	"bugs": {
+		"url": "https://jira.appcelerator.org/browse/TIMOB"
+	},
 	"repository": {
 		"type": "git",
 		"url": "git://github.com/appcelerator/titanium.git"
