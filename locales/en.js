@@ -204,7 +204,7 @@
 	"Release \"%s\" does not exist": "Release \"%s\" does not exist",
 	"Did you forget to specify the branch?": "Did you forget to specify the branch?",
 	"Available Releases:": "Available Releases:",
-	"Found release %s in branch %s": "Found release %s in branch %s",
+	"Found build %s in branch %s": "Found build %s in branch %s",
 	"No branches found!": "No branches found!",
 	"Branch \"%s\" does not exist": "Branch \"%s\" does not exist",
 	"Available Branches:": "Available Branches:",
