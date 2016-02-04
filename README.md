@@ -12,8 +12,6 @@ powerful and extensible enough for production usage.
 [![devDependency Status](https://david-dm.org/appcelerator/titanium/dev-status.svg)](https://david-dm.org/appcelerator/titanium#info=devDependencies)
 [![NPM version](https://badge.fury.io/js/titanium.svg)](http://badge.fury.io/js/grunt-appc-js)
 
-[![NPM](https://nodei.co/npm-dl/titanium.png)](https://nodei.co/npm/titanium/)
-
 ## Prerequisites
 
 The Titanium CLI requires [Node.js 0.10.x](http://nodejs.org/dist/) or newer.
