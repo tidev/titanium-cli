@@ -8,8 +8,8 @@ install:
 - npm install
 script:
 - npm test
-- brew update
-- brew install jq
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install jq      ; fi
 - PACKAGE_VERSION=`jq -r .version package.json`
 - PACKAGE_NAME=`jq -r .name package.json`
 - test -z "$(npm info $PACKAGE_NAME@$PACKAGE_VERSION)"
