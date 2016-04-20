@@ -8,6 +8,11 @@ install:
 - npm install
 script:
 - npm test
+- brew update
+- brew install jq
+- PACKAGE_VERSION=`jq -r .version package.json`
+- PACKAGE_NAME=`jq -r .name package.json`
+- test -z "$(npm info $PACKAGE_NAME@$PACKAGE_VERSION)"
 deploy:
   provider: npm
   email: npmjs@appcelerator.com
