@@ -12,6 +12,6 @@ script:
 - PACKAGE_VERSION=`jq -r .version package.json`
 - PACKAGE_NAME=`jq -r .name package.json`
 - echo "Checking for existance of already-published $PACKAGE_NAME@$PACKAGE_VERSION"
-- if [ -z "$(npm info $PACKAGE_NAME@$PACKAGE_VERSION)" ]; then echo "Build version exists on NPM"; exit 1; fi
+- if [ -n "$(npm info $PACKAGE_NAME@$PACKAGE_VERSION)" ]; then echo "Build version exists on NPM"; exit 1; fi
 - npm test
 
