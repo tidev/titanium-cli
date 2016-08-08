@@ -7,12 +7,11 @@ sudo: false
 install:
 - npm install
 script:
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install jq      ; fi
+- PACKAGE_VERSION=`jq -r .version package.json`
+- PACKAGE_NAME=`jq -r .name package.json`
+- echo "Checking for existance of already-published $PACKAGE_NAME@$PACKAGE_VERSION"
+- if [ -n "$(npm info $PACKAGE_NAME@$PACKAGE_VERSION)" ]; then echo "Build version exists on NPM"; exit 1; fi
 - npm test
-deploy:
-  provider: npm
-  email: npmjs@appcelerator.com
-  api_key:
-    secure: mTry0QnGx93zZh83CN3XE9GlgMLn9WVKw8UFg7r4nzYFnxSBFlC5W00HQHoizXQC0HgU/e7NMAOrqjzKfPOj/qFoqcOF2EiJ3xL+fwE3Uk6K38yklUgiRSd3tSfkX0ZG3Adlc1WK9D/JstrV7dKaOGms7ZIn92jtujb7Fm5qcjo=
-  on:
-    tags: true
-    repo: appcelerator/titanium
+
