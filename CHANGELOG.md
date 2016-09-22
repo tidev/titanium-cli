@@ -1,3 +1,7 @@
+5.0.10 (9/22/2016)
+-------------------
+ * Fixed bug when running `ti setup sdk` and entering "latest" when the selected SDK no longer exists [TIMOB-23941]
+
 5.0.4 (9/17/2015)
 -------------------
  * Added actual SDK version to `ti sdk list` output as well as SDK details to `ti sdk list -o json` [TIMOB-19541]
