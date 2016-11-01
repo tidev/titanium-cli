@@ -38,6 +38,7 @@
 	},
 	"preferGlobal": true,
 	"dependencies": {
+		"adm-zip": "0.4.7",
 		"async": "2.1.2",
 		"colors": "1.1.2",
 		"fields": "0.1.24",
