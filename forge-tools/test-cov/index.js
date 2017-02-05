@@ -12,10 +12,9 @@
 
 module.exports = function () {
 	var spawn = require('child_process').spawn,
-		fs = require('fs'),
+		fs = require('fs-extra'),
 		path = require('path'),
 		colors = require('colors'),
-		wrench = require('wrench'),
 		args = Array.prototype.slice.call(arguments);
 
 	console.log('Code Coverage Tool'.cyan.bold + ' - Copyright (c) 2012-' + (new Date).getFullYear() + ', Appcelerator, Inc.  All Rights Reserved.\n');
@@ -34,7 +33,7 @@ module.exports = function () {
 			var startTime = Date.now();
 			console.log('Generating lib-cov...');
 
-			wrench.rmdirSyncRecursive(path.join(rootDir, 'lib-cov'), true);
+			fs.removeSync(path.join(rootDir, 'lib-cov'), true);
 			var child = spawn('jscoverage', ['lib', 'lib-cov'], { cwd: rootDir }),
 				err = '';
 
