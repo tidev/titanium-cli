@@ -79,6 +79,10 @@ exports.init = function (logger, config, cli, appc) {
 			return callback();
 		}
 
+		if (!cli.sdk.platforms.iphone) {
+			return callback();
+		}
+
 		var detectFile = path.join(cli.sdk.platforms.iphone.path, 'cli', 'lib', 'detect.js');
 		if (!fs.existsSync(detectFile)) {
 			return callback();
