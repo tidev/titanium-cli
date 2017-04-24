@@ -113,9 +113,9 @@ describe('context', function () {
 			});
 			c.flags.should.have.ownProperty('quiet');
 			c.aliases.should.have.ownProperty('silence');
-			c.aliases.silence.should.include('quiet');
+			c.aliases.silence.should.containEql('quiet');
 			c.aliases.should.have.ownProperty('q');
-			c.aliases.q.should.include('quiet');
+			c.aliases.q.should.containEql('quiet');
 		});
 	});
 
@@ -158,9 +158,9 @@ describe('context', function () {
 			});
 			c.options.should.have.ownProperty('sdk');
 			c.aliases.should.have.ownProperty('s');
-			c.aliases.s.should.include('sdk');
+			c.aliases.s.should.containEql('sdk');
 			c.aliases.should.have.ownProperty('tisdk');
-			c.aliases.tisdk.should.include('sdk');
+			c.aliases.tisdk.should.containEql('sdk');
 		});
 	});
 
@@ -208,9 +208,9 @@ describe('context', function () {
 			c.commands.test.options.should.have.ownProperty('target');
 
 			c.commands.test.aliases.should.have.ownProperty('q');
-			c.commands.test.aliases.q.should.include('quiet');
+			c.commands.test.aliases.q.should.containEql('quiet');
 			c.commands.test.aliases.should.have.ownProperty('s');
-			c.commands.test.aliases.s.should.include('sdk');
+			c.commands.test.aliases.s.should.containEql('sdk');
 
 			c.commands.test.subcommands.should.have.ownProperty('list');
 		});
@@ -256,9 +256,9 @@ describe('context', function () {
 			c.commands.test.platforms.ios.options.should.have.ownProperty('target');
 
 			c.commands.test.platforms.ios.aliases.should.have.ownProperty('q');
-			c.commands.test.platforms.ios.aliases.q.should.include('quiet');
+			c.commands.test.platforms.ios.aliases.q.should.containEql('quiet');
 			c.commands.test.platforms.ios.aliases.should.have.ownProperty('s');
-			c.commands.test.platforms.ios.aliases.s.should.include('sdk');
+			c.commands.test.platforms.ios.aliases.s.should.containEql('sdk');
 
 			c.commands.test.platforms.ios.subcommands.should.have.ownProperty('list');
 		});
@@ -312,9 +312,9 @@ describe('context', function () {
 			c.subcommands.list.options.should.have.ownProperty('target');
 
 			c.subcommands.list.aliases.should.have.ownProperty('q');
-			c.subcommands.list.aliases.q.should.include('quiet');
+			c.subcommands.list.aliases.q.should.containEql('quiet');
 			c.subcommands.list.aliases.should.have.ownProperty('s');
-			c.subcommands.list.aliases.s.should.include('sdk');
+			c.subcommands.list.aliases.s.should.containEql('sdk');
 		});
 	});
 
@@ -327,7 +327,7 @@ describe('context', function () {
 
 			process.exit = function (code) {
 				process.exit = origExit;
-				logger.buffer.should.include('Unable to load "" command because command file path unknown');
+				logger.buffer.should.containEql('Unable to load "" command because command file path unknown');
 				code.should.equal(1);
 				done();
 			};
@@ -346,7 +346,7 @@ describe('context', function () {
 
 			process.exit = function (code) {
 				process.exit = origExit;
-				logger.buffer.should.include('Unable to load "test" command because command file path unknown');
+				logger.buffer.should.containEql('Unable to load "test" command because command file path unknown');
 				code.should.equal(1);
 				done();
 			};
@@ -365,8 +365,8 @@ describe('context', function () {
 
 			process.exit = function (code) {
 				process.exit = origExit;
-				logger.buffer.should.include('Unable to load "doesnotexist" command because command file path does not exist');
-				logger.buffer.should.include('Command file: ' + path.join(__dirname, 'resources', 'commands', 'doesnotexist.js'));
+				logger.buffer.should.containEql('Unable to load "doesnotexist" command because command file path does not exist');
+				logger.buffer.should.containEql('Command file: ' + path.join(__dirname, 'resources', 'commands', 'doesnotexist.js'));
 				code.should.equal(1);
 				done();
 			};
@@ -395,16 +395,19 @@ describe('context', function () {
 
 			process.exit = function (code) {
 				process.exit = origExit;
-				logger.buffer.should.include('Command "incompatible" incompatible with this version of the CLI');
-				logger.buffer.should.include('Requires version 1.0.0, currently 3.2.0');
+				logger.buffer.should.containEql('Command "incompatible" incompatible with this version of the CLI');
+				logger.buffer.should.containEql('Requires version 1.0.0, currently 3.2.0');
 				code.should.equal(1);
 				throw '';
 			};
 
-			c.load(logger, {}, { version: '3.2.0' }, function (err, ctx) {
-				process.exit = origExit;
-				assert(false, 'expected process to exit, not the callback to be fired');
-			});
+			(function () {
+				c.load(logger, {}, { version: '3.2.0' }, function (err, ctx) {
+					process.exit = origExit;
+					assert(false, 'expected process to exit, not the callback to be fired');
+				});
+			}).should.throw();
+			done();
 		});
 
 		it('should load module with object-based config', function (done) {
@@ -421,9 +424,9 @@ describe('context', function () {
 				ctx.options.should.have.ownProperty('target');
 
 				ctx.aliases.should.have.ownProperty('q');
-				ctx.aliases.q.should.include('quiet');
+				ctx.aliases.q.should.containEql('quiet');
 				ctx.aliases.should.have.ownProperty('s');
-				ctx.aliases.s.should.include('sdk');
+				ctx.aliases.s.should.containEql('sdk');
 
 				ctx.subcommands.should.have.ownProperty('list');
 
@@ -445,9 +448,9 @@ describe('context', function () {
 				ctx.options.should.have.ownProperty('target');
 
 				ctx.aliases.should.have.ownProperty('q');
-				ctx.aliases.q.should.include('quiet');
+				ctx.aliases.q.should.containEql('quiet');
 				ctx.aliases.should.have.ownProperty('s');
-				ctx.aliases.s.should.include('sdk');
+				ctx.aliases.s.should.containEql('sdk');
 
 				ctx.subcommands.should.have.ownProperty('list');
 
@@ -580,8 +583,8 @@ describe('context', function () {
 
 			c.load(logger, {}, cli, function (err, ctx) {
 				assert(!err, 'expected "foo" to load without error');
-				ctx.platforms.should.haveOwnProperty('android');
-				ctx.platforms.should.haveOwnProperty('ios');
+				ctx.platforms.should.have.ownProperty('android');
+				ctx.platforms.should.have.ownProperty('ios');
 				done();
 			});
 		});

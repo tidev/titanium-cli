@@ -23,9 +23,9 @@ describe('hook', function () {
 			h.scanHooks(dir);
 
 			h.hooks.scannedPaths.should.have.ownProperty(dir);
-			h.hooks.loadedFilenames.should.include(path.join(dir, 'testhook.js'));
-			h.hooks.incompatibleFilenames.should.include(path.join(dir, 'oldhook.js'));
-			h.hooks.erroredFilenames.should.include(path.join(dir, 'errorhook.js'));
+			h.hooks.loadedFilenames.should.containEql(path.join(dir, 'testhook.js'));
+			h.hooks.incompatibleFilenames.should.containEql(path.join(dir, 'oldhook.js'));
+			h.hooks.erroredFilenames.should.containEql(path.join(dir, 'errorhook.js'));
 		});
 	});
 
