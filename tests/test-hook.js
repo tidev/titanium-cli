@@ -7,7 +7,9 @@
 
 var assert = require('assert'),
 	path = require('path'),
-	Hook = require(__lib('hook'));
+	Hook = require('../lib/hook'),
+	should = require('should'),
+	Mocha = require('mocha');
 
 describe('hook', function () {
 	it('namespace exists', function () {

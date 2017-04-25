@@ -26,11 +26,11 @@ timestamps {
 						}
 						sh 'yarn install'
 
-						// try {
-							sh 'node forge test'
-						// } finally {
-						// 	junit 'junit_report.xml'
-						// }
+						try {
+							sh 'yarn test'
+						} finally {
+							junit 'junit_report.xml'
+						}
 						fingerprint 'package.json'
 
 						// Don't tag PRs

@@ -7,7 +7,9 @@
 
 var assert = require('assert'),
 	path = require('path'),
-	Context = require(__lib('context'));
+	Context = require('../lib/context'),
+	should = require('should'),
+	Mocha = require('mocha');
 
 function MockLogger() {
 	this.buffer = '';
@@ -894,8 +896,8 @@ describe('context', function () {
 			var c = new Context;
 			c.parse(['-a', '-b']).should.eql({
 				_: [],
-				a: true,
-				b: true
+				a: undefined,
+				b: undefined
 			});
 
 			c = new Context;
@@ -914,7 +916,7 @@ describe('context', function () {
 			c.parse(['-ab']).should.eql({
 				_: [],
 				a: true,
-				b: true
+				b: undefined
 			});
 
 			c = new Context;
