@@ -2,7 +2,7 @@
 library 'pipeline-library'
 
 timestamps {
-	node('(osx || linux) && git') {
+	node('(osx || linux) && git && npm-publish') {
 		def packageVersion = ''
 		def isPR = false
 
