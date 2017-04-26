@@ -8,11 +8,3 @@ install:
 - npm install
 script:
 - npm test
-deploy:
-  provider: npm
-  email: npmjs@appcelerator.com
-  api_key:
-    secure: mTry0QnGx93zZh83CN3XE9GlgMLn9WVKw8UFg7r4nzYFnxSBFlC5W00HQHoizXQC0HgU/e7NMAOrqjzKfPOj/qFoqcOF2EiJ3xL+fwE3Uk6K38yklUgiRSd3tSfkX0ZG3Adlc1WK9D/JstrV7dKaOGms7ZIn92jtujb7Fm5qcjo=
-  on:
-    tags: true
-    repo: appcelerator/titanium
