@@ -42,6 +42,8 @@ timestamps {
 					stage('Publish') {
 						if (!isPR) {
 							sh 'npm publish'
+							// Trigger appc-cli-wrapper job
+							build job: 'appc-cli-wrapper', wait: false
 						}
 					} // stage
 				} // timeout

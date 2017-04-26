@@ -55,10 +55,10 @@
 	},
 	"devDependencies": {
 		"jade": "1.11.0",
-		"mocha": "*",
-		"mocha-jenkins-reporter": "*",
+		"mocha": "^3.3.0",
+		"mocha-jenkins-reporter": "^0.3.7",
 		"optimist": "0.6.1",
-		"should": "11.1.1"
+		"should": "^11.2.1"
 	},
 	"license": "Apache-2.0",
 	"bin": {
