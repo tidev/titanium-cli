@@ -7,7 +7,9 @@
 
 var assert = require('assert'),
 	path = require('path'),
-	Hook = require(__lib('hook'));
+	Hook = require('../lib/hook'),
+	should = require('should'),
+	Mocha = require('mocha');
 
 describe('hook', function () {
 	it('namespace exists', function () {
@@ -23,9 +25,9 @@ describe('hook', function () {
 			h.scanHooks(dir);
 
 			h.hooks.scannedPaths.should.have.ownProperty(dir);
-			h.hooks.loadedFilenames.should.include(path.join(dir, 'testhook.js'));
-			h.hooks.incompatibleFilenames.should.include(path.join(dir, 'oldhook.js'));
-			h.hooks.erroredFilenames.should.include(path.join(dir, 'errorhook.js'));
+			h.hooks.loadedFilenames.should.containEql(path.join(dir, 'testhook.js'));
+			h.hooks.incompatibleFilenames.should.containEql(path.join(dir, 'oldhook.js'));
+			h.hooks.erroredFilenames.should.containEql(path.join(dir, 'errorhook.js'));
 		});
 	});
 
