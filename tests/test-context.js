@@ -9,7 +9,8 @@ var assert = require('assert'),
 	path = require('path'),
 	Context = require('../lib/context'),
 	should = require('should'),
-	Mocha = require('mocha');
+	Mocha = require('mocha'),
+	packageJSON = require('../package.json');
 
 function MockLogger() {
 	this.buffer = '';
@@ -398,13 +399,13 @@ describe('context', function () {
 			process.exit = function (code) {
 				process.exit = origExit;
 				logger.buffer.should.containEql('Command "incompatible" incompatible with this version of the CLI');
-				logger.buffer.should.containEql('Requires version 1.0.0, currently 3.2.0');
+				logger.buffer.should.containEql('Requires version 1.0.0, currently ' + packageJSON.version);
 				code.should.equal(1);
 				throw '';
 			};
 
 			(function () {
-				c.load(logger, {}, { version: '3.2.0' }, function (err, ctx) {
+				c.load(logger, {}, { version: packageJSON.version }, function (err, ctx) {
 					process.exit = origExit;
 					assert(false, 'expected process to exit, not the callback to be fired');
 				});
@@ -894,10 +895,12 @@ describe('context', function () {
 		// -a -b
 		it('should parse -a -b', function () {
 			var c = new Context;
+			c.flag('a');
+			c.flag('b');
 			c.parse(['-a', '-b']).should.eql({
 				_: [],
-				a: undefined,
-				b: undefined
+				a: true,
+				b: true
 			});
 
 			c = new Context;
@@ -913,10 +916,12 @@ describe('context', function () {
 		// -ab
 		it('should parse -ab', function () {
 			var c = new Context;
+			c.flag('a');
+			c.flag('b');
 			c.parse(['-ab']).should.eql({
 				_: [],
 				a: true,
-				b: undefined
+				b: true
 			});
 
 			c = new Context;

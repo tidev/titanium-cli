@@ -603,16 +603,16 @@ mkdirp@0.5.1, mkdirp@~0.5.0:
   dependencies:
     minimist "0.0.8"
 
-mocha-jenkins-reporter@*:
-  version "0.3.7"
-  resolved "https://registry.yarnpkg.com/mocha-jenkins-reporter/-/mocha-jenkins-reporter-0.3.7.tgz#8c86f3bd6e1d56fc2d480ae03829bd7827d40527"
+mocha-jenkins-reporter@^0.3.7:
+  version "0.3.8"
+  resolved "https://registry.yarnpkg.com/mocha-jenkins-reporter/-/mocha-jenkins-reporter-0.3.8.tgz#f6fc741506f57bde7ccc9e46cd1ebc4e7509894c"
   dependencies:
     diff "1.0.7"
     mkdirp "0.5.1"
     mocha ">=2.0.0"
     xml "^1.0.1"
 
-mocha@*, mocha@>=2.0.0:
+mocha@>=2.0.0, mocha@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/mocha/-/mocha-3.3.0.tgz#d29b7428d3f52c82e2e65df1ecb7064e1aabbfb5"
   dependencies:
@@ -794,9 +794,9 @@ should-util@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/should-util/-/should-util-1.0.0.tgz#c98cda374aa6b190df8ba87c9889c2b4db620063"
 
-should@11.1.1:
-  version "11.1.1"
-  resolved "https://registry.yarnpkg.com/should/-/should-11.1.1.tgz#760756475f0217ebbc5a141cbbf35f02f64feb07"
+should@^11.2.1:
+  version "11.2.1"
+  resolved "https://registry.yarnpkg.com/should/-/should-11.2.1.tgz#90f55145552d01cfc200666e4e818a1c9670eda2"
   dependencies:
     should-equal "^1.0.0"
     should-format "^3.0.2"
