@@ -10,3 +10,4 @@ coverage.html
 forge
 forge-tools
 lib/commands/lib/*.java
+junit_report.xml
