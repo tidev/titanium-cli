@@ -1,3 +1,10 @@
+5.0.13 (4/26/2017)
+-------------------
+ * Error thrown in CLI command plugin errors on load [TIMOB-24546]
+ * Removed hook that fixed some Titanium SDK 3.x versions (which are no longer supported)
+ * Avoid re-install of SDK from zipfile if already installed
+ * Fix NDK validation, fix google.com network test #185
+
 5.0.10 (9/22/2016)
 -------------------
  * Fixed bug when running `ti setup sdk` and entering "latest" when the selected SDK no longer exists [TIMOB-23941]
