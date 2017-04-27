@@ -1,6 +1,6 @@
 module.exports = function (grunt) {
 
-	var source = ['Gruntfile.js', 'bin/*', 'lib/**/*.js', 'tests/**/*.js'];
+	var source = ['Gruntfile.js', 'bin/*', 'lib/**/*.js', 'tests/**/*.js', '!tests/resources/hooks/errorhook.js', '!tests/resources/commands/badcommand.js'];
 	var tests = ['tests/**/test-*.js'];
 
 	// Project configuration.

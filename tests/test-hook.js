@@ -19,7 +19,7 @@ describe('hook', function () {
 	describe('#scanHooks()', function () {
 		it('should find test hook', function () {
 			var dir = path.join(__dirname, 'resources', 'hooks'),
-				h = new Hook;
+				h = new Hook();
 
 			h.version = '3.2.0';
 			h.scanHooks(dir);
@@ -33,7 +33,7 @@ describe('hook', function () {
 
 	describe('#on()', function () {
 		it('should register pre and post hooks', function () {
-			var h = new Hook;
+			var h = new Hook();
 			h.on('test', function () {});
 			h.on('test', {
 				post: function () {}
@@ -53,7 +53,7 @@ describe('hook', function () {
 			h.hooks.pre['test-obj'].should.have.length(1);
 
 			h.hooks.post.should.have.ownProperty('test');
-			h.hooks.post['test'].should.have.length(2);
+			h.hooks.post.test.should.have.length(2);
 
 			h.hooks.post.should.have.ownProperty('test-obj');
 			h.hooks.post['test-obj'].should.have.length(1);
@@ -62,7 +62,7 @@ describe('hook', function () {
 
 	describe('#emit()', function () {
 		it('should fire pre and post hooks', function (done) {
-			var h = new Hook,
+			var h = new Hook(),
 				counter = 0;
 
 			h.on('test', {
@@ -81,7 +81,7 @@ describe('hook', function () {
 		});
 
 		it('should fire pre and post hooks that have callbacks', function (done) {
-			var h = new Hook,
+			var h = new Hook(),
 				counter = 0;
 
 			h.on('test', {
@@ -108,7 +108,7 @@ describe('hook', function () {
 			// so this means 4 * 6 = 24. The post-hook then divides the result by 10 with
 			// a final value of 2.4.
 
-			var h = new Hook,
+			var h = new Hook(),
 				fn = h.createHook('test', null, function (x, y, cb) {
 					cb(null, x * y);
 				});
@@ -134,7 +134,7 @@ describe('hook', function () {
 			// so this means 4 * 6 = 24. The post-hook then divides the result by 10 with
 			// a final value of 2.4.
 
-			var h = new Hook,
+			var h = new Hook(),
 				fn = h.createHook('test', function (x, y, cb) {
 					cb(null, x * y);
 				});
@@ -160,7 +160,7 @@ describe('hook', function () {
 			// so this means 4 * 6 = 24. The post-hook then divides the result by 10 with
 			// a final value of 2.4.
 
-			var h = new Hook,
+			var h = new Hook(),
 				fn = h.createHook('test', { payload: 10 });
 
 			h.on('test', function (data) {

@@ -81,13 +81,13 @@ describe('context', function () {
 
 	describe('#flag()', function () {
 		it('should define a single flag', function () {
-			var c = new Context;
+			var c = new Context();
 			c.flag('quiet');
 			c.flags.should.have.ownProperty('quiet');
 		});
 
 		it ('should define multiple flags', function () {
-			var c = new Context;
+			var c = new Context();
 			c.flag({
 				quiet: null,
 				colors: {
@@ -101,7 +101,7 @@ describe('context', function () {
 		});
 
 		it('should not add flag if already exists', function () {
-			var c = new Context;
+			var c = new Context();
 			c.flag('quiet', { foo: 'bar' });
 			c.flag('quiet', { foo: 'baz' }, true);
 			c.flags.should.have.ownProperty('quiet');
@@ -109,7 +109,7 @@ describe('context', function () {
 		});
 
 		it('should define a single flag that has an alias', function () {
-			var c = new Context;
+			var c = new Context();
 			c.flag('quiet', {
 				abbr: 'q',
 				alias: 'silence'
@@ -124,13 +124,13 @@ describe('context', function () {
 
 	describe('#option()', function () {
 		it('should define a single option', function () {
-			var c = new Context;
+			var c = new Context();
 			c.option('sdk');
 			c.options.should.have.ownProperty('sdk');
 		});
 
 		it ('should define multiple options', function () {
-			var c = new Context;
+			var c = new Context();
 			c.option({
 				sdk: {
 					abbr: 's',
@@ -145,7 +145,7 @@ describe('context', function () {
 		});
 
 		it('should not add option if already exists', function () {
-			var c = new Context;
+			var c = new Context();
 			c.option('sdk', { foo: 'bar' });
 			c.option('sdk', { foo: 'baz' }, true);
 			c.options.should.have.ownProperty('sdk');
@@ -153,7 +153,7 @@ describe('context', function () {
 		});
 
 		it('should define a single option that has an alias', function () {
-			var c = new Context;
+			var c = new Context();
 			c.option('sdk', {
 				abbr: 's',
 				alias: 'tisdk',
@@ -169,7 +169,7 @@ describe('context', function () {
 
 	describe('#command()', function () {
 		it('should define a command', function () {
-			var c = new Context;
+			var c = new Context();
 			c.command({
 				name: 'test'
 			});
@@ -177,7 +177,7 @@ describe('context', function () {
 		});
 
 		it('should define a command with flags, options, and subcommands', function () {
-			var c = new Context;
+			var c = new Context();
 			c.command({
 				name: 'test',
 				conf: {
@@ -219,7 +219,7 @@ describe('context', function () {
 		});
 
 		it('should define a command with a platform', function () {
-			var c = new Context;
+			var c = new Context();
 			c.command({
 				name: 'test',
 				conf: {
@@ -269,13 +269,13 @@ describe('context', function () {
 
 	describe('#subcommand()', function () {
 		it('should define a subcommand', function () {
-			var c = new Context;
+			var c = new Context();
 			c.subcommand('list');
 			c.subcommands.should.have.ownProperty('list');
 		});
 
 		it('should define multiple subcommands', function () {
-			var c = new Context;
+			var c = new Context();
 			c.subcommand({
 				list: {},
 				update: {}
@@ -285,7 +285,7 @@ describe('context', function () {
 		});
 
 		it('should define a subcommand with flags and options', function () {
-			var c = new Context;
+			var c = new Context();
 			c.subcommand({
 				list: {
 					flags: {
@@ -323,8 +323,8 @@ describe('context', function () {
 
 	describe('#load()', function () {
 		it('should error because path is undefined', function (done) {
-			var c = new Context,
-				logger = new MockLogger,
+			var c = new Context(),
+				logger = new MockLogger(),
 				origExit = process.exit,
 				exitCode = null;
 
@@ -343,7 +343,7 @@ describe('context', function () {
 
 		it('should error because path is undefined, but with a name', function (done) {
 			var c = new Context({ name: 'test' }),
-				logger = new MockLogger,
+				logger = new MockLogger(),
 				origExit = process.exit,
 				exitCode = null;
 
@@ -362,7 +362,7 @@ describe('context', function () {
 
 		it('should error because path is invalid', function (done) {
 			var c = new Context({ name: 'doesnotexist', path: path.join(__dirname, 'resources', 'commands', 'doesnotexist.js') }),
-				logger = new MockLogger,
+				logger = new MockLogger(),
 				origExit = process.exit,
 				exitCode = null;
 
@@ -382,7 +382,7 @@ describe('context', function () {
 
 		it('should error because command contains syntax errors', function (done) {
 			var c = new Context({ name: 'badcommand', path: path.join(__dirname, 'resources', 'commands', 'badcommand.js') }),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.load(logger, {}, {}, function (err) {
 				assert(err, 'Context should have errored when loading a JavaScript command with syntax errors');
@@ -392,7 +392,7 @@ describe('context', function () {
 
 		it('should error because the cli version is incompatible', function (done) {
 			var c = new Context({ name: 'incompatible', path: path.join(__dirname, 'resources', 'commands', 'incompatible.js') }),
-				logger = new MockLogger,
+				logger = new MockLogger(),
 				origExit = process.exit,
 				exitCode = null;
 
@@ -415,7 +415,7 @@ describe('context', function () {
 
 		it('should load module with object-based config', function (done) {
 			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'foo.js') }),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.load(logger, {}, {}, function (err, ctx) {
 				assert(!err, 'expected "foo" to load without error');
@@ -439,7 +439,7 @@ describe('context', function () {
 
 		it('should load module with function-based config', function (done) {
 			var c = new Context({ name: 'bar', path: path.join(__dirname, 'resources', 'commands', 'bar.js') }),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.load(logger, {}, {}, function (err, ctx) {
 				assert(!err, 'expected "bar" to load without error');
@@ -463,7 +463,7 @@ describe('context', function () {
 
 		it('should load module with no config function', function (done) {
 			var c = new Context({ name: 'baz', path: path.join(__dirname, 'resources', 'commands', 'baz.js') }),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.load(logger, {}, {}, function (err, ctx) {
 				assert(!err, 'expected "baz" to load without error');
@@ -474,7 +474,7 @@ describe('context', function () {
 
 		it('should not load a module if it is already loaded', function (done) {
 			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'foo.js') }),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.load(logger, {}, {}, function (err, ctx) {
 				assert(!err, 'expected "foo" to load without error');
@@ -487,7 +487,7 @@ describe('context', function () {
 
 		it('should remove sdk option from child context', function (done) {
 			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'foo.js') }),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.load(logger, {}, {}, function (err, ctx) {
 				assert(!err, 'expected "foo" to load without error');
@@ -504,7 +504,7 @@ describe('context', function () {
 
 		it('should load module with cli args', function (done) {
 			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'foo.js') }),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.load(logger, {}, {
 				argv: {
@@ -522,7 +522,7 @@ describe('context', function () {
 
 		it('should load module with cli args including "help" command', function (done) {
 			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'foo.js') }),
-				logger = new MockLogger,
+				logger = new MockLogger(),
 				cli = {
 					argv: {
 						$0: 'node titanium',
@@ -546,7 +546,7 @@ describe('context', function () {
 
 		it('should load module with cli args including "bar list"', function (done) {
 			var c = new Context({ name: 'bar', path: path.join(__dirname, 'resources', 'commands', 'bar.js') }),
-				logger = new MockLogger,
+				logger = new MockLogger(),
 				cli = {
 					argv: {
 						$0: 'node titanium',
@@ -569,7 +569,7 @@ describe('context', function () {
 
 		it('should load module without cli arg --platform', function (done) {
 			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'foo.js') }),
-				logger = new MockLogger,
+				logger = new MockLogger(),
 				cli = {
 					argv: {
 						$0: 'node titanium',
@@ -594,7 +594,7 @@ describe('context', function () {
 
 		it('should load module with cli arg --platform', function (done) {
 			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'foo.js') }),
-				logger = new MockLogger,
+				logger = new MockLogger(),
 				cli = {
 					argv: {
 						$0: 'node titanium',
@@ -657,7 +657,7 @@ describe('context', function () {
 
 		it('should return immediately if already loaded', function (done) {
 			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'foo.js') }),
-				logger = new MockLogger,
+				logger = new MockLogger(),
 				cli = {
 					argv: {
 						$0: 'node titanium',
@@ -687,7 +687,7 @@ describe('context', function () {
 
 	describe('#setArg()', function () {
 		it('should set an option arg and skip callbacks', function () {
-			var c = new Context;
+			var c = new Context();
 
 			c.option({
 				foo: {
@@ -696,7 +696,7 @@ describe('context', function () {
 						return val.toUpperCase();
 					}
 				}
-			})
+			});
 
 			c.setArg('foo', 'bar', true);
 
@@ -705,7 +705,7 @@ describe('context', function () {
 		});
 
 		it('should set an option arg and fire callbacks', function () {
-			var c = new Context;
+			var c = new Context();
 
 			c.option({
 				foo: {
@@ -714,7 +714,7 @@ describe('context', function () {
 						return val.toUpperCase();
 					}
 				}
-			})
+			});
 
 			c.setArg('foo', 'bar', false);
 
@@ -723,7 +723,7 @@ describe('context', function () {
 		});
 
 		it('should set an option arg using the abbreviation', function () {
-			var c = new Context;
+			var c = new Context();
 
 			c.option('foo', {
 				abbr: 'f'
@@ -736,7 +736,7 @@ describe('context', function () {
 		});
 
 		it('should set a nested option arg', function () {
-			var c = new Context;
+			var c = new Context();
 
 			c.option('foo');
 
@@ -748,7 +748,7 @@ describe('context', function () {
 		});
 
 		it('should append multiple option args into an array', function () {
-			var c = new Context;
+			var c = new Context();
 
 			c.option('foo');
 
@@ -762,7 +762,7 @@ describe('context', function () {
 		});
 
 		it('should set an flag arg', function () {
-			var c = new Context;
+			var c = new Context();
 
 			c.flag('foo');
 
@@ -778,7 +778,7 @@ describe('context', function () {
 		});
 
 		it('should set an flag arg with a callback', function () {
-			var c = new Context,
+			var c = new Context(),
 				result = 'hello';
 
 			c.flag('foo', {
@@ -799,7 +799,7 @@ describe('context', function () {
 	describe('#getFlagsOptions()', function () {
 		it('should return flags and options', function (done) {
 			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'foo.js') }),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.load(logger, {}, {}, function (err, ctx) {
 				assert(!err, 'expected "foo" to load without error');
@@ -828,14 +828,14 @@ describe('context', function () {
 
 	describe('#parse()', function () {
 		it('should skip parsing when no args', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(null).should.eql({
 				_: []
 			});
 		});
 
 		it('should parse empty array of args', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse([]).should.eql({
 				_: []
 			});
@@ -843,7 +843,7 @@ describe('context', function () {
 
 		// <arg>
 		it('should parse <arg>', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['arg1']).should.eql({
 				_: ['arg1']
 			});
@@ -851,7 +851,7 @@ describe('context', function () {
 
 		// <arg> <arg>
 		it('should parse <arg1> <arg2>', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['arg1', 'arg2']).should.eql({
 				_: ['arg1', 'arg2']
 			});
@@ -859,13 +859,13 @@ describe('context', function () {
 
 		// --flag
 		it('should parse --foo', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--foo']).should.eql({
 				_: [],
 				foo: ''
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo');
 			c.parse(['--foo']).should.eql({
 				_: [],
@@ -875,14 +875,14 @@ describe('context', function () {
 
 		// --flag --flag
 		it('should parse --foo1 --foo2', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--foo1', '--foo2']).should.eql({
 				_: [],
 				foo1: '',
 				foo2: ''
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo1');
 			c.flag('foo2');
 			c.parse(['--foo1', '--foo2']).should.eql({
@@ -894,7 +894,7 @@ describe('context', function () {
 
 		// -a -b
 		it('should parse -a -b', function () {
-			var c = new Context;
+			var c = new Context();
 			c.flag('a');
 			c.flag('b');
 			c.parse(['-a', '-b']).should.eql({
@@ -903,7 +903,7 @@ describe('context', function () {
 				b: true
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo1', { abbr: 'a' });
 			c.flag('foo2', { abbr: 'b' });
 			c.parse(['-a', '-b']).should.eql({
@@ -915,7 +915,7 @@ describe('context', function () {
 
 		// -ab
 		it('should parse -ab', function () {
-			var c = new Context;
+			var c = new Context();
 			c.flag('a');
 			c.flag('b');
 			c.parse(['-ab']).should.eql({
@@ -924,7 +924,7 @@ describe('context', function () {
 				b: true
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo1', { abbr: 'a' });
 			c.flag('foo2', { abbr: 'b' });
 			c.parse(['-ab']).should.eql({
@@ -936,13 +936,13 @@ describe('context', function () {
 
 		// -a bar
 		it('should parse -a bar', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['-a', 'bar']).should.eql({
 				_: [],
 				a: 'bar'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo', { abbr: 'a' });
 			c.parse(['-a', 'bar']).should.eql({
 				_: ['bar'],
@@ -952,14 +952,14 @@ describe('context', function () {
 
 		// -ab bar
 		it('should parse -ab bar as flags', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['-ab', 'bar']).should.eql({
 				_: [],
 				a: true,
 				b: 'bar'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo1', { abbr: 'a' });
 			c.flag('foo2', { abbr: 'b' });
 			c.parse(['-ab', 'bar']).should.eql({
@@ -971,14 +971,14 @@ describe('context', function () {
 
 		// -ab bar
 		it('should parse -ab bar as options', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['-ab', 'bar']).should.eql({
 				_: [],
 				a: true,
 				b: 'bar'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.option('foo1', { abbr: 'a' });
 			c.option('foo2', { abbr: 'b' });
 			c.parse(['-ab', 'bar']).should.eql({
@@ -990,13 +990,13 @@ describe('context', function () {
 
 		// -a true
 		it('should parse -a true', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['-a', 'true']).should.eql({
 				_: [],
 				a: 'true'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo', { abbr: 'a' });
 			c.parse(['-a', 'true']).should.eql({
 				_: [],
@@ -1006,13 +1006,13 @@ describe('context', function () {
 
 		// --flag true
 		it('should parse --foo true', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--foo', 'true']).should.eql({
 				_: [],
 				foo: 'true'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo');
 			c.parse(['--foo', 'true']).should.eql({
 				_: [],
@@ -1022,13 +1022,13 @@ describe('context', function () {
 
 		// --flag false
 		it('should parse --foo true', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--foo', 'false']).should.eql({
 				_: [],
 				foo: 'false'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo');
 			c.parse(['--foo', 'false']).should.eql({
 				_: [],
@@ -1038,13 +1038,13 @@ describe('context', function () {
 
 		// --flag -- --flag
 		it('should parse --foo1 -- --foo2', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--foo1', '--', '--foo2']).should.eql({
 				_: ['--foo2'],
 				foo1: ''
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo1');
 			c.parse(['--foo1', '--', '--foo2']).should.eql({
 				_: ['--foo2'],
@@ -1054,13 +1054,13 @@ describe('context', function () {
 
 		// --no-flag
 		it('should parse --no-foo', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--no-foo']).should.eql({
 				_: [],
 				foo: false
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo', { negate: true });
 			c.parse(['--no-foo']).should.eql({
 				_: [],
@@ -1070,13 +1070,13 @@ describe('context', function () {
 
 		// --flag <arg>
 		it('should parse --foo <arg>', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--foo', 'arg']).should.eql({
 				_: [],
 				foo: 'arg' // doesn't know --foo is a flag, treats it as an option
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo');
 			c.parse(['--foo', 'arg']).should.eql({
 				_: ['arg'],
@@ -1086,13 +1086,13 @@ describe('context', function () {
 
 		// --option value
 		it('should parse --foo bar', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--foo', 'bar']).should.eql({
 				_: [],
 				foo: 'bar'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.option('foo');
 			c.parse(['--foo', 'bar']).should.eql({
 				_: [],
@@ -1102,13 +1102,13 @@ describe('context', function () {
 
 		// --option=value
 		it('should parse --foo=bar', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--foo=bar']).should.eql({
 				_: [],
 				foo: 'bar'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.option('foo');
 			c.parse(['--foo=bar']).should.eql({
 				_: [],
@@ -1118,14 +1118,14 @@ describe('context', function () {
 
 		// --option value --option value
 		it('should parse --foo bar --baz qux', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--foo', 'bar', '--baz', 'qux']).should.eql({
 				_: [],
 				foo: 'bar',
 				baz: 'qux'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.option('foo');
 			c.option('baz');
 			c.parse(['--foo', 'bar', '--baz', 'qux']).should.eql({
@@ -1137,13 +1137,13 @@ describe('context', function () {
 
 		// --option value <arg>
 		it('should parse --foo bar <arg>', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--foo', 'bar', 'arg']).should.eql({
 				_: ['arg'],
 				foo: 'bar'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.option('foo');
 			c.parse(['--foo', 'bar', 'arg']).should.eql({
 				_: ['arg'],
@@ -1153,14 +1153,14 @@ describe('context', function () {
 
 		// --option value <arg> --option value
 		it('should parse --foo bar <arg> --baz qux', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--foo', 'bar', 'arg', '--baz', 'qux']).should.eql({
 				_: ['arg'],
 				foo: 'bar',
 				baz: 'qux'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.option('foo');
 			c.option('baz');
 			c.parse(['--foo', 'bar', 'arg', '--baz', 'qux']).should.eql({
@@ -1172,14 +1172,14 @@ describe('context', function () {
 
 		// --flag --option value
 		it('should parse --foo --baz qux', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--foo', '--baz', 'qux']).should.eql({
 				_: [],
 				foo: '',
 				baz: 'qux'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo');
 			c.option('baz');
 			c.parse(['--foo', '--baz', 'qux']).should.eql({
@@ -1191,14 +1191,14 @@ describe('context', function () {
 
 		// --flag --option value <arg>
 		it('should parse --foo --baz qux <arg>', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--foo', '--baz', 'qux', 'arg']).should.eql({
 				_: ['arg'],
 				foo: '',
 				baz: 'qux'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo');
 			c.option('baz');
 			c.parse(['--foo', '--baz', 'qux', 'arg']).should.eql({
@@ -1210,14 +1210,14 @@ describe('context', function () {
 
 		// --flag <arg> --option value
 		it('should parse --foo <arg> --baz qux', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--foo', 'arg', '--baz', 'qux']).should.eql({
 				_: [],
 				foo: 'arg',
 				baz: 'qux'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo');
 			c.option('baz');
 			c.parse(['--foo', 'arg', '--baz', 'qux']).should.eql({
@@ -1229,14 +1229,14 @@ describe('context', function () {
 
 		// --option value --flag
 		it('should parse --baz qux --foo', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--baz', 'qux', '--foo']).should.eql({
 				_: [],
 				foo: '',
 				baz: 'qux'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo');
 			c.option('baz');
 			c.parse(['--baz', 'qux', '--foo']).should.eql({
@@ -1248,14 +1248,14 @@ describe('context', function () {
 
 		// --option value <arg> --flag
 		it('should parse --baz qux <arg> --foo', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--baz', 'qux', 'arg', '--foo']).should.eql({
 				_: ['arg'],
 				foo: '',
 				baz: 'qux'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo');
 			c.option('baz');
 			c.parse(['--baz', 'qux', 'arg', '--foo']).should.eql({
@@ -1267,14 +1267,14 @@ describe('context', function () {
 
 		// --option value <arg> --flag <arg>
 		it('should parse --baz qux <arg1> --foo', function () {
-			var c = new Context;
+			var c = new Context();
 			c.parse(['--baz', 'qux', 'arg1', '--foo', 'arg2']).should.eql({
 				_: ['arg1'],
 				foo: 'arg2',
 				baz: 'qux'
 			});
 
-			c = new Context;
+			c = new Context();
 			c.flag('foo');
 			c.option('baz');
 			c.parse(['--baz', 'qux', 'arg1', '--foo', 'arg2']).should.eql({
@@ -1377,7 +1377,7 @@ describe('context', function () {
 		// --global-flag <command> --global-flag
 		it('should parse --global-flag <command> --global-flag', function () {
 			var c = createGlobalContext(),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.commands.info.load(logger, {}, {}, function (err, cmd) {
 				cmd.parse(['--quiet', 'info', '--no-colors'], Object.keys(c.commands)).should.eql({
@@ -1398,7 +1398,7 @@ describe('context', function () {
 		// <command> --command-flag
 		it('should parse <command> --command-flag', function () {
 			var c = createGlobalContext(),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.commands.info.load(logger, {}, {}, function (err, cmd) {
 				cmd.parse(['info', '--legacy'], Object.keys(c.commands)).should.eql({
@@ -1419,7 +1419,7 @@ describe('context', function () {
 		// --global-flag <command> --command-flag
 		it('should parse --global-flag <command> --command-flag', function () {
 			var c = createGlobalContext(),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.commands.info.load(logger, {}, {}, function (err, cmd) {
 				cmd.parse(['--quiet', 'info', '--legacy'], Object.keys(c.commands)).should.eql({
@@ -1440,7 +1440,7 @@ describe('context', function () {
 		// --command-flag <command> --command-flag
 		it('should parse --command-flag <command> --command-flag', function () {
 			var c = createGlobalContext(),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.commands.info.load(logger, {}, {}, function (err, cmd) {
 				cmd.parse(['--dummyflag', 'info', '--legacy'], Object.keys(c.commands)).should.eql({
@@ -1453,8 +1453,7 @@ describe('context', function () {
 					'progress-bars': true,
 					banner: true,
 					dummyflag: true,
-					legacy: true,
-					dummyflag: true
+					legacy: true
 				});
 			});
 		});
@@ -1462,7 +1461,7 @@ describe('context', function () {
 		// --global-flag --command-flag <command> --command-flag
 		it('should parse --global-flag --command-flag <command> --command-flag', function () {
 			var c = createGlobalContext(),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.commands.info.load(logger, {}, {}, function (err, cmd) {
 				cmd.parse(['--quiet', '--dummyflag', 'info', '--legacy'], Object.keys(c.commands)).should.eql({
@@ -1475,8 +1474,7 @@ describe('context', function () {
 					'progress-bars': true,
 					banner: true,
 					dummyflag: true,
-					legacy: true,
-					dummyflag: true
+					legacy: true
 				});
 			});
 		});
@@ -1484,7 +1482,7 @@ describe('context', function () {
 		// --command-flag <command> --global-flag --command-flag
 		it('should parse --command-flag <command> --global-flag --command-flag', function () {
 			var c = createGlobalContext(),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.commands.info.load(logger, {}, {}, function (err, cmd) {
 				cmd.parse(['--dummyflag', 'info', '--quiet', '--legacy'], Object.keys(c.commands)).should.eql({
@@ -1505,7 +1503,7 @@ describe('context', function () {
 		// <command> <arg>
 		it('should parse <command> <arg>', function () {
 			var c = createGlobalContext(),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.commands.config.load(logger, {}, {}, function (err, cmd) {
 				cmd.parse(['config', 'test'], Object.keys(c.commands)).should.eql({
@@ -1528,7 +1526,7 @@ describe('context', function () {
 		// <command> <arg1> <arg2>
 		it('should parse <command> <arg1> <arg2>', function () {
 			var c = createGlobalContext(),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.commands.config.load(logger, {}, {}, function (err, cmd) {
 				cmd.parse(['config', 'test', 'dummy'], Object.keys(c.commands)).should.eql({
@@ -1551,7 +1549,7 @@ describe('context', function () {
 		// --global-flag <command> <arg>
 		it('should parse --global-flag <command> <arg>', function () {
 			var c = createGlobalContext(),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.commands.config.load(logger, {}, {}, function (err, cmd) {
 				cmd.parse(['--quiet', 'config', 'test'], Object.keys(c.commands)).should.eql({
@@ -1574,7 +1572,7 @@ describe('context', function () {
 		// <command> --global-flag <arg>
 		it('should parse --global-flag <command> <arg>', function () {
 			var c = createGlobalContext(),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.commands.config.load(logger, {}, {}, function (err, cmd) {
 				cmd.parse(['config', '--quiet', 'test'], Object.keys(c.commands)).should.eql({
@@ -1597,7 +1595,7 @@ describe('context', function () {
 		// --global-flag <command> --global-flag <arg>
 		it('should parse --global-flag <command> --global-flag <arg>', function () {
 			var c = createGlobalContext(),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.commands.config.load(logger, {}, {}, function (err, cmd) {
 				cmd.parse(['--no-colors', 'config', '--quiet', 'test'], Object.keys(c.commands)).should.eql({
@@ -1620,7 +1618,7 @@ describe('context', function () {
 		// <command> --command-flag <arg>
 		it('should parse <command> --command-flag <arg>', function () {
 			var c = createGlobalContext(),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.commands.config.load(logger, {}, {}, function (err, cmd) {
 				cmd.parse(['config', '--append', 'test'], Object.keys(c.commands)).should.eql({
@@ -1643,7 +1641,7 @@ describe('context', function () {
 		// --global-flag <command> --command-flag <arg>
 		it('should parse --global-flag <command> --command-flag <arg>', function () {
 			var c = createGlobalContext(),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.commands.config.load(logger, {}, {}, function (err, cmd) {
 				cmd.parse(['--quiet', 'config', '--append', 'test'], Object.keys(c.commands)).should.eql({
@@ -1666,7 +1664,7 @@ describe('context', function () {
 		// --command-flag <command> --command-flag <arg>
 		it('should parse --command-flag <command> --command-flag <arg>', function () {
 			var c = createGlobalContext(),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.commands.config.load(logger, {}, {}, function (err, cmd) {
 				cmd.parse(['--append', 'config', '--remove', 'test'], Object.keys(c.commands)).should.eql({
@@ -1689,7 +1687,7 @@ describe('context', function () {
 		// --global-flag --command-flag <command> --command-flag <arg>
 		it('should parse --global-flag --command-flag <command> --command-flag <arg>', function () {
 			var c = createGlobalContext(),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.commands.config.load(logger, {}, {}, function (err, cmd) {
 				cmd.parse(['--quiet', '--append', 'config', '--remove', 'test'], Object.keys(c.commands)).should.eql({
@@ -1712,7 +1710,7 @@ describe('context', function () {
 		// --command-flag <command> --global-flag --command-flag <arg>
 		it('should parse --command-flag <command> --global-flag --command-flag <arg>', function () {
 			var c = createGlobalContext(),
-				logger = new MockLogger;
+				logger = new MockLogger();
 
 			c.commands.config.load(logger, {}, {}, function (err, cmd) {
 				cmd.parse(['--append', 'config', '--quiet', '--remove', 'test'], Object.keys(c.commands)).should.eql({

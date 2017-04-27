@@ -2,7 +2,7 @@
  * Bootstraps mocha and handles code coverage testing setup.
  *
  * @copyright
- * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2017 by Appcelerator, Inc. All Rights Reserved.
  *
  * @license
  * Licensed under the terms of the Apache Public License
@@ -15,7 +15,7 @@ var fs = require('fs'),
 	should = require('should'),
 	Mocha = require('../node_modules/mocha/lib/mocha.js'),
 	Base = require('../node_modules/mocha/lib/reporters/base'),
-	mocha = new Mocha,
+	mocha = new Mocha(),
 	optimist = require('optimist'),
 	reporter = 'spec';
 
@@ -42,7 +42,7 @@ if (optimist.argv.hasOwnProperty('colors') && !optimist.argv.colors) {
 }
 
 if (!process.env.APPC_COV) {
-	console.log('Unit Test Tool'.cyan.bold + ' - Copyright (c) 2012-' + (new Date).getFullYear() + ', Appcelerator, Inc.  All Rights Reserved.');
+	console.log('Unit Test Tool'.cyan.bold + ' - Copyright (c) 2012-' + (new Date()).getFullYear() + ', Appcelerator, Inc.  All Rights Reserved.');
 }
 
 // display the help, if needed
@@ -95,9 +95,9 @@ if (process.env.APPC_COV) {
 				version: packageJson.version,
 				cov: self.cov,
 				coverageClass: function (n) {
-					if (n >= 75) return 'high';
-					if (n >= 50) return 'medium';
-					if (n >= 25) return 'low';
+					if (n >= 75) { return 'high'; }
+					if (n >= 50) { return 'medium'; }
+					if (n >= 25) { return 'low'; }
 					return 'terrible';
 				}
 			}));
@@ -130,7 +130,7 @@ if (runTest) {
 			var file = path.join(dir, name);
 			if (fs.statSync(file).isDirectory()) {
 				ff = ff.concat(walk(file));
-			} else if ((runTest && name == runTest) || (!runTest && /^test\-.+\.js$/.test(name))) {
+			} else if ((runTest && name === runTest) || (!runTest && /^test\-.+\.js$/.test(name))) {
 				ff.push(file);
 			}
 		});
