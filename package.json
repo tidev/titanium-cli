@@ -60,6 +60,10 @@
 		"winston": "3.0.0"
 	},
 	"devDependencies": {
+		"grunt": "*",
+		"grunt-appc-js": "^1.0.15",
+		"grunt-cli": "^1.2.0",
+		"grunt-mocha-test": "^0.12.0",
 		"jade": "1.11.0",
 		"mocha": "^5.2.0",
 		"mocha-jenkins-reporter": "^0.3.7",
@@ -76,7 +80,8 @@
 		"lib": "./lib"
 	},
 	"scripts": {
-		"test": "JUNIT_REPORT_PATH=junit_report.xml mocha --reporter mocha-jenkins-reporter tests/test-*.js"
+		"lint": "grunt lint",
+		"test": "grunt test"
 	},
 	"engines": {
 		"node": ">=4.0"
