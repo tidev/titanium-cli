@@ -4,12 +4,12 @@ library 'pipeline-library'
 timestamps {
 	node('(osx || linux) && git && npm-publish') {
 		def packageVersion = ''
-		def isPR = false
+		def isMaster = false
 
 		stage('Checkout') {
 			checkout scm
 
-			isPR = env.BRANCH_NAME.startsWith('PR-')
+			isMaster = env.BRANCH_NAME.equals('master')
 			packageVersion = jsonParse(readFile('package.json'))['version']
 			currentBuild.displayName = "#${packageVersion}-${currentBuild.number}"
 		}
@@ -33,14 +33,15 @@ timestamps {
 						}
 						fingerprint 'package.json'
 
-						// Don't tag PRs
-						if (!isPR) {
+						// Only tag master
+						if (isMaster) {
 							pushGitTag(name: packageVersion, message: "See ${env.BUILD_URL} for more information.", force: true)
 						}
 					} // stage
 
 					stage('Publish') {
-						if (!isPR) {
+						// only publish master and trigger downstream
+						if (isMaster) {
 							sh 'npm publish'
 							// Trigger appc-cli-wrapper job
 							build job: 'appc-cli-wrapper', wait: false
