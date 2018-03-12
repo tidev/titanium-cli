@@ -20,14 +20,20 @@
 		"mobile web",
 		"appc-client"
 	],
-	"version": "5.0.14",
+	"version": "5.1.0",
 	"author": {
 		"name": "Appcelerator, Inc.",
 		"email": "npmjs@appcelerator.com"
 	},
 	"maintainers": [
-		{"name": "Jeff Haynie", "email": "jhaynie@appcelerator.com"},
-		{"name": "Chris Barber", "email": "cbarber@appcelerator.com"}
+		{
+			"name": "Jeff Haynie",
+			"email": "jhaynie@appcelerator.com"
+		},
+		{
+			"name": "Chris Barber",
+			"email": "cbarber@appcelerator.com"
+		}
 	],
 	"bugs": {
 		"url": "https://jira.appcelerator.org/browse/TIMOB"
@@ -42,16 +48,16 @@
 		"async": "2.1.2",
 		"colors": "1.1.2",
 		"fields": "0.1.24",
+		"fs-extra": "^2.0.0",
 		"humanize": "0.0.9",
 		"longjohn": "0.2.11",
 		"moment": "2.16.0",
-		"node-appc": "0.2.41",
+		"node-appc": "0.2.44",
 		"request": "2.79.0",
 		"semver": "5.3.0",
 		"sprintf": "0.1.5",
 		"temp": "0.8.3",
-		"winston": "1.1.2",
-		"fs-extra": "^2.0.0"
+		"winston": "1.1.2"
 	},
 	"devDependencies": {
 		"jade": "1.11.0",
