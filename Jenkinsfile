@@ -43,8 +43,8 @@ timestamps {
 						// only publish master and trigger downstream
 						if (isMaster) {
 							sh 'npm publish'
-							// Trigger appc-cli-wrapper job
-							build job: 'appc-cli-wrapper', wait: false
+							// Trigger appc-cli job
+							build job: '../appc-cli/master', wait: false
 						}
 					} // stage
 				} // timeout
