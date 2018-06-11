@@ -1,5 +1,7 @@
 #! groovy
 library 'pipeline-library'
+def nodeVersion = '8.9.1'
+def npmVersion = '6.1.0'
 
 timestamps {
 	node('(osx || linux) && git && npm-publish') {
@@ -14,20 +16,16 @@ timestamps {
 			currentBuild.displayName = "#${packageVersion}-${currentBuild.number}"
 		}
 
-		nodejs(nodeJSInstallationName: 'node 4.7.3') {
+		nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
 			ansiColor('xterm') {
 				timeout(55) {
 					stage('Build') {
-						// Install yarn if not installed
-						if (sh(returnStatus: true, script: 'which yarn') != 0) {
-							// TODO Install using the curl script via chef before-hand?
-							// sh 'curl -o- -L https://yarnpkg.com/install.sh | bash'
-							sh 'npm install -g yarn'
-						}
-						sh 'yarn install'
+
+						ensureNPM(npmVersion)
+						sh 'npm ci'
 
 						try {
-							sh 'yarn test'
+							sh 'npm test'
 						} finally {
 							junit 'junit_report.xml'
 						}
