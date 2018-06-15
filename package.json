@@ -80,7 +80,7 @@
 	},
 	"scripts": {
 		"lint": "grunt lint",
-		"test": "grunt"
+		"test": "JUNIT_REPORT_PATH=junit_report.xml grunt"
 	},
 	"engines": {
 		"node": ">=4.0"
