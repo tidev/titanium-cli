@@ -1,36 +1,43 @@
-module.exports = function (grunt) {
+'use strict';
 
-	var source = ['Gruntfile.js', 'bin/*', 'lib/**/*.js', 'tests/**/*.js', '!tests/resources/hooks/errorhook.js', '!tests/resources/commands/badcommand.js'];
-	var tests = ['tests/**/test-*.js'];
+module.exports = function (grunt) {
 
 	// Project configuration.
 	grunt.initConfig({
 		appcJs: {
-			check: {
-				src: source
-			}
+			src: [
+				'Gruntfile.js',
+				'bin/*',
+				'lib/**/*.js',
+				'tests/**/test-*.js',
+				'!tests/resources/hooks/errorhook.js',
+				'!tests/resources/commands/badcommand.js'
+			]
 		},
-		mochaTest: {
+		mocha_istanbul: {
 			options: {
-				timeout: 3000,
+				timeout: 30000,
 				reporter: 'mocha-jenkins-reporter',
-				reporterOptions: {
-					junit_report_name: 'Tests',
-					junit_report_path: 'junit_report.xml',
-					junit_report_stack: 1
-				},
-				ignoreLeaks: false
+				ignoreLeaks: false,
+				globals: [ 'Hyperloop', 'HyperloopObject' ],
+				reportFormats: [ 'lcov', 'cobertura' ],
+				check: {
+					statements: 61,
+					branches: 50,
+					functions: 48,
+					lines: 62
+				}
 			},
-			src: tests
+			src: [ 'tests/**/test-*.js' ]
 		},
 	});
 
 	// Load grunt plugins for modules
-	grunt.loadNpmTasks('grunt-mocha-test');
+	grunt.loadNpmTasks('grunt-mocha-istanbul');
 	grunt.loadNpmTasks('grunt-appc-js');
 
 	// register tasks
-	grunt.registerTask('lint', ['appcJs:check']);
-	grunt.registerTask('test', ['mochaTest']);
-	grunt.registerTask('default', ['lint']);
+	grunt.registerTask('lint', [ 'appcJs' ]);
+	grunt.registerTask('test', [ 'mocha_istanbul' ]);
+	grunt.registerTask('default', [ 'lint', 'test' ]);
 };

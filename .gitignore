@@ -2,6 +2,6 @@
 .DS_Store
 npm-debug.log
 node_modules
-lib-cov
-coverage.html
 junit_report.xml
+retirejs.output.json
+coverage/

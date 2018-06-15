@@ -60,14 +60,14 @@
 		"winston": "3.0.0"
 	},
 	"devDependencies": {
-		"grunt": "*",
-		"grunt-appc-js": "^1.0.15",
+		"grunt": "^1.0.3",
+		"grunt-appc-js": "^2.1.0",
 		"grunt-cli": "^1.2.0",
+		"grunt-mocha-istanbul": "^5.0.2",
 		"grunt-mocha-test": "^0.12.0",
-		"jade": "1.11.0",
+		"istanbul": "^0.4.5",
 		"mocha": "^5.2.0",
 		"mocha-jenkins-reporter": "^0.3.7",
-		"optimist": "0.6.1",
 		"should": "^13.2.1"
 	},
 	"license": "Apache-2.0",
@@ -81,7 +81,7 @@
 	},
 	"scripts": {
 		"lint": "grunt lint",
-		"test": "grunt test"
+		"test": "grunt"
 	},
 	"engines": {
 		"node": ">=4.0"

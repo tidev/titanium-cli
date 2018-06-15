@@ -4,12 +4,13 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint-env mocha */
+'use strict';
 
 var assert = require('assert'),
 	path = require('path'),
 	Hook = require('../lib/hook'),
-	should = require('should'),
-	Mocha = require('mocha');
+	should = require('should'); // eslint-disable-line no-unused-vars
 
 describe('hook', function () {
 	it('namespace exists', function () {

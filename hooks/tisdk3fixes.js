@@ -10,6 +10,7 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+'use strict';
 
 var appc = require('node-appc'),
 	fs = require('fs'),
@@ -61,7 +62,7 @@ exports.init = function (logger, config, cli, appc) {
 			switch (cli.argv.target) {
 				case 'dist-adhoc':
 				case 'dist-appstore':
-					data.command.platform.options['deploy-type'].values = ['production'];
+					data.command.platform.options['deploy-type'].values = [ 'production' ];
 			}
 		}
 
@@ -84,7 +85,7 @@ exports.init = function (logger, config, cli, appc) {
 			return callback();
 		}
 
-		require(detectFile).detect(config, null, function (iosInfo) {
+		require(detectFile).detect(config, null, function (iosInfo) { // eslint-disable-line security/detect-non-literal-require
 			var validXcodes = 0;
 
 			// remove all Xcodes that are 6.0 or newer
