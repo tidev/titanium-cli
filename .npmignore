@@ -4,10 +4,22 @@ node_modules
 *.sublime-project
 *.sublime-workspace
 docs
-tests
-lib-cov
-coverage.html
-forge
-forge-tools
+
+# proxy detection
 lib/commands/lib/*.java
+
+# Testing/security
+tests/
 junit_report.xml
+retirejs.output.json
+coverage/
+
+# CI
+.travis.yml
+Jenkinsfile
+
+# eslint
+.eslintrc
+.eslintignore
+
+Gruntfile.js
