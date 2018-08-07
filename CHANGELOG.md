@@ -1,3 +1,23 @@
+5.2.0 (8/7/2018)
+-------------------
+ * Fix failure due to bad URL on `ti setup check` [TIMOB-26206]
+ * Fix incorrect dependencies being reported when running `appc ti setup check` [TIMOB-24892]
+ * Update dependencies
+
+5.1.1 (6/5/2018)
+-------------------
+ * Added flag to disable analytics [TIMOB-26083]
+ * Removed email from analytics payloads [TIMOB-26083]
+
+5.1.0 (3/12/2018)
+-------------------
+ * Fix typo in Android NDK path prompt
+ * Support detection of JDK 9 [TIMOB-25429]
+
+5.0.14 (12/5/2017)
+-------------------
+ * Fix forking of correct SDK during `ti build` [TIMOB-24690]
+
 5.0.13 (4/26/2017)
 -------------------
  * Error thrown in CLI command plugin errors on load [TIMOB-24546]
