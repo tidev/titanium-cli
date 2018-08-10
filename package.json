@@ -53,7 +53,7 @@
 		"longjohn": "0.2.12",
 		"moment": "2.22.2",
 		"node-appc": "^0.2.47",
-		"request": "2.87.0",
+		"request": "2.88.0",
 		"semver": "5.5.1",
 		"sprintf": "0.1.5",
 		"temp": "0.8.3",
