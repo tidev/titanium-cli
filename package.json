@@ -60,11 +60,18 @@
 		"winston": "1.1.2"
 	},
 	"devDependencies": {
+		"@seadub/danger-plugin-eslint": "^0.3.0",
+		"@seadub/danger-plugin-junit": "0.0.1",
+		"danger": "^6.1.12",
+		"eslint-config-axway": "^4.1.1",
+		"eslint-plugin-mocha": "^5.2.0",
 		"grunt": "^1.0.3",
 		"grunt-appc-js": "^2.1.0",
 		"grunt-cli": "^1.2.0",
 		"grunt-mocha-istanbul": "^5.0.2",
+		"husky": "^1.2.0",
 		"istanbul": "^0.4.5",
+		"lint-staged": "^8.1.0",
 		"mocha": "^5.2.0",
 		"mocha-jenkins-reporter": "^0.4.0",
 		"should": "^13.2.1"
@@ -84,5 +91,13 @@
 	},
 	"engines": {
 		"node": ">=4.0"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"*.js": "eslint"
 	}
 }
