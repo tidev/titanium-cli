@@ -13,6 +13,7 @@ tests/
 junit_report.xml
 retirejs.output.json
 coverage/
+.nyc_output/
 
 # CI
 .travis.yml
@@ -21,5 +22,3 @@ Jenkinsfile
 # eslint
 .eslintrc
 .eslintignore
-
-Gruntfile.js
