@@ -1,3 +1,5 @@
+'use strict';
+
 exports.desc = 'foo!';
 
 exports.config = function () {

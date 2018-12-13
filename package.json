@@ -84,7 +84,7 @@
 	},
 	"scripts": {
 		"lint": "eslint .",
-		"test": "npm run lint && npm run test",
+		"test": "npm run lint && npm run unit-test",
 		"unit-test": "JUNIT_REPORT_PATH=junit_report.xml nyc mocha tests/**/test-*.js --reporter=mocha-jenkins-reporter"
 	},
 	"mocha": {
