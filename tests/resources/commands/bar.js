@@ -1,3 +1,5 @@
+'use strict';
+
 exports.config = function () {
 	return function (cb) {
 		cb({

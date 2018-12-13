@@ -3,3 +3,4 @@ tests/resources/hooks/errorhook.js
 tests/resources/commands/badcommand.js
 **/locales/
 coverage/
+tests/resources/hooks/_ignorehook.js

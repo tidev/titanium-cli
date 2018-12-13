@@ -1,3 +1,5 @@
+'use strict';
+
 exports.config = function (logger, config, cli) {
 	return {
 		skipBanner: true,
@@ -14,7 +16,7 @@ exports.config = function (logger, config, cli) {
 			output: {
 				abbr: 'o',
 				default: 'report',
-				values: ['report', 'json', 'json-object']
+				values: [ 'report', 'json', 'json-object' ]
 			}
 		},
 		args: [

@@ -1,3 +1,5 @@
+'use strict';
+
 exports.config = function (logger, config, cli) {
 	return {
 		noAuth: true,
@@ -10,13 +12,13 @@ exports.config = function (logger, config, cli) {
 			output: {
 				abbr: 'o',
 				default: 'report',
-				values: ['report', 'json']
+				values: [ 'report', 'json' ]
 			},
 			types: {
 				abbr: 't',
 				default: 'all',
 				skipValueCheck: true,
-				values: ['all', 'os', 'nodejs', 'titanium', 'ios', 'jdk', 'android']
+				values: [ 'all', 'os', 'nodejs', 'titanium', 'ios', 'jdk', 'android' ]
 			}
 		}
 	};
