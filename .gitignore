@@ -5,3 +5,4 @@ node_modules
 junit_report.xml
 retirejs.output.json
 coverage/
+.nyc_output/

@@ -74,6 +74,7 @@
 		"lint-staged": "^8.1.0",
 		"mocha": "^5.2.0",
 		"mocha-jenkins-reporter": "^0.4.0",
+		"nyc": "^13.1.0",
 		"should": "^13.2.1"
 	},
 	"license": "Apache-2.0",
@@ -86,8 +87,26 @@
 		"lib": "./lib"
 	},
 	"scripts": {
-		"lint": "grunt lint",
-		"test": "JUNIT_REPORT_PATH=junit_report.xml grunt"
+		"lint": "eslint .",
+		"test": "npm run lint && npm run test",
+		"unit-test": "JUNIT_REPORT_PATH=junit_report.xml nyc mocha tests/**/test-*.js --reporter=mocha-jenkins-reporter"
+	},
+	"mocha": {
+		"timeout": 3000,
+		"check-leaks": true,
+		"globals": [ "Hyperloop", "HyperloopObject" ]
+	},
+	"nyc": {
+		"check-coverage": true,
+		"lines": 62,
+		"statements": 61,
+		"functions": 47,
+		"branches": 50,
+		"exclude": [
+			"tests/**/*.js",
+			"locales/**/*.js"
+		],
+		"reporter": [ "cobertura", "text" ]
 	},
 	"engines": {
 		"node": ">=4.0"
