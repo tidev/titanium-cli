@@ -1,1 +1,5 @@
 node_modules
+tests/resources/hooks/errorhook.js
+tests/resources/commands/badcommand.js
+**/locales/
+coverage/

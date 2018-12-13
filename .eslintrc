@@ -10,4 +10,13 @@
   "rules": {
     "strict": ["error", "global"]
   },
+  "overrides": [
+    {
+      "files": [ "dangerfile.js" ],
+      "parserOptions": {
+        "ecmaVersion": 2017,
+        "sourceType": "module"
+      },
+    },
+  ]
 }
