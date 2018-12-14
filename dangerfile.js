@@ -7,7 +7,7 @@ const junit = require('@seadub/danger-plugin-junit').default;
 async function main() {
 	await Promise.all([
 		eslint(),
-		junit({ pathToReport: './junit.*.xml' }),
+		junit({ pathToReport: './junit_report.xml' }),
 	]);
 }
 main()
