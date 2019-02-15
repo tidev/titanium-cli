@@ -1,3 +1,9 @@
+5.2.1 (2/15/2019)
+-------------------
+ * Fix selection of SDK when it is already installed [TIMOB-25179]
+ * Update dependencies
+
+
 5.2.0 (8/7/2018)
 -------------------
  * Fix failure due to bad URL on `ti setup check` [TIMOB-26206]
