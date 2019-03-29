@@ -1,0 +1,12 @@
+._*
+.DS_Store*
+.nyc_output
+/coverage
+/dist
+/docs
+junit.xml
+junit_report.xml
+node_modules
+npm-debug.log
+retirejs.output.json
+yarn-error.log
