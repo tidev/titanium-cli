@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@appcd/plugin-titanium": "^1.4.0",
-    "appcd-client": "^1.3.0",
+    "appcd-client": "^1.3.1",
     "appcd-logger": "^2.0.1",
     "cli-kit": "^0.7.5",
     "source-map-support": "^0.5.11",
