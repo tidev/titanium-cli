@@ -5,7 +5,7 @@ describe('Titanium CLI', () => {
 	it('should fail if appcd is not found', async () => {
 		const result = spawnSync(
 			process.execPath,
-			[ path.resolve(__dirname, '..', 'src', 'main.js') ],
+			[ path.resolve(__dirname, '..', 'dist', 'main.js') ],
 			{ env: {} }
 		);
 
