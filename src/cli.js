@@ -15,7 +15,8 @@ export default async function getCLI() {
 	const response = await bridge.request('/schema');
 	const schema = await new Promise((resolve, reject) => {
 		response
-			.once('data', resolve)
+			.once('response', resolve)
+			.once('finish', resolve)
 			.once('close', resolve)
 			.once('error', reject);
 	});
@@ -24,9 +25,9 @@ export default async function getCLI() {
 		throw new Error('Failed to get Titanium CLI schema');
 	}
 
-	const action = async ({ __argv, console }) => {
-		bridge.exec({ argv: __argv.slice(1), console });
-	};
+	const action = ({ __argv, console }) => bridge.exec({ argv: __argv.slice(1), console });
+
+	schema.action = action;
 
 	for (const cmd  of Object.values(schema.commands)) {
 		cmd.action = action;

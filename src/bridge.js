@@ -4,8 +4,6 @@ import fs from 'fs';
 import path from 'path';
 import snooplogg from 'snooplogg';
 
-import { PassThrough } from 'stream';
-
 const { log } = appcdLogger('ti:cli:bridge');
 const { highlight } = snooplogg.styles;
 
@@ -48,23 +46,8 @@ export default class Bridge {
 		});
 
 		try {
-			return await new Promise((resolve, reject) => {
-				log(`Requesting ${highlight(this.path)}`);
-				let out;
-				this.client
-					.request({ path: this.path, data: this.data })
-					.on('response', (msg, { fin }) => {
-						if (!out) {
-							resolve(out = new PassThrough({ objectMode: true }));
-						}
-						out.write(msg);
-						if (fin) {
-							this.client.disconnect();
-						}
-					})
-					.once('close', () => out && out.end())
-					.once('error', reject);
-			});
+			log(`Requesting ${highlight(this.path)}`);
+			return this.client.request({ path: this.path, data: this.data });
 		} catch (err) {
 			if (err.status === 404) {
 				return this.checkTitaniumPlugin();
@@ -147,16 +130,23 @@ export default class Bridge {
 	 */
 	async exec({ argv, console }) {
 		const response = await this.request('/', { argv });
-		await new Promise((resolve, reject) => {
-			response
-				.on('data', data => {
-					// TODO: write data to correct output stream (stdout/stderr)
-					// TODO: implement protocol for handling prompting
-					console.log(data);
-				})
-				.on('close', resolve)
-				.on('error', reject);
-		});
 
+		await new Promise((resolve, reject) => {
+			const cleanup = () => {
+				this.client.disconnect();
+				resolve();
+			};
+
+			response
+				.on('response', (msg, { type }) => {
+					// TODO: implement protocol for handling prompting
+					if (type === 'stdout' || type === 'stderr') {
+						console[`_${type}`].write(msg);
+					}
+				})
+				.once('finish', cleanup)
+				.once('close', cleanup)
+				.once('error', reject);
+		});
 	}
 }
