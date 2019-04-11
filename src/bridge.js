@@ -45,15 +45,29 @@ export default class Bridge {
 				.on('error', reject);
 		});
 
-		try {
-			log(`Requesting ${highlight(this.path)}`);
-			return this.client.request({ path: this.path, data: this.data });
-		} catch (err) {
-			if (err.status === 404) {
-				return this.checkTitaniumPlugin();
-			}
-			throw err;
-		}
+		log(`Requesting ${highlight(this.path)}`);
+		return await new Promise((resolve, reject) => {
+			const response = this.client.request({ path: this.path, data: this.data });
+			const onFinish = (...msg) => {
+				resolve(response);
+				setImmediate(() => response.emit('finish', ...msg));
+			};
+
+			response
+				.once('response', (...msg) => {
+					response.removeListener('finish', onFinish);
+					resolve(response);
+					setImmediate(() => response.emit('response', ...msg));
+				})
+				.once('finish', onFinish)
+				.once('error', err => {
+					if (err.status === 404) {
+						this.checkTitaniumPlugin().then(resolve).catch(reject);
+					} else {
+						reject(err);
+					}
+				});
+		});
 	}
 
 	/**
@@ -88,7 +102,7 @@ export default class Bridge {
 					log(`Registering Titanium appcd plugin: ${highlight(this.pluginDir)}`);
 					this.client
 						.request({ path: '/appcd/plugin/register', data: { path: this.pluginDir } })
-						.once('response', () => this.connect().then(resolve, reject))
+						.once('response', () => this.connect().then(resolve).catch(reject))
 						.once('error', err => {
 							reject(new Error(`Failed to register the Titanium appcd plugin: ${err.message}`));
 						});
@@ -131,6 +145,13 @@ export default class Bridge {
 	async exec({ argv, console }) {
 		const response = await this.request('/', { argv });
 
+		response.on('response', (msg, { type }) => {
+			// TODO: implement protocol for handling prompting
+			if (type === 'stdout' || type === 'stderr') {
+				console[`_${type}`].write(msg);
+			}
+		});
+
 		await new Promise((resolve, reject) => {
 			const cleanup = () => {
 				this.client.disconnect();
@@ -138,12 +159,6 @@ export default class Bridge {
 			};
 
 			response
-				.on('response', (msg, { type }) => {
-					// TODO: implement protocol for handling prompting
-					if (type === 'stdout' || type === 'stderr') {
-						console[`_${type}`].write(msg);
-					}
-				})
 				.once('finish', cleanup)
 				.once('close', cleanup)
 				.once('error', reject);
