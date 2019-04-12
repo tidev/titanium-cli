@@ -21,6 +21,8 @@ export default async function getCLI() {
 			.once('error', reject);
 	});
 
+	bridge.disconnect();
+
 	if (!schema) {
 		throw new Error('Failed to get Titanium CLI schema');
 	}
@@ -29,7 +31,7 @@ export default async function getCLI() {
 
 	schema.action = action;
 
-	for (const cmd  of Object.values(schema.commands)) {
+	for (const cmd of Object.values(schema.commands)) {
 		cmd.action = action;
 	}
 

@@ -111,26 +111,12 @@ export default class Bridge {
 	}
 
 	/**
-	 * Dispatches a request to the Appc Daemon.
+	 * Disconnects from the daemon.
 	 *
-	 * @param {String} path - A path relative to the Titanium appcd plugin's CLI service endpoint.
-	 * @param {Object} [data] - An optional data payload to send with the request.
-	 * @returns {Promise} Resolves a response stream.
 	 * @access public
 	 */
-	async request(path, data) {
-		if (!path || typeof path !== 'string') {
-			throw new TypeError('Expected path to be a non-empty string');
-		}
-
-		if (data && typeof data !== 'object') {
-			throw new TypeError('Expected data to be an object');
-		}
-
-		this.path = `/titanium/${this.pluginVersion}/cli/${path.replace(/^\//, '')}`;
-		this.data = data;
-
-		return this.connect();
+	disconnect() {
+		this.client.disconnect();
 	}
 
 	/**
@@ -154,7 +140,7 @@ export default class Bridge {
 
 		await new Promise((resolve, reject) => {
 			const cleanup = () => {
-				this.client.disconnect();
+				this.disconnect();
 				resolve();
 			};
 
@@ -163,5 +149,28 @@ export default class Bridge {
 				.once('close', cleanup)
 				.once('error', reject);
 		});
+	}
+
+	/**
+	 * Dispatches a request to the Appc Daemon.
+	 *
+	 * @param {String} path - A path relative to the Titanium appcd plugin's CLI service endpoint.
+	 * @param {Object} [data] - An optional data payload to send with the request.
+	 * @returns {Promise} Resolves a response stream.
+	 * @access public
+	 */
+	async request(path, data) {
+		if (!path || typeof path !== 'string') {
+			throw new TypeError('Expected path to be a non-empty string');
+		}
+
+		if (data && typeof data !== 'object') {
+			throw new TypeError('Expected data to be an object');
+		}
+
+		this.path = `/titanium/${this.pluginVersion}/cli/${path.replace(/^\//, '')}`;
+		this.data = data;
+
+		return this.connect();
 	}
 }
