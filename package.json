@@ -52,7 +52,7 @@
 		"humanize": "0.0.9",
 		"longjohn": "0.2.12",
 		"moment": "^2.24.0",
-		"node-appc": "^0.2.49",
+		"node-appc": "^0.3.0",
 		"request": "2.88.0",
 		"semver": "6.0.0",
 		"sprintf": "0.1.5",
