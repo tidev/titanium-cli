@@ -4,6 +4,8 @@ import fs from 'fs';
 import path from 'path';
 import snooplogg from 'snooplogg';
 
+import { EventEmitter } from 'events';
+
 const { log } = appcdLogger('ti:cli:bridge');
 const { highlight } = snooplogg.styles;
 
@@ -48,18 +50,17 @@ export default class Bridge {
 		log(`Requesting ${highlight(this.path)}`);
 		return await new Promise((resolve, reject) => {
 			const response = this.client.request({ path: this.path, data: this.data });
-			const onFinish = (...msg) => {
-				resolve(response);
-				setImmediate(() => response.emit('finish', ...msg));
-			};
+			const emitter = new EventEmitter();
 
 			response
-				.once('response', (...msg) => {
-					response.removeListener('finish', onFinish);
-					resolve(response);
-					setImmediate(() => response.emit('response', ...msg));
+				.on('response', (...msg) => {
+					resolve(emitter);
+					setImmediate(() => emitter.emit('response', ...msg));
 				})
-				.once('finish', onFinish)
+				.on('finish', (...msg) => {
+					resolve(emitter);
+					setImmediate(() => emitter.emit('finish', ...msg));
+				})
 				.once('error', err => {
 					if (err.status === 404) {
 						this.checkTitaniumPlugin().then(resolve).catch(reject);
