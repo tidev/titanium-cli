@@ -8,7 +8,7 @@ import Bridge from './bridge';
 (async () => {
 	try {
 		const bridge = new Bridge();
-		await bridge.exec({ argv: process.argv.slice(2), console });
+		await bridge.exec({ argv: process.argv.slice(2), console, env: process.env });
 	} catch (err) {
 		const exitCode = err.exitCode || 1;
 

@@ -126,11 +126,12 @@ export default class Bridge {
 	 * @param {Object} params - Various parameters.
 	 * @param {Array.<String>} params.argv - The list of command line arguments.
 	 * @param {Console} params.console - A console instance.
+	 * @param {Object} [params.env] - A map of environment variables.
 	 * @returns {Promise}
 	 * @access public
 	 */
-	async exec({ argv, console }) {
-		const response = await this.request('/', { argv });
+	async exec({ argv, console, env }) {
+		const response = await this.request('/', { argv, env });
 
 		response.on('response', (msg, { type }) => {
 			// TODO: implement protocol for handling prompting

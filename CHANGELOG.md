@@ -1,97 +1,102 @@
-6.0.0-alpha1 (3/29/2019)
--------------------
-  * Initial alpha release proof of concept that uses the Appc Daemon.
+# 6.0.0-alpha2
 
-5.2.1 (2/15/2019)
--------------------
+ * feat: Pass environment variables over bridge to plugin.
+ * chore: Update dependencies.
+
+# 6.0.0-alpha1 (Mar 29, 2019)
+
+ * feat: Initial alpha release proof of concept that uses the Appc Daemon.
+
+# 5.2.1 (2/15, 2019)
+
  * Fix selection of SDK when it is already installed [TIMOB-25179]
- * Update dependencies
+ * chore: Update dependencies.
 
-5.2.0 (8/7/2018)
--------------------
+# 5.2.0 (Aug 7, 2018)
+
  * Fix failure due to bad URL on `ti setup check` [TIMOB-26206]
  * Fix incorrect dependencies being reported when running `appc ti setup check` [TIMOB-24892]
- * Update dependencies
+ * chore: Update dependencies.
 
-5.1.1 (6/5/2018)
--------------------
+# 5.1.1 (Jun 5, 2018)
+
  * Added flag to disable analytics [TIMOB-26083]
  * Removed email from analytics payloads [TIMOB-26083]
 
-5.1.0 (3/12/2018)
--------------------
+# 5.1.0 (Mar 12, 2018)
+
  * Fix typo in Android NDK path prompt
  * Support detection of JDK 9 [TIMOB-25429]
 
-5.0.14 (12/5/2017)
--------------------
+# 5.0.14 (Dec 5, 2017)
+
  * Fix forking of correct SDK during `ti build` [TIMOB-24690]
 
-5.0.13 (4/26/2017)
--------------------
+# 5.0.13 (Apr 26, 2017)
+
  * Error thrown in CLI command plugin errors on load [TIMOB-24546]
  * Removed hook that fixed some Titanium SDK 3.x versions (which are no longer supported)
  * Avoid re-install of SDK from zipfile if already installed
  * Fix NDK validation, fix google.com network test #185
 
-5.0.10 (9/22/2016)
--------------------
+# 5.0.10 (Sep 22, 2016)
+
  * Fixed bug when running `ti setup sdk` and entering "latest" when the selected SDK no longer exists [TIMOB-23941]
 
-5.0.4 (9/17/2015)
--------------------
+# 5.0.4 (Sep 17, 2015)
+
  * Added actual SDK version to `ti sdk list` output as well as SDK details to `ti sdk list -o json` [TIMOB-19541]
  * Updated NPM dependencies
 
-5.0.3 (9/9/2015)
--------------------
+# 5.0.3 (Sep 9, 2015)
+
  * No longer display latest Node.js and NPM version as it confusing may imply the Titanium CLI supports them [TIMOB-19470]
  * Updated NPM dependencies
 
-5.0.2 (9/9/2015)
--------------------
+# 5.0.2 (Sep 9, 2015)
+
  * Fixed bug where 'ti setup check' was reporting the latest NPM version, not the latest stable version [TIMOB-19470]
 
-5.0.1 (9/3/2015)
--------------------
+# 5.0.1 (Sep 3, 2015)
+
  * Updated to node-appc 0.2.31 which fixes a bug with the JDK detection
 
-5.0.0 (9/3/2015)
--------------------
+# 5.0.0 (Sep 3, 2015)
+
  * Updated to node-appc 0.2.30
 
-4.1.5 (8/18/2015)
--------------------
+# 4.1.5 (Aug 18, 2015)
+
  * Fixed console colors when running in PowerShell [TIMOB-19126]
 
-4.1.4 (8/4/2015)
--------------------
+# 4.1.4 (Aug 4, 2015)
+
  * Fixed bug where the command line args weren't being parsed again after handling a branching option [TIMOB-19281]
 
-4.0.1 (5/29/2015)
--------------------
+# 4.0.1 (May 29, 2015)
+
  * Fixed bug with building an app that had a different Titanium SDK version than the selected SDK and abbreviated option names were being used [TIMOB-18826]
 
-4.0.0 (5/20/2015)
--------------------
+# 4.0.0 (May 20, 2015)
+
  * Added support for generic Titanium SDK-level info [TIMOB-17836]
  * Allow the colors to be controlled explicitly regardless if attached or detached from a TTY
  * Fixed bug where abbreviated options without values passed in before the last argument being treated as a boolean [TIMOB-18067]
  * Ripped out all authentication requirements. Analytics are now anonymous. Login and logout are no ops. [TIMOB-18711]
  * Capped SDK version monkey patch for which --password is converted to --store-password for Android [TIMOB-18783]
 
-3.4.2 (3/6/2015)
--------------------
+# 3.4.2 (Mar 6, 2015)
+
  * Fixed compatibility issues with Node 0.12 [TIMOB-18538]
  * Added Node.js version check when using a Titanium SDK [TIMOB-18629]
  * Drop support for Node.js 0.8 [TIMOB-18414]
 
-3.4.1 (11/14/14)
--------------------
+# 3.4.1 (Nov 14, 2014)
+
  * Fixed bug in Titanium SDK 3 bug fix hook where Xcode should only be removed when running on OS X [TIMOB-17808]
 
-3.4.0 (9/29/14)
--------------------
+# 3.4.0 (Sep 29, 2014)
+
  * Added support for selecting latest stable SDK [TIMOB-17378]
  * Fixed issues with config.json being overwritten at the same time [TIMOB-17346]
  * Improved handling of corrupt a config.json file [TIMOB-17346]
@@ -102,8 +107,8 @@
  * Fixed bug where "ti info" failed when an invalid Titanium SDK is selected [TIMOB-17666]
  * Added support for paths.xcode in "ti config" [TIMOB-17696]
 
-3.3.0 (7/17/14)
--------------------
+# 3.3.0 (Jul 17, 2014)
+
  * Fixed bug with 'ti setup' when the selected Titanium SDK does not exist [TIMOB-12268]
  * Added Genymotion environment information to 'ti info' command [TIMOB-16349]
  * Fixed bug where OS and Node.js info was always being returned in 'ti info'
@@ -123,8 +128,8 @@
  * Fixed formatting of multiline issues in 'ti info' [TIMOB-17221]
  * Fixed display of Android tools that are newer than the maximum supported version [TIMOB-17221]
 
-3.2.3 (5/1/2014)
--------------------
+# 3.2.3 (May 1, 2014)
+
  * When installing a Titanium SDK using the CI version name, but omitting the branch, it now automatically scans all branches [TIMOB-15899]
  * Fixed 'sdk' command to display custom Titanium SDK paths in SDK Install Locations [TIMOB-16141]
  * Fixed bug where the password was not being discarded after logging in and ends up confusing the Android build [TIMOB-16422]
@@ -132,12 +137,12 @@
  * Added temp directory checking to the 'setup check' command [TIMOB-16671]
  * Fixed disabling of colors for 'setup' command. Also fixed --no-color flag [TIMOB-16853]
 
-3.2.2
--------------------
+# 3.2.2
+
  * Version skipped, no changes
 
-3.2.1 (2/10/2014)
--------------------
+# 3.2.1 (Feb 10, 2014)
+
  * Fixed bug where npm version was not being displayed due to race condition [TIMOB-15962]
  * Fixed bug where if the node executable is not called "node", the CLI would error because argv[0] != process.execPath [TIMOB-15804]
  * Fixed bug when running "ti help" for a command that doesn't have 'platforms' [TIMOB-16233]
@@ -145,8 +150,8 @@
  * Fixed command and hook loading when comparing the minimum required CLI version in which the version has a -beta suffix [TIMOB-16365]
  * Fixed bug when a SDK >=3.2.0 build is run with --password instead of --store-password [TIMOB-16354]
 
-3.2.0 (12/20/2013)
--------------------
+# 3.2.0 (Dec 20, 2013)
+
  * Completely overhauled entire CLI architecture
  * Brand new setup command with 'check environment' and 'quick setup' sections
  * Added better error handling with logging in and out of the Appc network; saving cli config [TIMOB-13908]
@@ -186,74 +191,74 @@
  * Removed Java 1.7 warning from the 'setup check' command
  * Fixed bug where options that have valid values but don't have a validate function never have their callbacks fired [TIMOB-15935]
 
-3.1.4 (12/18/2013)
--------------------
+# 3.1.4 (Dec 18, 2013)
+
  * Fixed bug with detecting if CLI is being invoked by node.exe instead of titanium.cmd on Windows [TIMOB-14933]
  * Added support for config option cli.rejectUnauthorized to skip SSL cert validation [TIMOB-15783]
 
-3.1.2 (8/15/2013)
--------------------
+# 3.1.2 (Aug 15, 2013)
+
  * Updated "request" module to 2.25.0 [TIMOB-11267]
 
-3.1.1 (6/17/2013)
--------------------
+# 3.1.1 (Jun 17, 2013)
+
  * Added support for code processor plugin paths [TIMOB-13118]
 
-3.1.0 (4/16/2013)
--------------------
+# 3.1.0 (Apr 16, 2013)
+
  * Fixed scoping in hooks system. Added better error handling for bad hooks [TIMOB-13040]
  * Fixed bug with "titanium config cli.logLevel" outputting as a log message [TIMOB-13194]
  * Changed default log level to "trace" [TIMOB-13194]
  * Fixed bug where hooks could reverse --no-colors flag [TIMOB-13374]
 
-3.0.24 (2/19/2013)
--------------------
+# 3.0.24 (Feb 19, 2013)
+
  * Enabled padding for non-log() messages such as info, debug, etc [TIMOB-12436]
  * Fixed config saving to automatically create the ~/.titanium directory if it doesn't exist. [TIMOB-12437]
 
-3.0.23 (1/21/2013)
--------------------
+# 3.0.23 (Jan 21, 2013)
+
  * Fixed bug with setup command where an error occurs when a previously saved active SDK version is invalid [TIMOB-12268]
  * Updated info command to output iOS certs by keychain based on a fix in node-appc [TIMOB-12033]
  * Added terminal character encoding detection [TIMOB-12347]
  * Fixed bug with detecting if setup needs to be run
 
-3.0.22 (12/21/2012)
--------------------
+# 3.0.22 (Dec 21, 2012)
+
  * Added the sdk select 'command' to the sdk's help screen [TIMOB-12113]
  * Tiny i18n string update
 
-3.0.21 (12/10/2012)
--------------------
+# 3.0.21 (Dec 10, 2012)
+
  * In the advanced setup wizard, fixed iOS developer cert name validation to allow names with and without an ID [TIMOB-12003]
 
-3.0.20 (12/6/2012)
--------------------
+# 3.0.20 (Dec 6, 2012)
+
  * Updated i18n strings [TIMOB-11825]
 
-3.0.19 (11/30/2012)
--------------------
+# 3.0.19 (Nov 30, 2012)
+
  * Fixed bug with --sdk not properly overriding the SDK from the config file [TIMOB-11883]
 
-3.0.18 (11/21/2012)
--------------------
+# 3.0.18 (Nov 21, 2012)
+
  * Added support for searching for modules using both the module search path from the config file as well as the root of the selected Titanium SDK [TIMOB-11776]
 
-3.0.17 (11/20/2012)
--------------------
+# 3.0.17 (Nov 20, 2012)
+
  * Added better support for config values that are lists. Now you can set entire lists, append items to lists, and remove items from lists [TIMOB-11753]
  * Updated I18N strings
 
-3.0.16 (11/8/2012)
--------------------
+# 3.0.16 (Nov 8, 2012)
+
  * Reduced "sdk" command's download progress bar width to reduce possibility of rendering artifacts [TIMOB-11470]
 
-3.0.15 (11/7/2012)
--------------------
+# 3.0.15 (Nov 7, 2012)
+
  * Fixed bug with duplicate abbreviation aliases were conflicting
 
-3.0.14 (11/7/2012)
--------------------
+# 3.0.14 (Nov 7, 2012)
+
  * Changed behavior to only list commands for the active Titanium SDK
  * Added "select" subcommand to "sdk" command for selecting the active Titanium SDK
  * Added better error message for invalid "sdk" command subcommands
@@ -261,14 +266,14 @@
  * Added active Titanium SDK version to the banner
  * Updated CLI to use new environ detect() method and pass in SDK paths from the config file
 
-3.0.13 (10/30/2012)
--------------------
+# 3.0.13 (Oct 30, 2012)
+
  * Fixed bug when CLI config doesn't have any Titanium SDK home directories defined
 
-3.0.12 (10/29/2012)
--------------------
+# 3.0.12 (Oct 29, 2012)
+
  * Added support for specifying additional Titanium SDK home directory paths in the CLI config
 
-3.0.11 (10/24/2012)
--------------------
+# 3.0.11 (Oct 24, 2012)
+
  * Added "ti" alias
