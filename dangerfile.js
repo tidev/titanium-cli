@@ -1,4 +1,4 @@
-/* global process, fail */
+/* global fail */
 
 // requires
 const eslint = require('@seadub/danger-plugin-eslint').default;
