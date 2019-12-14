@@ -70,7 +70,7 @@
 		"mocha": "^6.2.1",
 		"mocha-jenkins-reporter": "^0.4.2",
 		"nyc": "^14.1.1",
-		"semver": "^6.3.0",
+		"semver": "^7.0.0",
 		"should": "^13.2.1"
 	},
 	"license": "Apache-2.0",
