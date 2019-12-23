@@ -69,7 +69,7 @@
 		"lint-staged": "^9.4.2",
 		"mocha": "^6.2.1",
 		"mocha-jenkins-reporter": "^0.4.2",
-		"nyc": "^14.1.1",
+		"nyc": "^15.0.0",
 		"semver": "^6.3.0",
 		"should": "^13.2.1"
 	},
