@@ -36,16 +36,16 @@
     "test": "gulp test"
   },
   "dependencies": {
-    "@appcd/plugin-titanium": "^1.6.0",
-    "appcd-client": "^2.0.1",
-    "appcd-logger": "^2.0.3",
-    "cli-kit": "^0.12.0",
-    "source-map-support": "^0.5.13",
+    "@appcd/plugin-titanium": "^1.7.0",
+    "appcd-client": "^2.0.4",
+    "appcd-logger": "^2.0.5",
+    "cli-kit": "^0.13.1",
+    "source-map-support": "^0.5.16",
     "v8-compile-cache": "^2.1.0"
   },
   "devDependencies": {
-    "appcd": "^3.0.0",
-    "appcd-gulp": "^2.2.0"
+    "appcd": "^3.2.0",
+    "appcd-gulp": "^2.3.2"
   },
   "homepage": "https://github.com/appcelerator/titanium",
   "bugs": "https://github.com/appcelerator/titanium/issues",
