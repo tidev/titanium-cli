@@ -67,7 +67,7 @@
 		"fs-extra": "^8.1.0",
 		"husky": "^3.0.9",
 		"lint-staged": "^9.4.2",
-		"mocha": "^6.2.1",
+		"mocha": "^7.0.1",
 		"mocha-jenkins-reporter": "^0.4.2",
 		"nyc": "^14.1.1",
 		"semver": "^6.3.0",
