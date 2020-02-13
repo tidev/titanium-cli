@@ -21,12 +21,12 @@ export default class Bridge {
 	 * @access public
 	 */
 	constructor() {
-		this.pluginDir        = path.resolve(require.resolve('@appcd/plugin-titanium'), '..', '..');
-		let { name, version } = JSON.parse(fs.readFileSync(path.join(this.pluginDir, 'package.json'), 'utf8'));
-		this.pluginName       = name;
-		this.pluginVersion    = version;
+		const { dependencies, version } = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
 
-		({ version } = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8')));
+		this.pluginName       = '@appcd/plugin-titanium';
+		this.pluginDir        = path.resolve(require.resolve(this.pluginName), '..', '..');
+		this.pluginVersion    = dependencies[this.pluginName];
+
 		this.client = new Client({
 			userAgent: `titanium-cli/${version}`
 		});

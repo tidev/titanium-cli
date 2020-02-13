@@ -1,6 +1,9 @@
 # 6.0.0-alpha2
 
  * feat: Pass environment variables over bridge to plugin.
+ * fix: Call the most recent Titanium plugin that satisfies the semver range in the Titanium CLI's
+   dependencies, not the version that was installed.
+   [(DAEMON-317)](https://jira.appcelerator.org/browse/DAEMON-317)
  * chore: Update dependencies.
 
 # 6.0.0-alpha1 (Mar 29, 2019)
