@@ -1,12 +1,11 @@
 import appcdLogger from 'appcd-logger';
+import CLI, { ansi, Terminal, util } from 'cli-kit';
 import Client from 'appcd-client';
 import fs from 'fs';
 import path from 'path';
 import snooplogg from 'snooplogg';
 
-import { EventEmitter } from 'events';
-
-const { log } = appcdLogger('ti:cli:bridge');
+const { error, log } = appcdLogger('ti:cli:bridge');
 const { highlight } = snooplogg.styles;
 
 /**
@@ -21,53 +20,18 @@ export default class Bridge {
 	 * @access public
 	 */
 	constructor() {
-		const { dependencies, version } = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
+		const {
+			dependencies,
+			version
+		} = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf8'));
 
 		this.pluginName       = '@appcd/plugin-titanium';
 		this.pluginDir        = path.resolve(require.resolve(this.pluginName), '..', '..');
 		this.pluginVersion    = dependencies[this.pluginName];
+		this.version          = version;
 
 		this.client = new Client({
 			userAgent: `titanium-cli/${version}`
-		});
-	}
-
-	/**
-	 * Attempts to connect to the Appc Daemon. If the connection fails, it attempts to find appcd,
-	 * get its configuration, start the daemon, and reconnect.
-	 *
-	 * @returns {Promise} Resolves a response stream.
-	 * @access private
-	 */
-	async connect() {
-		await new Promise((resolve, reject) => {
-			this.client
-				.connect({ startDaemon: true })
-				.on('connected', resolve)
-				.on('error', reject);
-		});
-
-		log(`Requesting ${highlight(this.path)}`);
-		return await new Promise((resolve, reject) => {
-			const response = this.client.request({ path: this.path, data: this.data });
-			const emitter = new EventEmitter();
-
-			response
-				.on('response', (...msg) => {
-					resolve(emitter);
-					setImmediate(() => emitter.emit('response', ...msg));
-				})
-				.on('finish', (...msg) => {
-					resolve(emitter);
-					setImmediate(() => emitter.emit('finish', ...msg));
-				})
-				.once('error', err => {
-					if (err.status === 404) {
-						this.checkTitaniumPlugin().then(resolve).catch(reject);
-					} else {
-						reject(err);
-					}
-				});
 		});
 	}
 
@@ -103,7 +67,7 @@ export default class Bridge {
 					log(`Registering Titanium appcd plugin: ${highlight(this.pluginDir)}`);
 					this.client
 						.request({ path: '/appcd/plugin/register', data: { path: this.pluginDir } })
-						.once('response', () => this.connect().then(resolve).catch(reject))
+						.once('response', resolve)
 						.once('error', err => {
 							reject(new Error(`Failed to register the Titanium appcd plugin: ${err.message}`));
 						});
@@ -125,54 +89,98 @@ export default class Bridge {
 	 *
 	 * @param {Object} params - Various parameters.
 	 * @param {Array.<String>} params.argv - The list of command line arguments.
-	 * @param {Console} params.console - A console instance.
+	 * @param {String} params.cwd - The current working directory.
 	 * @param {Object} [params.env] - A map of environment variables.
+	 * @param {Stream} params.stdin - The input stream.
+	 * @param {Stream} params.stdout - The output stream.
 	 * @returns {Promise}
 	 * @access public
 	 */
-	async exec({ argv, console, env }) {
-		const response = await this.request('/', { argv, env });
+	async exec({ argv, cwd, env, stdin, stdout }) {
+		const p = argv.indexOf('--interactive');
+		let interactive = false;
+		if (p !== -1) {
+			interactive = true;
+			argv.splice(p, 1);
+		}
 
-		response.on('response', (msg, { type }) => {
-			// TODO: implement protocol for handling prompting
-			if (type === 'stdout' || type === 'stderr') {
-				console[`_${type}`].write(msg);
+		// step 1: get the url
+		let url;
+		try {
+			url = await new Promise((resolve, reject) => {
+				const path = `/titanium/${this.pluginVersion}/cli`;
+				log(`Requesting ${highlight(path)}`);
+				this.client.request({ path, startDaemon: true })
+					.once('response', msg => {
+						if (msg && msg.url) {
+							resolve(msg.url);
+						} else {
+							reject(new Error('Unable to retrieve CLI session URL'));
+						}
+					})
+					.once('error', async err => {
+						if (err.status !== 404) {
+							return reject(err);
+						}
+
+						try {
+							await this.checkTitaniumPlugin();
+						} catch (e) {
+							return reject(e);
+						}
+
+						log(`Requesting ${highlight(path)}`);
+						this.client.request({ path })
+							.once('response', msg => {
+								if (msg && msg.url) {
+									resolve(msg.url);
+								} else {
+									reject(new Error('Unable to retrieve CLI session URL'));
+								}
+							})
+							.once('error', reject);
+					});
+			});
+		} finally {
+			this.client.disconnect();
+		}
+
+		// step 2: connect to the cli session
+		const handle = await CLI.connect(url, {
+			headers: {
+				'clikit-cwd': util.encodeHeader(cwd),
+				'clikit-env': util.encodeHeader(env),
+				'User-Agent': `titanium-cli/${this.version}`
+			},
+			terminal: new Terminal({
+				stdin,
+				stdout
+			})
+		});
+
+		handle.on('close', () => process.exit());
+
+		handle.on('error', err => {
+			error(err);
+			process.exit(1);
+		});
+
+		handle.on('exit', code => {
+			if (!interactive) {
+				process.exit(code);
 			}
 		});
 
-		await new Promise((resolve, reject) => {
-			const cleanup = () => {
-				this.disconnect();
-				resolve();
-			};
-
-			response
-				.once('finish', cleanup)
-				.once('close', cleanup)
-				.once('error', reject);
-		});
-	}
-
-	/**
-	 * Dispatches a request to the Appc Daemon.
-	 *
-	 * @param {String} path - A path relative to the Titanium appcd plugin's CLI service endpoint.
-	 * @param {Object} [data] - An optional data payload to send with the request.
-	 * @returns {Promise} Resolves a response stream.
-	 * @access public
-	 */
-	async request(path, data) {
-		if (!path || typeof path !== 'string') {
-			throw new TypeError('Expected path to be a non-empty string');
+		// step 3: run the command
+		if (!interactive || argv.length) {
+			handle.send(`${argv.map(a => {
+				return !a.length ? '""' : /\s/.test(a) ? `"${a.replace(/"/g, '\\"')}"` : a;
+			}).join(' ')}\n`);
 		}
 
-		if (data && typeof data !== 'object') {
-			throw new TypeError('Expected data to be an object');
+		// only turn on echo after initial command has been run
+		if (interactive) {
+			handle.send(ansi.custom.echo(true));
 		}
-
-		this.path = `/titanium/${this.pluginVersion}/cli/${path.replace(/^\//, '')}`;
-		this.data = data;
-
-		return this.connect();
 	}
 }
