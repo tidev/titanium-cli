@@ -11,19 +11,9 @@ import Bridge from './bridge';
  *
  * @returns {Promise<CLI>}
  */
-export default async function getCLI() {
-	throw new Error('Temporarily unavailable');
-
-	/*
+export default async () => {
 	const bridge = new Bridge();
-	const response = await bridge.request('/schema');
-	const schema = await new Promise((resolve, reject) => {
-		response
-			.once('response', resolve)
-			.once('finish', resolve)
-			.once('close', resolve)
-			.once('error', reject);
-	});
+	const schema = await bridge.schema();
 
 	bridge.disconnect();
 
@@ -43,5 +33,4 @@ export default async function getCLI() {
 	}
 
 	return schema;
-	*/
-}
+};

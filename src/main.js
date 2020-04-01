@@ -5,6 +5,10 @@ if (!Error.prepareStackTrace) {
 
 import Bridge from './bridge';
 
+/**
+ * Main entry point for the Titanium CLI. Create the bridge to the Appc Daemon,
+ * then dispatch the command line arguments.
+ */
 (async () => {
 	try {
 		const bridge = new Bridge();

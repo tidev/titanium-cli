@@ -85,7 +85,7 @@ export default class Bridge {
 	}
 
 	/**
-	 * Executes a command.
+	 * Ensures the daemon is installed and running, connects to it, and executes the CLI command.
 	 *
 	 * @param {Object} params - Various parameters.
 	 * @param {Array.<String>} params.argv - The list of command line arguments.
@@ -97,7 +97,7 @@ export default class Bridge {
 	 * @access public
 	 */
 	async exec({ argv, cwd, env, stdin, stdout }) {
-		const p = argv.indexOf('--interactive');
+		const p = argv.indexOf('--interactive'); // experimental repl
 		let interactive = false;
 		if (p !== -1) {
 			interactive = true;
@@ -110,6 +110,7 @@ export default class Bridge {
 			url = await new Promise((resolve, reject) => {
 				const path = `/titanium/${this.pluginVersion}/cli`;
 				log(`Requesting ${highlight(path)}`);
+
 				this.client.request({ path, startDaemon: true })
 					.once('response', msg => {
 						if (msg && msg.url) {
@@ -182,5 +183,38 @@ export default class Bridge {
 		if (interactive) {
 			handle.send(ansi.custom.echo(true));
 		}
+	}
+
+	/**
+	 * Ensures the daemon is installed and running, connects to it, and retrieves the CLI schema.
+	 *
+	 * @returns {Promise} Resolves an object containing the CLI schema.
+	 * @access public
+	 */
+	schema() {
+		return new Promise((resolve, reject) => {
+			const path = `/titanium/${this.pluginVersion}/cli/schema`;
+			log(`Requesting ${highlight(path)}`);
+
+			this.client.request({ path, startDaemon: true })
+				.once('response', resolve)
+				.once('error', async err => {
+					if (err.status !== 404) {
+						return reject(err);
+					}
+
+					try {
+						await this.checkTitaniumPlugin();
+					} catch (e) {
+						return reject(e);
+					}
+
+					log(`Requesting ${highlight(path)}`);
+
+					this.client.request({ path })
+						.once('response', resolve)
+						.once('error', reject);
+				});
+		});
 	}
 }

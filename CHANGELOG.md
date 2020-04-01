@@ -1,7 +1,6 @@
 # 6.0.0-alpha3
 
  * refactor: Updated to cli-kit@0.14.0 adding support for the new client/server architecture.
- * refactor: Disabled schema support for AMPLIFY CLI integration.
 
 # 6.0.0-alpha2 (Jan 13, 2020)
 
