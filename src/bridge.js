@@ -91,12 +91,14 @@ export default class Bridge {
 	 * @param {Array.<String>} params.argv - The list of command line arguments.
 	 * @param {String} params.cwd - The current working directory.
 	 * @param {Object} [params.env] - A map of environment variables.
+	 * @param {Array.<String>} [params.parentContextNames] - An array of parent names used for
+	 * rendering help.
 	 * @param {Stream} params.stdin - The input stream.
 	 * @param {Stream} params.stdout - The output stream.
 	 * @returns {Promise}
 	 * @access public
 	 */
-	async exec({ argv, cwd, env, stdin, stdout }) {
+	async exec({ argv, cwd, env, parentContextNames, stdin, stdout }) {
 		const p = argv.indexOf('--interactive'); // experimental repl
 		let interactive = false;
 		if (p !== -1) {
@@ -146,13 +148,22 @@ export default class Bridge {
 			this.client.disconnect();
 		}
 
+		const headers = {
+			'User-Agent': `titanium-cli/${this.version}`
+		};
+		if (cwd) {
+			headers['clikit-cwd'] = util.encodeHeader(cwd);
+		}
+		if (env) {
+			headers['clikit-env'] = util.encodeHeader(env);
+		}
+		if (parentContextNames) {
+			headers['clikit-parents'] = util.encodeHeader(parentContextNames);
+		}
+
 		// step 2: connect to the cli session
 		const handle = await CLI.connect(url, {
-			headers: {
-				'clikit-cwd': util.encodeHeader(cwd),
-				'clikit-env': util.encodeHeader(env),
-				'User-Agent': `titanium-cli/${this.version}`
-			},
+			headers,
 			terminal: new Terminal({
 				stdin,
 				stdout
