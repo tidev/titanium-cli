@@ -1,4 +1,4 @@
-# 6.0.0-alpha3
+# 6.0.0-alpha3 (May 8, 2020)
 
  * refactor: Updated to cli-kit@1.0.1 adding support for the new client/server architecture.
  * chore: Updated dependencies.
