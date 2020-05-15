@@ -152,13 +152,13 @@ export default class Bridge {
 			'User-Agent': `titanium-cli/${this.version}`
 		};
 		if (cwd) {
-			headers['clikit-cwd'] = util.encodeHeader(cwd);
+			headers['clikit-cwd'] = util.encode(cwd);
 		}
 		if (env) {
-			headers['clikit-env'] = util.encodeHeader(env);
+			headers['clikit-env'] = util.encode(env);
 		}
 		if (parentContextNames) {
-			headers['clikit-parents'] = util.encodeHeader(parentContextNames);
+			headers['clikit-parents'] = util.encode(parentContextNames);
 		}
 
 		// step 2: connect to the cli session
@@ -185,9 +185,11 @@ export default class Bridge {
 
 		// step 3: run the command
 		if (!interactive || argv.length) {
-			handle.send(`${argv.map(a => {
+			const command = argv.map(a => {
 				return !a.length ? '""' : /\s/.test(a) ? `"${a.replace(/"/g, '\\"')}"` : a;
-			}).join(' ')}\n`);
+			}).join(' ');
+			log(`Executing: ${highlight(command)}`);
+			handle.send(ansi.custom.exec(command));
 		}
 
 		// only turn on echo after initial command has been run

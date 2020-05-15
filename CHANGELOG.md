@@ -1,3 +1,7 @@
+# 6.0.0-alpha4
+
+ * fix: Updated to cli-kit@1.1.0 adding support for the `exec` ansi sequence.
+
 # 6.0.0-alpha3 (May 8, 2020)
 
  * refactor: Updated to cli-kit@1.0.1 adding support for the new client/server architecture.
