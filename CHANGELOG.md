@@ -1,6 +1,7 @@
-# 6.0.0-alpha4
+# 6.0.0-alpha4 (Jun 23, 2020)
 
  * fix: Updated to cli-kit@1.1.0 adding support for the `exec` ansi sequence.
+ * build: Transpile using Node.js 10 profile.
  * chore: Updated dependencies.
 
 # 6.0.0-alpha3 (May 8, 2020)

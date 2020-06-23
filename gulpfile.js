@@ -4,5 +4,5 @@ require('appcd-gulp')({
 	exports,
 	pkgJson:  require('./package.json'),
 	template: 'standard',
-	babel:    'node8'
+	babel:    'node10'
 });

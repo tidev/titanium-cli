@@ -1,6 +1,6 @@
 {
   "name": "titanium",
-  "version": "6.0.0-alpha3",
+  "version": "6.0.0-alpha4",
   "publishConfig": {
     "tag": "next"
   },
