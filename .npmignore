@@ -18,6 +18,8 @@ coverage/
 # CI
 .travis.yml
 Jenkinsfile
+dangerfile.js
+npm-audit.json
 
 # eslint
 .eslintrc
