@@ -54,7 +54,7 @@
 		"request": "2.88.0",
 		"sprintf": "0.1.5",
 		"temp": "0.9.0",
-		"winston": "1.1.2"
+		"winston": "3.3.3"
 	},
 	"devDependencies": {
 		"@seadub/danger-plugin-dependencies": "0.1.0",
