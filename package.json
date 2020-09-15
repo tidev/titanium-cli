@@ -20,7 +20,7 @@
 		"mobile web",
 		"appc-client"
 	],
-	"version": "5.2.4",
+	"version": "5.2.5",
 	"author": {
 		"name": "Appcelerator, Inc.",
 		"email": "npmjs@appcelerator.com"
@@ -50,7 +50,7 @@
 		"fields": "0.1.24",
 		"humanize": "0.0.9",
 		"moment": "^2.24.0",
-		"node-appc": "^1.1.0",
+		"node-appc": "^1.1.1",
 		"request": "2.88.0",
 		"sprintf": "0.1.5",
 		"temp": "0.9.0",
