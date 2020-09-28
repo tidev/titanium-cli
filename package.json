@@ -64,7 +64,7 @@
 		"eslint": "^6.5.1",
 		"eslint-config-axway": "^4.3.0",
 		"eslint-plugin-mocha": "^6.2.0",
-		"fs-extra": "^8.1.0",
+		"fs-extra": "^9.0.1",
 		"husky": "^4.3.0",
 		"lint-staged": "^10.4.0",
 		"mocha": "^6.2.1",
