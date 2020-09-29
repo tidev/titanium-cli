@@ -2,7 +2,7 @@
 	"about": {
 		"name": "Titanium Command-Line Interface",
 		"author": "Appcelerator",
-		"copyright": "Copyright (c) 2012-2017, Appcelerator, Inc.  All Rights Reserved.",
+		"copyright": "Copyright (c) 2012-2020, Appcelerator, Inc.  All Rights Reserved.",
 		"id": "com.appcelerator.titanium.cli"
 	},
 	"name": "titanium",
@@ -113,7 +113,7 @@
 		]
 	},
 	"engines": {
-		"node": ">=4.0"
+		"node": ">=10.13"
 	},
 	"husky": {
 		"hooks": {
