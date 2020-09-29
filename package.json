@@ -53,7 +53,8 @@
 		"request": "2.88.2",
 		"sprintf": "0.1.5",
 		"temp": "0.9.1",
-		"winston": "2.4.5"
+		"winston": "2.4.5",
+		"yauzl": "^2.10.0"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^11.0.0",
@@ -125,7 +126,7 @@
 	},
 	"commitlint": {
 		"extends": [
-		  "@commitlint/config-conventional"
+			"@commitlint/config-conventional"
 		]
 	}
 }
