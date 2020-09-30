@@ -7,28 +7,13 @@
 /* eslint-env mocha */
 'use strict';
 
+const MockLogger = require('./mocklogger');
+
 var assert = require('assert'),
 	path = require('path'),
 	Context = require('../lib/context'),
 	should = require('should'), // eslint-disable-line no-unused-vars
 	packageJSON = require('../package.json');
-
-function MockLogger() {
-	this.buffer = '';
-	this.debug = function (s) {
-		this.buffer += s + '\n';
-	};
-	this.info = function (s) {
-		this.buffer += s + '\n';
-	};
-	this.warn = function (s) {
-		this.buffer += s + '\n';
-	};
-	this.error = function (s) {
-		this.buffer += s + '\n';
-	};
-	this.banner = function () {};
-}
 
 function createGlobalContext() {
 	var g = new Context({
