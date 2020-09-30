@@ -33,6 +33,10 @@
 		{
 			"name": "Chris Barber",
 			"email": "cbarber@appcelerator.com"
+		},
+		{
+			"name": "Chris Williams",
+			"email": "cwilliams@axway.com"
 		}
 	],
 	"bugs": {
