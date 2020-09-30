@@ -48,7 +48,6 @@
 		"colors": "1.4.0",
 		"fields": "0.1.24",
 		"humanize": "0.0.9",
-		"moment": "^2.24.0",
 		"node-appc": "^1.1.1",
 		"request": "2.88.2",
 		"sprintf": "0.1.5",
