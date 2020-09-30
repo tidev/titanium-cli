@@ -213,7 +213,7 @@ describe('sdk', () => {
 					logger.calls[7].should.eql([ 'log', '\'9_2_X\' Branch Builds:' ]);
 					// TODO: verify log levels of below...
 					// Verify a known build from branch
-					logger.buffer.should.containEql(`  ${'9.2.0.v20200923092031'.cyan}  9/23/2020 9:20 AM   ${'(174.3 MB)'.grey}\n`);
+					logger.buffer.should.containEql(`  ${'9.2.0.v20200923092031'.cyan}  9/23/2020, 9:20:31 AM   ${'(174.3 MB)'.grey}\n`);
 					// Verify warning at bottom
 					logger.buffer.should.endWith(`${'** NOTE: these builds not recommended for production use **'.grey}\n\n`);
 
