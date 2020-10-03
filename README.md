@@ -5,7 +5,7 @@ open-source and easy to use.
 
 ## Requirements
 
-You must have Node.js 10.13.0 or newer.
+You must have Node.js 10.13.0 or newer and you must be using a 64-bit operating system.
 
 You also must have the Appc Daemon ([appcd][2]) installed. You can install it via the [Axway
 AMPLIFY Package Manager][3] or npm.

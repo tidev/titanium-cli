@@ -39,7 +39,7 @@
     "@appcd/plugin-titanium": "^1.8.1",
     "appcd-client": "^3.0.0",
     "appcd-logger": "^3.0.0",
-    "cli-kit": "^1.2.3",
+    "cli-kit": "^1.8.2",
     "source-map-support": "^0.5.19",
     "v8-compile-cache": "^2.1.1"
   },
