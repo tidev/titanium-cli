@@ -11,22 +11,12 @@
  */
 'use strict';
 
-const fs = require('fs');
 const path = require('path');
 
 exports.cliVersion = '>=3.2';
 
 exports.init = function (logger, config, cli, _appc) {
-	function getSDK() {
-		return (cli.sdk && (cli.sdk.manifest && cli.sdk.manifest.version || cli.sdk.name)) || (cli.manifest && cli.manifest.version);
-	}
-
 	function handleFork (data, commandName) {
-		var sdk = getSDK();
-		if (!sdk) {
-			return;
-		}
-
 		// Pretty much all versions of Titanium SDK incorrectly handle the situation where the <sdk-version>
 		// in the tiapp.xml differs from selected SDK.
 		//
@@ -45,47 +35,41 @@ exports.init = function (logger, config, cli, _appc) {
 		// the select Titanium SDK and if so, runs the build, otherwise it will fork the correct command
 		// as initially intended.
 
-		var pd = data.result[1].options['project-dir'],
-			tiPath = path.join(cli.sdk.path, 'node_modules', 'node-titanium-sdk', 'lib', 'titanium.js');
+		const pd = data.result[1].options['project-dir'];
 
-		if (!fs.existsSync(tiPath)) {
-			tiPath = path.join(cli.sdk.path, 'node_modules', 'titanium-sdk', 'lib', 'titanium.js');
-		}
-
-		if (!fs.existsSync(tiPath)) {
-			// we have bigger problems :(
+		if (!pd || typeof pd.validate !== 'function') {
 			return;
 		}
 
-		var ti = require(tiPath),
-			realValidateCorrectSDK = ti.validateCorrectSDK;
+		const tiPath = path.join(cli.sdk.path, 'node_modules', 'node-titanium-sdk', 'lib', 'titanium.js');
 
-		if (pd && typeof pd.validate === 'function') {
-			ti.validateCorrectSDK = function () {
-				// just return true to trick the Titanium SDK 3.4.0+ build command --project-dir option's
-				// callback into succeeding
-				return true;
-			};
+		const ti = require(tiPath); // eslint-disable-line security/detect-non-literal-require
+		const realValidateCorrectSDK = ti.validateCorrectSDK;
 
-			var origValidate = pd.validate;
-			pd.validate = function (projectDir, callback) {
-				return origValidate(projectDir, function (err, projectDir) {
-					if (!err) {
-						// if we don't have a tiapp loaded, then the --project-dir callback() wasn't
-						// called, so just call it now
-						if (!cli.tiapp) {
-							projectDir = pd.callback(projectDir);
-						}
+		ti.validateCorrectSDK = function () {
+			// just return true to trick the Titanium SDK 3.4.0+ build command --project-dir option's
+			// callback into succeeding
+			return true;
+		};
 
-						// now validate the sdk
-						if (!realValidateCorrectSDK(logger, config, cli, commandName)) {
-							throw new cli.GracefulShutdown();
-						}
+		const origValidate = pd.validate;
+		pd.validate = function (projectDir, callback) {
+			return origValidate(projectDir, function (err, projectDir) {
+				if (!err) {
+					// if we don't have a tiapp loaded, then the --project-dir callback() wasn't
+					// called, so just call it now
+					if (!cli.tiapp) {
+						projectDir = pd.callback(projectDir);
 					}
-					callback(err, projectDir);
-				});
-			};
-		}
+
+					// now validate the sdk
+					if (!realValidateCorrectSDK(logger, config, cli, commandName)) {
+						throw new cli.GracefulShutdown();
+					}
+				}
+				callback(err, projectDir);
+			});
+		};
 	}
 
 	cli.on('build.config', {
