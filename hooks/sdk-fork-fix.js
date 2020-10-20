@@ -11,6 +11,7 @@
  */
 'use strict';
 
+const fields = require('fields');
 const path = require('path');
 
 exports.cliVersion = '>=3.2';
@@ -52,7 +53,10 @@ exports.init = function (logger, config, cli, _appc) {
 			return true;
 		};
 
+		let origPrompt = pd.prompt;
 		const origValidate = pd.validate;
+		let gracefulShutdown = false;
+
 		pd.validate = function (projectDir, callback) {
 			return origValidate(projectDir, function (err, projectDir) {
 				if (!err) {
@@ -62,12 +66,61 @@ exports.init = function (logger, config, cli, _appc) {
 						projectDir = pd.callback(projectDir);
 					}
 
+					// force overwrite when validate() was called during prompting, otherwise
+					// the value should be the same
+					cli.argv['project-dir'] = projectDir;
+
 					// now validate the sdk
 					if (!realValidateCorrectSDK(logger, config, cli, commandName)) {
 						throw new cli.GracefulShutdown();
 					}
 				}
 				callback(err, projectDir);
+			});
+		};
+
+		// SDKs prior to 9.3.0 did not set a prompt correctly on the --project-dir argument and let
+		// the default prompting occur, if we detect that instance then just redirect
+		if (commandName === 'clean' && origPrompt === undefined) {
+			origPrompt = function prompt (callback) {
+				callback(fields.file({
+					promptLabel: 'Where is the __project directory__?',
+					complete: true,
+					showHidden: true,
+					ignoreDirs: new RegExp(config.get('cli.ignoreDirs')), // eslint-disable-line security/detect-non-literal-regexp
+					ignoreFiles: /.*/,
+					validate: pd.validate
+				}));
+			};
+		}
+
+		pd.prompt = callback => {
+			origPrompt(field => {
+				field.validate = (projectDir, cb) => {
+					try {
+						pd.validate(projectDir, cb);
+					} catch (err) {
+						if (err instanceof cli.GracefulShutdown) {
+							gracefulShutdown = true;
+							return true;
+						} else {
+							cb(err);
+						}
+					}
+				};
+				const origFieldPrompt = field.prompt.bind(field);
+				field.prompt = cb => {
+					origFieldPrompt((err, value) => {
+						if (err) {
+							cb(err);
+						} else if (gracefulShutdown) {
+							// do nothing!
+						} else {
+							cb(null, value);
+						}
+					});
+				};
+				callback(field);
 			});
 		};
 	}
