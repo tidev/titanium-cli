@@ -343,7 +343,7 @@ describe('context', function () {
 				done();
 			};
 
-			c.load(logger, {}, {}, function (err, ctx) {
+			c.load(logger, {}, {}, function (_err, _ctx) {
 				process.exit = origExit;
 				assert(false, 'expected process to exit, not the callback to be fired');
 			});
@@ -361,7 +361,7 @@ describe('context', function () {
 				done();
 			};
 
-			c.load(logger, {}, {}, function (err, ctx) {
+			c.load(logger, {}, {}, function (_err, _ctx) {
 				process.exit = origExit;
 				assert(false, 'expected process to exit, not the callback to be fired');
 			});
@@ -370,8 +370,7 @@ describe('context', function () {
 		it('should error because path is invalid', function (done) {
 			var c = new Context({ name: 'doesnotexist', path: path.join(__dirname, 'resources', 'commands', 'doesnotexist.js') }),
 				logger = new MockLogger(),
-				origExit = process.exit,
-				exitCode = null;
+				origExit = process.exit;
 
 			process.exit = function (code) {
 				process.exit = origExit;
@@ -381,7 +380,7 @@ describe('context', function () {
 				done();
 			};
 
-			c.load(logger, {}, {}, function (err, ctx) {
+			c.load(logger, {}, {}, function (_err, _ctx) {
 				process.exit = origExit;
 				assert(false, 'expected process to exit, not the callback to be fired');
 			});
@@ -400,8 +399,7 @@ describe('context', function () {
 		it('should error because the cli version is incompatible', function (done) {
 			var c = new Context({ name: 'incompatible', path: path.join(__dirname, 'resources', 'commands', 'incompatible.js') }),
 				logger = new MockLogger(),
-				origExit = process.exit,
-				exitCode = null;
+				origExit = process.exit;
 
 			process.exit = function (code) {
 				process.exit = origExit;
@@ -412,7 +410,7 @@ describe('context', function () {
 			};
 
 			(function () {
-				c.load(logger, {}, { version: packageJSON.version }, function (err, ctx) {
+				c.load(logger, {}, { version: packageJSON.version }, function (_err, _ctx) {
 					process.exit = origExit;
 					assert(false, 'expected process to exit, not the callback to be fired');
 				});
@@ -485,7 +483,7 @@ describe('context', function () {
 
 			c.load(logger, {}, {}, function (err, ctx) {
 				assert(!err, 'expected "foo" to load without error');
-				ctx.load(logger, {}, {}, function (err, ctx) {
+				ctx.load(logger, {}, {}, function (err, _ctx) {
 					assert(!err, 'expected "foo" to load without error');
 					done();
 				});
@@ -496,11 +494,11 @@ describe('context', function () {
 			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'foo.js') }),
 				logger = new MockLogger();
 
-			c.load(logger, {}, {}, function (err, ctx) {
+			c.load(logger, {}, {}, function (err, _ctx) {
 				assert(!err, 'expected "foo" to load without error');
 
 				var c2 = new Context({ name: 'bar', path: path.join(__dirname, 'resources', 'commands', 'bar.js'), parent: c });
-				c2.load(logger, {}, {}, function (err, ctx) {
+				c2.load(logger, {}, {}, function (err, _ctx) {
 					assert(!err, 'expected "bar" to load without error');
 					c.options.should.have.ownProperty('sdk');
 					c2.options.should.not.have.ownProperty('sdk');
@@ -521,7 +519,7 @@ describe('context', function () {
 					_: [],
 					$command: null
 				}
-			}, function (err, ctx) {
+			}, function (err, _ctx) {
 				assert(!err, 'expected "foo" to load without error');
 				done();
 			});
@@ -543,7 +541,7 @@ describe('context', function () {
 					}
 				};
 
-			c.load(logger, {}, cli, function (err, ctx) {
+			c.load(logger, {}, cli, function (err, _ctx) {
 				assert(!err, 'expected "foo" to load without error');
 				cli.argv.should.have.ownProperty('$command');
 				cli.argv.$command.should.equal('help');
@@ -564,7 +562,7 @@ describe('context', function () {
 					}
 				};
 
-			c.load(logger, {}, cli, function (err, ctx) {
+			c.load(logger, {}, cli, function (err, _ctx) {
 				assert(!err, 'expected "bar" to load without error');
 				cli.argv.should.have.ownProperty('$command');
 				cli.argv.$command.should.equal('bar');
@@ -616,7 +614,7 @@ describe('context', function () {
 					scanHooks: function () {}
 				};
 
-			c.load(logger, {}, cli, function (err, ctx) {
+			c.load(logger, {}, cli, function (err, _ctx) {
 				assert(!err, 'expected "foo" to load without error');
 				cli.argv.should.have.ownProperty('platform');
 				cli.argv.platform.should.equal('ios');
@@ -628,7 +626,7 @@ describe('context', function () {
 	describe('#loadModuleOnly()', function () {
 		it('should fail if path is undefined', function (done) {
 			var c = new Context({ name: 'foo' });
-			c.loadModuleOnly(function (err, ctx) {
+			c.loadModuleOnly(function (err, _ctx) {
 				assert(err, 'expected "foo" to load with error');
 				done();
 			});
@@ -636,7 +634,7 @@ describe('context', function () {
 
 		it('should fail if path is invalid', function (done) {
 			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'doesnotexist.js') });
-			c.loadModuleOnly(function (err, ctx) {
+			c.loadModuleOnly(function (err, _ctx) {
 				assert(err, 'expected "foo" to load with error');
 				done();
 			});
@@ -656,7 +654,7 @@ describe('context', function () {
 
 		it('should fail if command module has syntax error', function (done) {
 			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'badcommand.js') });
-			c.loadModuleOnly(function (err, ctx) {
+			c.loadModuleOnly(function (err, _ctx) {
 				assert(err, 'expected "foo" to load with error');
 				done();
 			});
@@ -679,7 +677,7 @@ describe('context', function () {
 					scanHooks: function () {}
 				};
 
-			c.load(logger, {}, cli, function (err, ctx) {
+			c.load(logger, {}, cli, function (err, _ctx) {
 				assert(!err, 'expected "foo" to load without error');
 				c.loadModuleOnly(function (err, ctx) {
 					assert(!err, 'expected "foo" to load without error');
@@ -790,7 +788,7 @@ describe('context', function () {
 
 			c.flag('foo', {
 				abbr: 'f',
-				callback: function (val) {
+				callback: function (_val) {
 					result = 'world';
 				}
 			});
@@ -808,7 +806,7 @@ describe('context', function () {
 			var c = new Context({ name: 'foo', path: path.join(__dirname, 'resources', 'commands', 'foo.js') }),
 				logger = new MockLogger();
 
-			c.load(logger, {}, {}, function (err, ctx) {
+			c.load(logger, {}, {}, function (err, _ctx) {
 				assert(!err, 'expected "foo" to load without error');
 
 				var x = c.getFlagsOptions();
@@ -818,7 +816,7 @@ describe('context', function () {
 				x.options.should.have.ownProperty('target');
 
 				var c2 = new Context({ name: 'bar', path: path.join(__dirname, 'resources', 'commands', 'bar.js'), parent: c });
-				c2.load(logger, {}, {}, function (err, ctx) {
+				c2.load(logger, {}, {}, function (err, _ctx) {
 					assert(!err, 'expected "bar" to load without error');
 
 					var y = c2.getFlagsOptions();
