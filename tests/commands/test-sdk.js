@@ -588,6 +588,48 @@ describe('sdk', () => {
 					finished();
 				});
 			});
+
+			it('with invalid branch', function (finished) {
+				const cli = {
+					argv: {
+						_: [ 'install' ],
+						$: 'titanium',
+						default: false,
+						force: false,
+						quiet: false,
+						'progress-bars': false,
+						branch: 'foo'
+					},
+					env: {
+						installPath: sdksPath,
+						os: {
+							name: 'osx',
+							sdkPaths: [ sdksPath ],
+						},
+						sdks: {
+							'9.2.0.GA': {
+								manifest: {
+									name: '9.2.0.v20200923092031',
+									version: '9.2.0.GA',
+									timestamp: '9/23/2020 16:25'
+								},
+								path: path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA')
+							}
+						}
+					},
+					addAnalyticsEvent: (name, obj) => {}
+				};
+
+				SDK.run(logger, config, cli, function (err) {
+					try {
+						logger.buffer.should.startWith('Branch "foo" does not exist');
+					} catch (e) {
+						return finished(e);
+					}
+
+					finished();
+				});
+			});
 		});
 
 		describe('uninstall', () => {
