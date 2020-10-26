@@ -168,7 +168,7 @@ describe('hook', function () {
 				data.payload *= 2;
 			});
 
-			fn(function (err, result) {
+			fn(function (_err, _result) {
 				this.should.have.ownProperty('payload');
 				this.payload.should.equal(20);
 				done();

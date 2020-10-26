@@ -343,7 +343,7 @@ describe('sdk', () => {
 							}
 						}
 					},
-					addAnalyticsEvent: (name, obj) => {}
+					addAnalyticsEvent: (_name, _obj) => {}
 				};
 
 				SDK.run(logger, config, cli, function (err) {
@@ -387,7 +387,7 @@ describe('sdk', () => {
 							}
 						}
 					},
-					addAnalyticsEvent: (name, obj) => {}
+					addAnalyticsEvent: (_name, _obj) => {}
 				};
 
 				SDK.run(logger, config, cli, function (err) {
@@ -445,7 +445,7 @@ describe('sdk', () => {
 							}
 						}
 					},
-					addAnalyticsEvent: (name, obj) => {}
+					addAnalyticsEvent: (_name, _obj) => {}
 				};
 
 				SDK.run(logger, config, cli, function (err) {
@@ -489,7 +489,7 @@ describe('sdk', () => {
 							}
 						}
 					},
-					addAnalyticsEvent: (name, obj) => {}
+					addAnalyticsEvent: (_name, _obj) => {}
 				};
 
 				SDK.run(logger, config, cli, function (err) {
@@ -533,7 +533,7 @@ describe('sdk', () => {
 							}
 						}
 					},
-					addAnalyticsEvent: (name, obj) => {}
+					addAnalyticsEvent: (_name, _obj) => {}
 				};
 
 				SDK.run(logger, config, cli, function (err) {
@@ -575,7 +575,7 @@ describe('sdk', () => {
 							}
 						}
 					},
-					addAnalyticsEvent: (name, obj) => {}
+					addAnalyticsEvent: (_name, _obj) => {}
 				};
 
 				SDK.run(logger, config, cli, function (err) {
@@ -617,10 +617,10 @@ describe('sdk', () => {
 							}
 						}
 					},
-					addAnalyticsEvent: (name, obj) => {}
+					addAnalyticsEvent: (_name, _obj) => {}
 				};
 
-				SDK.run(logger, config, cli, function (err) {
+				SDK.run(logger, config, cli, function (_err) {
 					try {
 						logger.buffer.should.startWith('Branch "foo" does not exist');
 					} catch (e) {

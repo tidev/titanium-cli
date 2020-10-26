@@ -2,6 +2,6 @@
 
 exports.cliVersion = '1.0';
 
-exports.init = function (logger, config, cli, appc) {
+exports.init = function (_logger, _config, _cli, _appc) {
 	// do nothing
 };
