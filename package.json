@@ -48,7 +48,7 @@
 	},
 	"preferGlobal": true,
 	"dependencies": {
-		"async": "^2.6.3",
+		"async": "^3.2.0",
 		"colors": "1.4.0",
 		"fields": "0.1.24",
 		"humanize": "0.0.9",
