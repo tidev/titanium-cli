@@ -1,6 +1,6 @@
 {
   "name": "titanium",
-  "version": "6.0.0-alpha4",
+  "version": "6.0.0-alpha5",
   "publishConfig": {
     "tag": "next"
   },
@@ -37,15 +37,15 @@
   },
   "dependencies": {
     "@appcd/plugin-titanium": "^1.8.1",
-    "appcd-client": "^3.0.0",
-    "appcd-logger": "^3.0.0",
-    "cli-kit": "^1.8.2",
+    "appcd-client": "^3.0.1",
+    "appcd-logger": "^3.0.1",
+    "cli-kit": "^1.9.1",
     "source-map-support": "^0.5.19",
-    "v8-compile-cache": "^2.1.1"
+    "v8-compile-cache": "^2.2.0"
   },
   "devDependencies": {
     "appcd": "^3.2.0",
-    "appcd-gulp": "^3.0.1"
+    "appcd-gulp": "^3.1.0"
   },
   "homepage": "https://github.com/appcelerator/titanium",
   "bugs": "https://github.com/appcelerator/titanium/issues",

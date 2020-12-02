@@ -1,3 +1,7 @@
+# 6.0.0-alpha5
+
+ * chore: Updated dependencies.
+
 # 6.0.0-alpha4 (Jun 23, 2020)
 
  * fix: Updated to cli-kit@1.1.0 adding support for the `exec` ansi sequence.
