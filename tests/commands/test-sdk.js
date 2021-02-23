@@ -397,7 +397,7 @@ describe('sdk', () => {
 
 					try {
 						logger.calls[0].should.eql([ 'banner', undefined ]);
-						logger.calls[1].should.eql([ 'log', `Downloading ${'https://builds.appcelerator.com/mobile-releases/7.5.0/mobilesdk-7.5.0.GA-osx.zip'.cyan}` ]);
+						logger.calls[1].should.eql([ 'log', `Downloading ${'https://github.com/appcelerator/titanium_mobile/releases/download/7_5_0_GA/mobilesdk-7.5.0.GA-osx.zip'.cyan}` ]);
 						logger.calls[2].should.eql([ 'log', '\n' ]); // end of progress bar
 						logger.calls[3].should.eql([ 'log', `Extracting SDK to ${sdksPath.cyan}` ]);
 						logger.calls[4].should.eql([ 'log', '\n' ]); // end of progress bar
