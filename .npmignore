@@ -20,6 +20,7 @@ coverage/
 Jenkinsfile
 dangerfile.js
 npm-audit.json
+.github/
 
 # eslint
 .eslintrc
