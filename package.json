@@ -90,7 +90,7 @@
 	"scripts": {
 		"lint": "eslint .",
 		"test": "npm run lint && npm run unit-test",
-		"unit-test": "JUNIT_REPORT_PATH=junit_report.xml nyc mocha \"tests/**/test-*.js\" --reporter=mocha-jenkins-reporter",
+		"unit-test": "nyc mocha \"tests/**/test-*.js\"",
 		"prepare": "husky install"
 	},
 	"mocha": {
@@ -99,7 +99,9 @@
 		"globals": [
 			"Hyperloop",
 			"HyperloopObject"
-		]
+		],
+		"reporter": "mocha-jenkins-reporter",
+		"reporter-option": "junit_report_path=junit_report.xml"
 	},
 	"nyc": {
 		"check-coverage": true,
