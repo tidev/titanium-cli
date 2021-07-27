@@ -148,15 +148,15 @@ describe('sdk', () => {
 					if (err) {
 						return finished(err);
 					}
-					logger.calls[0].should.eql([ 'banner', undefined ]);
-					logger.calls[1].should.eql([ 'log', 'SDK Install Locations:' ]);
-					logger.calls[2].should.eql([ 'log', `   ${sdksPath.cyan}${' [default]'.grey}` ]);
-					logger.calls[3].should.eql([ 'log', undefined ]);
-					logger.calls[4].should.eql([ 'log', 'Installed SDKs:' ]);
-					logger.calls[5].should.eql([ 'log', `   ${('9.2.0.GA').cyan}${' [selected]'.grey}  ${'9.2.0.v20200923092031  '.magenta}${sdkPath}` ]);
-					logger.calls[6].should.eql([ 'log', undefined ]);
+					logger.calls[1].should.eql([ 'banner', undefined ]);
+					logger.calls[2].should.eql([ 'log', 'SDK Install Locations:' ]);
+					logger.calls[3].should.eql([ 'log', `   ${sdksPath.cyan}${' [default]'.grey}` ]);
+					logger.calls[4].should.eql([ 'log', undefined ]);
+					logger.calls[5].should.eql([ 'log', 'Installed SDKs:' ]);
+					logger.calls[6].should.eql([ 'log', `   ${('9.2.0.GA').cyan}${' [selected]'.grey}  ${'9.2.0.v20200923092031  '.magenta}${sdkPath}` ]);
+					logger.calls[7].should.eql([ 'log', undefined ]);
 					// branch listing header
-					logger.calls[7].should.eql([ 'log', 'Branches:' ]);
+					logger.calls[8].should.eql([ 'log', 'Branches:' ]);
 					// TODO: verify log levels of below...
 					// Verify master is default branch and is listed
 					logger.buffer.should.containEql(`   ${'master'.cyan}${' [default]'.grey}`);
@@ -622,7 +622,7 @@ describe('sdk', () => {
 
 				SDK.run(logger, config, cli, function (_err) {
 					try {
-						logger.buffer.should.startWith('Branch "foo" does not exist');
+						logger.buffer.should.containEql('Branch "foo" does not exist');
 					} catch (e) {
 						return finished(e);
 					}
