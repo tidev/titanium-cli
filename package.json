@@ -48,6 +48,7 @@
 	},
 	"preferGlobal": true,
 	"dependencies": {
+		"@octokit/rest": "^18.12.0",
 		"async": "^3.2.0",
 		"colors": "1.4.0",
 		"fields": "0.1.24",
