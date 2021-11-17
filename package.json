@@ -40,7 +40,7 @@
 		}
 	],
 	"bugs": {
-		"url": "https://jira.appcelerator.org/browse/TIMOB"
+		"url": "https://github.com/appcelerator/titanium_mobile/issues"
 	},
 	"repository": {
 		"type": "git",
