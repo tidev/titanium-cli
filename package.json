@@ -66,7 +66,7 @@
 		"@seadub/danger-plugin-dependencies": "1.0.0",
 		"@seadub/danger-plugin-eslint": "^2.0.0",
 		"@seadub/danger-plugin-junit": "0.2.0",
-		"danger": "^10.4.1",
+		"danger": "^11.0.2",
 		"eslint": "^7.10.0",
 		"eslint-config-axway": "^6.0.0",
 		"eslint-plugin-mocha": "^9.0.0",
