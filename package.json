@@ -2,11 +2,11 @@
 	"about": {
 		"name": "Titanium Command-Line Interface",
 		"author": "Appcelerator",
-		"copyright": "Copyright (c) 2012-2020, Appcelerator, Inc.  All Rights Reserved.",
+		"copyright": "Copyright (c) 2012-2022, TiDev, Inc. All Rights Reserved.",
 		"id": "com.appcelerator.titanium.cli"
 	},
 	"name": "titanium",
-	"description": "Appcelerator Titanium Command line",
+	"description": "TiDev Titanium Command line",
 	"keywords": [
 		"appcelerator",
 		"titanium",
