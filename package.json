@@ -1,12 +1,12 @@
 {
 	"about": {
 		"name": "Titanium Command-Line Interface",
-		"author": "TiDev",
+		"author": "Appcelerator",
 		"copyright": "Copyright (c) 2012-2020, Appcelerator, Inc.  All Rights Reserved.",
 		"id": "com.appcelerator.titanium.cli"
 	},
 	"name": "titanium",
-	"description": "Titanium Command line",
+	"description": "Appcelerator Titanium Command line",
 	"keywords": [
 		"appcelerator",
 		"titanium",
@@ -23,7 +23,7 @@
 	"version": "5.4.1",
 	"author": {
 		"name": "Appcelerator, Inc.",
-		"email": "npm@tidev.io"
+		"email": "npmjs@appcelerator.com"
 	},
 	"maintainers": [
 		{
@@ -40,11 +40,11 @@
 		}
 	],
 	"bugs": {
-		"url": "https://github.com/tidev/titanium_mobile/issues"
+		"url": "https://github.com/appcelerator/titanium_mobile/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/tidev/titanium.git"
+		"url": "git://github.com/appcelerator/titanium.git"
 	},
 	"preferGlobal": true,
 	"dependencies": {
