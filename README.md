@@ -1,16 +1,8 @@
-## Titanium CLI
+# Titanium CLI
 
-> [Titanium CLI](https://github.com/appcelerator/titanium) is a
-[Command Line Tool](http://en.wikipedia.org/wiki/Command-line_interface)
-for creating and building Titanium Mobile applications and modules. It's
-open-source and easy to use. [We've](https://github.com/appcelerator)
-designed Titanium to be suitable for command line beginners, but still be
-powerful and extensible enough for production usage.
+> [Titanium CLI](https://github.com/tidev/titanium) is a [Command Line Tool](http://en.wikipedia.org/wiki/Command-line_interface) for creating and building Titanium Mobile applications and modules. It's open-source and easy to use. [We've](https://github.com/tidev) designed Titanium to be suitable for command line beginners, but still be powerful and extensible enough for production usage.
 
-[![Build Status](https://travis-ci.org/appcelerator/titanium.svg?branch=master)](https://travis-ci.org/appcelerator/titanium)
-[![Dependency Status](https://david-dm.org/appcelerator/titanium.svg)](https://david-dm.org/appcelerator/titanium)
-[![devDependency Status](https://david-dm.org/appcelerator/titanium/dev-status.svg)](https://david-dm.org/appcelerator/titanium#info=devDependencies)
-[![NPM version](https://badge.fury.io/js/titanium.svg)](http://badge.fury.io/js/grunt-appc-js) [![Greenkeeper badge](https://badges.greenkeeper.io/appcelerator/titanium.svg)](https://greenkeeper.io/)
+[![NPM version](https://badge.fury.io/js/titanium.svg)](http://badge.fury.io/js/grunt-appc-js) [![Greenkeeper badge](https://badges.greenkeeper.io/tidev/titanium.svg)](https://greenkeeper.io/)
 
 ## Prerequisites
 
@@ -20,43 +12,40 @@ The Titanium CLI requires [Node.js 0.10.x](http://nodejs.org/dist/) or newer.
 
     [sudo] npm install -g titanium
 
+After install, Titanium CLI is executable as `ti`    
+
 ## Bleeding Edge
 
-You can download the latest and greatest *unstable* Titanium CLI code by
-running the following:
+You can download the latest and greatest *unstable* Titanium CLI code by running the following:
 
-    [sudo] npm install -g git://github.com/appcelerator/titanium.git
+    [sudo] npm install -g git://github.com/tidev/titanium.git
 
 ## Obtaining a Titanium SDK
 
-You will need to download a Titanium SDK 3.0 or newer:
+You will need to download a Titanium SDK:
 
     # stable release (recommended)
-    titanium sdk install --default
+    ti sdk install --default
 
-There are times when the latest stable release has an issue or lacks a feature
-in which case you may want to try an unstable Titanium SDK build. These builds
-are not recommended for production use, but should work for development.
+There are times when the latest stable release has an issue or lacks a feature in which case you may want to try an unstable Titanium SDK build. These builds are not recommended for production use, but should work for development.
 
     # unstable next release
-    titanium sdk install --branch 3_1_X --default
+    ti sdk install --branch 3_1_X --default
 
     # bleeding edge
-    titanium sdk install --branch master --default
+    ti sdk install --branch master --default
 
 ## Setting up the Titanium CLI
 
-Before you begin using the Titanium CLI, you should configure it by running the
-"setup" command:
+Before you begin using the Titanium CLI, you should configure it by running the "setup" command:
 
-    titanium setup
+    ti setup
 
-It will prompt you with a number of questions such as your e-mail address (for
-logging into the Appcelerator Network), the location of your Android SDK, and so on.
+It will prompt you with a number of questions such as your e-mail address (for logging into the Appcelerator Network), the location of your Android SDK, and so on.
 
 ## Usage
 
-    titanium <command> [options]
+    ti <command> [options]
 
 ## Built-in Commands
 
@@ -66,43 +55,21 @@ Configure your CLI settings.
 
 **Implementation not complete**
 
-    titanium config <setting> <value>
+    ti config <setting> <value>
 
 ### help
 
 Displays help or help for a specific command.
 
-    titanium
+    ti
 
-    titanium help
+    ti help
 
-    titanium --help
+    titatinium --help
 
-    titanium help <command>
+    ti help <command>
 
-    titanium <command> --help
-
-### login
-
-Logs into the Appcelerator Network
-
-**Implementation not complete**
-
-Login requires both user and password options to be passed in.
-
-    titanium login <username> <password>
-
-If you omit an option, the CLI will prompt you for the value.
-
-    titanium login
-
-### logout
-
-Logs out of the Appcelerator Network
-
-**Implementation not complete**
-
-    titanium logout
+    ti <command> --help
 
 ### sdk
 
@@ -112,86 +79,83 @@ Download and install Titanium SDKs
 
 Installs a specific version of the Titanium SDK. If no version is specified, it assumes the latest.
 
-    titanium sdk install
+    ti sdk install
 
-    titanium sdk install <version>
+    ti sdk install <version>
 
-    titanium sdk install <version> --force
+    ti sdk install <version> --force
 
 Download, install <version>, and set as default SDK.
 
-    titanium sdk install <version> --default
+    ti sdk install <version> --default
 
 Download and install the latest version for the specified branch
 
-    titanium sdk install --branch master
+    ti sdk install --branch master
 
 #### sdk uninstall
 
 Uninstalls a Titanium SDK.
 
-    titanium sdk uninstall <version>
+    ti sdk uninstall <version>
 
 #### sdk list
 
 Lists all installed Titanium SDKs. Optionally lists all branches and releases.
 
-    titanium sdk list
+    ti sdk list
 
-    titanium sdk list -b
-    titanium sdk list --branches
+    ti sdk list -b
+    ti sdk list --branches
 
-    titanium sdk list -r
-    titanium sdk list --releases
+    ti sdk list -r
+    ti sdk list --releases
 
-    titanium sdk list -br
-    titanium sdk list --branches --releases
+    ti sdk list -br
+    ti sdk list --branches --releases
 
 ### setup
 
 Reconfigures the Titanium CLI by asking you a series of questions.
 
-    titanium setup
+    ti setup
 
 ### status
 
 Indicates whether you are logged in or not.
 
-    titanium status
+    ti status
 
-    titanium status --output json
+    ti status --output json
 
 ### version
 
 Displays the current version of the CLI and exits.
 
-    titanium -v
+    ti -v
 
-    titanium --version
+    ti --version
 
 ### info
 
-Displays information about your development environment including Xcode installs,
-iOS SDKs, Android SDKs, and so on.
+Displays information about your development environment including Xcode installs, iOS SDKs, Android SDKs, and so on.
 
-    titanium info
+    ti info
 
-    titanium info -o json
+    ti info -o json
 
 ## Hacking the Titanium CLI
 
-In order to begin hacking on the Titanium CLI, you need to download and install
-[git](http://git-scm.com/).
+In order to begin hacking on the Titanium CLI, you need to download and install [git](http://git-scm.com/).
 
-If you have already installed a previous version of the Titanium CLI, it's
-recommended you uninstall the old one first:
+If you have already installed a previous version of the Titanium CLI, it's recommended you uninstall the old one first:
 
     [sudo] npm uninstall -g titanium
 
 The Titanium CLI is essentially pure JavaScript, so there is no build process.
 You just need to pull the code and resolve the dependendencies.
 
-    git clone git@github.com:appcelerator/titanium.git
+    git clone git@github.com:tidev/titanium.git
     cd titanium
     npm install
     sudo npm link
@@ -204,9 +168,7 @@ To run the unit tests, simply run:
 
 ### Running Code Coverage
 
-To generate the code coverage, you first must install
-[node-jscoverage](https://github.com/visionmedia/node-jscoverage). The easist
-way to do this is run:
+To generate the code coverage, you first must install [node-jscoverage](https://github.com/visionmedia/node-jscoverage). The easist way to do this is run:
 
     git clone git@github.com:visionmedia/node-jscoverage.git
     cd node-jscoverage
@@ -228,24 +190,11 @@ Don't worry, it's still around. You can install it by running:
 
 ## Contributing
 
-Titanium is an open source project. Titanium wouldn't be where it is now without
-contributions by the community. Please consider forking this repo to improve,
-enhance or fix issues. If you feel like the community will benefit from your
-fork, please open a pull request.
+Titanium is an open source project. Titanium wouldn't be where it is now without contributions by the community. Please consider forking this repo to improve, enhance or fix issues. If you feel like the community will benefit from your fork, please open a pull request.
 
-To protect the interests of the Titanium contributors, Appcelerator, customers
-and end users we require contributors to sign a Contributors License Agreement
-(CLA) before we pull the changes into the main repository. Our CLA is simple and
-straightforward - it requires that the contributions you make to any
-Appcelerator open source project are properly licensed and that you have the
-legal authority to make those changes. This helps us significantly reduce future
-legal risk for everyone involved. It is easy, helps everyone, takes only a few
-minutes, and only needs to be completed once.
+To protect the interests of the Titanium contributors, TiDev, customers and end users we require contributors to sign a Contributors License Agreement (CLA) before we pull the changes into the main repository. Our CLA is simple and straightforward - it requires that the contributions you make to any TiDev open source project are properly licensed and that you have the legal authority to make those changes. This helps us significantly reduce future legal risk for everyone involved. It is easy, helps everyone, takes only a few minutes, and only needs to be completed once.
 
-[You can digitally sign the CLA](http://bit.ly/app_cla) online. Please indicate
-your e-mail address in your first pull request so that we can make sure that
-will locate your CLA. Once you've submitted it, you no longer need to send one
-for subsequent submissions.
+[Follow the steps to sign our CLA](https://github.com/tidev/organization-docs/blob/main/AUTHORIZED_CONTRIBUTORS.md). Please indicate your e-mail address in your first pull request so that we can make sure that will locate your CLA. Once you've submitted it, you no longer need to send one for subsequent submissions.
 
 ## License
 
