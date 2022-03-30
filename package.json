@@ -6,7 +6,7 @@
 		"id": "com.appcelerator.titanium.cli"
 	},
 	"name": "titanium",
-	"description": "TiDev Titanium Command line",
+	"description": "Titanium Command line",
 	"keywords": [
 		"appcelerator",
 		"titanium",
