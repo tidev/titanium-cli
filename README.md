@@ -27,8 +27,6 @@ Before you begin using the Titanium CLI, you should configure it by running the 
 
     ti setup
 
-It will prompt you with a number of questions such as your e-mail address (for logging into the Appcelerator Network), the location of your Android SDK, and so on.
-
 ## Usage
 
     ti <command> [options]
