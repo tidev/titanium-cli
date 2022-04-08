@@ -14,12 +14,6 @@ The Titanium CLI requires [Node.js 0.10.x](http://nodejs.org/dist/) or newer.
 
 After install, Titanium CLI is executable as `ti`    
 
-## Bleeding Edge
-
-You can download the latest and greatest *unstable* Titanium CLI code by running the following:
-
-    [sudo] npm install -g git://github.com/tidev/titanium.git
-
 ## Obtaining a Titanium SDK
 
 You will need to download a Titanium SDK:
