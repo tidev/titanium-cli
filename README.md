@@ -21,14 +21,6 @@ You will need to download a Titanium SDK:
     # stable release (recommended)
     ti sdk install --default
 
-There are times when the latest stable release has an issue or lacks a feature in which case you may want to try an unstable Titanium SDK build. These builds are not recommended for production use, but should work for development.
-
-    # unstable next release
-    ti sdk install --branch 3_1_X --default
-
-    # bleeding edge
-    ti sdk install --branch master --default
-
 ## Setting up the Titanium CLI
 
 Before you begin using the Titanium CLI, you should configure it by running the "setup" command:
