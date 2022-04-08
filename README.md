@@ -73,10 +73,6 @@ Download, install <version>, and set as default SDK.
 
     ti sdk install <version> --default
 
-Download and install the latest version for the specified branch
-
-    ti sdk install --branch master
-
 #### sdk uninstall
 
 Uninstalls a Titanium SDK.
@@ -89,28 +85,14 @@ Lists all installed Titanium SDKs. Optionally lists all branches and releases.
 
     ti sdk list
 
-    ti sdk list -b
-    ti sdk list --branches
-
     ti sdk list -r
     ti sdk list --releases
-
-    ti sdk list -br
-    ti sdk list --branches --releases
 
 ### setup
 
 Reconfigures the Titanium CLI by asking you a series of questions.
 
     ti setup
-
-### status
-
-Indicates whether you are logged in or not.
-
-    ti status
-
-    ti status --output json
 
 ### version
 
