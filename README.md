@@ -1,8 +1,6 @@
 # Titanium CLI
 
-> [Titanium CLI](https://github.com/tidev/titanium) is a [Command Line Tool](http://en.wikipedia.org/wiki/Command-line_interface) for creating and building Titanium Mobile applications and modules. It's open-source and easy to use. [We've](https://github.com/tidev) designed Titanium to be suitable for command line beginners, but still be powerful and extensible enough for production usage.
-
-[![NPM version](https://badge.fury.io/js/titanium.svg)](http://badge.fury.io/js/grunt-appc-js) [![Greenkeeper badge](https://badges.greenkeeper.io/tidev/titanium.svg)](https://greenkeeper.io/)
+> [Titanium CLI](https://github.com/tidev/titanium) is a Command Line Tool for creating and building Titanium Mobile applications and modules. It's open-source and easy to use. [We've](https://github.com/tidev) designed Titanium to be suitable for command line beginners, but still be powerful and extensible enough for production usage.
 
 ## Prerequisites
 
