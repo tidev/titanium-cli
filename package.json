@@ -40,11 +40,11 @@
 		}
 	],
 	"bugs": {
-		"url": "https://github.com/appcelerator/titanium_mobile/issues"
+		"url": "https://github.com/tidev/titanium_mobile/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/appcelerator/titanium.git"
+		"url": "git://github.com/tidev/titanium.git"
 	},
 	"preferGlobal": true,
 	"dependencies": {
