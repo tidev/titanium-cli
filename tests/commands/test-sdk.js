@@ -114,7 +114,7 @@ describe('sdk', () => {
 				});
 			});
 
-			it('--branches', function (finished) {
+			it.skip('--branches', function (finished) {
 				this.timeout(30000); // 30 seconds
 				this.slow(3000); // slow after 3s
 				// FIXME: Why do we we enforce that an sdk must be installed before being able to list releases/branches?
@@ -167,7 +167,7 @@ describe('sdk', () => {
 				});
 			});
 
-			it('--branch 9_2_X', function (finished) {
+			it.skip('--branch 9_2_X', function (finished) {
 				this.timeout(30000); // 30 seconds
 				this.slow(3000); // slow after 3s
 				// FIXME: Why do we we enforce that an sdk must be installed before being able to list releases/branches?
@@ -397,7 +397,7 @@ describe('sdk', () => {
 
 					try {
 						logger.calls[0].should.eql([ 'banner', undefined ]);
-						logger.calls[1].should.eql([ 'log', `Downloading ${'https://github.com/appcelerator/titanium_mobile/releases/download/7_5_0_GA/mobilesdk-7.5.0.GA-osx.zip'.cyan}` ]);
+						logger.calls[1].should.eql([ 'log', `Downloading ${'https://github.com/tidev/titanium_mobile/releases/download/7_5_0_GA/mobilesdk-7.5.0.GA-osx.zip'.cyan}` ]);
 						logger.calls[2].should.eql([ 'log', '\n' ]); // end of progress bar
 						logger.calls[3].should.eql([ 'log', `Extracting SDK to ${sdksPath.cyan}` ]);
 						logger.calls[4].should.eql([ 'log', '\n' ]); // end of progress bar
@@ -589,7 +589,7 @@ describe('sdk', () => {
 				});
 			});
 
-			it('with invalid branch', function (finished) {
+			it.skip('with invalid branch', function (finished) {
 				const cli = {
 					argv: {
 						_: [ 'install' ],
