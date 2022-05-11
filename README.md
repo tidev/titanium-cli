@@ -17,17 +17,17 @@ After install, Titanium CLI is executable as `ti`
 You will need to download a Titanium SDK:
 
     # stable release (recommended)
-    ti sdk install --default
+    titanium sdkinstall --default
 
 ## Setting up the Titanium CLI
 
 Before you begin using the Titanium CLI, you should configure it by running the "setup" command:
 
-    ti setup
+    titanium setup
 
 ## Usage
 
-    ti <command> [options]
+    titanium <command> [options]
 
 ## Built-in Commands
 
@@ -37,7 +37,7 @@ Configure your CLI settings.
 
 **Implementation not complete**
 
-    ti config <setting> <value>
+    titanium config <setting> <value>
 
 ### help
 
@@ -45,13 +45,13 @@ Displays help or help for a specific command.
 
     ti
 
-    ti help
+    titanium help
 
     titatinium --help
 
-    ti help <command>
+    titanium help <command>
 
-    ti <command> --help
+    titanium <command> --help
 
 ### sdk
 
@@ -61,52 +61,52 @@ Download and install Titanium SDKs
 
 Installs a specific version of the Titanium SDK. If no version is specified, it assumes the latest.
 
-    ti sdk install
+    titanium sdkinstall
 
-    ti sdk install <version>
+    titanium sdkinstall <version>
 
-    ti sdk install <version> --force
+    titanium sdkinstall <version> --force
 
 Download, install <version>, and set as default SDK.
 
-    ti sdk install <version> --default
+    titanium sdkinstall <version> --default
 
 #### sdk uninstall
 
 Uninstalls a Titanium SDK.
 
-    ti sdk uninstall <version>
+    titanium sdkuninstall <version>
 
 #### sdk list
 
 Lists all installed Titanium SDKs. Optionally lists all branches and releases.
 
-    ti sdk list
+    titanium sdklist
 
-    ti sdk list -r
-    ti sdk list --releases
+    titanium sdklist -r
+    titanium sdklist --releases
 
 ### setup
 
 Reconfigures the Titanium CLI by asking you a series of questions.
 
-    ti setup
+    titanium setup
 
 ### version
 
 Displays the current version of the CLI and exits.
 
-    ti -v
+    titanium -v
 
-    ti --version
+    titanium --version
 
 ### info
 
 Displays information about your development environment including Xcode installs, iOS SDKs, Android SDKs, and so on.
 
-    ti info
+    titanium info
 
-    ti info -o json
+    titanium info -o json
 
 ## Hacking the Titanium CLI
 
