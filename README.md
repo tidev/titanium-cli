@@ -154,9 +154,6 @@ Don't worry, it's still around. You can install it by running:
 
 ## License
 
-This project is open source and provided under the Apache Public License
-(version 2). Please make sure you see the `LICENSE` file included in this
-distribution for more details on the license.  Also, please take notice of the
-privacy notice at the end of the file.
+Titanium is a registered trademark of TiDev Inc. All Titanium trademark and patent rights were transferred and assigned to TiDev Inc. on 04/07/2022. Please see the LEGAL information about using our trademarks, privacy policy, terms of usage and other legal information at http://www.tidev.io/legal.
 
-#### (C) Copyright 2012-2013, [Appcelerator](http://www.appcelerator.com/) Inc. All Rights Reserved.
+#### Copyright TiDev, Inc. 04/07/2022-Present
