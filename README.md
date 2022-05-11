@@ -154,6 +154,6 @@ Don't worry, it's still around. You can install it by running:
 
 ## Legal
 
-Titanium is a registered trademark of TiDev Inc. All Titanium trademark and patent rights were transferred and assigned to TiDev Inc. on 04/07/2022. Please see the LEGAL information about using our trademarks, privacy policy, terms of usage and other legal information at http://www.tidev.io/legal.
+Titanium is a registered trademark of TiDev Inc. All Titanium trademark and patent rights were transferred and assigned to TiDev Inc. on 04/07/2022. Please see the LEGAL information about using our trademarks, privacy policy, terms of usage and other legal information at https://tidev.io/legal.
 
 #### Copyright TiDev, Inc. 04/07/2022-Present
