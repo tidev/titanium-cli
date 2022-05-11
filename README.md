@@ -47,7 +47,7 @@ Displays help or help for a specific command.
 
     titanium help
 
-    titatinium --help
+    titanium --help
 
     titanium help <command>
 
