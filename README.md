@@ -17,7 +17,7 @@ After install, Titanium CLI is executable as `ti`
 You will need to download a Titanium SDK:
 
     # stable release (recommended)
-    titanium sdkinstall --default
+    titanium sdk install --default
 
 ## Setting up the Titanium CLI
 
@@ -61,30 +61,30 @@ Download and install Titanium SDKs
 
 Installs a specific version of the Titanium SDK. If no version is specified, it assumes the latest.
 
-    titanium sdkinstall
+    titanium sdk install
 
-    titanium sdkinstall <version>
+    titanium sdk install <version>
 
-    titanium sdkinstall <version> --force
+    titanium sdk install <version> --force
 
 Download, install <version>, and set as default SDK.
 
-    titanium sdkinstall <version> --default
+    titanium sdk install <version> --default
 
 #### sdk uninstall
 
 Uninstalls a Titanium SDK.
 
-    titanium sdkuninstall <version>
+    titanium sdk uninstall <version>
 
 #### sdk list
 
 Lists all installed Titanium SDKs. Optionally lists all branches and releases.
 
-    titanium sdklist
+    titanium sdk list
 
-    titanium sdklist -r
-    titanium sdklist --releases
+    titanium sdk list -r
+    titanium sdk list --releases
 
 ### setup
 
