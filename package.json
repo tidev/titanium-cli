@@ -87,7 +87,7 @@
 		"reporter-option": "junit_report_path=junit_report.xml"
 	},
 	"nyc": {
-		"check-coverage": true,
+		"check-coverage": false,
 		"lines": 55,
 		"statements": 55,
 		"functions": 49,
