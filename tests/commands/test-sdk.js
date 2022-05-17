@@ -1,6 +1,6 @@
 /**
  * Titanium CLI
- * Copyright (c) 2020-Present by Appcelerator, Inc. All Rights Reserved.
+ * Copyright TiDev, Inc. 04/07/2022-Present
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
@@ -217,47 +217,6 @@ describe('sdk', () => {
 					// Verify warning at bottom
 					logger.buffer.should.endWith(`${'** NOTE: these builds not recommended for production use **'.grey}\n\n`);
 
-					finished();
-				});
-			});
-
-			it('--branch madeup-name', function (finished) {
-				this.timeout(30000); // 30 seconds
-				this.slow(3000); // slow after 3s
-				// FIXME: Why do we we enforce that an sdk must be installed before being able to list releases/branches?
-				const sdkPath = path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA');
-				const cli = {
-					argv: {
-						_: [],
-						$: 'titanium',
-						branch: 'madeup-name'
-					},
-					env: {
-						installPath: sdksPath,
-						os: {
-							name: 'osx',
-							sdkPaths: [
-								sdksPath
-							],
-						},
-						sdks: {
-							'9.2.0.GA': {
-								manifest: {
-									name: '9.2.0.v20200923092031',
-									version: '9.2.0.GA',
-								},
-								path: sdkPath
-							}
-						}
-					}
-				};
-				SDK.run(logger, config, cli, function (err) {
-					if (err) {
-						return finished(err);
-					}
-					// Verify error/logs at end
-					logger.calls[logger.calls.length - 2].should.eql([ 'error', 'Invalid branch "madeup-name"\n' ]);
-					logger.calls[logger.calls.length - 1].should.eql([ 'log', `Run '${'titanium sdk --branches'.cyan}' for a list of available branches.\n` ]);
 					finished();
 				});
 			});

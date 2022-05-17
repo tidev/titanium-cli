@@ -1,14 +1,13 @@
 {
 	"about": {
 		"name": "Titanium Command-Line Interface",
-		"author": "Appcelerator",
-		"copyright": "Copyright (c) 2012-2020, Appcelerator, Inc.  All Rights Reserved.",
+		"author": "TiDev",
+		"copyright": "Copyright TiDev, Inc. 04/07/2022-Present  All Rights Reserved.",
 		"id": "com.appcelerator.titanium.cli"
 	},
 	"name": "titanium",
-	"description": "Appcelerator Titanium Command line",
+	"description": "TiDev Titanium Command line",
 	"keywords": [
-		"appcelerator",
 		"titanium",
 		"mobile",
 		"ios",
@@ -21,30 +20,13 @@
 		"appc-client"
 	],
 	"version": "5.4.1",
-	"author": {
-		"name": "Appcelerator, Inc.",
-		"email": "npmjs@appcelerator.com"
-	},
-	"maintainers": [
-		{
-			"name": "Jeff Haynie",
-			"email": "jhaynie@appcelerator.com"
-		},
-		{
-			"name": "Chris Barber",
-			"email": "cbarber@appcelerator.com"
-		},
-		{
-			"name": "Chris Williams",
-			"email": "cwilliams@axway.com"
-		}
-	],
+	"author": "TiDev, Inc. <npm@tidev.io>",
 	"bugs": {
-		"url": "https://github.com/appcelerator/titanium_mobile/issues"
+		"url": "https://github.com/tidev/titanium_mobile/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/appcelerator/titanium.git"
+		"url": "git://github.com/tidev/titanium.git"
 	},
 	"preferGlobal": true,
 	"dependencies": {
@@ -105,7 +87,7 @@
 		"reporter-option": "junit_report_path=junit_report.xml"
 	},
 	"nyc": {
-		"check-coverage": true,
+		"check-coverage": false,
 		"lines": 55,
 		"statements": 55,
 		"functions": 49,
@@ -120,7 +102,7 @@
 		]
 	},
 	"engines": {
-		"node": ">=10.13"
+		"node": ">=14.15"
 	},
 	"lint-staged": {
 		"*.js": "eslint"

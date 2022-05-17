@@ -1,6 +1,6 @@
 'use strict';
 
-exports.config = function (logger, config, cli) {
+exports.config = function (_logger, _config, _cli) {
 	return {
 		skipBanner: true,
 		noAuth: true,
