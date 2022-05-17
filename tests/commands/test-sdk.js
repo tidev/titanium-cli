@@ -221,47 +221,6 @@ describe('sdk', () => {
 				});
 			});
 
-			it('--branch madeup-name', function (finished) {
-				this.timeout(30000); // 30 seconds
-				this.slow(3000); // slow after 3s
-				// FIXME: Why do we we enforce that an sdk must be installed before being able to list releases/branches?
-				const sdkPath = path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA');
-				const cli = {
-					argv: {
-						_: [],
-						$: 'titanium',
-						branch: 'madeup-name'
-					},
-					env: {
-						installPath: sdksPath,
-						os: {
-							name: 'osx',
-							sdkPaths: [
-								sdksPath
-							],
-						},
-						sdks: {
-							'9.2.0.GA': {
-								manifest: {
-									name: '9.2.0.v20200923092031',
-									version: '9.2.0.GA',
-								},
-								path: sdkPath
-							}
-						}
-					}
-				};
-				SDK.run(logger, config, cli, function (err) {
-					if (err) {
-						return finished(err);
-					}
-					// Verify error/logs at end
-					logger.calls[logger.calls.length - 2].should.eql([ 'error', 'Invalid branch "madeup-name"\n' ]);
-					// logger.calls[logger.calls.length - 1].should.eql([ 'log', `Run '${'titanium sdk --branches'.cyan}' for a list of available branches.\n` ]);
-					finished();
-				});
-			});
-
 			it('--releases', function (finished) {
 				// FIXME: Why do we we enforce that an sdk must be installed before being able to list releases/branches?
 				this.timeout(30000); // 30 seconds
