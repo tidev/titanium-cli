@@ -4,7 +4,7 @@
 
 ## Prerequisites
 
-The Titanium CLI requires [Node.js 0.10.x](http://nodejs.org/dist/) or newer.
+The Titanium CLI requires [Node.js 14](http://nodejs.org/dist/) or newer.
 
 ## Installation
 
