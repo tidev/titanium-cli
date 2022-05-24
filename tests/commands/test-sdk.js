@@ -67,8 +67,11 @@ describe('sdk', () => {
 						return finished(err);
 					}
 					logger.calls[0].should.eql([ 'banner', undefined ]);
-					logger.calls[1].should.eql([ 'log', 'No Titanium SDKs are installed\n' ]);
-					logger.calls[2].should.eql([ 'log', `You can download the latest Titanium SDK by running: ${('titanium sdk install').cyan}\n` ]);
+					logger.calls[1].should.eql([ 'log', 'SDK Install Locations:' ]);
+					// call 2 is the install location path
+					logger.calls[3].should.eql([ 'log', undefined ]);
+					logger.calls[4].should.eql([ 'log', 'No Titanium SDKs are installed\n' ]);
+					logger.calls[5].should.eql([ 'log', `You can download the latest Titanium SDK by running: ${('titanium sdk install').cyan}\n` ]);
 					finished();
 				});
 			});
