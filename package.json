@@ -39,6 +39,7 @@
 		"request": "2.88.2",
 		"sprintf": "0.1.5",
 		"temp": "0.9.4",
+		"update-notifier": "^5.1.0",
 		"winston": "2.4.5",
 		"yauzl": "^2.10.0"
 	},
