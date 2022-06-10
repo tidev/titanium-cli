@@ -1,8 +1,27 @@
+6.1.0
+-------------------
+ * Re-enabled installing CI builds
+ * Updated minor/patch dependencies
+
+6.0.2 (5/24/2022)
+-------------------
+ * Disabled retrieving CI build branches and builds since it didn't work anyways
+
+6.0.1 (5/23/2022)
+-------------------
+ * Updated banner copyright and links
+
+6.0.0 (5/23/2022)
+-------------------
+ * BREAKING CHANGE: Dropped support for Node 12 and older
+ * feat(sdk): handle an sdk zip downloaded as an artifact from github
+ * feat(sdk): add timestamp flag
+ * fix: optimize error for unknown deviceid
+
 5.2.1 (2/15/2019)
 -------------------
  * Fix selection of SDK when it is already installed [TIMOB-25179]
  * Update dependencies
-
 
 5.2.0 (8/7/2018)
 -------------------
