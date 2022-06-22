@@ -69,9 +69,8 @@ describe('sdk', () => {
 					logger.calls[0].should.eql([ 'banner', undefined ]);
 					logger.calls[1].should.eql([ 'log', 'SDK Install Locations:' ]);
 					// call 2 is the install location path
-					logger.calls[3].should.eql([ 'log', undefined ]);
-					logger.calls[4].should.eql([ 'log', 'No Titanium SDKs are installed\n' ]);
-					logger.calls[5].should.eql([ 'log', `You can download the latest Titanium SDK by running: ${('titanium sdk install').cyan}\n` ]);
+					logger.calls[3].should.eql([ 'log', 'No Titanium SDKs are installed\n' ]);
+					logger.calls[4].should.eql([ 'log', `You can download the latest Titanium SDK by running: ${('titanium sdk install').cyan}\n` ]);
 					finished();
 				});
 			});
@@ -108,7 +107,7 @@ describe('sdk', () => {
 					}
 					logger.calls[0].should.eql([ 'banner', undefined ]);
 					logger.calls[1].should.eql([ 'log', 'SDK Install Locations:' ]);
-					logger.calls[2].should.eql([ 'log', `   ${sdksPath.cyan}${' [default]'.grey}` ]);
+					// call 2 is the install location path
 					logger.calls[3].should.eql([ 'log', undefined ]);
 					logger.calls[4].should.eql([ 'log', 'Installed SDKs:' ]);
 					logger.calls[5].should.eql([ 'log', `   ${('9.2.0.GA').cyan}${' [selected]'.grey}  ${'9.2.0.v20200923092031  '.magenta}${sdkPath}` ]);
@@ -117,7 +116,7 @@ describe('sdk', () => {
 				});
 			});
 
-			it.skip('--branches', function (finished) {
+			it('--branches', function (finished) {
 				this.timeout(30000); // 30 seconds
 				this.slow(3000); // slow after 3s
 				// FIXME: Why do we we enforce that an sdk must be installed before being able to list releases/branches?
@@ -151,26 +150,26 @@ describe('sdk', () => {
 					if (err) {
 						return finished(err);
 					}
-					logger.calls[1].should.eql([ 'banner', undefined ]);
-					logger.calls[2].should.eql([ 'log', 'SDK Install Locations:' ]);
-					logger.calls[3].should.eql([ 'log', `   ${sdksPath.cyan}${' [default]'.grey}` ]);
-					logger.calls[4].should.eql([ 'log', undefined ]);
-					logger.calls[5].should.eql([ 'log', 'Installed SDKs:' ]);
-					logger.calls[6].should.eql([ 'log', `   ${('9.2.0.GA').cyan}${' [selected]'.grey}  ${'9.2.0.v20200923092031  '.magenta}${sdkPath}` ]);
-					logger.calls[7].should.eql([ 'log', undefined ]);
+					logger.calls[0].should.eql([ 'banner', undefined ]);
+					logger.calls[1].should.eql([ 'log', 'SDK Install Locations:' ]);
+					// call 2 is the install location path
+					logger.calls[3].should.eql([ 'log', undefined ]);
+					logger.calls[4].should.eql([ 'log', 'Installed SDKs:' ]);
+					logger.calls[5].should.eql([ 'log', `   ${('9.2.0.GA').cyan}${' [selected]'.grey}  ${'9.2.0.v20200923092031  '.magenta}${sdkPath}` ]);
+					logger.calls[6].should.eql([ 'log', undefined ]);
 					// branch listing header
-					logger.calls[8].should.eql([ 'log', 'Branches:' ]);
+					logger.calls[7].should.eql([ 'log', 'Branches:' ]);
 					// TODO: verify log levels of below...
 					// Verify master is default branch and is listed
 					logger.buffer.should.containEql(`   ${'master'.cyan}${' [default]'.grey}`);
 					// Verify 9_2_X branch exists
-					logger.buffer.should.containEql(`   ${'9_2_X'.cyan}`);
+					logger.buffer.should.containEql(`   ${'11_0_X'.cyan}`);
 
 					finished();
 				});
 			});
 
-			it.skip('--branch 9_2_X', function (finished) {
+			it('--branch 11_0_X', function (finished) {
 				this.timeout(30000); // 30 seconds
 				this.slow(3000); // slow after 3s
 				// FIXME: Why do we we enforce that an sdk must be installed before being able to list releases/branches?
@@ -179,7 +178,7 @@ describe('sdk', () => {
 					argv: {
 						_: [],
 						$: 'titanium',
-						branch: '9_2_X'
+						branch: '11_0_X'
 					},
 					env: {
 						installPath: sdksPath,
@@ -204,19 +203,16 @@ describe('sdk', () => {
 					if (err) {
 						return finished(err);
 					}
-					logger.buffer.should.startWith(`SDK Install Locations:\n   ${sdksPath.cyan}${' [default]'.grey}\n\nInstalled SDKs:\n   ${('9.2.0.GA').cyan}${' [selected]'.grey}  ${'9.2.0.v20200923092031  '.magenta}${sdkPath}\n\n`);
 					logger.calls[0].should.eql([ 'banner', undefined ]);
 					logger.calls[1].should.eql([ 'log', 'SDK Install Locations:' ]);
-					logger.calls[2].should.eql([ 'log', `   ${sdksPath.cyan}${' [default]'.grey}` ]);
+					// call 2 is the install location path
 					logger.calls[3].should.eql([ 'log', undefined ]);
 					logger.calls[4].should.eql([ 'log', 'Installed SDKs:' ]);
 					logger.calls[5].should.eql([ 'log', `   ${('9.2.0.GA').cyan}${' [selected]'.grey}  ${'9.2.0.v20200923092031  '.magenta}${sdkPath}` ]);
 					logger.calls[6].should.eql([ 'log', undefined ]);
 					// branch listing header
-					logger.calls[7].should.eql([ 'log', '\'9_2_X\' Branch Builds:' ]);
+					logger.calls[7].should.eql([ 'log', '\'11_0_X\' Branch Builds:' ]);
 					// TODO: verify log levels of below...
-					// Verify a known build from branch
-					logger.buffer.should.containEql(`  ${'9.2.0.v20200923092031'.cyan}  9/23/2020, 9:20:31 AM    ${'(174.3 MB)'.grey}\n`);
 					// Verify warning at bottom
 					logger.buffer.should.endWith(`${'** NOTE: these builds not recommended for production use **'.grey}\n\n`);
 
@@ -258,10 +254,9 @@ describe('sdk', () => {
 					if (err) {
 						return finished(err);
 					}
-					logger.buffer.should.startWith(`SDK Install Locations:\n   ${sdksPath.cyan}${' [default]'.grey}\n\nInstalled SDKs:\n   ${('9.2.0.GA').cyan}${' [selected]'.grey}  ${'9.2.0.v20200923092031  '.magenta}${sdkPath}\n\n`);
 					logger.calls[0].should.eql([ 'banner', undefined ]);
 					logger.calls[1].should.eql([ 'log', 'SDK Install Locations:' ]);
-					logger.calls[2].should.eql([ 'log', `   ${sdksPath.cyan}${' [default]'.grey}` ]);
+					// call 2 is the install location path
 					logger.calls[3].should.eql([ 'log', undefined ]);
 					logger.calls[4].should.eql([ 'log', 'Installed SDKs:' ]);
 					logger.calls[5].should.eql([ 'log', `   ${('9.2.0.GA').cyan}${' [selected]'.grey}  ${'9.2.0.v20200923092031  '.magenta}${sdkPath}` ]);
@@ -269,7 +264,7 @@ describe('sdk', () => {
 					// Release listing header
 					logger.calls[7].should.eql([ 'log', 'Releases:' ]);
 					// Verify 9.2.0.GA is listed and thinks it is installed
-					logger.buffer.should.containEql(`   ${'9.2.0.GA'.cyan} [installed]`);
+					logger.buffer.should.containEql('10.1.0.GA');
 
 					finished();
 				});
@@ -279,6 +274,8 @@ describe('sdk', () => {
 		describe('install', () => {
 			// TODO: Test with install location in place we don't have rights to create/write
 			it('with pre-existing sdk, without --force', function (finished) {
+				this.timeout(30000); // 30 seconds
+				this.slow(3000); // slow after 3s
 				const cli = {
 					argv: {
 						_: [ 'install' ],
@@ -309,13 +306,11 @@ describe('sdk', () => {
 				};
 
 				SDK.run(logger, config, cli, function (err) {
-					if (err) {
-						return finished(err);
+					try {
+						err.message.should.eql('Titanium SDK 9.2.0.GA is already installed');
+					} catch (e) {
+						return finished(e);
 					}
-
-					logger.calls[0].should.eql([ 'banner', undefined ]);
-					logger.calls[1].should.eql([ 'log', `Titanium SDK ${'9.2.0.GA'.cyan} is already installed!\n` ]);
-					logger.calls[2].should.eql([ 'log', `Run '${('titanium sdk install 9.2.0.GA --force').cyan}' to re-install.\n` ]);
 
 					finished();
 				});
@@ -361,9 +356,10 @@ describe('sdk', () => {
 						logger.calls[0].should.eql([ 'banner', undefined ]);
 						logger.calls[1].should.eql([ 'log', `Downloading ${'https://github.com/tidev/titanium_mobile/releases/download/7_5_0_GA/mobilesdk-7.5.0.GA-osx.zip'.cyan}` ]);
 						logger.calls[2].should.eql([ 'log', '\n' ]); // end of progress bar
-						logger.calls[3].should.eql([ 'log', `Extracting SDK to ${sdksPath.cyan}` ]);
+						logger.calls[3].should.eql([ 'log', 'Extracting SDK' ]);
 						logger.calls[4].should.eql([ 'log', '\n' ]); // end of progress bar
-						logger.calls[5].should.eql([ 'log', `Titanium SDK ${'7.5.0.GA'.cyan} successfully installed!\n` ]);
+						// Installing SDK files to...
+						logger.calls[6].should.eql([ 'log', `Titanium SDK ${'7.5.0.GA'.cyan} successfully installed` ]);
 					} catch (error) {
 						return finished(error);
 					} finally {
@@ -411,13 +407,11 @@ describe('sdk', () => {
 				};
 
 				SDK.run(logger, config, cli, function (err) {
-					if (err) {
-						return finished(err);
+					try {
+						err.message.should.eql('Titanium SDK 9.2.0.GA is already installed');
+					} catch (e) {
+						return finished(e);
 					}
-
-					logger.calls[0].should.eql([ 'banner', undefined ]);
-					logger.calls[1].should.eql([ 'log', `Titanium SDK ${'9.2.0'.cyan} is already installed!\n` ]);
-					logger.calls[2].should.eql([ 'log', `Run '${('titanium sdk install 9.2.0 --force').cyan}' to re-install.\n` ]);
 
 					finished();
 				});
@@ -455,13 +449,11 @@ describe('sdk', () => {
 				};
 
 				SDK.run(logger, config, cli, function (err) {
-					if (err) {
-						return finished(err);
+					try {
+						err.message.should.eql('Titanium SDK 9.2.0.GA is already installed');
+					} catch (e) {
+						return finished(e);
 					}
-
-					logger.calls[0].should.eql([ 'banner', undefined ]);
-					logger.calls[1].should.eql([ 'log', `Extracting SDK to ${sdksPath.cyan}` ]);
-					logger.calls[2].should.eql([ 'log', `Titanium SDK ${'9.2.0'.cyan} successfully installed!\n` ]);
 
 					finished();
 				});
@@ -500,7 +492,7 @@ describe('sdk', () => {
 
 				SDK.run(logger, config, cli, function (err) {
 					try {
-						err.message.should.eql('Zip file did not contain expected manifest.json entry');
+						err.message.should.eql('Zip file does not contain a valid Titanium SDK');
 					} catch (e) {
 						return finished(e);
 					}
@@ -526,23 +518,14 @@ describe('sdk', () => {
 							name: 'osx',
 							sdkPaths: [ sdksPath ],
 						},
-						sdks: {
-							'9.2.0.GA': {
-								manifest: {
-									name: '9.2.0.v20200923092031',
-									version: '9.2.0.GA',
-									timestamp: '9/23/2020 16:25'
-								},
-								path: path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA')
-							}
-						}
+						sdks: {}
 					},
 					addAnalyticsEvent: (_name, _obj) => {}
 				};
 
 				SDK.run(logger, config, cli, function (err) {
 					try {
-						err.message.should.eql('Zip file did not contain expected manifest.json entry');
+						err.message.should.eql('Zip file does not contain a valid Titanium SDK');
 					} catch (e) {
 						return finished(e);
 					}
@@ -551,7 +534,7 @@ describe('sdk', () => {
 				});
 			});
 
-			it.skip('with invalid branch', function (finished) {
+			it('with invalid branch', function (finished) {
 				const cli = {
 					argv: {
 						_: [ 'install' ],
