@@ -1,4 +1,8 @@
-6.1.0
+6.1.1 (7/13/2022)
+-------------------
+ * Allow SDK directories to contain any version suffix
+
+6.1.0 (6/28/2022)
 -------------------
  * Re-enabled installing CI builds
  * Updated minor/patch dependencies
