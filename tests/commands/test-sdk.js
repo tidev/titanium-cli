@@ -359,7 +359,7 @@ describe('sdk', () => {
 						logger.calls[3].should.eql([ 'log', 'Extracting SDK' ]);
 						logger.calls[4].should.eql([ 'log', '\n' ]); // end of progress bar
 						// Installing SDK files to...
-						logger.calls[6].should.eql([ 'log', `Titanium SDK ${'7.5.0.GA'.cyan} successfully installed` ]);
+						logger.calls[6].should.eql([ 'log', `\nTitanium SDK ${'7.5.0.GA'.cyan} successfully installed. Run '${`${cli.argv.$} sdk select`.cyan}' to select your main Titanium SDK.\n` ]);
 					} catch (error) {
 						return finished(error);
 					} finally {
