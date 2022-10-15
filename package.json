@@ -19,7 +19,7 @@
 		"mobile web",
 		"appc-client"
 	],
-	"version": "6.1.1",
+	"version": "6.1.2",
 	"author": "TiDev, Inc. <npm@tidev.io>",
 	"bugs": {
 		"url": "https://github.com/tidev/titanium_mobile/issues"
@@ -33,7 +33,7 @@
 		"async": "^3.2.4",
 		"colors": "1.4.0",
 		"fields": "0.1.24",
-		"got": "^11.8.5",
+		"got": "^12.5.2",
 		"humanize": "0.0.9",
 		"node-appc": "^1.1.5",
 		"request": "2.88.2",
@@ -43,22 +43,22 @@
 		"yauzl": "^2.10.0"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^12.1.4",
-		"@commitlint/config-conventional": "^12.1.4",
+		"@commitlint/cli": "^17.1.2",
+		"@commitlint/config-conventional": "^17.1.0",
 		"@seadub/danger-plugin-dependencies": "1.0.0",
 		"@seadub/danger-plugin-eslint": "^2.0.0",
 		"@seadub/danger-plugin-junit": "0.3.0",
-		"danger": "^10.9.0",
+		"danger": "^11.1.4",
 		"eslint": "^7.32.0",
 		"eslint-config-axway": "^6.0.2",
 		"eslint-plugin-mocha": "^9.0.0",
-		"fs-extra": "^9.1.0",
-		"husky": "^6.0.0",
-		"lint-staged": "^11.2.6",
+		"fs-extra": "^10.1.0",
+		"husky": "^8.0.1",
+		"lint-staged": "^13.0.3",
 		"mocha": "^8.4.0",
 		"mocha-jenkins-reporter": "^0.4.7",
 		"nyc": "^15.1.0",
-		"semver": "^7.3.7",
+		"semver": "^7.3.8",
 		"should": "^13.2.3"
 	},
 	"license": "Apache-2.0",
