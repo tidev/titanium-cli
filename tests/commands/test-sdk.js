@@ -580,7 +580,7 @@ describe('sdk', () => {
 					}
 
 					logger.calls[0].should.eql([ 'banner', undefined ]);
-					logger.calls[1].should.eql([ 'error', 'Titanium SDK "9.1.0.GA" is not found' ]);
+					logger.calls[1].should.eql([ 'error', 'Titanium SDK "9.1.0.GA" is not found\n' ]);
 					// it suggests installed sdks
 					logger.calls[2].should.eql([ 'log', 'Did you mean this?' ]);
 					logger.calls[3].should.eql([ 'log', `    ${'11.1.1.GA'.cyan}` ]);
