@@ -9,7 +9,7 @@
 
 const SDK = require('../../lib/commands/sdk');
 const path = require('path');
-const fs = require('fs-extra');
+// const fs = require('fs-extra');
 const config = require('../../lib/config');
 require('should'); // eslint-disable-line no-unused-vars
 
@@ -66,6 +66,7 @@ describe('sdk', () => {
 					if (err) {
 						return finished(err);
 					}
+
 					logger.calls[0].should.eql([ 'banner', undefined ]);
 					logger.calls[1].should.eql([ 'log', 'SDK Install Locations:' ]);
 					// call 2 is the install location path
@@ -76,7 +77,7 @@ describe('sdk', () => {
 			});
 
 			it('with an sdk', function (finished) {
-				const sdkPath = path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA');
+				const sdkPath = path.join(sdksPath, 'mobilesdk/osx/11.1.1.GA');
 				const cli = {
 					argv: {
 						_: [],
@@ -91,10 +92,10 @@ describe('sdk', () => {
 							],
 						},
 						sdks: {
-							'9.2.0.GA': {
+							'11.1.1.GA': {
 								manifest: {
-									name: '9.2.0.v20200923092031',
-									version: '9.2.0.GA',
+									name: '11.1.1.GA',
+									version: '11.1.1.GA',
 								},
 								path: sdkPath
 							}
@@ -110,7 +111,7 @@ describe('sdk', () => {
 					// call 2 is the install location path
 					logger.calls[3].should.eql([ 'log', undefined ]);
 					logger.calls[4].should.eql([ 'log', 'Installed SDKs:' ]);
-					logger.calls[5].should.eql([ 'log', `   ${('9.2.0.GA').cyan}${' [selected]'.grey}  ${'9.2.0.v20200923092031  '.magenta}${sdkPath}` ]);
+					logger.calls[5].should.eql([ 'log', `   ${('11.1.1.GA').cyan}${' [selected]'.grey}  ${'11.1.1.GA  '.magenta}${sdkPath}` ]);
 					logger.calls[6].should.eql([ 'log', undefined ]);
 					finished();
 				});
@@ -120,7 +121,7 @@ describe('sdk', () => {
 				this.timeout(30000); // 30 seconds
 				this.slow(3000); // slow after 3s
 				// FIXME: Why do we we enforce that an sdk must be installed before being able to list releases/branches?
-				const sdkPath = path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA');
+				const sdkPath = path.join(sdksPath, 'mobilesdk/osx/11.1.1.GA');
 				const cli = {
 					argv: {
 						_: [],
@@ -136,10 +137,10 @@ describe('sdk', () => {
 							],
 						},
 						sdks: {
-							'9.2.0.GA': {
+							'11.1.1.GA': {
 								manifest: {
-									name: '9.2.0.v20200923092031',
-									version: '9.2.0.GA',
+									name: '11.1.1.GA',
+									version: '11.1.1.GA',
 								},
 								path: sdkPath
 							}
@@ -155,7 +156,7 @@ describe('sdk', () => {
 					// call 2 is the install location path
 					logger.calls[3].should.eql([ 'log', undefined ]);
 					logger.calls[4].should.eql([ 'log', 'Installed SDKs:' ]);
-					logger.calls[5].should.eql([ 'log', `   ${('9.2.0.GA').cyan}${' [selected]'.grey}  ${'9.2.0.v20200923092031  '.magenta}${sdkPath}` ]);
+					logger.calls[5].should.eql([ 'log', `   ${('11.1.1.GA').cyan}${' [selected]'.grey}  ${'11.1.1.GA  '.magenta}${sdkPath}` ]);
 					logger.calls[6].should.eql([ 'log', undefined ]);
 					// branch listing header
 					logger.calls[7].should.eql([ 'log', 'Branches:' ]);
@@ -163,22 +164,22 @@ describe('sdk', () => {
 					// Verify master is default branch and is listed
 					logger.buffer.should.containEql(`   ${'master'.cyan}${' [default]'.grey}`);
 					// Verify 9_2_X branch exists
-					logger.buffer.should.containEql(`   ${'11_0_X'.cyan}`);
+					logger.buffer.should.containEql(`   ${'11_1_X'.cyan}`);
 
 					finished();
 				});
 			});
 
-			it('--branch 11_0_X', function (finished) {
+			it('--branch 11_1_X', function (finished) {
 				this.timeout(30000); // 30 seconds
 				this.slow(3000); // slow after 3s
 				// FIXME: Why do we we enforce that an sdk must be installed before being able to list releases/branches?
-				const sdkPath = path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA');
+				const sdkPath = path.join(sdksPath, 'mobilesdk/osx/11.1.1.GA');
 				const cli = {
 					argv: {
 						_: [],
 						$: 'titanium',
-						branch: '11_0_X'
+						branch: '11_1_X'
 					},
 					env: {
 						installPath: sdksPath,
@@ -189,10 +190,10 @@ describe('sdk', () => {
 							],
 						},
 						sdks: {
-							'9.2.0.GA': {
+							'11.1.1.GA': {
 								manifest: {
-									name: '9.2.0.v20200923092031',
-									version: '9.2.0.GA',
+									name: '11.1.1.GA',
+									version: '11.1.1.GA',
 								},
 								path: sdkPath
 							}
@@ -208,10 +209,10 @@ describe('sdk', () => {
 					// call 2 is the install location path
 					logger.calls[3].should.eql([ 'log', undefined ]);
 					logger.calls[4].should.eql([ 'log', 'Installed SDKs:' ]);
-					logger.calls[5].should.eql([ 'log', `   ${('9.2.0.GA').cyan}${' [selected]'.grey}  ${'9.2.0.v20200923092031  '.magenta}${sdkPath}` ]);
+					logger.calls[5].should.eql([ 'log', `   ${('11.1.1.GA').cyan}${' [selected]'.grey}  ${'11.1.1.GA  '.magenta}${sdkPath}` ]);
 					logger.calls[6].should.eql([ 'log', undefined ]);
 					// branch listing header
-					logger.calls[7].should.eql([ 'log', '\'11_0_X\' Branch Builds:' ]);
+					logger.calls[7].should.eql([ 'log', '\'11_1_X\' Branch Builds:' ]);
 					// TODO: verify log levels of below...
 					// Verify warning at bottom
 					logger.buffer.should.endWith(`${'** NOTE: these builds not recommended for production use **'.grey}\n\n`);
@@ -224,7 +225,7 @@ describe('sdk', () => {
 				// FIXME: Why do we we enforce that an sdk must be installed before being able to list releases/branches?
 				this.timeout(30000); // 30 seconds
 				this.slow(3000); // slow after 3s
-				const sdkPath = path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA');
+				const sdkPath = path.join(sdksPath, 'mobilesdk/osx/11.1.1.GA');
 				const cli = {
 					argv: {
 						_: [],
@@ -240,10 +241,10 @@ describe('sdk', () => {
 							],
 						},
 						sdks: {
-							'9.2.0.GA': {
+							'11.1.1.GA': {
 								manifest: {
-									name: '9.2.0.v20200923092031',
-									version: '9.2.0.GA',
+									name: '11.1.1.GA',
+									version: '11.1.1.GA',
 								},
 								path: sdkPath
 							}
@@ -259,11 +260,11 @@ describe('sdk', () => {
 					// call 2 is the install location path
 					logger.calls[3].should.eql([ 'log', undefined ]);
 					logger.calls[4].should.eql([ 'log', 'Installed SDKs:' ]);
-					logger.calls[5].should.eql([ 'log', `   ${('9.2.0.GA').cyan}${' [selected]'.grey}  ${'9.2.0.v20200923092031  '.magenta}${sdkPath}` ]);
+					logger.calls[5].should.eql([ 'log', `   ${('11.1.1.GA').cyan}${' [selected]'.grey}  ${'11.1.1.GA  '.magenta}${sdkPath}` ]);
 					logger.calls[6].should.eql([ 'log', undefined ]);
 					// Release listing header
 					logger.calls[7].should.eql([ 'log', 'Releases:' ]);
-					// Verify 9.2.0.GA is listed and thinks it is installed
+					// Verify 11.1.1.GA is listed and thinks it is installed
 					logger.buffer.should.containEql('10.1.0.GA');
 
 					finished();
@@ -273,8 +274,8 @@ describe('sdk', () => {
 
 		describe('install', () => {
 			// TODO: Test with install location in place we don't have rights to create/write
-			it('with pre-existing sdk, without --force', function (finished) {
-				this.timeout(30000); // 30 seconds
+			it('install SDK', function (finished) {
+				this.timeout(5 * 60 * 1000); // 5 minutes
 				this.slow(3000); // slow after 3s
 				const cli = {
 					argv: {
@@ -282,9 +283,9 @@ describe('sdk', () => {
 						$: 'titanium',
 						default: false,
 						force: false,
-						quiet: false,
+						quiet: true,
 						'progress-bars': false,
-						version: '9.2.0.GA'
+						version: '11.1.1.GA'
 					},
 					env: {
 						installPath: sdksPath,
@@ -293,83 +294,25 @@ describe('sdk', () => {
 							sdkPaths: [ sdksPath ],
 						},
 						sdks: {
-							'9.2.0.GA': {
+							'11.1.1.GA': {
 								manifest: {
-									name: '9.2.0.v20200923092031',
-									version: '9.2.0.GA',
+									name: '11.1.1.GA',
+									version: '11.1.1.GA',
 								},
-								path: path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA')
+								path: path.join(sdksPath, 'mobilesdk/osx/11.1.1.GA')
 							}
 						}
 					},
 					addAnalyticsEvent: (_name, _obj) => {}
 				};
 
-				SDK.run(logger, config, cli, function (err) {
-					try {
-						err.message.should.eql('Titanium SDK 9.2.0.GA is already installed');
-					} catch (e) {
-						return finished(e);
-					}
-
-					finished();
-				});
-			});
-
-			it('with uninstalled sdk', function (finished) {
-				this.timeout(5 * 60 * 1000); // 5 minutes
-				const cli = {
-					argv: {
-						_: [ 'install' ],
-						$: 'titanium',
-						default: false,
-						force: false,
-						quiet: false,
-						'progress-bars': true,
-						version: '7.5.0.GA'
-					},
-					env: {
-						installPath: sdksPath,
-						os: {
-							name: 'osx',
-							sdkPaths: [ sdksPath ],
-						},
-						sdks: {
-							'9.2.0.GA': {
-								manifest: {
-									name: '9.2.0.v20200923092031',
-									version: '9.2.0.GA',
-								},
-								path: path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA')
-							}
-						}
-					},
-					addAnalyticsEvent: (_name, _obj) => {}
-				};
-
-				SDK.run(logger, config, cli, function (err) {
-					if (err) {
-						return finished(err);
-					}
-
+				SDK.run(logger, config, cli, function (_err) {
 					try {
 						logger.calls[0].should.eql([ 'banner', undefined ]);
-						logger.calls[1].should.eql([ 'log', `Downloading ${'https://github.com/tidev/titanium_mobile/releases/download/7_5_0_GA/mobilesdk-7.5.0.GA-osx.zip'.cyan}` ]);
-						logger.calls[2].should.eql([ 'log', '\n' ]); // end of progress bar
-						logger.calls[3].should.eql([ 'log', 'Extracting SDK' ]);
-						logger.calls[4].should.eql([ 'log', '\n' ]); // end of progress bar
-						// Installing SDK files to...
-						logger.calls[6].should.eql([ 'log', `\nTitanium SDK ${'7.5.0.GA'.cyan} successfully installed. Run '${`${cli.argv.$} sdk select`.cyan}' to select your main Titanium SDK.\n` ]);
-					} catch (error) {
-						return finished(error);
-					} finally {
-						// Remove the extracted contents
-						try {
-							fs.removeSync(path.join(sdksPath, 'modules'));
-							fs.removeSync(path.join(sdksPath, 'mobilesdk/osx/7.5.0.GA'));
-						} catch (error) {
-							// squash
-						}
+						logger.calls[5].should.eql([ 'log',
+							'\nTitanium SDK \x1B[36m11.1.1.GA\x1B[39m successfully installed. Run \'\x1B[36mtitanium sdk select\x1B[39m\' to select your main Titanium SDK.\n' ]);
+					} catch (e) {
+						return finished(e);
 					}
 					finished();
 				});
@@ -384,7 +327,7 @@ describe('sdk', () => {
 						force: false,
 						quiet: false,
 						'progress-bars': false,
-						version: path.join(__dirname, '../resources/9.2.0.GA.zip')
+						version: path.join(__dirname, '../resources/mobilesdk-11.1.1.GA-osx.zip')
 					},
 					env: {
 						installPath: sdksPath,
@@ -393,22 +336,23 @@ describe('sdk', () => {
 							sdkPaths: [ sdksPath ],
 						},
 						sdks: {
-							'9.2.0.GA': {
+							'11.1.1.GA': {
 								manifest: {
-									name: '9.2.0.v20200923092031',
-									version: '9.2.0.GA',
+									name: '11.1.1.GA',
+									version: '11.1.1.GA',
 									timestamp: '9/23/2020 16:25'
 								},
-								path: path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA')
+								path: path.join(sdksPath, 'mobilesdk/osx/11.1.1.GA')
 							}
 						}
 					},
 					addAnalyticsEvent: (_name, _obj) => {}
 				};
 
-				SDK.run(logger, config, cli, function (err) {
+				SDK.run(logger, config, cli, function (_err) {
 					try {
-						err.message.should.eql('Titanium SDK 9.2.0.GA is already installed');
+						logger.calls[0].should.eql([ 'banner', undefined ]);
+						logger.calls[2].should.eql([ 'error', 'Titanium SDK 11.1.1.GA is already installed' ]);
 					} catch (e) {
 						return finished(e);
 					}
@@ -435,22 +379,23 @@ describe('sdk', () => {
 							sdkPaths: [ sdksPath ],
 						},
 						sdks: {
-							'9.2.0.GA': {
+							'11.1.1.GA': {
 								manifest: {
-									name: '9.2.0.v20200923092031',
-									version: '9.2.0.GA',
+									name: '11.1.1.GA',
+									version: '11.1.1.GA',
 									timestamp: '9/23/2020 16:25'
 								},
-								path: path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA')
+								path: path.join(sdksPath, 'mobilesdk/osx/11.1.1.GA')
 							}
 						}
 					},
 					addAnalyticsEvent: (_name, _obj) => {}
 				};
 
-				SDK.run(logger, config, cli, function (err) {
+				SDK.run(logger, config, cli, function (_err) {
 					try {
-						err.message.should.eql('Titanium SDK 9.2.0.GA is already installed');
+						logger.calls[4].should
+							.eql([ 'log', '\nTitanium SDK \x1B[36m9.2.0.GA\x1B[39m successfully installed. Run \'\x1B[36mtitanium sdk select\x1B[39m\' to select your main Titanium SDK.\n' ]);
 					} catch (e) {
 						return finished(e);
 					}
@@ -477,13 +422,13 @@ describe('sdk', () => {
 							sdkPaths: [ sdksPath ],
 						},
 						sdks: {
-							'9.2.0.GA': {
+							'11.1.1.GA': {
 								manifest: {
-									name: '9.2.0.v20200923092031',
-									version: '9.2.0.GA',
+									name: '11.1.1.GA',
+									version: '11.1.1.GA',
 									timestamp: '9/23/2020 16:25'
 								},
-								path: path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA')
+								path: path.join(sdksPath, 'mobilesdk/osx/11.1.1.GA')
 							}
 						}
 					},
@@ -552,13 +497,13 @@ describe('sdk', () => {
 							sdkPaths: [ sdksPath ],
 						},
 						sdks: {
-							'9.2.0.GA': {
+							'11.1.1.GA': {
 								manifest: {
-									name: '9.2.0.v20200923092031',
-									version: '9.2.0.GA',
+									name: '11.1.1.GA',
+									version: '11.1.1.GA',
 									timestamp: '9/23/2020 16:25'
 								},
-								path: path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA')
+								path: path.join(sdksPath, 'mobilesdk/osx/11.1.1.GA')
 							}
 						}
 					},
@@ -622,8 +567,8 @@ describe('sdk', () => {
 							sdkPaths: [ sdksPath ],
 						},
 						sdks:  {
-							'9.2.0.GA': {
-								path: path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA')
+							'11.1.1.GA': {
+								path: path.join(sdksPath, 'mobilesdk/osx/11.1.1.GA')
 							}
 						}
 					}
@@ -638,7 +583,7 @@ describe('sdk', () => {
 					logger.calls[1].should.eql([ 'error', 'Titanium SDK "9.1.0.GA" is not found\n' ]);
 					// it suggests installed sdks
 					logger.calls[2].should.eql([ 'log', 'Did you mean this?' ]);
-					logger.calls[3].should.eql([ 'log', `    ${'9.2.0.GA'.cyan}` ]);
+					logger.calls[3].should.eql([ 'log', `    ${'11.1.1.GA'.cyan}` ]);
 					finished();
 				});
 			});
@@ -649,7 +594,7 @@ describe('sdk', () => {
 						_: [ 'uninstall' ],
 						$: 'titanium',
 						prompt: false,
-						version: '9.2.0.GA'
+						version: '11.1.1.GA'
 					},
 					env: {
 						installPath: '',
@@ -658,8 +603,8 @@ describe('sdk', () => {
 							sdkPaths: [ sdksPath ],
 						},
 						sdks:  {
-							'9.2.0.GA': {
-								path: path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA')
+							'11.1.1.GA': {
+								path: path.join(sdksPath, 'mobilesdk/osx/11.1.1.GA')
 							}
 						}
 					}
@@ -672,7 +617,7 @@ describe('sdk', () => {
 
 					logger.calls[0].should.eql([ 'banner', undefined ]);
 					logger.calls[1].should.eql([ 'error', `To uninstall a Titanium SDK in non-interactive mode, you must use ${'--force'.cyan}\n` ]);
-					logger.calls[2].should.eql([ 'log', `Usage: ${'titanium sdk uninstall 9.2.0.GA --force'.cyan}\n` ]);
+					logger.calls[2].should.eql([ 'log', `Usage: ${'titanium sdk uninstall 11.1.1.GA --force'.cyan}\n` ]);
 
 					finished();
 				});
@@ -722,12 +667,12 @@ describe('sdk', () => {
 							sdkPaths: [],
 						},
 						sdks: {
-							'9.2.0.GA': {
+							'11.1.1.GA': {
 								manifest: {
-									name: '9.2.0.v20200923092031',
-									version: '9.2.0.GA',
+									name: '11.1.1.GA',
+									version: '11.1.1.GA',
 								},
-								path: path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA')
+								path: path.join(sdksPath, 'mobilesdk/osx/11.1.1.GA')
 							}
 						}
 					}
@@ -760,12 +705,12 @@ describe('sdk', () => {
 							sdkPaths: [ sdksPath ],
 						},
 						sdks:  {
-							'9.2.0.GA': {
+							'11.1.1.GA': {
 								manifest: {
-									name: '9.2.0.v20200923092031',
-									version: '9.2.0.GA',
+									name: '11.1.1.GA',
+									version: '11.1.1.GA',
 								},
-								path: path.join(sdksPath, 'mobilesdk/osx/9.2.0.GA')
+								path: path.join(sdksPath, 'mobilesdk/osx/11.1.1.GA')
 							}
 						}
 					}
@@ -780,7 +725,7 @@ describe('sdk', () => {
 					logger.calls[1].should.eql([ 'error', 'Invalid Titanium SDK "9.1.0.GA"\n' ]);
 					// it suggests installed sdks
 					logger.calls[2].should.eql([ 'log', 'Did you mean this?' ]);
-					logger.calls[3].should.eql([ 'log', `    ${'9.2.0.GA'.cyan}` ]);
+					logger.calls[3].should.eql([ 'log', `    ${'11.1.1.GA'.cyan}` ]);
 					finished();
 				});
 			});
