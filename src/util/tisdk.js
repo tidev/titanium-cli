@@ -1,5 +1,5 @@
 import { readdir } from 'node:fs/promises';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import fs from 'fs-extra';
 import { expand } from './expand.js';
 import { arrayify } from './arrayify.js';
@@ -26,7 +26,7 @@ export async function getTitaniumSDKPaths(config) {
 	const sdkPaths = new Set();
 
 	for (const p of locations[os]) {
-		sdkPaths.add(expand(join(p, 'mobilesdk', os)));
+		sdkPaths.add(expand(p, 'mobilesdk', os));
 	}
 
 	const defaultInstallLocation = config.get('sdk.defaultInstallLocation');
@@ -95,7 +95,7 @@ export async function detectTitaniumSDKs(config) {
 	cache = {
 		latest,
 		sdks,
-		sdkPaths
+		sdkPaths: sdkPaths.map(p => dirname(dirname(p)))
 	};
 
 	return cache;

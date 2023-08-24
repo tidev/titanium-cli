@@ -198,12 +198,23 @@ export class CLI {
 				this.logger.trace(`Adding subcommand "${name}" to "${cmdName}"`);
 				const subcmd = new Command(name);
 				this.applyConfig(name, subcmd, subconf);
-				subcmd.configureHelp({
-					helpWidth: ticonfig.get('cli.width', 80),
-					showGlobalOptions: true,
-					sortSubcommands: true
-				});
-				subcmd.action((...args) => this.executeCommand(args));
+				subcmd
+					.addHelpText('beforeAll', (ctx) => {
+						this.logger.bannerEnabled(true);
+						this.logger.skipBanner(false);
+						this.logger.banner();
+					})
+					.configureHelp({
+						helpWidth: ticonfig.get('cli.width', 80),
+						showGlobalOptions: true,
+						sortSubcommands: true
+					})
+					.configureOutput({
+						outputError(msg) {
+							throw new TiError(msg.replace(/^error:\s*/, ''));
+						}
+					})
+					.action((...args) => this.executeCommand(args));
 				cmd.addCommand(subcmd, {
 					default: conf.defaultSubcommand === name
 				});
@@ -299,7 +310,6 @@ export class CLI {
 			})().catch(err => {
 				// this is the primary error handler
 				if (typeof callback === 'function') {
-					tunnel.log(err.stack);
 					callback(err);
 				} else {
 					this.logger.error('Hook completion callback threw unhandled error:');
@@ -513,11 +523,12 @@ export class CLI {
 			sdk,
 			sdkPaths
 		} = await initSDK(cwd, this.argv.sdk, this.config, this.logger);
-		this.sdk = sdk;
-		this.env.installPath = this.sdk?.path;
+		this.env.installPath = sdk?.path;
 		this.env.os.sdkPaths = sdkPaths;
-		if (this.sdk) {
-			// scan for hooks in the sdk
+		this.sdk = sdk;
+
+		// if we have an sdk and we're running a sdk command, then scan the sdk for hooks
+		if (this.sdk && sdkCommands[cmdName]) {
 			await this.scanHooks(expand(this.sdk.path, 'cli', 'hooks'));
 		}
 
