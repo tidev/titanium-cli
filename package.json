@@ -1,74 +1,61 @@
 {
+	"name": "titanium",
+	"version": "7.0.0-alpha",
+	"author": "TiDev, Inc. <npm@tidev.io>",
+	"description": "Command line interface for building Titanium SDK apps",
+	"type": "module",
 	"about": {
 		"name": "Titanium Command-Line Interface",
 		"author": "TiDev",
 		"copyright": "Copyright TiDev, Inc. 4/7/2022-Present. All Rights Reserved.",
 		"id": "com.appcelerator.titanium.cli"
 	},
-	"name": "titanium",
-	"description": "TiDev Titanium Command line",
 	"keywords": [
 		"titanium",
+		"tidev",
 		"mobile",
 		"ios",
 		"iphone",
-		"android",
-		"blackberry",
-		"html5",
-		"mobileweb",
-		"mobile web",
-		"appc-client"
+		"android"
 	],
-	"version": "6.1.2",
-	"author": "TiDev, Inc. <npm@tidev.io>",
-	"bugs": {
-		"url": "https://github.com/tidev/titanium_mobile/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/tidev/titanium.git"
-	},
+	"homepage": "https://github.com/tidev/titanium",
+	"bugs": "https://github.com/tidev/titanium/issues",
+	"repository": "https://github.com/tidev/titanium",
 	"preferGlobal": true,
 	"dependencies": {
-		"async": "^3.2.4",
-		"colors": "1.4.0",
+		"@clack/prompts": "0.7.0",
+		"@xmldom/xmldom": "0.8.10",
+		"chalk": "5.3.0",
+		"commander": "11.0.0",
+		"execa": "8.0.1",
 		"fields": "0.1.24",
-		"got": "^11.8.5",
+		"fs-extra": "11.1.1",
 		"humanize": "0.0.9",
-		"node-appc": "^1.1.5",
-		"request": "2.88.2",
-		"sprintf": "0.1.5",
-		"tmp": "^0.2.1",
-		"winston": "2.4.6",
-		"yauzl": "^2.10.0",
-		"fs-extra": "^10.1.0",
-		"semver": "^7.3.8"
+		"semver": "7.5.4",
+		"sprintf-js": "1.1.2",
+		"tmp": "0.2.1",
+		"which": "3.0.1",
+		"wrap-ansi": "8.1.0",
+		"xpath": "0.0.33",
+		"yauzl": "2.10.0"
 	},
 	"devDependencies": {
-		"@commitlint/cli": "^17.1.2",
-		"@commitlint/config-conventional": "^17.1.0",
-		"@seadub/danger-plugin-dependencies": "1.0.0",
-		"@seadub/danger-plugin-eslint": "^2.0.0",
-		"@seadub/danger-plugin-junit": "0.3.0",
-		"danger": "^11.1.4",
-		"eslint": "^7.32.0",
-		"eslint-config-axway": "^6.0.2",
-		"eslint-plugin-mocha": "^9.0.0",
-		"husky": "^8.0.1",
-		"lint-staged": "^13.0.3",
-		"mocha": "^8.4.0",
-		"mocha-jenkins-reporter": "^0.4.7",
-		"nyc": "^15.1.0",
-		"should": "^13.2.3"
+		"@commitlint/cli": "17.7.1",
+		"@commitlint/config-conventional": "17.7.0",
+		"danger": "11.2.8",
+		"eslint": "8.47.0",
+		"eslint-config-axway": "8.0.0",
+		"eslint-plugin-mocha": "10.1.0",
+		"husky": "8.0.3",
+		"lint-staged": "14.0.1",
+		"mocha": "10.2.0",
+		"nyc": "15.1.0",
+		"should": "13.2.3"
 	},
 	"license": "Apache-2.0",
 	"bin": {
-		"ti": "./bin/titanium",
-		"titanium": "./bin/titanium"
-	},
-	"main": "./lib/titanium",
-	"directories": {
-		"lib": "./lib"
+		"ti": "./bin/ti.js",
+		"titanium": "./bin/ti.js"
 	},
 	"scripts": {
 		"lint": "eslint .",
@@ -82,9 +69,7 @@
 		"globals": [
 			"Hyperloop",
 			"HyperloopObject"
-		],
-		"reporter": "mocha-jenkins-reporter",
-		"reporter-option": "junit_report_path=junit_report.xml"
+		]
 	},
 	"nyc": {
 		"check-coverage": false,
@@ -102,7 +87,7 @@
 		]
 	},
 	"engines": {
-		"node": ">=14.15"
+		"node": ">=18"
 	},
 	"lint-staged": {
 		"*.js": "eslint"

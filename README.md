@@ -4,20 +4,20 @@
 
 ## Prerequisites
 
-The Titanium CLI requires [Node.js 14](http://nodejs.org/dist/) or newer.
+The Titanium CLI requires [Node.js 18](http://nodejs.org/dist/) or newer.
 
 ## Installation
 
     [sudo] npm install -g titanium
 
-After install, Titanium CLI is executable as `ti`    
+After install, Titanium CLI is executable as `ti` or `titanium`.
 
 ## Obtaining a Titanium SDK
 
 You will need to download a Titanium SDK:
 
     # stable release (recommended)
-    titanium sdk install --default
+    titanium sdk install
 
 ## Setting up the Titanium CLI
 
@@ -35,9 +35,14 @@ Before you begin using the Titanium CLI, you should configure it by running the 
 
 Configure your CLI settings.
 
-**Implementation not complete**
+    # list all config settings
+    titanium config
 
-    titanium config <setting> <value>
+    # get a config setting
+    titanium config <key>
+
+    # set a config setting
+    titanium config <key> <value>
 
 ### help
 
@@ -48,8 +53,6 @@ Displays help or help for a specific command.
     titanium help
 
     titanium --help
-
-    titanium help <command>
 
     titanium <command> --help
 
@@ -66,10 +69,6 @@ Installs a specific version of the Titanium SDK. If no version is specified, it 
     titanium sdk install <version>
 
     titanium sdk install <version> --force
-
-Download, install <version>, and set as default SDK.
-
-    titanium sdk install <version> --default
 
 #### sdk uninstall
 
@@ -128,23 +127,7 @@ You just need to pull the code and resolve the dependendencies.
 
 To run the unit tests, simply run:
 
-    node forge test
-
-### Running Code Coverage
-
-To generate the code coverage, you first must install [node-jscoverage](https://github.com/visionmedia/node-jscoverage). The easist way to do this is run:
-
-    git clone git@github.com:visionmedia/node-jscoverage.git
-    cd node-jscoverage
-    ./configure
-    make
-    sudo make install
-
-Then run:
-
-	node forge test-cov
-
-It will generate a file called _coverage.html_ in the Titanium CLI directory.
+    npm test
 
 ## Contributing
 
@@ -170,7 +153,7 @@ If you find a security related issue, please send an email to [security@tidev.io
 
 For the latest information, please find us on Twitter: [Titanium SDK](https://twitter.com/titaniumsdk) and [TiDev](https://twitter.com/tidevio).
 
-Join our growing Slack community by visiting https://slack.tidev.io
+Join our growing Slack community by visiting https://slack.tidev.io!
 
 ## Legal
 

@@ -10,13 +10,5 @@
   "rules": {
     "strict": ["error", "global"],
     "no-lonely-if": "off"
-  },
-  "overrides": [
-    {
-      "files": [ "dangerfile.js" ],
-      "parserOptions": {
-        "sourceType": "module"
-      }
-    }
-  ]
+  }
 }

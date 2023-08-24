@@ -1,3 +1,26 @@
+7.0.0
+-------------------
+ * Require Node.js 18 or newer
+ * Refactored entire codebase using ESM
+ * Removed `login`, `logout`, `plugin`, and `status` commands
+ * Removed all analytics/telemetry code
+ * Removed i18n logic; all output rendered in English
+ * Removed incomplete tab completion code
+ * Removed "default" SDK; `<sdk-version>` in tiapp.xml is source of truth, override with `--sdk <ver>` arg
+ * `ti config` changes:
+   - Added `--json` flag
+   - Replaced `--output json` with `--output json-object` output
+   - Removed support for `paths.commands` config setting
+ * `ti info` changes:
+   - Added `--json` flag
+   - Removed `haxm` info
+   - Removed `genymotion` and VirtualBox info
+   - Removed macOS info including Xcode CLI Tools
+   - Removed `jarsigner` from JDK detection; no longer used thanks to Gradle
+   - Removed `nodeAppcVer` from Titanium CLI and Titanium SDKs in info
+ * Replaced "winston" based logger with lighter weight logger
+ * Updated dependencies, replaced deprecated dependencies
+
 6.1.1 (7/13/2022)
 -------------------
  * Allow SDK directories to contain any version suffix
