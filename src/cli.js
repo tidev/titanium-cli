@@ -685,8 +685,6 @@ export class CLI {
 								this.logger.trace(`Importing ${cyan(join(this.sdk.path, 'node_modules', 'node-appc', 'index.js'))}`);
 								appc = await import(nodeAppc);
 							}
-							console.log('CALLING HOOK INIT');
-							console.log(appc);
 							mod.init && mod.init(this.logger, this.config, this, appc);
 							this.hooks.loadedFilenames.push(file);
 							this.logger.trace(`Loaded CLI hook: ${cyan(file)} ${gray(`(${Date.now() - startTime} ms)`)}`);
