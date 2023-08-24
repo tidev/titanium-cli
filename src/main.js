@@ -5,7 +5,7 @@ import { TiError } from './util/tierror.js';
 const cli = new CLI();
 
 try {
-	await cli.init();
+	await cli.go();
 } catch (e) {
 	cli.logger.bannerEnabled(true);
 	cli.logger.skipBanner(false);

@@ -416,7 +416,7 @@ export class CLI {
 	 * @returns {Promise}
 	 * @access public
 	 */
-	async init() {
+	async go() {
 		this.program = program
 			.name('titanium')
 			.addHelpText('beforeAll', (ctx) => {
