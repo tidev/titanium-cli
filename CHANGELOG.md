@@ -20,6 +20,9 @@
    - Removed `nodeAppcVer` from Titanium CLI and Titanium SDKs in info
  * `ti module` changes:
    - Removed global `iphone` modules as it was just a copy of `ios` modules
+ * `ti sdk` changes:
+   - Added `--json` flag
+   - Removed `activeSDK` from JSON result
  * Replaced "winston" based logger with lighter weight logger
  * Updated dependencies, replaced deprecated dependencies
 

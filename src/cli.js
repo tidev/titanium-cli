@@ -72,7 +72,9 @@ export class CLI {
 	env = {
 		installPath: '',
 		os: {
-			sdkPaths: []
+			name: process.platform === 'darwin' ? 'osx' : process.platform,
+			sdkPaths: [],
+			sdks: {}
 		}
 	};
 
@@ -114,6 +116,10 @@ export class CLI {
 			name: this.name,
 			copyright: this.copyright,
 			version: this.version
+		});
+
+		process.on('exit', () => {
+			this.logger.trace(`Total run time ${process.uptime().toFixed(2)}s`);
 		});
 	}
 
@@ -165,7 +171,7 @@ export class CLI {
 				if (Array.isArray(meta.values)) {
 					opt.choices(meta.values);
 				}
-				this.logger.trace(`Adding "${cmdName}" option: ${meta.abbr ? `-${meta.abbr}, ` : ''}${long}`);
+				this.logger.trace(`Adding "${cmdName}" option: ${meta.abbr ? `-${meta.abbr}, ` : ''}${long} [value]`);
 				cmd.addOption(opt);
 				if (typeof meta.callback === 'function') {
 					cmd.hook('preAction', (_, actionCommand) => {
@@ -195,9 +201,8 @@ export class CLI {
 
 		if (conf.subcommands) {
 			for (const [name, subconf] of Object.entries(conf.subcommands)) {
-				this.logger.trace(`Adding subcommand "${name}" to "${cmdName}"`);
+				this.logger.trace(`Adding subcommand "${name}"${conf.defaultSubcommand === name ? ' (default)' : ''} to "${cmdName}"`);
 				const subcmd = new Command(name);
-				this.applyConfig(name, subcmd, subconf);
 				subcmd
 					.addHelpText('beforeAll', (ctx) => {
 						this.logger.bannerEnabled(true);
@@ -213,10 +218,11 @@ export class CLI {
 						outputError(msg) {
 							throw new TiError(msg.replace(/^error:\s*/, ''));
 						}
-					})
-					.action((...args) => this.executeCommand(args));
+					});
+				this.applyConfig(name, subcmd, subconf);
+				subcmd.action((...args) => this.executeCommand(args));
 				cmd.addCommand(subcmd, {
-					default: conf.defaultSubcommand === name
+					isDefault: conf.defaultSubcommand === name
 				});
 			}
 		}
@@ -379,7 +385,7 @@ export class CLI {
 			return;
 		}
 
-		this.logger.trace(`Executing ${cyan(this.command.name())}`);
+		this.logger.trace(`Executing command: ${this.command.name()}`);
 		await new Promise((resolve, reject) => {
 			try {
 				const result = run(this.logger, this.config, this, async (err, result) => {
@@ -472,7 +478,7 @@ export class CLI {
 			.on('option:quiet', () => this.logger.silence())
 			.on('option:timestamp', () => this.logger.timestampEnabled(true))
 			.on('option:version', () => {
-				console.log(version);
+				this.logger.log(this.version);
 				process.exit(0);
 			})
 			.hook('preSubcommand', (_, cmd) => this.loadCommand(cmd))
@@ -520,11 +526,14 @@ export class CLI {
 
 		// load the sdk and its hooks
 		const {
+			installPath,
 			sdk,
-			sdkPaths
+			sdkPaths,
+			sdks
 		} = await initSDK(cwd, this.argv.sdk, this.config, this.logger);
-		this.env.installPath = sdk?.path;
+		this.env.installPath = installPath;
 		this.env.os.sdkPaths = sdkPaths;
+		this.env.sdks = sdks;
 		this.sdk = sdk;
 
 		// if we have an sdk and we're running a sdk command, then scan the sdk for hooks
@@ -578,7 +587,7 @@ export class CLI {
 			: join(import.meta.url, `../commands/${cmdName}.js`);
 
 		// load the command
-		this.logger.trace(`Importing ${cyan(commandFile)}`);
+		this.logger.trace(`Importing: ${commandFile}`);
 		cmd.module = (await import(commandFile)) || {};
 
 		if (typeof this.command.module.extendedDesc === 'string') {
@@ -647,7 +656,7 @@ export class CLI {
 	 */
 	async scanHooks(dir) {
 		dir = expand(dir);
-		this.logger.trace(`Scanning hooks: ${cyan(dir)}`);
+		this.logger.trace(`Scanning hooks: ${dir}`);
 
 		if (this.hooks.scannedPaths[dir]) {
 			return;
@@ -682,12 +691,12 @@ export class CLI {
 						if (this.sdk && (!this.version || !mod.cliVersion || version.satisfies(this.version, mod.cliVersion))) {
 							if (!appc) {
 								const nodeAppc = pathToFileURL(join(this.sdk.path, 'node_modules', 'node-appc', 'index.js'));
-								this.logger.trace(`Importing ${cyan(join(this.sdk.path, 'node_modules', 'node-appc', 'index.js'))}`);
-								appc = await import(nodeAppc);
+								this.logger.trace(`Importing: ${join(this.sdk.path, 'node_modules', 'node-appc', 'index.js')}`);
+								appc = (await import(nodeAppc)).default;
 							}
 							mod.init && mod.init(this.logger, this.config, this, appc);
 							this.hooks.loadedFilenames.push(file);
-							this.logger.trace(`Loaded CLI hook: ${cyan(file)} ${gray(`(${Date.now() - startTime} ms)`)}`);
+							this.logger.trace(`Loaded CLI hook: ${file} (${Date.now() - startTime} ms)`);
 						} else {
 							this.hooks.incompatibleFilenames.push(file);
 						}
@@ -700,7 +709,7 @@ export class CLI {
 			}
 		} catch (err) {
 			if (err.code !== 'ENOENT') {
-				this.logger.trace(`Error scanning hooks: ${cyan(dir)}`);
+				this.logger.trace(`Error scanning hooks: ${dir}`);
 				this.logger.trace(err.stack);
 			}
 		}

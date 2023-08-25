@@ -21,27 +21,27 @@ export class Logger extends EventEmitter {
 	};
 
 	log(msg = '', ...args) {
-		this.render(9, process.stdout, `${format(msg, ...args)}\n`);
+		this.render(9, process.stdout, `${format(msg, ...args)}`);
 	}
 
 	trace(msg = '', ...args) {
-		this.render(1, process.stdout, `${gray('[TRACE]')} ${format(msg, ...args)}\n`);
+		this.render(1, process.stdout, gray(`[TRACE] ${format(msg, ...args)}`));
 	}
 
 	debug(msg = '', ...args) {
-		this.render(2, process.stdout, `${magenta('[DEBUG]')} ${format(msg, ...args)}\n`);
+		this.render(2, process.stdout, `${magenta('[DEBUG]')} ${format(msg, ...args)}`);
 	}
 
 	error(msg = '', ...args) {
-		this.render(3, process.stderr, `${red(`[ERROR] ${format(msg, ...args)}`)}\n`);
+		this.render(3, process.stderr, red(`[ERROR] ${format(msg, ...args)}`));
 	}
 
 	info(msg = '', ...args) {
-		this.render(4, process.stdout, `${green('[INFO]')}  ${format(msg, ...args)}\n`);
+		this.render(4, process.stdout, `${green('[INFO]')}  ${format(msg, ...args)}`);
 	}
 
 	warn(msg = '', ...args) {
-		this.render(5, process.stdout, `${yellow(`[WARN]  ${format(msg, ...args)}`)}\n`);
+		this.render(5, process.stdout, `${yellow(`[WARN]  ${format(msg, ...args)}`)}`);
 	}
 
 	banner() {
@@ -75,10 +75,11 @@ export class Logger extends EventEmitter {
 
 	render(level, out, msg) {
 		if (level >= this.#level) {
-			if (this.#timestampEnabled) {
-				out.write(`${new Date().toISOString()} - `);
-			}
+			// if (this.#timestampEnabled) {
+			// 	out.write(`${new Date().toISOString()} - `);
+			// }
 			out.write(msg);
+			out.write('\n');
 		}
 	}
 

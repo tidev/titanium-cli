@@ -1,7 +1,5 @@
 import { BusyIndicator } from '../util/busyindicator.js';
-import { detect } from '../util/detect.js';
 import chalk from 'chalk';
-import wrapAnsi from 'wrap-ansi';
 
 const { bold, cyan, gray, magenta, red, yellow } = chalk;
 const typesList = ['all', 'os', 'nodejs', 'titanium', 'jdk', 'android', 'ios'];
@@ -74,6 +72,7 @@ export async function run(logger, config, cli) {
 	let data;
 	let platformInfo;
 	try {
+		const { detect } = await import('../util/detect.js');
 		({
 			data,
 			platformInfo
@@ -83,7 +82,7 @@ export async function run(logger, config, cli) {
 	}
 
 	if (isJson) {
-		console.log(JSON.stringify(data, null, '\t'));
+		logger.log(JSON.stringify(data, null, '\t'));
 		process.exit(0);
 	}
 
@@ -95,12 +94,12 @@ export async function run(logger, config, cli) {
 			name: 'os',
 			title: 'Operating System',
 			render() {
-				console.log(bold(this.title));
-				console.log(`  ${'Name'.padEnd(indent)} = ${magenta(data.os.name)}`);
-				console.log(`  ${'Version'.padEnd(indent)} = ${magenta(data.os.version)}`);
-				console.log(`  ${'Architecture'.padEnd(indent)} = ${magenta(data.os.architecture)}`);
-				console.log(`  ${'# CPUs'.padEnd(indent)} = ${magenta(data.os.numcpus)}`);
-				console.log(`  ${'Memory'.padEnd(indent)} = ${magenta((data.os.memory / 1024 / 1024 / 1024).toFixed(1) + 'GB')}\n`);
+				logger.log(bold(this.title));
+				logger.log(`  ${'Name'.padEnd(indent)} = ${magenta(data.os.name)}`);
+				logger.log(`  ${'Version'.padEnd(indent)} = ${magenta(data.os.version)}`);
+				logger.log(`  ${'Architecture'.padEnd(indent)} = ${magenta(data.os.architecture)}`);
+				logger.log(`  ${'# CPUs'.padEnd(indent)} = ${magenta(data.os.numcpus)}`);
+				logger.log(`  ${'Memory'.padEnd(indent)} = ${magenta((data.os.memory / 1024 / 1024 / 1024).toFixed(1) + 'GB')}\n`);
 			}
 		}));
 	}
@@ -110,9 +109,9 @@ export async function run(logger, config, cli) {
 			name: 'nodejs',
 			title: 'Node.js',
 			render() {
-				console.log(bold(this.title));
-				console.log(`  ${'Node.js Version'.padEnd(indent)} = ${magenta(data.node.version)}`);
-				console.log(`  ${'npm Version'.padEnd(indent)} = ${magenta(data.npm.version)}\n`);
+				logger.log(bold(this.title));
+				logger.log(`  ${'Node.js Version'.padEnd(indent)} = ${magenta(data.node.version)}`);
+				logger.log(`  ${'npm Version'.padEnd(indent)} = ${magenta(data.npm.version)}\n`);
 			}
 		}));
 	}
@@ -122,23 +121,23 @@ export async function run(logger, config, cli) {
 			name: 'titanium',
 			title: 'Titanium CLI',
 			render() {
-				console.log(bold(this.title));
-				console.log(`  ${'CLI Version'.padEnd(indent)} = ${magenta(data.titaniumCLI.version)}\n`);
+				logger.log(bold(this.title));
+				logger.log(`  ${'CLI Version'.padEnd(indent)} = ${magenta(data.titaniumCLI.version)}\n`);
 
-				console.log(bold('Titanium SDKs'));
+				logger.log(bold('Titanium SDKs'));
 				const names = Object.keys(data.titanium);
 				if (names.length) {
 					for (const name of names.sort().reverse()) {
 						const sdk = data.titanium[name];
-						console.log(`  ${cyan(name)}`);
-						console.log(`  ${'  Version'.padEnd(indent)} = ${magenta(sdk.version)}`);
-						console.log(`  ${'  Install Location'.padEnd(indent)} = ${magenta(sdk.path)}`);
-						console.log(`  ${'  Platforms'.padEnd(indent)} = ${magenta(sdk.platforms.join(', '))}`);
-						console.log(`  ${'  git Hash'.padEnd(indent)} = ${magenta(sdk.githash || 'unknown')}`);
-						console.log(`  ${'  git Timestamp'.padEnd(indent)} = ${magenta(sdk.timestamp || 'unknown')}\n`);
+						logger.log(`  ${cyan(name)}`);
+						logger.log(`  ${'  Version'.padEnd(indent)} = ${magenta(sdk.version)}`);
+						logger.log(`  ${'  Install Location'.padEnd(indent)} = ${magenta(sdk.path)}`);
+						logger.log(`  ${'  Platforms'.padEnd(indent)} = ${magenta(sdk.platforms.join(', '))}`);
+						logger.log(`  ${'  git Hash'.padEnd(indent)} = ${magenta(sdk.githash || 'unknown')}`);
+						logger.log(`  ${'  git Timestamp'.padEnd(indent)} = ${magenta(sdk.timestamp || 'unknown')}\n`);
 					}
 				} else {
-					console.log(`  ${gray('None')}\n`);
+					logger.log(`  ${gray('None')}\n`);
 				}
 			}
 		}));
@@ -149,12 +148,12 @@ export async function run(logger, config, cli) {
 			name: 'jdk',
 			title: 'Java Development Kit',
 			render() {
-				console.log(bold(this.title));
+				logger.log(bold(this.title));
 				if (data.jdk.version) {
-					console.log(`  ${'Version'.padEnd(indent)} = ${magenta(`${data.jdk.version}_${data.jdk.build}`)}`);
-					console.log(`  ${'Java Home'.padEnd(indent)} = ${magenta(data.jdk.home)}\n`);
+					logger.log(`  ${'Version'.padEnd(indent)} = ${magenta(`${data.jdk.version}_${data.jdk.build}`)}`);
+					logger.log(`  ${'Java Home'.padEnd(indent)} = ${magenta(data.jdk.home)}\n`);
 				} else {
-					console.log(`  ${gray('Not found')}\n`);
+					logger.log(`  ${gray('Not found')}\n`);
 				}
 			}
 		}));
@@ -168,7 +167,7 @@ export async function run(logger, config, cli) {
 				const container = {
 					data: data[info.name]
 				};
-				info.render.call(container, console, config, s => s.padEnd(indent), bold, magenta, red);
+				info.render.call(container, logger, config, s => s.padEnd(indent), bold, magenta, red);
 			}
 		}));
 	}
@@ -192,9 +191,11 @@ export async function run(logger, config, cli) {
 	});
 
 	if (withIssues.length) {
+		const { default: wrapAnsi } = await import('wrap-ansi');
+
 		for (const [type, info] of withIssues) {
 			const section = sections.find(s => s.name === type);
-			console.log(bold(`${section.title} Issues`));
+			logger.log(bold(`${section.title} Issues`));
 
 			for (const issue of info.issues) {
 				const msg = issue.message.split('\n\n').map(chunk => {
@@ -209,17 +210,17 @@ export async function run(logger, config, cli) {
 				}).join('\n     ');
 
 				if (issue.type === 'error') {
-					console.log(red(`  ${process.platform === 'win32' ? '\u00D7' : '\u2715'}  ${msg}`));
+					logger.log(red(`  ${process.platform === 'win32' ? '\u00D7' : '\u2715'}  ${msg}`));
 				} else if (issue.type === 'warning') {
-					console.log(bold(yellow('  !  ')) + yellow(msg));
+					logger.log(bold(yellow('  !  ')) + yellow(msg));
 				} else {
-					console.log(magenta(`  ${process.platform === 'win32' ? '*' : '\u25CF'}  ${msg}`));
+					logger.log(magenta(`  ${process.platform === 'win32' ? '*' : '\u25CF'}  ${msg}`));
 				}
 			}
 		}
 	} else {
-		console.log(bold('Issues'));
-		console.log('  No issues detected! Your development environment should be working perfectly!');
+		logger.log(bold('Issues'));
+		logger.log('  No issues detected! Your development environment should be working perfectly!');
 	}
 }
 

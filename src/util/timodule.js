@@ -2,7 +2,6 @@ import { arrayify } from './arrayify.js';
 import { join, resolve } from 'node:path';
 import { existsSync, unlinkSync } from 'node:fs';
 import { readdir, readFile, stat } from 'node:fs/promises';
-import { extractZip } from './extract-zip.js';
 import chalk from 'chalk';
 
 const { cyan } = chalk;
@@ -92,6 +91,7 @@ async function unzipIfNecessary(moduleRoot, name, logger) {
 
 	try {
 		logger.log(`Installing module: ${cyan(name)}`);
+		const { extractZip } = await import('./extract-zip.js');
 		await extractZip({
 			file,
 			dest: moduleRoot
@@ -199,7 +199,7 @@ async function detectModule(modulePath, version, ignoreDirs, logger) {
 		mod.platform = [ mod.manifest.platform ];
 	}
 
-	logger.trace(`Detected %s module: ${mod.platform[0]} ${cyan(mod.manifest.moduleid)} @ ${mod.modulePath}`);
+	logger.trace(`Detected ${cyan(mod.platform[0])} module: ${cyan(mod.manifest.moduleid)} @ ${mod.modulePath}`);
 	return mod;
 }
 

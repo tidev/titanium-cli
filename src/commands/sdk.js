@@ -1,300 +1,247 @@
-export const description = 'manages installed Titanium SDKs';
+import chalk from 'chalk';
+import { TiError } from '../util/tierror.js';
+import { expand } from '../util/expand.js';
+import * as version from '../util/version.js';
+import { request } from 'undici';
+import { BusyIndicator } from '../util/busyindicator.js';
 
-// const fs = require('fs-extra');
-// const got = require('got');
-// const path = require('path');
-// const fields = require('fields'); // TODO: Move to the couple locations it's used, on-demand?
-// const appc = require('node-appc');
-// const tmp = require('tmp');
-// const yauzl = require('yauzl');
-// const afs = appc.fs;
+const { cyan, gray, green, magenta } = chalk;
 
-// const callbackify = require('util').callbackify;
-
-// /** SDK command title. */
-// exports.title = 'SDK';
-
-// /** @namespace SdkSubcommands */
-// const SdkSubcommands = {};
+const SdkSubcommands = {};
 
 // // X.Y.Z
 // // X.Y.Z.GA or X.Y.Z.RC or X.Y.Z.GA.foo or X.Y.Z.GA.foo.bar
 // // X.Y.Z.foo or X.Y.Z.foo.bar
-// const versionRegExp = /^(\d+)\.(\d+)\.(\d+)(?:\.\w+)?/i;
+const versionRegExp = /^(\d+)\.(\d+)\.(\d+)(?:\.\w+)?/i;
 
-// const sortTypes = [ 'beta', 'rc', 'ga' ];
-// const releaseTypeMap = {
-// 	latest: 'ga',
-// 	stable: 'ga',
-// 	rc: 'rc',
-// 	beta: 'beta'
-// };
+const sortTypes = [ 'beta', 'rc', 'ga' ];
+const releaseTypeMap = {
+	latest: 'ga',
+	stable: 'ga',
+	rc: 'rc',
+	beta: 'beta'
+};
 
-// /**
-//  * Returns the configuration for the SDK command.
-//  * @param {Object} logger - The logger instance
-//  * @param {Object} config - The CLI config object
-//  * @param {CLI} cli - The CLI instance
-//  * @returns {Object} SDK command configuration
-//  */
-// exports.config = function config(logger, config, cli) {
-// 	const subcommands = {};
-// 	for (const s of Object.keys(SdkSubcommands)) {
-// 		subcommands[s] = SdkSubcommands[s].conf(logger, config, cli);
-// 	}
-// 	return {
-// 		skipBanner: true,
-// 		defaultSubcommand: 'list',
-// 		subcommands
-// 	};
-// };
+/**
+ * Returns the configuration for the SDK command.
+ * @param {Object} logger - The logger instance
+ * @param {Object} config - The CLI config object
+ * @param {CLI} cli - The CLI instance
+ * @returns {Object} SDK command configuration
+ */
+export function config(logger, config, cli) {
+	const subcommands = {};
+	for (const [name, subcmd] of Object.entries(SdkSubcommands)) {
+		subcommands[name] = subcmd.conf(logger, config, cli);
+	}
+	return {
+		defaultSubcommand: 'list',
+		skipBanner: true,
+		subcommands
+	};
+}
 
-// /**
-//  * Displays all installed Titanium SDKs or installs a new SDK.
-//  * @param {Object} logger - The logger instance
-//  * @param {Object} config - The CLI config object
-//  * @param {CLI} cli - The CLI instance
-//  * @param {Function} finished - Callback when the command finishes
-//  */
-// exports.run = function run(logger, config, cli, finished) {
-// 	const action = cli.argv._.shift() || 'list';
-// 	if (action !== 'list') {
-// 		logger.banner();
-// 	}
+/**
+ * Displays all installed Titanium SDKs or installs a new SDK.
+ * @param {Object} logger - The logger instance
+ * @param {Object} config - The CLI config object
+ * @param {CLI} cli - The CLI instance
+ */
+export async function run(logger, config, cli) {
+	let action = cli.argv._.shift() || 'list';
+	if (!SdkSubcommands[action]) {
+		throw new TiError(`Invalid subcommand "${action}"`);
+	}
+	await SdkSubcommands[action].fn(logger, config, cli);
+}
 
-// 	if (SdkSubcommands[action]) {
-// 		SdkSubcommands[action].fn.call(SdkSubcommands[action].fn, logger, config, cli, (error, result) => {
-// 			if (error && error instanceof CLIError) {
-// 				logger.error(error.message);
-// 				if (error.detail) {
-// 					logger.log();
-// 					logger.log(error.detail);
-// 				}
-// 			} else if (error && error instanceof Error) {
-// 				logger.error(error);
-// 			}
-// 			finished(error, result);
-// 		});
-// 	} else {
-// 		logger.error(`Invalid subcommand "${action}"\n`);
-// 		appc.string.suggest(action, Object.keys(SdkSubcommands), logger.log);
-// 		logger.log('Available subcommands:');
-// 		for (const cmd of Object.keys(SdkSubcommands)) {
-// 			logger.log('    ' + cmd.cyan);
-// 		}
-// 		logger.log();
-// 		finished();
-// 	}
-// };
+/**
+ * Displays a list of all installed Titanium SDKs.
+ * @memberof SdkSubcommands
+ * @param {Object} logger - The logger instance
+ * @param {Object} config - The CLI config object
+ * @param {CLI} cli - The CLI instance
+ */
+SdkSubcommands.list = {
+	conf(_logger, _config, _cli) {
+		return {
+			desc: 'print a list of installed SDK versions',
+			flags: {
+				branches: {
+					abbr: 'b',
+					desc: 'retrieve and print all branches'
+				},
+				json: {
+					desc: 'display installed modules as json'
+				},
+				releases: {
+					abbr: 'r',
+					desc: 'retrieve and print all releases'
+				},
+				unstable: {
+					abbr: 'u',
+					desc: 'retrieve and print all unstable release candidate (rc) and beta releases'
+				}
+			},
+			options: {
+				branch: {
+					desc: 'branch to fetch CI builds'
+				},
+				output: {
+					abbr: 'o',
+					default: 'report',
+					hidden: true,
+					values: ['report', 'json']
+				}
+			}
+		};
+	},
+	async fn(logger, config, cli) {
+		const os = cli.env.os.name;
 
-// /**
-//  * Displays a list of all installed Titanium SDKs.
-//  * @memberof SdkSubcommands
-//  * @param {Object} logger - The logger instance
-//  * @param {Object} config - The CLI config object
-//  * @param {CLI} cli - The CLI instance
-//  * @param {Function} finished - Callback when the command finishes
-//  */
-// SdkSubcommands.list = {
-// 	conf: function (_logger, _config, _cli) {
-// 		return {
-// 			desc: 'print a list of installed SDK versions',
-// 			flags: {
-// 				branches: {
-// 					abbr: 'b',
-// 					desc: 'retrieve and print all branches'
-// 				},
-// 				releases: {
-// 					abbr: 'r',
-// 					desc: 'retrieve and print all releases'
-// 				},
-// 				unstable: {
-// 					abbr: 'u',
-// 					desc: 'retrieve and print all unstable release candidate (rc) and beta releases'
-// 				}
-// 			},
-// 			options: {
-// 				branch: {
-// 					desc: 'branch to fetch CI builds'
-// 				},
-// 				output: {
-// 					abbr: 'o',
-// 					default: 'report',
-// 					desc: 'output format',
-// 					values: [ 'report', 'json' ]
-// 				}
-// 			}
-// 		};
-// 	},
-// 	fn: callbackify(list)
-// };
+		const [ releases, branches, branchBuilds ] = (await Promise.allSettled([
+			(cli.argv.releases || cli.argv.unstable) && getReleases(os, cli.argv.unstable),
+			cli.argv.branches && getBranches(),
+			cli.argv.branch && getBranchBuilds(cli.argv.branch, os)
+		])).map(r => {
+			return r.status === 'fulfilled' ? r.value : new TiError(r.reason);
+		});
 
-// /**
-//  * @param {Object} logger - The logger instance
-//  * @param {Object} config - The CLI config object
-//  * @param {CLI} cli - The CLI instance
-//  */
-// async function list(logger, config, cli) {
-// 	const os = cli.env.os.name;
+		const { sdks } = cli.env;
+		const vers = version.sort(Object.keys(sdks)).reverse();
 
-// 	const [ releases, branches, branchBuilds ] = (await Promise.allSettled([
-// 		(cli.argv.releases || cli.argv.unstable) && getReleases(os, cli.argv.unstable),
-// 		cli.argv.branches && getBranches(),
-// 		cli.argv.branch && getBranchBuilds(cli.argv.branch, os)
-// 	])).map(r => {
-// 		return r.status === 'fulfilled' ? r.value : new CLIError(r.reason);
-// 	});
+		const defaultInstallLocation = cli.env.installPath;
+		const locations = Array.from(
+			new Set([
+				cli.env.os.sdkPaths,
+				defaultInstallLocation,
+				config.get('paths.sdks')
+			].flat().map(p => p && expand(p)).filter(Boolean))
+		).sort();
 
-// 	const { sdks } = cli.env;
-// 	const vers = appc.version.sort(Object.keys(sdks)).reverse();
+		if (cli.argv.json || cli.argv.output === 'json') {
+			for (const ver of vers) {
+				delete sdks[ver].commands;
+				delete sdks[ver].packageJson;
+				delete sdks[ver].platforms;
+			}
 
-// 	let activeSDK = config.get('sdk.selected', config.get('app.sdk'));
-// 	if ((!activeSDK || activeSDK === 'latest') && vers.length) {
-// 		activeSDK = vers[0];
-// 	}
+			const obj = {
+				branch: branchBuilds?.length ? {
+					[cli.argv.branch]: branchBuilds
+				} : {},
+				branches: {
+					defaultBranch: 'master',
+					branches: branches || []
+				},
+				defaultInstallLocation,
+				installLocations: locations,
+				installed: vers.reduce((obj, v) => {
+					obj[v] = sdks[v].path;
+					return obj;
+				}, {}),
+				releases: releases && releases.reduce((obj, { name, assets }) => {
+					obj[name] = assets.find(a => a.os === os).url;
+					return obj;
+				}, {}) || {},
+				sdks
+			};
 
-// 	const defaultInstallLocation = cli.env.installPath;
-// 	const locations = Array.from(
-// 		new Set([
-// 			cli.env.os.sdkPaths,
-// 			defaultInstallLocation,
-// 			config.get('paths.sdks')
-// 		].flat().map(p => p && afs.resolvePath(p)).filter(Boolean))
-// 	).sort();
+			logger.log(JSON.stringify(obj, null, '\t'));
+			return;
+		}
 
-// 	if (cli.argv.output === 'json') {
-// 		for (const ver of vers) {
-// 			delete sdks[ver].commands;
-// 			delete sdks[ver].packageJson;
-// 			delete sdks[ver].platforms;
-// 		}
+		logger.skipBanner(false);
+		logger.banner();
 
-// 		const obj = {
-// 			activeSDK,
-// 			branch: branchBuilds?.length ? {
-// 				[cli.argv.branch]: branchBuilds
-// 			} : {},
-// 			branches: {
-// 				defaultBranch: 'master',
-// 				branches: branches || []
-// 			},
-// 			defaultInstallLocation,
-// 			installLocations: locations,
-// 			installed: vers.reduce((obj, v) => {
-// 				obj[v] = sdks[v].path;
-// 				return obj;
-// 			}, {}),
-// 			releases: releases && releases.reduce((obj, { name, assets }) => {
-// 				obj[name] = assets.find(a => a.os === os).url;
-// 				return obj;
-// 			}, {}) || {},
-// 			sdks
-// 		};
+		logger.log('SDK Install Locations:');
+		for (const p of locations) {
+			logger.log(`   ${cyan(p)}${p === defaultInstallLocation ? gray(' [default]') : ''}`);
+		}
+		logger.log();
 
-// 		logger.log(JSON.stringify(obj, null, '\t'));
-// 		return;
-// 	}
+		if (vers.length) {
+			const maxlen = vers.reduce((len, b) => Math.max(len, b.length), 0);
+			const maxname = vers.reduce((len, b) => {
+				return Math.max(len, sdks[b].manifest && sdks[b].manifest.name ? sdks[b].manifest.name.length : 0);
+			}, 0);
 
-// 	logger.banner();
-// 	logger.log('SDK Install Locations:');
-// 	for (const p of locations) {
-// 		logger.log(`   ${p.cyan}${p === defaultInstallLocation ? ' [default]'.gray : ''}`);
-// 	}
-// 	logger.log();
+			logger.log('Installed SDKs:');
+			for (const v of vers) {
+				const n = maxlen + 2 - v.length;
+				let name = sdks[v].manifest && (sdks[v].manifest.name || sdks[v].manifest.version);
 
-// 	let activeValid = false;
+				if (!name) {
+					try {
+						name = version.format(v, 3, 3);
+					} catch (ex) {
+						name = '';
+					}
+				}
 
-// 	if (vers.length) {
-// 		const activeLabel = ' [selected]';
-// 		const maxlen = vers.reduce((len, b) => {
-// 			return Math.max(len, b.length + (b === activeSDK ? activeLabel.length : 0));
-// 		}, 0);
-// 		const maxname = vers.reduce((len, b) => {
-// 			return Math.max(len, sdks[b].manifest && sdks[b].manifest.name ? sdks[b].manifest.name.length : 0);
-// 		}, 0);
+				logger.log(`   ${cyan(v)}${' '.repeat(n)}${maxname ? magenta(name.padEnd(maxname + 2)) : ''}${sdks[v].path}`);
+			}
+			logger.log();
+		} else {
+			logger.log('No Titanium SDKs are installed\n');
+			logger.log(`You can download the latest Titanium SDK by running: ${cyan(cli.argv.$ + ' sdk install')}\n`);
+		}
 
-// 		logger.log('Installed SDKs:');
-// 		for (const v of vers) {
-// 			const d = v === activeSDK ? activeLabel : '';
-// 			const n = maxlen + 2 - v.length - d.length;
-// 			let name = sdks[v].manifest && (sdks[v].manifest.name || sdks[v].manifest.version);
+		const { default: humanize } = await import('humanize');
 
-// 			if (!name) {
-// 				try {
-// 					name = appc.version.format(v, 3, 3);
-// 				} catch (ex) {
-// 					// ignore
-// 				}
-// 			}
+		if (releases) {
+			logger.log('Releases:');
+			if (releases instanceof Error) {
+				logger.log(`   ${red(releases.message)}`);
+			} else if (!releases.length) {
+				logger.log('   No releases found');
+			} else {
+				let i = 0;
+				for (const r of releases) {
+					logger.log(`   ${cyan(r.name.padEnd(12))}\
+${Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date(r.date)).padStart(8)}\
+${humanize.filesize(r.assets.find(a => a.os === os).size, 1024, 1).toUpperCase().padStart(11)}\
+${Object.prototype.hasOwnProperty.call(sdks, r) ? ' [installed]' : ''}\
+${r.type !== 'ga' ? gray('  [unstable]') : i++ === 0 ? green('  [latest stable]') : ''}`);
+				}
+			}
+			logger.log();
+		}
 
-// 			activeValid = activeValid || v === activeSDK;
-// 			logger.log(`   ${v.cyan}${d.grey}${' '.repeat(n)}${maxname ? appc.string.rpad(name ? name : '', maxname + 2).magenta : ''}${sdks[v].path}`);
-// 		}
-// 		logger.log();
-// 	} else {
-// 		logger.log('No Titanium SDKs are installed\n');
-// 		logger.log(`You can download the latest Titanium SDK by running: ${(cli.argv.$ + ' sdk install').cyan}\n`);
-// 	}
+		if (branches) {
+			logger.log('Branches:');
+			if (branches instanceof Error) {
+				logger.log(`   ${branches.message.red}`);
+			} else {
+				for (const b of branches) {
+					logger.log(`   ${cyan(b)}${b === 'master' ? gray(' [default]') : ''}`);
+				}
+			}
+			logger.log();
+		}
 
-// 	const humanize = require('humanize');
-
-// 	if (releases) {
-// 		logger.log('Releases:');
-// 		if (releases instanceof Error) {
-// 			logger.log(`   ${releases.message.red}`);
-// 		} else if (!releases.length) {
-// 			logger.log('   No releases found');
-// 		} else {
-// 			let i = 0;
-// 			for (const r of releases) {
-// 				logger.log(`   ${r.name.padEnd(12).cyan}\
-// ${Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date(r.date)).padStart(8)}\
-// ${humanize.filesize(r.assets.find(a => a.os === os).size, 1024, 1).toUpperCase().padStart(11)}\
-// ${Object.prototype.hasOwnProperty.call(sdks, r) ? ' [installed]' : ''}\
-// ${r.type !== 'ga' ? '  [unstable]'.grey : i++ === 0 ? '  [latest stable]'.green : ''}`);
-// 			}
-// 		}
-// 		logger.log();
-// 	}
-
-// 	if (branches) {
-// 		logger.log('Branches:');
-// 		if (branches instanceof Error) {
-// 			logger.log(`   ${branches.message.red}`);
-// 		} else {
-// 			for (const b of branches) {
-// 				logger.log(`   ${b.cyan}${b === 'master' ? ' [default]'.grey : ''}`);
-// 			}
-// 		}
-// 		logger.log();
-// 	}
-
-// 	if (cli.argv.branch) {
-// 		if (branchBuilds instanceof Error) {
-// 			logger.error(`Invalid branch "${cli.argv.branch}"\n`);
-// 			logger.log(`Run '${`${cli.argv.$} sdk --branches`.cyan}' for a list of available branches.\n`);
-// 		} else {
-// 			logger.log(`'${cli.argv.branch}' Branch Builds:`);
-// 			if (branchBuilds?.length) {
-// 				for (const b of branchBuilds) {
-// 					const dt = Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date(b.date));
-// 					logger.log(`   ${b.name.cyan}\
-// ${dt.padStart(11)}\
-// ${humanize.filesize(b.assets.find(a => a.os === os).size, 1024, 1).toUpperCase().padStart(11)}`);
-// 				}
-// 				logger.log('** NOTE: these builds not recommended for production use **'.grey);
-// 			} else {
-// 				logger.log('   No builds found');
-// 			}
-// 			logger.log();
-// 		}
-// 	}
-
-// 	if (vers.length && !activeValid) {
-// 		logger.error(`Selected Titanium SDK '${activeSDK}' not found\n`);
-// 		logger.log(`Run '${`${cli.argv.$} sdk select <sdk-version>`.cyan}' to set the selected Titanium SDK.\n`);
-// 	}
-// }
+		if (cli.argv.branch) {
+			if (branchBuilds instanceof Error) {
+				logger.error(`Invalid branch "${cli.argv.branch}"\n`);
+				logger.log(`Run '${cyan(`${cli.argv.$} sdk --branches`)}' for a list of available branches.\n`);
+			} else {
+				logger.log(`'${cli.argv.branch}' Branch Builds:`);
+				if (branchBuilds?.length) {
+					for (const b of branchBuilds) {
+						const dt = Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date(b.date));
+						logger.log(`   ${cyan(b.name)}\
+${dt.padStart(11)}\
+${humanize.filesize(b.assets.find(a => a.os === os).size, 1024, 1).toUpperCase().padStart(11)}`);
+					}
+					logger.log(gray('** NOTE: these builds not recommended for production use **'));
+				} else {
+					logger.log('   No builds found');
+				}
+				logger.log();
+			}
+		}
+	}
+};
 
 // /**
 //  * Selects the specified Titanium SDK as the selected SDK.
@@ -367,7 +314,7 @@ export const description = 'manages installed Titanium SDKs';
 // 		const error = 'No suitable Titanium SDKs installed';
 // 		// TODO: provide a command to install latest GA?
 // 		logger.error(error + '\n');
-// 		throw new CLIError(error); // NOTE: this used to log this normally and treat as "success"
+// 		throw new TiError(error); // NOTE: this used to log this normally and treat as "success"
 // 	}
 
 // 	// if they specified 'latest' or 'stable', then determine the latest/stable version
@@ -397,14 +344,14 @@ export const description = 'manages installed Titanium SDKs';
 // 		appc.string.suggest(selectedSDK, vers, logger.log.bind(logger));
 // 		// if prompting is disabled, then we're done
 // 		if (noPrompt) {
-// 			throw new CLIError(error);
+// 			throw new TiError(error);
 // 		}
 // 	} else if (noPrompt) {
 // 		// no version supplied, no prompting, show error and exit
 // 		const error = 'No SDK version specified';
 // 		logger.error(error + '\n');
-// 		logger.log(`Usage: ${`${cli.argv.$} sdk select <version>`.cyan}\n`);
-// 		throw new CLIError(error);
+// 		logger.log(`Usage: ${cyan(`${cli.argv.$} sdk select <version>`)}\n`);
+// 		throw new TiError(error);
 // 	}
 
 // 	// get the current SDK
@@ -443,7 +390,7 @@ export const description = 'manages installed Titanium SDKs';
 // 				option: function (opt, idx, num) {
 // 					var d = opt.value === activeSDK ? activeLabel : '',
 // 						n = maxlen + 2 - opt.value.length - d.length;
-// 					return '  ' + num + opt.value.cyan + d.grey + new Array(n + 1).join(' ') + opt.path;
+// 					return '  ' + num + cyan(opt.value) + gray(d) + new Array(n + 1).join(' ') + opt.path;
 // 				}
 // 			},
 // 			validate: function (value) {
@@ -539,7 +486,7 @@ export const description = 'manages installed Titanium SDKs';
 //  * @param {CLI} cli - The CLI instance
 //  */
 // async function install(logger, config, cli) {
-// 	const titaniumDir  = afs.resolvePath(cli.env.installPath);
+// 	const titaniumDir  = expand(cli.env.installPath);
 // 	const osName       = cli.env.os.name;
 // 	const branch       = cli.argv.branch;
 // 	let force          = cli.argv.force;
@@ -568,14 +515,14 @@ export const description = 'manages installed Titanium SDKs';
 // 	}
 
 // 	if (file) {
-// 		file = afs.resolvePath(file);
+// 		file = expand(file);
 
 // 		if (!fs.existsSync(file)) {
-// 			throw new CLIError('Specified file does not exist');
+// 			throw new TiError('Specified file does not exist');
 // 		}
 
 // 		if (!/\.zip$/.test(file)) {
-// 			throw new CLIError('Specified file is not a zip file');
+// 			throw new TiError('Specified file is not a zip file');
 // 		}
 // 	} else {
 // 		// we are downloading an sdk
@@ -592,19 +539,21 @@ export const description = 'manages installed Titanium SDKs';
 // 					str += (s || '') + '\n';
 // 				}, 2);
 // 				str += 'Available Branches:\n';
-// 				str += appc.string.renderColumns(branches, '    ', 100).cyan;
-// 				throw new CLIError(`Branch "${branch}" does not exist`, str);
+// 				str += cyan(appc.string.renderColumns(branches, '    ', 100));
+				// throw new TiError(`Branch "${branch}" does not exist`, {
+				// 	after: str
+				// });
 // 			}
 
 // 			const builds = await getBranchBuilds(branch, osName);
 // 			const build = uri === 'latest' ? builds[0] : builds.find(b => b.name.toLowerCase() === uri);
 // 			if (!build) {
-// 				throw new CLIError(`CI build ${subject} does not exist`);
+// 				throw new TiError(`CI build ${subject} does not exist`);
 // 			}
 
 // 			const asset = build.assets.find(a => a.os === osName);
 // 			if (!asset) {
-// 				throw new CLIError(`CI build ${subject} does not support ${osName}`);
+// 				throw new TiError(`CI build ${subject} does not support ${osName}`);
 // 			}
 
 // 			url = asset.url;
@@ -629,14 +578,14 @@ export const description = 'manages installed Titanium SDKs';
 // 			if (release) {
 // 				const asset = release.assets.find(a => a.os === osName);
 // 				if (!asset) {
-// 					throw new CLIError(`SDK release ${subject} does not support ${osName}`);
+// 					throw new TiError(`SDK release ${subject} does not support ${osName}`);
 // 				}
 // 				url = asset.url;
 // 			}
 // 		}
 
 // 		if (!url) {
-// 			throw new CLIError(`Unable to find any Titanium SDK releases or CI builds that match "${subject}"`);
+// 			throw new TiError(`Unable to find any Titanium SDK releases or CI builds that match "${subject}"`);
 // 		}
 
 // 		// step 1.5: download the file
@@ -654,7 +603,7 @@ export const description = 'manages installed Titanium SDKs';
 // 			let last = 0;
 // 			let total = 0;
 
-// 			logger.log(`Downloading ${url.cyan}`);
+// 			logger.log(`Downloading ${cyan(url)}`);
 
 // 			const stream = got.stream(url, { retry: 0 })
 // 				.on('downloadProgress', ({ transferred }) => {
@@ -685,13 +634,13 @@ export const description = 'manages installed Titanium SDKs';
 // 					if (showProgress) {
 // 						if (total) {
 // 							bar = new appc.progress('  :paddedPercent [:bar]', {
-// 								complete: '='.cyan,
-// 								incomplete: '.'.grey,
+// 								complete: cyan('='),
+// 								incomplete: gray('.'),
 // 								width: 40,
 // 								total
 // 							});
 // 						} else {
-// 							busy = new appc.busyindicator();
+// 							busy = new busyindicator();
 // 							busy.start();
 // 						}
 // 					}
@@ -764,12 +713,13 @@ export const description = 'manages installed Titanium SDKs';
 // 						const tip = `Run '${`${cli.argv.$} sdk install ${latest.name} --force`.cyan}' to re-install`;
 // 						if (noPrompt) {
 // 							if (subject === 'latest' && name === latest.name) {
-// 								throw new CLIError(
-// 									`Titanium SDK ${name} is already installed`,
-// 									`You're up-to-date. Version ${latest.name.cyan} is currently the newest version available.\n${tip}`
-// 								);
+								// throw new TiError(`Titanium SDK ${name} is already installed`, {
+								// 	after: `You're up-to-date. Version ${latest.name.cyan} is currently the newest version available.\n${tip}`
+								// });
 // 							}
-// 							throw new CLIError(`Titanium SDK ${name} is already installed`, tip);
+							// throw new TiError(`Titanium SDK ${name} is already installed`, {
+							// 	after: tip
+							// });
 // 						}
 
 // 						await new Promise(resolve => {
@@ -820,7 +770,7 @@ export const description = 'manages installed Titanium SDKs';
 // 		}
 
 // 		if (!name) {
-// 			throw new CLIError('Zip file does not contain a valid Titanium SDK');
+// 			throw new TiError('Zip file does not contain a valid Titanium SDK');
 // 		}
 
 // 		// step 3: move the sdk files to the dest
@@ -918,17 +868,17 @@ export const description = 'manages installed Titanium SDKs';
 // 	}
 
 // 	if (!fs.existsSync(file)) {
-// 		throw new CLIError('The specified zip file does not exist');
+// 		throw new TiError('The specified zip file does not exist');
 // 	}
 
 // 	if (!fs.statSync(file).isFile()) {
-// 		throw new CLIError('The specified zip file is not a file');
+// 		throw new TiError('The specified zip file is not a file');
 // 	}
 
 // 	return await new Promise((resolve, reject) => {
 // 		yauzl.open(file, { lazyEntries: true }, (err, zipfile) => {
 // 			if (err) {
-// 				return reject(new CLIError(`Invalid zip file: ${err.message || err}`));
+// 				return reject(new TiError(`Invalid zip file: ${err.message || err}`));
 // 			}
 
 // 			if (zipfile.entryCount > 1) {
@@ -957,7 +907,7 @@ export const description = 'manages installed Titanium SDKs';
 // 					}
 
 // 					if (!entry.fileName.endsWith('.zip') || isSymlink || isDir) {
-// 						return abort(new CLIError('Invalid SDK: does not contain a SDK zip file'));
+// 						return abort(new TiError('Invalid SDK: does not contain a SDK zip file'));
 // 					}
 
 // 					const fullPath = path.join(dest, entry.fileName);
@@ -1007,17 +957,17 @@ export const description = 'manages installed Titanium SDKs';
 // 	}
 
 // 	if (!fs.existsSync(file)) {
-// 		throw new CLIError('The specified zip file does not exist');
+// 		throw new TiError('The specified zip file does not exist');
 // 	}
 
 // 	if (!fs.statSync(file).isFile()) {
-// 		throw new CLIError('The specified zip file is not a file');
+// 		throw new TiError('The specified zip file is not a file');
 // 	}
 
 // 	return await new Promise((resolve, reject) => {
 // 		yauzl.open(file, { lazyEntries: true }, (err, zipfile) => {
 // 			if (err) {
-// 				return reject(new CLIError(`Invalid zip file: ${err.message || err}`));
+// 				return reject(new TiError(`Invalid zip file: ${err.message || err}`));
 // 			}
 
 // 			let idx = 0;
@@ -1107,12 +1057,12 @@ export const description = 'manages installed Titanium SDKs';
 // 		} else {
 // 			str += ex.toString();
 // 		}
-// 		throw new CLIError(str);
+// 		throw new TiError(str);
 // 	}
 
 // 	// make sure sdk folder is writable when installing an sdk
 // 	if (!afs.isDirWritable(installLocation)) {
-// 		throw new CLIError(`Installation location is not writable: ${installLocation}\n`);
+// 		throw new TiError(`Installation location is not writable: ${installLocation}\n`);
 // 	}
 // }
 
@@ -1170,7 +1120,7 @@ export const description = 'manages installed Titanium SDKs';
 // 			const error = 'No SDK version specified';
 // 			logger.error(error + '\n');
 // 			logger.log(`Usage: ${`${cli.argv.$} sdk uninstall <version>`.cyan}\n`);
-// 			throw new CLIError(error);
+// 			throw new TiError(error);
 // 		}
 // 		// prompt for which sdk to remove
 // 		await new Promise((resolve, reject) => {
@@ -1219,7 +1169,7 @@ export const description = 'manages installed Titanium SDKs';
 // 		const error = `Titanium SDK "${version}" is not found`;
 // 		logger.error(error + '\n');
 // 		appc.string.suggest(version, vers, logger.log.bind(logger));
-// 		throw new CLIError(error);
+// 		throw new TiError(error);
 // 	}
 
 // 	if (!force) {
@@ -1228,7 +1178,7 @@ export const description = 'manages installed Titanium SDKs';
 // 			const error = `To uninstall a Titanium SDK in non-interactive mode, you must use ${'--force'.cyan}`;
 // 			logger.error(error + '\n');
 // 			logger.log(`Usage: ${`${cli.argv.$} sdk uninstall ${version} --force`.cyan}\n`);
-// 			throw new CLIError(error);
+// 			throw new TiError(error);
 // 		}
 
 // 		// prompt for confirmation
@@ -1283,78 +1233,89 @@ export const description = 'manages installed Titanium SDKs';
 // 	logger.log(`Successfully uninstalled Titanium SDK ${version.cyan}\n`);
 // }
 
-// /**
-//  * Retrieves the list of releases.
-//  * @param {String} os - The name of the OS (osx, linux, win32)
-//  * @param {Boolean} [unstable] - When `true`, returns beta and rc releases along with ga releases.
-//  * @returns {Promise<Release[]>}
-//  */
-// async function getReleases(os, unstable) {
-// 	const releaseRE = /^(\d+)\.(\d+)\.(\d+)\.(\w+)$/;
-// 	const releaseTypes = [ 'beta', 'rc', 'ga' ];
+/**
+ * Retrieves the list of releases.
+ * @param {String} os - The name of the OS (osx, linux, win32)
+ * @param {Boolean} [unstable] - When `true`, returns beta and rc releases along with ga releases.
+ * @returns {Promise<Release[]>}
+ */
+async function getReleases(os, unstable) {
+	const releaseRE = /^(\d+)\.(\d+)\.(\d+)\.(\w+)$/;
+	const releaseTypes = [ 'beta', 'rc', 'ga' ];
 
-// 	return (await Promise.allSettled([
-// 		unstable && got('https://downloads.titaniumsdk.com/registry/beta.json', { responseType: 'json' }).then(res => ({ type: 'beta', releases: res.body })),
-// 		unstable && got('https://downloads.titaniumsdk.com/registry/rc.json', { responseType: 'json' }).then(res => ({ type: 'rc', releases: res.body })),
-// 		got('https://downloads.titaniumsdk.com/registry/ga.json', { responseType: 'json' }).then(res => ({ type: 'ga', releases: res.body }))
-// 	])).flatMap(r => {
-// 		return r.status === 'fulfilled' && r.value ? r.value.releases.map(rel => {
-// 			rel.type = r.value.type;
-// 			return rel;
-// 		}) : [];
-// 	}).filter(r => {
-// 		return r.assets.some(a => a.os === os);
-// 	}).sort((a, b) => {
-// 		const [ , amajor, aminor, apatch, atag ] = a.name.toLowerCase().match(releaseRE);
-// 		const [ , bmajor, bminor, bpatch, btag ] = b.name.toLowerCase().match(releaseRE);
+	const fetches = [
+		unstable && request('https://downloads.titaniumsdk.com/registry/beta.json', {
+			responseType: 'json'
+		}).then(async res => ({ type: 'beta', releases: await res.body.json() })),
 
-// 		let n = parseInt(bmajor) - parseInt(amajor);
-// 		if (n !== 0) {
-// 			return n;
-// 		}
+		unstable && request('https://downloads.titaniumsdk.com/registry/rc.json', {
+			responseType: 'json'
+		}).then(async res => ({ type: 'rc', releases: await res.body.json() })),
 
-// 		n = parseInt(bminor) - parseInt(aminor);
-// 		if (n !== 0) {
-// 			return n;
-// 		}
+		request('https://downloads.titaniumsdk.com/registry/ga.json', {
+			responseType: 'json'
+		}).then(async res => ({ type: 'ga', releases: await res.body.json() }))
+	];
 
-// 		n = parseInt(bpatch) - parseInt(apatch);
-// 		if (n !== 0) {
-// 			return n;
-// 		}
+	const results = await Promise.allSettled(fetches);
 
-// 		return releaseTypes.indexOf(btag) - releaseTypes.indexOf(atag);
-// 	});
-// }
-// exports.getReleases = getReleases;
+	return results
+		.flatMap(r => {
+			return r.status === 'fulfilled' && r.value ? r.value.releases.map(rel => {
+				rel.type = r.value.type;
+				return rel;
+			}) : [];
+		})
+		.filter(r => r.assets.some(a => a.os === os))
+		.sort((a, b) => {
+			const [ , amajor, aminor, apatch, atag ] = a.name.toLowerCase().match(releaseRE);
+			const [ , bmajor, bminor, bpatch, btag ] = b.name.toLowerCase().match(releaseRE);
 
-// /**
-//  * Retrieves the list of branches.
-//  * @returns {Promise<Branches>}
-//  */
-// async function getBranches() {
-// 	return Object
-// 		.entries((await got('https://downloads.titaniumsdk.com/registry/branches.json', { responseType: 'json' })).body)
-// 		.filter(([ , count ]) => count)
-// 		.map(([ name ]) => name);
-// }
+			let n = parseInt(bmajor) - parseInt(amajor);
+			if (n !== 0) {
+				return n;
+			}
 
-// /**
-//  * Retrieves the list of builds for a given branch.
-//  * @param {String} branch - The name of the branch
-//  * @param {String} os - The name of the current OS (osx, linux, win32)
-//  * @returns {Promise<BranchBuild[]>}
-//  */
-// async function getBranchBuilds(branch, os) {
-// 	const now = Date.now();
-// 	return (await got(`https://downloads.titaniumsdk.com/registry/${branch}.json`, { responseType: 'json' })).body.filter(b => {
-// 		return (!b.expires || Date.parse(b.expires) > now) && b.assets.some(a => a.os === os);
-// 	});
-// }
+			n = parseInt(bminor) - parseInt(aminor);
+			if (n !== 0) {
+				return n;
+			}
 
-// class CLIError extends Error {
-// 	constructor(message, detail) {
-// 		super(message);
-// 		this.detail = detail;
-// 	}
-// }
+			n = parseInt(bpatch) - parseInt(apatch);
+			if (n !== 0) {
+				return n;
+			}
+
+			return releaseTypes.indexOf(btag) - releaseTypes.indexOf(atag);
+		});
+}
+
+/**
+ * Retrieves the list of branches.
+ * @returns {Promise<Branches>}
+ */
+async function getBranches() {
+	const res = await request('https://downloads.titaniumsdk.com/registry/branches.json', {
+		responseType: 'json'
+	});
+	return Object
+		.entries(await res.body.json())
+		.filter(([ , count ]) => count)
+		.map(([ name ]) => name);
+}
+
+/**
+ * Retrieves the list of builds for a given branch.
+ * @param {String} branch - The name of the branch
+ * @param {String} os - The name of the current OS (osx, linux, win32)
+ * @returns {Promise<BranchBuild[]>}
+ */
+async function getBranchBuilds(branch, os) {
+	const res = await request('https://downloads.titaniumsdk.com/registry/branches.json', {
+		responseType: 'json'
+	});
+	const now = Date.now();
+	return (await res.body.json()).filter(b => {
+		return (!b.expires || Date.parse(b.expires) > now) && b.assets.some(a => a.os === os);
+	});
+}

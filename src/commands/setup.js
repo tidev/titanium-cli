@@ -504,7 +504,7 @@ export function config(_logger, _config, _cli) {
 // 												var info = JSON.parse(stdout);
 // 												r.npm.latest = info && info.version || null;
 // 											} catch (ex) {
-// 												console.log(ex);
+// 												logger.log(ex);
 // 											}
 // 										}
 // 										cb();
@@ -1193,7 +1193,7 @@ export function config(_logger, _config, _cli) {
 // 		for (; i < len; i++) {
 // 			if (proxy[i] && proxy[i].valid) {
 // 				defaultProxy = proxy[i].fullAddress;
-// 				console.log(defaultProxy);
+// 				logger.log(defaultProxy);
 // 				break;
 // 			}
 // 		}

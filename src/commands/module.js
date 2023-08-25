@@ -3,9 +3,7 @@ import { expand } from '../util/expand.js';
 import { TiError } from '../util/tierror.js';
 import { existsSync } from 'node:fs';
 import { dirname, join, parse } from 'node:path';
-import * as timodule from '../util/timodule.js';
 import chalk from 'chalk';
-import { capitalize } from '../util/capitalize.js';
 
 const { bold, cyan, gray } = chalk;
 
@@ -45,12 +43,12 @@ export function config(logger, config, cli) {
  * @param {CLI} cli - The CLI instance
  * @param {Function} finished - Callback when the command finishes
  */
-export async function run(logger, _config, cli) {
+export async function run(logger, config, cli) {
 	let action = cli.argv._.shift() || 'list';
 	if (!ModuleSubcommands[action]) {
 		throw new TiError(`Invalid subcommand "${action}"`);
 	}
-	await ModuleSubcommands[action].fn(logger, _config, cli);
+	await ModuleSubcommands[action].fn(logger, config, cli);
 }
 
 /**
@@ -137,15 +135,18 @@ ModuleSubcommands.list = {
 			}
 		}
 
-		const results = await timodule.detect(searchPaths, config, logger);
+		const { detect } = await import('../util/timodule.js');
+		const results = await detect(searchPaths, config, logger);
 
 		if (isJson) {
-			console.log(JSON.stringify(results, null, '\t'));
+			logger.log(JSON.stringify(results, null, '\t'));
 			return;
 		}
 
 		logger.skipBanner(false);
 		logger.banner();
+
+		const { capitalize } = await import('../util/capitalize.js');
 
 		for (const [scope, modules] of Object.entries(results)) {
 			const platforms = Object.keys(modules);
@@ -155,25 +156,25 @@ ModuleSubcommands.list = {
 				continue;
 			}
 
-			console.log(bold(scopeLabels[scope]));
+			logger.log(bold(scopeLabels[scope]));
 			if (platforms.length) {
 				let i = 0;
 				for (const platform of platforms) {
 					if (i++) {
-						console.log();
+						logger.log();
 					}
 
 					const platformName = platformNames[platform.toLowerCase()] || capitalize(platform);
-					console.log(gray(platformName));
+					logger.log(gray(platformName));
 					for (const [name, versions] of Object.entries(modules[platform])) {
-						console.log(`  ${name}`);
+						logger.log(`  ${name}`);
 						for (const [ver, mod] of Object.entries(versions)) {
-							console.log(`    ${cyan(ver.padEnd(7))} ${mod.modulePath}`);
+							logger.log(`    ${cyan(ver.padEnd(7))} ${mod.modulePath}`);
 						}
 					}
 				}
 			} else {
-				console.log(gray('No modules found'));
+				logger.log(gray('No modules found'));
 			}
 		}
 	}

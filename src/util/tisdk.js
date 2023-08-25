@@ -41,7 +41,10 @@ export async function getTitaniumSDKPaths(config) {
 		}
 	}
 
-	return Array.from(sdkPaths);
+	return {
+		defaultInstallLocation,
+		sdkPaths: Array.from(sdkPaths)
+	};
 }
 
 let cache;
@@ -51,7 +54,10 @@ export async function detectTitaniumSDKs(config) {
 		return cache;
 	}
 
-	const sdkPaths = await getTitaniumSDKPaths(config);
+	let {
+		defaultInstallLocation,
+		sdkPaths
+	} = await getTitaniumSDKPaths(config);
 	const sdks = [];
 	let latest = null;
 
@@ -69,16 +75,19 @@ export async function detectTitaniumSDKs(config) {
 							if (!latest || version.gt(manifest.version, latest)) {
 								latest = manifest.version;
 							}
-							manifest.path = path;
-							manifest.platforms = Array.isArray(manifest.platforms)
-								? manifest.platforms.reduce((platforms, name) => {
-									platforms[name] = {
-										path: join(path, name)
-									};
-									return platforms;
-								}, {})
-								: {};
-							sdks.push(manifest);
+							sdks.push({
+								name: manifest.name,
+								manifest,
+								path,
+								platforms: Array.isArray(manifest.platforms)
+									? manifest.platforms.reduce((platforms, name) => {
+										platforms[name] = {
+											path: join(path, name)
+										};
+										return platforms;
+									}, {})
+									: {}
+							});
 						}
 					} catch {
 						// no manifest (too old)
@@ -91,11 +100,13 @@ export async function detectTitaniumSDKs(config) {
 	);
 
 	sdks.sort((a, b) => version.compare(b.version, a.version));
+	sdkPaths = sdkPaths.map(p => dirname(dirname(p)));
 
 	cache = {
+		installPath: defaultInstallLocation || sdkPaths[0],
 		latest,
 		sdks,
-		sdkPaths: sdkPaths.map(p => dirname(dirname(p)))
+		sdkPaths
 	};
 
 	return cache;
@@ -114,7 +125,12 @@ export async function initSDK(cwd, selectedSdk, config, logger) {
 	}
 
 	// detect sdks
-	const { latest, sdks, sdkPaths } = await detectTitaniumSDKs(config);
+	const {
+		installPath,
+		latest,
+		sdks,
+		sdkPaths
+	} = await detectTitaniumSDKs(config);
 	if (!latest) {
 		throw new TiError('No Titanium SDKs found', {
 			after: `You can download the latest Titanium SDK by running: ${cyan('titanium sdk install')}`
@@ -160,7 +176,12 @@ export async function initSDK(cwd, selectedSdk, config, logger) {
 	}
 
 	return {
+		installPath,
 		sdk,
-		sdkPaths
+		sdkPaths,
+		sdks: sdks.reduce((obj, sdk) => {
+			obj[sdk.name] = sdk;
+			return obj;
+		}, {})
 	};
 }

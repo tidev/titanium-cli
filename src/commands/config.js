@@ -1,7 +1,6 @@
 import chalk from 'chalk';
 import { ticonfig } from '../util/ticonfig.js';
 import { TiError } from '../util/tierror.js';
-import { arrayify } from '../util/arrayify.js';
 import { expand } from '../util/expand.js';
 
 const { cyan } = chalk;
