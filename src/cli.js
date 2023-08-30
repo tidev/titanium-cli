@@ -14,7 +14,7 @@ import { capitalize } from './util/capitalize.js';
 import wrapAnsi from 'wrap-ansi';
 import { TiError } from './util/tierror.js';
 
-const { cyan, gray } = chalk;
+const { cyan } = chalk;
 
 const commands = {
 	config:  'get and set config options',
@@ -143,7 +143,6 @@ export class CLI {
 			}
 			Object.assign(this.argv, argv);
 		}
-		this.argv._ = cmd.args;
 	}
 
 	applyConfig(cmdName, cmd, conf) {
@@ -187,24 +186,30 @@ export class CLI {
 
 		if (Array.isArray(conf.args)) {
 			for (const meta of conf.args) {
-				const arg = new Argument(`[${meta.name}]`, meta.desc);
+				const v = meta.variadic ? '...' : '';
+				const fmt = meta.required ? `<${meta.name}${v}>` : `[${meta.name}${v}]`;
+				const arg = new Argument(fmt, meta.desc);
 				if (meta.default !== undefined) {
 					arg.default(meta.default);
 				}
 				if (Array.isArray(meta.values)) {
 					arg.choices(meta.values);
 				}
-				this.logger.trace(`Adding "${cmdName}" arg: [${meta.name}]`);
+				this.logger.trace(`Adding "${cmdName}" arg: ${fmt}`);
 				cmd.addArgument(arg);
 			}
 		}
 
 		if (conf.subcommands) {
 			for (const [name, subconf] of Object.entries(conf.subcommands)) {
-				this.logger.trace(`Adding subcommand "${name}"${conf.defaultSubcommand === name ? ' (default)' : ''} to "${cmdName}"`);
+				this.logger.trace(
+					`Adding subcommand "${name}"${
+						conf.defaultSubcommand === name ? ' (default)' : ''
+					} to "${cmdName}"`
+				);
 				const subcmd = new Command(name);
 				subcmd
-					.addHelpText('beforeAll', (ctx) => {
+					.addHelpText('beforeAll', () => {
 						this.logger.bannerEnabled(true);
 						this.logger.skipBanner(false);
 						this.logger.banner();
@@ -215,12 +220,15 @@ export class CLI {
 						sortSubcommands: true
 					})
 					.configureOutput({
-						outputError(msg) {
+						outputError: msg => {
+							// explicitly set the subcommand so the global error
+							// handler can print the correct help screen
+							this.command = subcmd;
 							throw new TiError(msg.replace(/^error:\s*/, ''));
 						}
 					});
 				this.applyConfig(name, subcmd, subconf);
-				subcmd.action((...args) => this.executeCommand(args));
+				subcmd.action((...args) => this.executeCommand(args, true));
 				cmd.addCommand(subcmd, {
 					isDefault: conf.defaultSubcommand === name
 				});
@@ -369,8 +377,27 @@ export class CLI {
 	 * @returns {Promise}
 	 * @access private
 	 */
-	async executeCommand(args) {
+	async executeCommand(args, isSubcommand) {
 		const cmd = args.pop();
+
+		if (isSubcommand) {
+			// Titanium CLI 6 and older had a CLI arg parser that did not
+			// support subcommands of subcommands. We now use Commander and it
+			// does. The problem is the commands expect the args to be relative
+			// to the subcommand and Commander returns them as relative to most
+			// specific subcommand subcommand. This means we need to drill down
+			// all of the command contexts until we find the top most subcommand
+			// and get its args.
+			let ctx = cmd;
+			while (ctx.parent) {
+				ctx = ctx.parent;
+			}
+			// get rid of the subcommand
+			this.argv._ = ctx.args.slice(1);
+		} else {
+			this.argv._ = cmd.args;
+		}
+
 		this.applyArgv(cmd);
 
 		this.logger.banner();
@@ -423,9 +450,9 @@ export class CLI {
 	 * @access public
 	 */
 	async go() {
-		this.program = program
+		this.command = program
 			.name('titanium')
-			.addHelpText('beforeAll', (ctx) => {
+			.addHelpText('beforeAll', () => {
 				this.logger.bannerEnabled(true);
 				this.logger.skipBanner(false);
 				this.logger.banner();

@@ -4,23 +4,20 @@ import { expand } from '../util/expand.js';
 import * as version from '../util/version.js';
 import { request } from 'undici';
 import { BusyIndicator } from '../util/busyindicator.js';
+import fs from 'fs-extra';
+import { mkdir } from 'node:fs/promises';
+import { suggest } from '../util/suggest.js';
+import { columns } from '../util/columns.js';
+import { basename, dirname, join } from 'node:path';
+import { tmpNameSync } from 'tmp';
+import { ProgressBar } from '../util/progress.js';
+import { Transform } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
+import { extractZip } from '../util/extract-zip.js';
 
-const { cyan, gray, green, magenta } = chalk;
+const { cyan, gray, green, magenta, red, yellow } = chalk;
 
 const SdkSubcommands = {};
-
-// // X.Y.Z
-// // X.Y.Z.GA or X.Y.Z.RC or X.Y.Z.GA.foo or X.Y.Z.GA.foo.bar
-// // X.Y.Z.foo or X.Y.Z.foo.bar
-const versionRegExp = /^(\d+)\.(\d+)\.(\d+)(?:\.\w+)?/i;
-
-const sortTypes = [ 'beta', 'rc', 'ga' ];
-const releaseTypeMap = {
-	latest: 'ga',
-	stable: 'ga',
-	rc: 'rc',
-	beta: 'beta'
-};
 
 /**
  * Returns the configuration for the SDK command.
@@ -243,569 +240,143 @@ ${humanize.filesize(b.assets.find(a => a.os === os).size, 1024, 1).toUpperCase()
 	}
 };
 
-// /**
-//  * Selects the specified Titanium SDK as the selected SDK.
-//  * @memberof SdkSubcommands
-//  * @param {Object} logger - The logger instance
-//  * @param {Object} config - The CLI config object
-//  * @param {CLI} cli - The CLI instance
-//  * @param {Function} finished - Callback when the command finishes
-//  */
-// SdkSubcommands.select = {
-// 	conf: function (_logger, config, _cli) {
-// 		return {
-// 			desc: 'used to select which installed Titanium SDK is the selected SDK',
-// 			args: [
-// 				{
-// 					desc: 'the version to select',
-// 					name: 'version',
-// 					required: !config.get('cli.prompt')
-// 				}
-// 			]
-// 		};
-// 	},
-// 	fn: callbackify(select)
-// };
+/**
+ * Installs the specified Titanium SDK.
+ * @memberof SdkSubcommands
+ * @param {Object} logger - The logger instance
+ * @param {Object} config - The CLI config object
+ * @param {CLI} cli - The CLI instance
+ * @param {Function} finished - Callback when the command finishes
+ */
+SdkSubcommands.install = {
+	conf(_logger, _config, _cli) {
+		return {
+			// command examples:
+			// ti sdk install
+			// ti sdk install --default
+			// ti sdk install latest
+			// ti sdk install latest-rc
+			// ti sdk install latest-beta
+			// ti sdk install something.zip
+			// ti sdk install something.zip --default
+			// ti sdk install http://builds.appcelerator.com/mobile/master/mobilesdk-3.2.0.v20130612114042-osx.zip
+			// ti sdk install 3.1.0.GA
+			// ti sdk install 3.1.0.GA --default
+			// ti sdk install master:11.1.0.v20220614174006
+			desc: 'download the latest Titanium SDK or a specific version',
+			args: [
+				{
+					desc: 'the version to install, "latest", URL, zip file, or <branch>:<build_name>',
+					name: 'version'
+				}
+			],
+			flags: {
+				default: {
+					abbr: 'd',
+					desc: 'set as default SDK'
+				},
+				force: {
+					abbr: 'f',
+					desc: 'force re-install'
+				},
+				'keep-files': {
+					abbr: 'k',
+					desc: 'keep downloaded files after install'
+				}
+			},
+			options: {
+				branch: {
+					abbr: 'b',
+					desc: 'the branch to install from or "latest" (stable)',
+					hint: 'branch name'
+				}
+			}
+		};
+	},
+	async fn(logger, config, cli) {
+		const titaniumDir  = expand(cli.env.installPath);
+		const showProgress = !cli.argv.quiet && !cli.argv['no-progress-bars'];
+		const osName       = cli.env.os.name;
+		const subject      = cli.argv._.shift() || 'latest';
 
-// function sortVersion(a, b) {
-// 	const [ , amajor, aminor, apatch, atag ] = a.toLowerCase().match(versionRegExp);
-// 	const [ , bmajor, bminor, bpatch, btag ] = b.toLowerCase().match(versionRegExp);
+		logger.skipBanner(false);
+		logger.banner();
 
-// 	let n = parseInt(bmajor) - parseInt(amajor);
-// 	if (n !== 0) {
-// 		return n;
-// 	}
+		// step 0: make sure the install location exists
 
-// 	n = parseInt(bminor) - parseInt(aminor);
-// 	if (n !== 0) {
-// 		return n;
-// 	}
+		await mkdir(titaniumDir, { recursive: true });
 
-// 	n = parseInt(bpatch) - parseInt(apatch);
-// 	if (n !== 0) {
-// 		return n;
-// 	}
+		// step 1: determine what the uri is
 
-// 	if (atag && btag) {
-// 		return sortTypes.indexOf(btag) - sortTypes.indexOf(atag);
-// 	}
+		const { downloadedFile, file } = await getInstallFile({
+			branch: cli.argv.branch,
+			config,
+			logger,
+			osName,
+			showProgress,
+			subject
+		});
 
-// 	return atag ? -1 : btag ? 1 : 0;
-// }
+		// step 2: extract the sdk zip file
 
-// /**
-//  * @param {Object} logger - The logger instance
-//  * @param {Object} config - The CLI config object
-//  * @param {CLI} cli - The CLI instance
-//  */
-// async function select(logger, config, cli) {
-// 	// we only care about SDKs that are 3.0 or newer
-// 	// also we sort before filter so that the invalid SDKs print in some order
-// 	const vers = Object.keys(cli.env.sdks)
-// 		.filter(v => {
-// 			const s = cli.env.sdks[v];
-// 			const name = s.manifest && s.manifest.version || s.name;
-// 			return appc.version.gte(name, '3.2.0');
-// 		})
-// 		.sort(sortVersion);
+		const { name, tempDir } = await extractSDK({
+			file,
+			force: cli.argv.force,
+			logger,
+			noPrompt: !cli.argv.prompt,
+			osName,
+			showProgress,
+			subject,
+			titaniumDir
+		});
 
-// 	// check we even have any (valid) SDKs installed
-// 	if (!vers.length) {
-// 		const error = 'No suitable Titanium SDKs installed';
-// 		// TODO: provide a command to install latest GA?
-// 		logger.error(error + '\n');
-// 		throw new TiError(error); // NOTE: this used to log this normally and treat as "success"
-// 	}
+		// step 3: validate the manifest.json
 
-// 	// if they specified 'latest' or 'stable', then determine the latest/stable version
-// 	let selectedSDK = cli.argv.version?.toLowerCase();
-// 	if (selectedSDK in releaseTypeMap) {
-// 		selectedSDK = vers.find(v => {
-// 			const m = v.toLowerCase().match(versionRegExp);
-// 			return m && m[4] === releaseTypeMap[selectedSDK];
-// 		});
-// 	}
+		const src = name && join(tempDir, 'mobilesdk', osName, name);
+		if (name) {
+			try {
+				await fs.readJson(join(src, 'manifest.json'));
+			} catch (e) {
+				name = null;
+			}
+		}
+		if (!name) {
+			throw new TiError('Zip file does not contain a valid Titanium SDK');
+		}
 
-// 	// we have a version, see if it's valid
-// 	const selected = selectedSDK && vers.find(ver => ver.toLowerCase() === selectedSDK);
-// 	if (selected) {
-// 		// need to force the config to reload
-// 		config.load();
-// 		config.set('sdk.selected', selected);
-// 		config.save();
-// 		logger.log('Configuration saved\n');
-// 		return;
-// 	}
+		// step 4: move the sdk files to the dest
 
-// 	const noPrompt = !cli.argv.prompt;
-// 	if (selectedSDK) {
-// 		const error = `Invalid Titanium SDK "${cli.argv.version}"`;
-// 		logger.error(error + '\n');
-// 		appc.string.suggest(selectedSDK, vers, logger.log.bind(logger));
-// 		// if prompting is disabled, then we're done
-// 		if (noPrompt) {
-// 			throw new TiError(error);
-// 		}
-// 	} else if (noPrompt) {
-// 		// no version supplied, no prompting, show error and exit
-// 		const error = 'No SDK version specified';
-// 		logger.error(error + '\n');
-// 		logger.log(`Usage: ${cyan(`${cli.argv.$} sdk select <version>`)}\n`);
-// 		throw new TiError(error);
-// 	}
+		const dest = join(titaniumDir, 'mobilesdk', osName, name);
+		logger.log(`\n\nInstalling SDK files to ${cyan(dest)}`);
+		await fs.mkdirs(dest);
+		await fs.move(src, dest, { overwrite: true });
 
-// 	// get the current SDK
-// 	let activeSDK = config.get('sdk.selected', config.get('app.sdk', 'latest'));
+		// step 5: install the modules
 
-// 	// prompt for the sdk version to select
-// 	if (activeSDK === 'latest') {
-// 		activeSDK = vers.find(v => {
-// 			const m = v.toLowerCase().match(versionRegExp);
-// 			return m && m[4] === releaseTypeMap[activeSDK];
-// 		});
-// 	}
-
-// 	const activeLabel = ' [selected]';
-// 	const maxlen = vers.reduce(function (a, b) {
-// 		return Math.max(a, b.length + (b === activeSDK ? activeLabel.length : 0));
-// 	}, 0);
-
-// 	return new Promise(resolve => {
-// 		fields.select({
-// 			default: cli.env.sdks[activeSDK] ? activeSDK : undefined,
-// 			promptLabel: 'Titanium SDK version to select',
-// 			complete: true,
-// 			completeIgnoreCase: true,
-// 			numbered: true,
-// 			margin: '',
-// 			options: {
-// 				'Installed SDKs:': vers.map(function (v) {
-// 					return {
-// 						path: cli.env.sdks[v].path,
-// 						value: v
-// 					};
-// 				})
-// 			},
-// 			formatters: {
-// 				option: function (opt, idx, num) {
-// 					var d = opt.value === activeSDK ? activeLabel : '',
-// 						n = maxlen + 2 - opt.value.length - d.length;
-// 					return '  ' + num + cyan(opt.value) + gray(d) + new Array(n + 1).join(' ') + opt.path;
-// 				}
-// 			},
-// 			validate: function (value) {
-// 				if (!cli.env.sdks[value]) {
-// 					logger.error(`Invalid Titanium SDK "${value}"`);
-// 					return false;
-// 				}
-// 				return true;
-// 			}
-// 		}).prompt(function (err, value) {
-// 			if (err && err.message === 'cancelled') {
-// 				logger.log('\n');
-// 				return resolve();
-// 			}
-
-// 			// need to force the config to reload
-// 			config.load();
-// 			config.set('sdk.selected', value);
-// 			config.save();
-
-// 			logger.log('\nConfiguration saved\n');
-// 			resolve();
-// 		});
-// 	});
-// }
-
-// /**
-//  * Installs the specified Titanium SDK.
-//  * @memberof SdkSubcommands
-//  * @param {Object} logger - The logger instance
-//  * @param {Object} config - The CLI config object
-//  * @param {CLI} cli - The CLI instance
-//  * @param {Function} finished - Callback when the command finishes
-//  */
-// SdkSubcommands.install = {
-// 	conf(_logger, _config, _cli) {
-// 		return {
-// 			// command examples:
-// 			// ti sdk install
-// 			// ti sdk install --default
-// 			// ti sdk install latest
-// 			// ti sdk install latest-rc
-// 			// ti sdk install latest-beta
-// 			// ti sdk install something.zip
-// 			// ti sdk install something.zip --default
-// 			// ti sdk install http://builds.appcelerator.com/mobile/master/mobilesdk-3.2.0.v20130612114042-osx.zip
-// 			// ti sdk install 3.1.0.GA
-// 			// ti sdk install 3.1.0.GA --default
-// 			// ti sdk install master:11.1.0.v20220614174006
-// 			desc: 'download the latest Titanium SDK or a specific version',
-// 			args: [
-// 				{
-// 					desc: 'the version to install, "latest", URL, zip file, or <branch>:<build_name>',
-// 					name: 'version',
-// 					required: true
-// 				}
-// 			],
-// 			flags: {
-// 				default: {
-// 					abbr: 'd',
-// 					desc: 'set as default SDK'
-// 				},
-// 				force: {
-// 					abbr: 'f',
-// 					desc: 'force re-install'
-// 				},
-// 				'keep-files': {
-// 					abbr: 'k',
-// 					desc: 'keep downloaded files after install'
-// 				}
-// 			},
-// 			options: {
-// 				branch: {
-// 					abbr: 'b',
-// 					desc: 'the branch to install from or "latest" (stable)',
-// 					hint: 'branch name'
-// 				}
-// 			}
-// 		};
-// 	},
-// 	fn: callbackify(install)
-// };
-
-// /**
-//  * A regex to test if a string is a URL or path to a zip file.
-//  * @type {RegExp}
-//  */
-// const uriRegExp = /^(https?:\/\/.+)|(?:file:\/\/(.+))$/;
-
-// /**
-//  * @param {Object} logger - The logger instance
-//  * @param {Object} config - The CLI config object
-//  * @param {CLI} cli - The CLI instance
-//  */
-// async function install(logger, config, cli) {
-// 	const titaniumDir  = expand(cli.env.installPath);
-// 	const osName       = cli.env.os.name;
-// 	const branch       = cli.argv.branch;
-// 	let force          = cli.argv.force;
-// 	const keepFiles    = cli.argv['keep-files'];
-// 	const noPrompt     = !cli.argv.prompt;
-// 	const setDefault   = cli.argv.default || !Object.keys(cli.env.sdks).length;
-// 	const subject      = cli.argv.version;
-// 	const showProgress = !cli.argv.quiet && !cli.argv['no-progress-bars'];
-// 	let uri            = (subject || 'latest').trim().toLowerCase();
-// 	const uriMatch     = subject?.match(uriRegExp);
-// 	let downloadedFile = null;
-// 	let file           = null;
-// 	let url            = null;
-// 	const releases     = await getReleases(osName, true);
-
-// 	// step 0: make sure the install location exists
-
-// 	await ensureInstallLocation(titaniumDir);
-
-// 	// step 1: determine what the uri is
-
-// 	if (uriMatch && uriMatch[2]) {
-// 		file = uriMatch[2];
-// 	} else if (subject && fs.existsSync(subject)) {
-// 		file = subject;
-// 	}
-
-// 	if (file) {
-// 		file = expand(file);
-
-// 		if (!fs.existsSync(file)) {
-// 			throw new TiError('Specified file does not exist');
-// 		}
-
-// 		if (!/\.zip$/.test(file)) {
-// 			throw new TiError('Specified file is not a zip file');
-// 		}
-// 	} else {
-// 		// we are downloading an sdk
-
-// 		if (uriMatch && uriMatch[1]) {
-// 			// we have a http url
-// 			url = uriMatch[1];
-// 		} else if (branch) {
-// 			// we have a ci build
-// 			const branches = await getBranches();
-// 			if (!branches.includes(branch)) {
-// 				let str = '';
-// 				appc.string.suggest(branch, branches, s => {
-// 					str += (s || '') + '\n';
-// 				}, 2);
-// 				str += 'Available Branches:\n';
-// 				str += cyan(appc.string.renderColumns(branches, '    ', 100));
-				// throw new TiError(`Branch "${branch}" does not exist`, {
-				// 	after: str
-				// });
-// 			}
-
-// 			const builds = await getBranchBuilds(branch, osName);
-// 			const build = uri === 'latest' ? builds[0] : builds.find(b => b.name.toLowerCase() === uri);
-// 			if (!build) {
-// 				throw new TiError(`CI build ${subject} does not exist`);
-// 			}
-
-// 			const asset = build.assets.find(a => a.os === osName);
-// 			if (!asset) {
-// 				throw new TiError(`CI build ${subject} does not support ${osName}`);
-// 			}
-
-// 			url = asset.url;
-// 		} else {
-// 			// try to find the release by name
-// 			let release = null;
-
-// 			if (uri === 'latest') {
-// 				release = releases.find(r => r.type === 'ga');
-// 			} else if (uri === 'latest-rc') {
-// 				release = releases.find(r => r.type === 'rc');
-// 			} else if (uri === 'latest-beta') {
-// 				release = releases.find(r => r.type === 'beta');
-// 			} else {
-// 				release = releases.find(r => r.name.toLowerCase() === uri);
-// 				if (!release) {
-// 					const name = `${uri}.ga`;
-// 					release = releases.find(r => r.name.toLowerCase() === name);
-// 				}
-// 			}
-
-// 			if (release) {
-// 				const asset = release.assets.find(a => a.os === osName);
-// 				if (!asset) {
-// 					throw new TiError(`SDK release ${subject} does not support ${osName}`);
-// 				}
-// 				url = asset.url;
-// 			}
-// 		}
-
-// 		if (!url) {
-// 			throw new TiError(`Unable to find any Titanium SDK releases or CI builds that match "${subject}"`);
-// 		}
-
-// 		// step 1.5: download the file
-
-// 		downloadedFile = tmp.tmpNameSync({
-// 			prefix: 'titanium-',
-// 			postfix: '.zip'
-// 		});
-// 		const downloadDir = path.dirname(downloadedFile);
-// 		await fs.mkdirp(downloadDir);
-
-// 		file = await new Promise((resolve, reject) => {
-// 			let bar;
-// 			let busy;
-// 			let last = 0;
-// 			let total = 0;
-
-// 			logger.log(`Downloading ${cyan(url)}`);
-
-// 			const stream = got.stream(url, { retry: 0 })
-// 				.on('downloadProgress', ({ transferred }) => {
-// 					if (bar) {
-// 						bar?.tick(transferred - last);
-// 						last = transferred;
-// 					}
-// 				})
-// 				.on('error', err => {
-// 					if (bar) {
-// 						bar.tick(total);
-// 						logger.log('\n');
-// 					}
-// 					reject(err);
-// 				})
-// 				.on('response', response => {
-// 					const { headers } = response;
-// 					const cd = headers['content-disposition'];
-// 					let m = cd && cd.match(/filename[^;=\n]*=['"]*(.*?\2|[^'";\n]*)/);
-// 					let filename = m && m[1];
-
-// 					// try to determine the file extension by the filename in the url
-// 					if (!filename && (m = url.match(/.*\/(.+\.zip)$/))) {
-// 						filename = m[1];
-// 					}
-
-// 					total = parseInt(headers['content-length']);
-// 					if (showProgress) {
-// 						if (total) {
-// 							bar = new appc.progress('  :paddedPercent [:bar]', {
-// 								complete: cyan('='),
-// 								incomplete: gray('.'),
-// 								width: 40,
-// 								total
-// 							});
-// 						} else {
-// 							busy = new busyindicator();
-// 							busy.start();
-// 						}
-// 					}
-
-// 					const out = fs.createWriteStream(downloadedFile);
-// 					out.on('error', err => {
-// 						if (bar) {
-// 							bar.tick(total);
-// 						}
-// 						reject(err);
-// 					});
-// 					out.on('close', () => {
-// 						if (bar) {
-// 							bar.tick(total);
-// 						} else if (busy) {
-// 							busy.stop();
-// 							logger.log();
-// 						}
-
-// 						let file = downloadedFile;
-// 						if (filename) {
-// 							file = path.join(downloadDir, filename);
-// 							fs.moveSync(downloadedFile, file, { overwrite: true });
-// 						}
-
-// 						setTimeout(() => {
-// 							if (bar) {
-// 								logger.log('\n');
-// 							}
-// 							resolve(file);
-// 						}, 250);
-// 					});
-// 					stream.pipe(out);
-// 				});
-// 		});
-// 	}
-
-// 	// step 2: extract the sdk zip file
-
-// 	// eslint-disable-next-line security/detect-non-literal-regexp
-// 	const sdkDestRegExp = new RegExp(`^mobilesdk[/\\\\]${osName}[/\\\\]([^/\\\\]+)`);
-// 	let tempDir = tmp.tmpNameSync({ prefix: 'titanium-' });
-// 	let tempArtifactDir = tmp.tmpNameSync({ prefix: 'titanium-' });
-// 	let name;
-// 	let src;
-
-// 	try {
-// 		let bar;
-
-// 		const zipFile = await extractArtifactZip({
-// 			dest: tempArtifactDir,
-// 			file,
-// 			logger
-// 		});
-
-// 		await extractZip({
-// 			dest: tempDir,
-// 			file: zipFile,
-// 			logger,
-// 			async onEntry(filename, idx, total) {
-// 				// do a quick check to make sure the destination doesn't exist
-// 				const m = !name && filename.match(sdkDestRegExp);
-// 				if (m) {
-// 					name = m[1];
-
-// 					const sdkDir = path.join(titaniumDir, 'mobilesdk', osName, name);
-// 					if (!force && isDir(sdkDir)) {
-// 						// already installed
-// 						const latest = releases.find(r => r.type === 'ga');
-// 						const tip = `Run '${`${cli.argv.$} sdk install ${latest.name} --force`.cyan}' to re-install`;
-// 						if (noPrompt) {
-// 							if (subject === 'latest' && name === latest.name) {
-								// throw new TiError(`Titanium SDK ${name} is already installed`, {
-								// 	after: `You're up-to-date. Version ${latest.name.cyan} is currently the newest version available.\n${tip}`
-								// });
-// 							}
-							// throw new TiError(`Titanium SDK ${name} is already installed`, {
-							// 	after: tip
-							// });
-// 						}
-
-// 						await new Promise(resolve => {
-// 							logger.log();
-// 							logger.log(`Titanium SDK ${name} is already installed!`.yellow);
-// 							fields.select({
-// 								promptLabel: 'Overwrite?',
-// 								display: 'prompt',
-// 								default: 'yes',
-// 								options: [ 'yes', 'no' ]
-// 							}).prompt(function (err, value) {
-// 								force = !err && value !== 'no';
-// 								logger.log();
-// 								if (!force) {
-// 									logger.log(`\n${tip}`);
-// 									process.exit();
-// 								}
-// 								resolve();
-// 							});
-// 						});
-// 					}
-
-// 					if (showProgress) {
-// 						if (!bar) {
-// 							bar = new appc.progress('  :paddedPercent [:bar]', {
-// 								complete: '='.cyan,
-// 								incomplete: '.'.grey,
-// 								width: 40,
-// 								total
-// 							});
-// 						}
-// 					}
-// 				}
-
-// 				bar?.tick();
-// 			}
-// 		});
-// 		logger.log('\n');
-
-// 		// validate the manifest.json
-// 		if (name) {
-// 			src = path.join(tempDir, 'mobilesdk', osName, name);
-// 			try {
-// 				await fs.readJson(path.join(src, 'manifest.json'));
-// 			} catch (e) {
-// 				name = null;
-// 			}
-// 		}
-
-// 		if (!name) {
-// 			throw new TiError('Zip file does not contain a valid Titanium SDK');
-// 		}
-
-// 		// step 3: move the sdk files to the dest
-
-// 		const dest = path.join(titaniumDir, 'mobilesdk', osName, name);
-// 		logger.log(`Installing SDK files to ${dest.cyan}`);
-// 		await fs.mkdirs(dest);
-// 		await fs.move(src, dest, { overwrite: true });
-
-// 		// install the modules
-
-// 		const modules = [];
-// 		src = path.join(tempDir, 'modules');
+		const modules = [];
+// 		src = join(tempDir, 'modules');
 // 		if (isDir(src)) {
-// 			const modulesDest = path.join(titaniumDir, 'modules');
+// 			const modulesDest = join(titaniumDir, 'modules');
 
 // 			for (const platform of fs.readdirSync(src)) {
-// 				const srcPlatformDir = path.join(src, platform);
+// 				const srcPlatformDir = join(src, platform);
 // 				if (!isDir(srcPlatformDir)) {
 // 					continue;
 // 				}
 
 // 				for (const moduleName of fs.readdirSync(srcPlatformDir)) {
-// 					const srcModuleDir = path.join(srcPlatformDir, moduleName);
+// 					const srcModuleDir = join(srcPlatformDir, moduleName);
 // 					if (!isDir(srcModuleDir)) {
 // 						continue;
 // 					}
 
 // 					for (const ver of fs.readdirSync(srcModuleDir)) {
-// 						const srcVersionDir = path.join(srcModuleDir, ver);
+// 						const srcVersionDir = join(srcModuleDir, ver);
 // 						if (!isDir(srcVersionDir)) {
 // 							continue;
 // 						}
 
-// 						const destDir = path.join(modulesDest, platform, moduleName, ver);
+// 						const destDir = join(modulesDest, platform, moduleName, ver);
 // 						if (!force && isDir(destDir)) {
 // 							continue;
 // 						}
@@ -822,416 +393,438 @@ ${humanize.filesize(b.assets.find(a => a.os === os).size, 1024, 1).toUpperCase()
 // 				await fs.move(src, dest, { overwrite: true });
 // 			}
 // 		}
-// 	} finally {
-// 		if (downloadedFile && !keepFiles) {
-// 			await fs.remove(downloadedFile);
-// 		}
-// 		await fs.remove(tempDir);
-// 		await fs.remove(tempArtifactDir);
-// 	}
 
-// 	if (setDefault) {
-// 		logger.log(`Setting Titanium SDK ${name.cyan} as the default`);
-// 		config.load();
-// 		config.set('sdk.selected', name);
-// 		config.save();
-// 	}
+		// step 6: cleanup
 
-// 	logger.log(`\nTitanium SDK ${name.cyan} successfully installed. Run '${`${cli.argv.$} sdk select`.cyan}' to select your main Titanium SDK.\n`);
-// }
+		if (downloadedFile && !cli.argv['keep-files']) {
+			await fs.remove(downloadedFile);
+		}
+		await fs.remove(tempDir);
 
-// /**
-//  * Validates the zip that has been requested to be installed. This is because when downloading a
-//  * GitHub artifact the actual SDK zip will be placed inside a zip which will cause the extract to
-//  * fail. If this zip is a GitHub artifact then it will be unzipped and the resulting zip will be
-//  * returned.
-//  *
-//  * @param {Object} params - Various parameters.
-//  * @param {String} params.dest - The path to extract the artifact to.
-//  * @param {String} params.file - The zip file to extract the artifact from.
-//  * @param {Object} params.logger - The logger instance.
-//  * @returns {String} - The correct path to install.
-//  */
-// async function extractArtifactZip(params) {
-// 	if (!params || typeof params !== 'object') {
-// 		throw new TypeError('Expected params to be an object');
-// 	}
+		logger.log(`\nTitanium SDK ${cyan(name)} successfully installed!`);
+	}
+};
 
-// 	let { dest, file, logger } = params;
+async function getInstallFile({ branch, config, logger, osName, showProgress, subject }) {
+	const uriMatch = subject?.match(/^(https?:\/\/.+)|(?:file:\/\/(.+))$/);
+	let file;
 
-// 	if (!dest || typeof dest !== 'string') {
-// 		throw new TypeError('Expected destination directory to be a non-empty string');
-// 	}
+	if (uriMatch && uriMatch[2]) {
+		file = uriMatch[2];
+	} else if (subject && fs.existsSync(subject)) {
+		file = subject;
+	}
 
-// 	if (!file || typeof file !== 'string') {
-// 		throw new TypeError('Expected zip file to be a non-empty string');
-// 	}
+	if (file) {
+		file = expand(file);
 
-// 	if (!fs.existsSync(file)) {
-// 		throw new TiError('The specified zip file does not exist');
-// 	}
+		if (!fs.existsSync(file)) {
+			throw new TiError('Specified file does not exist');
+		}
 
-// 	if (!fs.statSync(file).isFile()) {
-// 		throw new TiError('The specified zip file is not a file');
-// 	}
+		if (!/\.zip$/.test(file)) {
+			throw new TiError('Specified file is not a zip file');
+		}
+		return { file };
+	}
 
-// 	return await new Promise((resolve, reject) => {
-// 		yauzl.open(file, { lazyEntries: true }, (err, zipfile) => {
-// 			if (err) {
-// 				return reject(new TiError(`Invalid zip file: ${err.message || err}`));
-// 			}
+	// we are downloading an sdk
 
-// 			if (zipfile.entryCount > 1) {
-// 				zipfile.close();
-// 				return resolve(file);
-// 			}
+	let url;
+	let uri = subject.toLowerCase();
+	if (uriMatch && uriMatch[1]) {
+		// we have a http url
+		url = uriMatch[1];
+	} else if (branch) {
+		// we have a ci build
+		const branches = await getBranches();
+		if (!branches.includes(branch)) {
+			throw new TiError(`Branch "${branch}" does not exist`, {
+				after: `${
+					suggest(branch, branches, 2)
+				}Available Branches:\n${
+					columns(branches, '    ', config.get('cli.width', 80))
+				}`
+			});
+		}
 
-// 			logger.log('Extracting SDK artifact');
+		const builds = await getBranchBuilds(branch, osName);
+		const build = uri === 'latest' ? builds[0] : builds.find(b => b.name.toLowerCase() === uri);
+		if (!build) {
+			throw new TiError(`CI build ${subject} does not exist`);
+		}
 
-// 			const abort = err => {
-// 				zipfile.close();
-// 				reject(err);
-// 			};
+		const asset = build.assets.find(a => a.os === osName);
+		if (!asset) {
+			throw new TiError(`CI build ${subject} does not support ${osName}`);
+		}
 
-// 			zipfile
-// 				.on('entry', entry => {
-// 					const mode = (entry.externalFileAttributes >>> 16) || 0o644;
-// 					const isSymlink = (mode & fs.constants.S_IFMT) === fs.constants.S_IFLNK;
-// 					let isDir = (mode & fs.constants.S_IFMT) === fs.constants.S_IFDIR;
+		url = asset.url;
+	} else {
+		// try to find the release by name
+		let release = null;
 
-// 					// check for windows weird way of specifying a directory
-// 					// https://github.com/maxogden/extract-zip/issues/13#issuecomment-154494566
-// 					const madeBy = entry.versionMadeBy >> 8;
-// 					if (!isDir) {
-// 						isDir = (madeBy === 0 && entry.externalFileAttributes === 16);
-// 					}
+		const releases = await getReleases(osName, true);
+		if (uri === 'latest') {
+			release = releases.find(r => r.type === 'ga');
+		} else if (uri === 'latest-rc') {
+			release = releases.find(r => r.type === 'rc');
+		} else if (uri === 'latest-beta') {
+			release = releases.find(r => r.type === 'beta');
+		} else {
+			release = releases.find(r => r.name.toLowerCase() === uri);
+			if (!release) {
+				const name = `${uri}.ga`;
+				release = releases.find(r => r.name.toLowerCase() === name);
+			}
+		}
 
-// 					if (!entry.fileName.endsWith('.zip') || isSymlink || isDir) {
-// 						return abort(new TiError('Invalid SDK: does not contain a SDK zip file'));
-// 					}
+		if (release) {
+			const asset = release.assets.find(a => a.os === osName);
+			if (!asset) {
+				throw new TiError(`SDK release ${subject} does not support ${osName}`);
+			}
+			url = asset.url;
+		}
+	}
 
-// 					const fullPath = path.join(dest, entry.fileName);
-// 					fs.mkdirp(path.dirname(fullPath), () => {
-// 						zipfile.openReadStream(entry, (err, readStream) => {
-// 							if (err) {
-// 								return abort(err);
-// 							}
+	if (!url) {
+		throw new TiError(`Unable to find any Titanium SDK releases or CI builds that match "${subject}"`);
+	}
 
-// 							const writeStream = fs.createWriteStream(fullPath,  { mode });
-// 							writeStream.on('close', () => {
-// 								zipfile.close();
-// 								resolve(fullPath);
-// 							});
-// 							writeStream.on('error', abort);
-// 							readStream.pipe(writeStream);
-// 						});
-// 					});
-// 				})
-// 				.readEntry();
-// 		});
-// 	});
-// }
+	// step 1.5: download the file
 
-// /**
-//  * Extracts a SDK zip file to the destination.
-//  *
-//  * @param {Object} params - Various parameters.
-//  * @param {String} params.dest - The path to extract the SDK to.
-//  * @param {String} params.file - The zip file to extract.
-//  * @param {Object} params.logger - The logger instance.
-//  * @returns {String} - The correct path to install.
-//  */
-// async function extractZip(params) {
-// 	if (!params || typeof params !== 'object') {
-// 		throw new TypeError('Expected params to be an object');
-// 	}
+	const downloadedFile = tmpNameSync({
+		prefix: 'titanium-',
+		postfix: '.zip'
+	});
+	const downloadDir = dirname(downloadedFile);
+	await mkdir(downloadDir, { recursive: true });
 
-// 	let { dest, file, logger } = params;
+	logger.log(`Downloading ${cyan(url)}`);
 
-// 	if (!dest || typeof dest !== 'string') {
-// 		throw new TypeError('Expected destination directory to be a non-empty string');
-// 	}
+	let bar;
+	let busy;
+	let filename;
+	let total;
+	const out = fs.createWriteStream(downloadedFile);
+	let response = await request(url);
 
-// 	if (!file || typeof file !== 'string') {
-// 		throw new TypeError('Expected zip file to be a non-empty string');
-// 	}
+	if ([301, 302].includes(response.statusCode)) {
+		response = await request(response.headers.location);
+	}
 
-// 	if (!fs.existsSync(file)) {
-// 		throw new TiError('The specified zip file does not exist');
-// 	}
+	const cd = response.headers['content-disposition'];
+	let m = cd && cd.match(/filename[^;=\n]*=['"]*(.*?\2|[^'";\n]*)/);
+	filename = m && m[1];
 
-// 	if (!fs.statSync(file).isFile()) {
-// 		throw new TiError('The specified zip file is not a file');
-// 	}
+	// try to determine the file extension by the filename in the url
+	if (!filename && (m = url.match(/.*\/(.+\.zip)$/))) {
+		filename = m[1];
+	}
 
-// 	return await new Promise((resolve, reject) => {
-// 		yauzl.open(file, { lazyEntries: true }, (err, zipfile) => {
-// 			if (err) {
-// 				return reject(new TiError(`Invalid zip file: ${err.message || err}`));
-// 			}
+	total = parseInt(response.headers['content-length']);
 
-// 			let idx = 0;
-// 			const total = zipfile.entryCount;
-// 			const abort = err => {
-// 				zipfile.removeListener('end', resolve);
-// 				zipfile.close();
-// 				reject(err);
-// 			};
+	if (showProgress) {
+		if (total) {
+			bar = new ProgressBar('  :paddedPercent [:bar]', {
+				complete: cyan('='),
+				incomplete: gray('.'),
+				width: 40,
+				total
+			});
+		} else {
+			busy = new BusyIndicator();
+			busy.start();
+		}
+	}
 
-// 			logger.log('Extracting SDK');
+	const progressStream = new Transform({
+		transform(chunk, _encoding, callback) {
+			bar?.tick(chunk.length);
+			this.push(chunk);
+			callback();
+		}
+	});
 
-// 			zipfile
-// 				.on('entry', async entry => {
-// 					idx++;
-// 					if (typeof params.onEntry === 'function') {
-// 						try {
-// 							await params.onEntry(entry.fileName, idx, total);
-// 						} catch (e) {
-// 							return abort(e);
-// 						}
-// 					}
+	await pipeline(response.body, progressStream, out);
 
-// 					const fullPath = path.join(dest, entry.fileName);
-// 					const mode = (entry.externalFileAttributes >>> 16) || 0o644;
+	out.close();
+	busy?.stop();
+	bar?.tick(total);
+	if (bar) {
+		logger.log('\n');
+	}
 
-// 					const isSymlink = (mode & fs.constants.S_IFMT) === fs.constants.S_IFLNK;
-// 					let isDir = (mode & fs.constants.S_IFMT) === fs.constants.S_IFDIR;
+	if (filename) {
+		file = join(downloadDir, filename);
+		await fs.move(downloadedFile, file, { overwrite: true });
+	} else {
+		file = downloadedFile;
+	}
 
-// 					// check for windows weird way of specifying a directory
-// 					// https://github.com/maxogden/extract-zip/issues/13#issuecomment-154494566
-// 					const madeBy = entry.versionMadeBy >> 8;
-// 					if (!isDir) {
-// 						isDir = (madeBy === 0 && entry.externalFileAttributes === 16);
-// 					}
+	return { downloadedFile, file };
+}
 
-// 					if (isSymlink) {
-// 						// skip symlinks because A) we don't really need them and B) we can't
-// 						// reliably create them on Windows due to the default security policy
-// 						// only allows administrators to create symlinks
-// 						zipfile.readEntry();
-// 					} else if (isDir) {
-// 						fs.mkdirp(fullPath, () => zipfile.readEntry());
-// 					} else {
-// 						fs.mkdirp(path.dirname(fullPath), () => {
-// 							zipfile.openReadStream(entry, (err, readStream) => {
-// 								if (err) {
-// 									return abort(err);
-// 								}
+async function extractSDK({ file, force, logger, noPrompt, osName, showProgress, subject, titaniumDir }) {
+	const sdkDestRegExp = new RegExp(`^mobilesdk[/\\\\]${osName}[/\\\\]([^/\\\\]+)`);
+	const tempDir = tmpNameSync({ prefix: 'titanium-' });
+	let artifact;
+	let bar;
+	let name;
 
-// 								const writeStream = fs.createWriteStream(fullPath,  { mode });
-// 								writeStream.on('close', () => zipfile.readEntry());
-// 								writeStream.on('error', abort);
-// 								readStream.pipe(writeStream);
-// 							});
-// 						});
-// 					}
-// 				})
-// 				.once('end', resolve)
-// 				.readEntry();
-// 		});
-// 	});
-// }
+	const onEntry = async (filename, _idx, total) => {
+		if (total > 1) {
+			const m = !name && filename.match(sdkDestRegExp);
+			if (m) {
+				name = m[1];
+				await checkSDKFile({
+					force,
+					logger,
+					name,
+					noPrompt,
+					osName,
+					sdkDir: join(titaniumDir, 'mobilesdk', osName, name),
+					subject
+				});
 
-// function isDir(dir) {
-// 	try {
-// 		return fs.statSync(dir).isDirectory();
-// 	} catch (e) {
-// 		// squelch
-// 	}
-// 	return false;
-// }
+				if (showProgress && !bar) {
+					bar = new ProgressBar('  :paddedPercent [:bar]', {
+						complete: cyan('='),
+						incomplete: gray('.'),
+						width: 40,
+						total
+					});
+				}
+			}
 
-// /**
-//  * Ensures the install location exists and we have write access to it
-//  * @param {string} installLocation directory we plan to install the SDK to
-//  * @returns {Promise<void>}
-//  * @throws {Error} if unable to create install directory, or it is not writable
-//  */
-// async function ensureInstallLocation(installLocation) {
-// 	try {
-// 		await fs.ensureDir(installLocation);
-// 	} catch (ex) {
-// 		let str = `Unable to create installation location: ${installLocation}\n`;
-// 		if (ex.code === 'EACCES') {
-// 			str += 'Permission denied\n';
-// 		} else {
-// 			str += ex.toString();
-// 		}
-// 		throw new TiError(str);
-// 	}
+			bar?.tick();
+		} else {
+			artifact = filename;
+		}
+	};
 
-// 	// make sure sdk folder is writable when installing an sdk
-// 	if (!afs.isDirWritable(installLocation)) {
-// 		throw new TiError(`Installation location is not writable: ${installLocation}\n`);
-// 	}
-// }
+	logger.log('Extracting SDK...');
+	logger.trace(`Extracting ${file} -> ${tempDir}`);
+	await extractZip({
+		dest: tempDir,
+		file,
+		onEntry
+	});
 
-// /**
-//  * Uninstalls the specified Titanium SDK.
-//  * @memberof SdkSubcommands
-//  * @param {Object} logger - The logger instance
-//  * @param {Object} config - The CLI config object
-//  * @param {CLI} cli - The CLI instance
-//  * @param {Function} finished - Callback when the command finishes
-//  */
-// SdkSubcommands.uninstall = {
-// 	conf: function (_logger, _config, _cli) {
-// 		return {
-// 			desc: 'uninstall a specific Titanium SDK version',
-// 			args: [
-// 				{
-// 					desc: 'the version to uninstall',
-// 					name: 'version',
-// 					required: true
-// 				}
-// 			],
-// 			flags: {
-// 				force: {
-// 					abbr: 'f',
-// 					desc: 'force uninstall without confirmation'
-// 				}
-// 			}
-// 		};
-// 	},
-// 	fn: callbackify(uninstall)
-// };
+	if (!artifact) {
+		return { name, tempDir };
+	}
 
-// /**
-//  * @param {Object} logger - The logger instance
-//  * @param {Object} config - The CLI config object
-//  * @param {CLI} cli - The CLI instance
-//  * @returns {Promise<void>}
-//  */
-// async function uninstall(logger, config, cli) {
-// 	// Gather up current state of sdks...
-// 	const vers = appc.version.sort(Object.keys(cli.env.sdks)).reverse();
-// 	const activeSDK = config.get('sdk.selected', config.get('app.sdk', 'latest')) === 'latest' && vers.length ? vers[0] : config.get('sdk.selected', config.get('app.sdk'));
-// 	const activeLabel = ' [selected]';
-// 	const maxlen = vers.reduce(function (a, b) {
-// 		return Math.max(a, b.length + (b === activeSDK ? activeLabel.length : 0));
-// 	}, 0);
+	logger.trace(`Detected artifact: ${artifact}`);
+	const tempDir2 = tmpNameSync({ prefix: 'titanium-' });
+	file = join(tempDir, artifact);
 
-// 	let version = cli.argv.version;
-// 	const noPrompt = !cli.argv.prompt;
-// 	const force = cli.argv.force;
-// 	if (!version) {
-// 		// if they didn't specify a version and prompting is disabled, then exit
-// 		if (noPrompt) {
-// 			const error = 'No SDK version specified';
-// 			logger.error(error + '\n');
-// 			logger.log(`Usage: ${`${cli.argv.$} sdk uninstall <version>`.cyan}\n`);
-// 			throw new TiError(error);
-// 		}
-// 		// prompt for which sdk to remove
-// 		await new Promise((resolve, reject) => {
-// 			fields.select({
-// 				promptLabel: 'Titanium SDK version to uninstall',
-// 				complete: true,
-// 				numbered: true,
-// 				margin: '',
-// 				options: {
-// 					'Installed SDKs:': vers.map(v => {
-// 						return {
-// 							path: cli.env.sdks[v].path,
-// 							value: v
-// 						};
-// 					})
-// 				},
-// 				formatters: {
-// 					option: function (opt, idx, num) {
-// 						var d = opt.value === activeSDK ? activeLabel : '',
-// 							n = maxlen + 2 - opt.value.length - d.length;
-// 						return '  ' + num + opt.value.cyan + d.grey + new Array(n + 1).join(' ') + opt.path;
-// 					}
-// 				},
-// 				validate: function (value) {
-// 					if (!cli.env.sdks[value]) {
-// 						logger.error(`Invalid Titanium SDK "${value}"`);
-// 						return false;
-// 					}
-// 					return true;
-// 				}
-// 			}).prompt(function (err, value) {
-// 				if (err && err.message === 'cancelled') {
-// 					logger.log('\n');
-// 					return reject(err);
-// 				}
+	logger.trace(`Extracting ${file} -> ${tempDir2}`);
+	await extractZip({
+		dest: tempDir2,
+		file,
+		onEntry
+	});
 
-// 				logger.log();
-// 				version = value;
-// 				resolve();
-// 			});
-// 		});
-// 	}
+	await fs.remove(tempDir);
+	return { name, tempDir: tempDir2 };
+}
 
-// 	// Validate that the version exists
-// 	if (!vers.includes(version)) {
-// 		const error = `Titanium SDK "${version}" is not found`;
-// 		logger.error(error + '\n');
-// 		appc.string.suggest(version, vers, logger.log.bind(logger));
-// 		throw new TiError(error);
-// 	}
+async function checkSDKFile({ force, logger, name, noPrompt, osName, sdkDir, subject }) {
+	try {
+		if (force || !fs.statSync(sdkDir).isDirectory()) {
+			return;
+		}
+	} catch {
+		return;
+	}
 
-// 	if (!force) {
-// 		// Must specify --force if no prompt
-// 		if (noPrompt) {
-// 			const error = `To uninstall a Titanium SDK in non-interactive mode, you must use ${'--force'.cyan}`;
-// 			logger.error(error + '\n');
-// 			logger.log(`Usage: ${`${cli.argv.$} sdk uninstall ${version} --force`.cyan}\n`);
-// 			throw new TiError(error);
-// 		}
+	// already installed
+	const releases = await getReleases(osName, false);
+	const latest = releases[0];
+	const tip = `Run '${cyan(`titanium sdk install ${latest.name} --force`)}' to re-install`;
 
-// 		// prompt for confirmation
-// 		logger.log(`${`WARNING! This will permanently remove Titanium SDK ${version}!`.red}\n`);
-// 		await new Promise((resolve, reject) => {
-// 			fields.text({
-// 				promptLabel: `Enter '${version.cyan}' to confirm uninstall`,
-// 				validate: function (value) {
-// 					if (value !== version) {
-// 						logger.error('Incorrect, try again');
-// 						return false;
-// 					}
-// 					return true;
-// 				}
-// 			}).prompt(function (err) {
-// 				logger.log();
-// 				if (err) {
-// 					logger.log();
-// 					return reject(err);
-// 				}
-// 				resolve();
-// 			});
-// 		});
-// 	}
+	if (noPrompt) {
+		if (subject === 'latest' && name === latest.name) {
+			throw new TiError(`Titanium SDK ${name} is already installed`, {
+				after: `You're up-to-date. Version ${cyan(latest.name)} is currently the newest version available.\n${tip}`
+			});
+		}
+		throw new TiError(`Titanium SDK ${name} is already installed`, {
+			after: tip
+		});
+	}
 
-// 	try {
-// 		logger.log(`Removing SDK directory: ${cli.env.sdks[version].path.cyan}\n`);
-// 		await fs.remove(cli.env.sdks[version].path);
-// 	} catch (e) {
-// 		logger.error('An error occurred trying to remove the Titanium SDK folder:');
-// 		if (e.code === 'EACCES') {
-// 			logger.error('Permission denied\n');
-// 		} else {
-// 			e.toString().split('\n').forEach(function (line) {
-// 				line.trim() && logger.error(line);
-// 			});
-// 			logger.log();
-// 		}
-// 		throw e;
-// 	}
+	let renameTo;
+	for (let i = 2; true; i++) {
+		renameTo = `${sdkDir}-${i}`;
+		try {
+			if (!fs.statSync(renameTo).isDirectory()) {
+				break;
+			}
+		} catch {
+			break;
+		}
+	}
 
-// 	vers.splice(vers.indexOf(version), 1);
+	const { prompt } = (await import('prompts')).default;
+	const { action } = await prompt({
+		type: 'select',
+		name: 'action',
+		message: `Titanium SDK ${name} is already installed`,
+		instructions: false,
+		hint: 'Space to select. Return to submit',
+		choices: [
+			{ title: 'Overwrite', value: 'overwrite' },
+			{ title: `Rename as ${basename(renameTo)}`, value: 'rename' },
+			{ title: 'Abort', value: 'abort' }
+		]
+	});
 
-// 	if (config.get('sdk.selected', config.get('app.sdk')) === version) {
-// 		// need to force the config to reload
-// 		config.load();
-// 		config.set('sdk.selected', vers.shift() || 'latest');
-// 		config.save();
-// 		logger.log(`Updated selected Titanium SDK to ${config.sdk.selected.cyan}\n`);
-// 	}
+	if (!action || action === 'abort') {
+		process.exit(0);
+	}
 
-// 	logger.log(`Successfully uninstalled Titanium SDK ${version.cyan}\n`);
-// }
+	logger.log();
+
+	if (action === 'rename') {
+		return renameTo;
+	}
+
+	return sdkDir;
+}
+
+/**
+ * Uninstalls the specified Titanium SDK.
+ * @memberof SdkSubcommands
+ * @param {Object} logger - The logger instance
+ * @param {Object} config - The CLI config object
+ * @param {CLI} cli - The CLI instance
+ */
+SdkSubcommands.uninstall = {
+	conf(_logger, _config, _cli) {
+		return {
+			desc: 'uninstall a specific Titanium SDK versions',
+			args: [
+				{
+					desc: 'one or more SDK names to uninstall',
+					name: 'versions',
+					variadic: true
+				}
+			],
+			flags: {
+				force: {
+					abbr: 'f',
+					desc: 'force uninstall without confirmation'
+				}
+			}
+		};
+	},
+	async fn(logger, _config, cli) {
+		const vers = version.sort(Object.keys(cli.env.sdks)).reverse();
+		const { force } = cli.argv;
+		let versions = cli.argv._;
+
+		logger.skipBanner(false);
+		logger.banner();
+
+		if (!cli.argv.prompt) {
+			if (!versions.length) {
+				throw new TiError('Missing <version...> argument');
+			}
+			if (!force) {
+				throw new TiError('To uninstall a Titanium SDK in non-interactive mode, you must use --force');
+			}
+		}
+
+		const { prompt } = (await import('prompts')).default;
+
+		if (!versions.length) {
+			({ versions } = await prompt({
+				type: 'multiselect',
+				name: 'versions',
+				message: 'Which SDKs to uninstall?',
+				instructions: false,
+				hint: 'Space to select. Return to submit',
+				choices: vers.map(v => ({
+					title: v,
+					value: v
+				}))
+			}));
+			if (!versions) {
+				process.exit(0);
+			}
+			logger.log();
+		}
+
+		const found = versions.filter(v => vers.includes(v));
+		const maxlen = versions.reduce((a, b) => Math.max(a, b.length), 0);
+
+		if (!found.length) {
+			for (const v of versions) {
+				logger.log(` • ${cyan(v.padEnd(maxlen))}  ${cli.env.sdks[v]?.path || yellow('not found')}`)
+			}
+			process.exit(0);
+		}
+
+		if (!force) {
+			// prompt for confirmation
+			logger.log(`${yellow('WARNING!')} This will permanently remove the following Titanium SDKs:\n`);
+			for (const v of versions) {
+				logger.log(` • ${cyan(v.padEnd(maxlen))}  ${cli.env.sdks[v]?.path || yellow('not found')}`)
+			}
+			logger.log();
+
+			const { confirm } = await prompt({
+				type: 'toggle',
+				name: 'confirm',
+				message: 'Proceed?',
+				initial: false,
+				active: 'yes',
+				inactive: 'no'
+			});
+			if (!confirm) {
+				process.exit(0);
+			}
+			logger.log();
+		}
+
+		let busy;
+		if (!cli.argv.quiet && !!cli.argv['progress-bars']) {
+			busy = new BusyIndicator();
+			busy.start();
+		}
+
+		let results;
+		try {
+			results = await Promise.allSettled(found.map(async (ver) => {
+				const dir = cli.env.sdks[ver].path;
+				try {
+					await fs.remove(dir);
+					return dir;
+				} catch (e) {
+					throw new TiError(`Failed to remove ${dir}`, {
+						after: e.message
+					});
+				}
+			}));
+		} finally {
+			busy?.stop();
+		}
+
+		for (const r of results) {
+			if (r.status === 'fulfilled') {
+				logger.log(` ${green('√')} ${cyan(r.value)} removed`);
+			} else {
+				logger.log(` ${red(`× ${r.reason}`)}`);
+				if (r.reason.after) {
+					logger.log(`     ${red(r.reason.after)}`);
+				}
+			}
+		}
+	}
+};
 
 /**
  * Retrieves the list of releases.

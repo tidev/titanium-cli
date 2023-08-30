@@ -17,6 +17,6 @@ try {
 	}\n${
 		e.after ? `\n${e.after}\n` : ''
 	}`);
-	(cli.command || cli.program)?.help();
+	cli.command?.help();
 	process.exit(1);
 }

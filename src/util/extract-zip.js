@@ -1,5 +1,6 @@
 import yauzl from 'yauzl';
 import fs from 'node:fs';
+import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 
 /**
@@ -49,11 +50,14 @@ export async function extractZip(params) {
 			};
 
 			zipfile
-				.on('entry', entry => {
+				.on('entry', async entry => {
 					idx++;
 					if (typeof params.onEntry === 'function') {
 						try {
-							params.onEntry(entry.fileName, idx, total);
+							const d = await params.onEntry(entry.fileName, idx, total);
+							if (typeof d === 'string') {
+								dest = d;
+							}
 						} catch (e) {
 							return reject(e);
 						}
@@ -73,41 +77,40 @@ export async function extractZip(params) {
 					}
 
 					if (symlink) {
-						fs.mkdirp(path.dirname(fullPath), () => {
-							zipfile.openReadStream(entry, (err, readStream) => {
-								if (err) {
-									return abort(err);
-								}
+						await mkdir(path.dirname(fullPath), { recursive: true });
+						zipfile.openReadStream(entry, (err, readStream) => {
+							if (err) {
+								return abort(err);
+							}
 
-								const chunks = [];
-								readStream.on('data', chunk => chunks.push(chunk));
-								readStream.on('error', abort);
-								readStream.on('end', () => {
-									let str = Buffer.concat(chunks).toString('utf8');
-									if (fs.existsSync(fullPath)) {
-										fs.unlinkSync(fullPath);
-									}
-									fs.symlinkSync(str, fullPath);
-									zipfile.readEntry();
-								});
+							const chunks = [];
+							readStream.on('data', chunk => chunks.push(chunk));
+							readStream.on('error', abort);
+							readStream.on('end', () => {
+								let str = Buffer.concat(chunks).toString('utf8');
+								if (fs.existsSync(fullPath)) {
+									fs.unlinkSync(fullPath);
+								}
+								// fs.symlinkSync(str, fullPath);
+								zipfile.readEntry();
 							});
 						});
 					} else if (isDir) {
-						fs.mkdirp(fullPath, () => zipfile.readEntry());
+						await mkdir(fullPath, { recursive: true });
+						zipfile.readEntry();
 					} else {
-						fs.mkdirp(path.dirname(fullPath), () => {
-							zipfile.openReadStream(entry, (err, readStream) => {
-								if (err) {
-									return abort(err);
-								}
+						await mkdir(path.dirname(fullPath), { recursive: true });
+						zipfile.openReadStream(entry, (err, readStream) => {
+							if (err) {
+								return abort(err);
+							}
 
-								const writeStream = fs.createWriteStream(fullPath,  {
-									mode
-								});
-								writeStream.on('close', () => zipfile.readEntry());
-								writeStream.on('error', abort);
-								readStream.pipe(writeStream);
+							const writeStream = fs.createWriteStream(fullPath,  {
+								mode
 							});
+							writeStream.on('close', () => zipfile.readEntry());
+							writeStream.on('error', abort);
+							readStream.pipe(writeStream);
 						});
 					}
 				})
