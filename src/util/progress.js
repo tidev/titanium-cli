@@ -51,7 +51,7 @@ export class ProgressBar {
 			.replace(':elapsed', (elapsed / 1000).toFixed(1))
 			.replace(':eta', (eta / 1000).toFixed(1))
 			.replace(':percent', percent.toFixed(0) + '%')
-			.replace(':paddedPercent', `${percent.toFixed(0)}% `.padStart(4));
+			.replace(':paddedPercent', `${percent.toFixed(0)}% `.padStart(5));
 
 		if (tokens) {
 			for (const [key, value] of Object.entries(tokens)) {

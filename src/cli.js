@@ -150,6 +150,10 @@ export class CLI {
 			this.logger.skipBanner(true);
 		}
 
+		if (conf.alias) {
+			cmd.alias(conf.alias);
+		}
+
 		if (conf.flags) {
 			for (const [name, meta] of Object.entries(conf.flags)) {
 				this.logger.trace(`Adding "${cmdName}" flag: ${meta.abbr ? `-${meta.abbr}, ` : ''}--${name}`);
@@ -379,6 +383,7 @@ export class CLI {
 	 */
 	async executeCommand(args, isSubcommand) {
 		const cmd = args.pop();
+		this.argv._ = cmd.args;
 
 		if (isSubcommand) {
 			// Titanium CLI 6 and older had a CLI arg parser that did not
@@ -393,9 +398,7 @@ export class CLI {
 				ctx = ctx.parent;
 			}
 			// get rid of the subcommand
-			this.argv._ = ctx.args.slice(1);
-		} else {
-			this.argv._ = cmd.args;
+			this.argv._.unshift(ctx.args[1]);
 		}
 
 		this.applyArgv(cmd);

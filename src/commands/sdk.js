@@ -30,6 +30,9 @@ export function config(logger, config, cli) {
 	const subcommands = {};
 	for (const [name, subcmd] of Object.entries(SdkSubcommands)) {
 		subcommands[name] = subcmd.conf(logger, config, cli);
+		if (subcmd.alias) {
+			subcommands[name].alias = subcmd.alias;
+		}
 	}
 	return {
 		defaultSubcommand: 'list',
@@ -45,11 +48,14 @@ export function config(logger, config, cli) {
  * @param {CLI} cli - The CLI instance
  */
 export async function run(logger, config, cli) {
-	let action = cli.argv._.shift() || 'list';
-	if (!SdkSubcommands[action]) {
-		throw new TiError(`Invalid subcommand "${action}"`);
+	const action = cli.argv._.shift() || 'list';
+	for (const [name, subcommand] of Object.entries(SdkSubcommands)) {
+		if (action === name || action === subcommand.alias) {
+			await SdkSubcommands[name].fn(logger, config, cli);
+			return;
+		}
 	}
-	await SdkSubcommands[action].fn(logger, config, cli);
+	throw new TiError(`Invalid subcommand "${action}"`);
 }
 
 /**
@@ -60,6 +66,7 @@ export async function run(logger, config, cli) {
  * @param {CLI} cli - The CLI instance
  */
 SdkSubcommands.list = {
+	alias: 'ls',
 	conf(_logger, _config, _cli) {
 		return {
 			desc: 'print a list of installed SDK versions',
@@ -249,6 +256,7 @@ ${humanize.filesize(b.assets.find(a => a.os === os).size, 1024, 1).toUpperCase()
  * @param {Function} finished - Callback when the command finishes
  */
 SdkSubcommands.install = {
+	alias: 'i',
 	conf(_logger, _config, _cli) {
 		return {
 			// command examples:
@@ -319,7 +327,7 @@ SdkSubcommands.install = {
 
 		// step 2: extract the sdk zip file
 
-		const { name, tempDir } = await extractSDK({
+		let { name, renameTo, tempDir } = await extractSDK({
 			file,
 			force: cli.argv.force,
 			logger,
@@ -332,10 +340,15 @@ SdkSubcommands.install = {
 
 		// step 3: validate the manifest.json
 
-		const src = name && join(tempDir, 'mobilesdk', osName, name);
+		let src = name && join(tempDir, 'mobilesdk', osName, name);
 		if (name) {
 			try {
-				await fs.readJson(join(src, 'manifest.json'));
+				const manifestFile = join(src, 'manifest.json');
+				const manifest = await fs.readJson(manifestFile);
+				if (renameTo) {
+					manifest.name = renameTo;
+					await fs.writeJson(manifestFile, manifest);
+				}
 			} catch (e) {
 				name = null;
 			}
@@ -346,7 +359,7 @@ SdkSubcommands.install = {
 
 		// step 4: move the sdk files to the dest
 
-		const dest = join(titaniumDir, 'mobilesdk', osName, name);
+		const dest = join(titaniumDir, 'mobilesdk', osName, renameTo || name);
 		logger.log(`\n\nInstalling SDK files to ${cyan(dest)}`);
 		await fs.mkdirs(dest);
 		await fs.move(src, dest, { overwrite: true });
@@ -354,45 +367,46 @@ SdkSubcommands.install = {
 		// step 5: install the modules
 
 		const modules = [];
-// 		src = join(tempDir, 'modules');
-// 		if (isDir(src)) {
-// 			const modulesDest = join(titaniumDir, 'modules');
+		src = join(tempDir, 'modules');
+		try {
+			if (fs.statSync(src).isDirectory()) {
+				const modulesDest = join(titaniumDir, 'modules');
 
-// 			for (const platform of fs.readdirSync(src)) {
-// 				const srcPlatformDir = join(src, platform);
-// 				if (!isDir(srcPlatformDir)) {
-// 					continue;
-// 				}
+				for (const platform of fs.readdirSync(src)) {
+					const srcPlatformDir = join(src, platform);
+					if (!fs.statSync(srcPlatformDir).isDirectory()) {
+						continue;
+					}
 
-// 				for (const moduleName of fs.readdirSync(srcPlatformDir)) {
-// 					const srcModuleDir = join(srcPlatformDir, moduleName);
-// 					if (!isDir(srcModuleDir)) {
-// 						continue;
-// 					}
+					for (const moduleName of fs.readdirSync(srcPlatformDir)) {
+						const srcModuleDir = join(srcPlatformDir, moduleName);
+						if (!fs.statSync(srcModuleDir).isDirectory()) {
+							continue;
+						}
 
-// 					for (const ver of fs.readdirSync(srcModuleDir)) {
-// 						const srcVersionDir = join(srcModuleDir, ver);
-// 						if (!isDir(srcVersionDir)) {
-// 							continue;
-// 						}
+						for (const ver of fs.readdirSync(srcModuleDir)) {
+							const srcVersionDir = join(srcModuleDir, ver);
+							if (!fs.statSync(srcVersionDir).isDirectory()) {
+								continue;
+							}
 
-// 						const destDir = join(modulesDest, platform, moduleName, ver);
-// 						if (!force && isDir(destDir)) {
-// 							continue;
-// 						}
+							const destDir = join(modulesDest, platform, moduleName, ver);
+							if (!force || fs.statSync(destDir).isDirectory()) {
+								continue;
+							}
 
-// 						modules.push({ src: srcVersionDir, dest: destDir });
-// 					}
-// 				}
-// 			}
-// 		}
+							modules.push({ src: srcVersionDir, dest: destDir });
+						}
+					}
+				}
+			}
+		} catch {}
 
-// 		const numModules = modules.length;
-// 		if (numModules) {
-// 			for (const { src, dest } of modules) {
-// 				await fs.move(src, dest, { overwrite: true });
-// 			}
-// 		}
+		if (modules.length) {
+			for (const { src, dest } of modules) {
+				await fs.move(src, dest, { overwrite: true });
+			}
+		}
 
 		// step 6: cleanup
 
@@ -572,15 +586,17 @@ async function extractSDK({ file, force, logger, noPrompt, osName, showProgress,
 	let artifact;
 	let bar;
 	let name;
+	let renameTo;
 
 	const onEntry = async (filename, _idx, total) => {
 		if (total > 1) {
 			const m = !name && filename.match(sdkDestRegExp);
 			if (m) {
 				name = m[1];
-				await checkSDKFile({
+				renameTo = await checkSDKFile({
 					force,
 					logger,
+					filename,
 					name,
 					noPrompt,
 					osName,
@@ -588,6 +604,7 @@ async function extractSDK({ file, force, logger, noPrompt, osName, showProgress,
 					subject
 				});
 
+				logger.log('Extracting SDK...');
 				if (showProgress && !bar) {
 					bar = new ProgressBar('  :paddedPercent [:bar]', {
 						complete: cyan('='),
@@ -604,7 +621,6 @@ async function extractSDK({ file, force, logger, noPrompt, osName, showProgress,
 		}
 	};
 
-	logger.log('Extracting SDK...');
 	logger.trace(`Extracting ${file} -> ${tempDir}`);
 	await extractZip({
 		dest: tempDir,
@@ -613,7 +629,7 @@ async function extractSDK({ file, force, logger, noPrompt, osName, showProgress,
 	});
 
 	if (!artifact) {
-		return { name, tempDir };
+		return { name, renameTo, tempDir };
 	}
 
 	logger.trace(`Detected artifact: ${artifact}`);
@@ -628,10 +644,10 @@ async function extractSDK({ file, force, logger, noPrompt, osName, showProgress,
 	});
 
 	await fs.remove(tempDir);
-	return { name, tempDir: tempDir2 };
+	return { name, renameTo, tempDir: tempDir2 };
 }
 
-async function checkSDKFile({ force, logger, name, noPrompt, osName, sdkDir, subject }) {
+async function checkSDKFile({ force, logger, filename, name, noPrompt, osName, sdkDir, subject }) {
 	try {
 		if (force || !fs.statSync(sdkDir).isDirectory()) {
 			return;
@@ -658,9 +674,9 @@ async function checkSDKFile({ force, logger, name, noPrompt, osName, sdkDir, sub
 
 	let renameTo;
 	for (let i = 2; true; i++) {
-		renameTo = `${sdkDir}-${i}`;
 		try {
-			if (!fs.statSync(renameTo).isDirectory()) {
+			renameTo = `${name}-${i}`;
+			if (!fs.statSync(`${sdkDir}-${i}`).isDirectory()) {
 				break;
 			}
 		} catch {
@@ -691,8 +707,6 @@ async function checkSDKFile({ force, logger, name, noPrompt, osName, sdkDir, sub
 	if (action === 'rename') {
 		return renameTo;
 	}
-
-	return sdkDir;
 }
 
 /**
@@ -703,6 +717,7 @@ async function checkSDKFile({ force, logger, name, noPrompt, osName, sdkDir, sub
  * @param {CLI} cli - The CLI instance
  */
 SdkSubcommands.uninstall = {
+	alias: 'rm',
 	conf(_logger, _config, _cli) {
 		return {
 			desc: 'uninstall a specific Titanium SDK versions',

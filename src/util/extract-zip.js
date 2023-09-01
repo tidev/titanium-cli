@@ -54,10 +54,7 @@ export async function extractZip(params) {
 					idx++;
 					if (typeof params.onEntry === 'function') {
 						try {
-							const d = await params.onEntry(entry.fileName, idx, total);
-							if (typeof d === 'string') {
-								dest = d;
-							}
+							await params.onEntry(entry.fileName, idx, total);
 						} catch (e) {
 							return reject(e);
 						}
