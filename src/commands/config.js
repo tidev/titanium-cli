@@ -72,7 +72,7 @@ export function config(_logger, _config, _cli) {
  * @param {Object} config - The CLI config object
  * @param {CLI} cli - The CLI instance
  */
-export function validate(logger, _config, cli) {
+export function validate(_logger, _config, cli) {
 	const len = cli.argv._.length;
 	const key = cli.argv._[0];
 
@@ -127,7 +127,7 @@ export async function run(logger, config, cli) {
 	}
 
 	function print(prefix) {
-		if (argv.output === 'json') {
+		if (asJson) {
 			logger.log(JSON.stringify(config.get(prefix), null, '\t'));
 		} else {
 			walk(config, prefix && prefix.split('.'));
@@ -235,7 +235,7 @@ export async function run(logger, config, cli) {
 						logger.log(obj[q].join('\n'));
 					}
 				} else if (obj[q] !== undefined) {
-					logger.log('_', asJson ? JSON.stringify(obj[q]) : obj[q]);
+					logger.log(asJson ? JSON.stringify(obj[q]) : obj[q]);
 				} else {
 					logger.log(asJson ? JSON.stringify({
 						success: false,

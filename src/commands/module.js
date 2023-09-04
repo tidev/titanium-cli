@@ -28,6 +28,9 @@ export function config(logger, config, cli) {
 	const subcommands = {};
 	for (const [name, subcmd] of Object.entries(ModuleSubcommands)) {
 		subcommands[name] = subcmd.conf(logger, config, cli);
+		if (subcmd.alias) {
+			subcommands[name].alias = subcmd.alias;
+		}
 	}
 	return {
 		defaultSubcommand: 'list',
@@ -45,10 +48,13 @@ export function config(logger, config, cli) {
  */
 export async function run(logger, config, cli) {
 	let action = cli.argv._.shift() || 'list';
-	if (!ModuleSubcommands[action]) {
-		throw new TiError(`Invalid subcommand "${action}"`);
+	for (const [name, subcommand] of Object.entries(ModuleSubcommands)) {
+		if (action === name || action === subcommand.alias) {
+			await ModuleSubcommands[name].fn(logger, config, cli);
+			return;
+		}
 	}
-	await ModuleSubcommands[action].fn(logger, config, cli);
+	throw new TiError(`Invalid subcommand "${action}"`, { showHelp: true });
 }
 
 /**
@@ -60,6 +66,7 @@ export async function run(logger, config, cli) {
  * @param {Function} _finished - Callback when the command finishes
  */
 ModuleSubcommands.list = {
+	alias: 'ls',
 	conf(_logger, _config, _cli) {
 		return {
 			desc: 'print a list of installed modules',

@@ -55,7 +55,7 @@ export async function run(logger, config, cli) {
 			return;
 		}
 	}
-	throw new TiError(`Invalid subcommand "${action}"`);
+	throw new TiError(`Invalid subcommand "${action}"`, { showHelp: true });
 }
 
 /**
@@ -185,7 +185,6 @@ SdkSubcommands.list = {
 
 				logger.log(`   ${cyan(v)}${' '.repeat(n)}${maxname ? magenta(name.padEnd(maxname + 2)) : ''}${sdks[v].path}`);
 			}
-			logger.log();
 		} else {
 			logger.log('No Titanium SDKs are installed\n');
 			logger.log(`You can download the latest Titanium SDK by running: ${cyan(cli.argv.$ + ' sdk install')}\n`);
@@ -194,6 +193,7 @@ SdkSubcommands.list = {
 		const { default: humanize } = await import('humanize');
 
 		if (releases) {
+			logger.log();
 			logger.log('Releases:');
 			if (releases instanceof Error) {
 				logger.log(`   ${red(releases.message)}`);
@@ -209,10 +209,10 @@ ${Object.prototype.hasOwnProperty.call(sdks, r) ? ' [installed]' : ''}\
 ${r.type !== 'ga' ? gray('  [unstable]') : i++ === 0 ? green('  [latest stable]') : ''}`);
 				}
 			}
-			logger.log();
 		}
 
 		if (branches) {
+			logger.log();
 			logger.log('Branches:');
 			if (branches instanceof Error) {
 				logger.log(`   ${branches.message.red}`);
@@ -221,10 +221,10 @@ ${r.type !== 'ga' ? gray('  [unstable]') : i++ === 0 ? green('  [latest stable]'
 					logger.log(`   ${cyan(b)}${b === 'master' ? gray(' [default]') : ''}`);
 				}
 			}
-			logger.log();
 		}
 
 		if (cli.argv.branch) {
+			logger.log();
 			if (branchBuilds instanceof Error) {
 				logger.error(`Invalid branch "${cli.argv.branch}"\n`);
 				logger.log(`Run '${cyan(`${cli.argv.$} sdk --branches`)}' for a list of available branches.\n`);
@@ -241,7 +241,6 @@ ${humanize.filesize(b.assets.find(a => a.os === os).size, 1024, 1).toUpperCase()
 				} else {
 					logger.log('   No builds found');
 				}
-				logger.log();
 			}
 		}
 	}
@@ -568,6 +567,8 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 	bar?.tick(total);
 	if (bar) {
 		logger.log('\n');
+	} else if (busy) {
+		logger.log();
 	}
 
 	if (filename) {
@@ -919,11 +920,12 @@ async function getBranches() {
  * @returns {Promise<BranchBuild[]>}
  */
 async function getBranchBuilds(branch, os) {
-	const res = await request('https://downloads.titaniumsdk.com/registry/branches.json', {
+	const res = await request(`https://downloads.titaniumsdk.com/registry/${branch}.json`, {
 		responseType: 'json'
 	});
 	const now = Date.now();
-	return (await res.body.json()).filter(b => {
+	const results = await res.body.json();
+	return results.filter(b => {
 		return (!b.expires || Date.parse(b.expires) > now) && b.assets.some(a => a.os === os);
 	});
 }

@@ -29,7 +29,8 @@ export function config(_logger, _config, _cli) {
 			types: {
 				abbr: 't',
 				default: 'all',
-				desc: 'information types to display; you may select one or more'
+				desc: 'information types to display; you may select one or more',
+				values: typesList.filter(t => t !== 'ios' || process.platform === 'darwin')
 			}
 		}
 	};

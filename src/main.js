@@ -17,6 +17,8 @@ try {
 	}\n${
 		e.after ? `\n${e.after}\n` : ''
 	}`);
-	cli.command?.help();
+	if (!(e instanceof TiError) || e.showHelp) {
+		cli.command?.help();
+	}
 	process.exit(1);
 }

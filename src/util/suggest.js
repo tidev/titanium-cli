@@ -6,7 +6,7 @@ export function suggest(value, choices, threshold = 3) {
 	value = `${value}`;
 
 	const suggestions = choices.filter(choice => {
-		return choice.startsWith(value) || levenshtein(value, opt) <= threshold;
+		return choice.startsWith(value) || levenshtein(value, choice) <= threshold;
 	});
 
 	return suggestions.length

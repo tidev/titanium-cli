@@ -86,7 +86,8 @@ export async function detectTitaniumSDKs(config) {
 										};
 										return platforms;
 									}, {})
-									: {}
+									: {},
+								version: manifest.version
 							});
 						}
 					} catch {

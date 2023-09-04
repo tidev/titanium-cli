@@ -1,5 +1,7 @@
 import semver from 'semver';
 
+const versionRegExp = /^(\d+)\.(\d+)\.(\d+)(?:\.\w+)?/i;
+
 /**
  * Compare function for sort().
  * @param {String} a - Version A
@@ -7,12 +9,29 @@ import semver from 'semver';
  * @returns {Number}
  */
 export function compare(a, b) {
-	if (eq(a, b)) {
-		return 0;
-	} else if (gt(a, b)) {
-		return 1;
+	const [ , amajor, aminor, apatch, atag ] = a.toLowerCase().match(versionRegExp);
+	const [ , bmajor, bminor, bpatch, btag ] = b.toLowerCase().match(versionRegExp);
+
+	let n = parseInt(amajor) - parseInt(bmajor);
+	if (n !== 0) {
+		return n;
 	}
-	return -1;
+
+	n = parseInt(aminor) - parseInt(bminor);
+	if (n !== 0) {
+		return n;
+	}
+
+	n = parseInt(apatch) - parseInt(bpatch);
+	if (n !== 0) {
+		return n;
+	}
+
+	if (atag && btag) {
+		return sortTypes.indexOf(atag) - sortTypes.indexOf(btag);
+	}
+
+	return atag ? -1 : btag ? 1 : 0;
 }
 
 /**
