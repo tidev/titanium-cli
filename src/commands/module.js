@@ -33,6 +33,7 @@ export function config(logger, config, cli) {
 		}
 	}
 	return {
+		title: 'Module',
 		defaultSubcommand: 'list',
 		skipBanner: true,
 		subcommands

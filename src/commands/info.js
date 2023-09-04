@@ -13,6 +13,7 @@ const typesList = ['all', 'os', 'nodejs', 'titanium', 'jdk', 'android', 'ios'];
  */
 export function config(_logger, _config, _cli) {
 	return {
+		title: 'Info',
 		skipBanner: true,
 		flags: {
 			json: {

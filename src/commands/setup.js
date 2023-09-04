@@ -13,6 +13,7 @@ setup wizard__ to configure the most common settings.`;
  */
 export function config(_logger, _config, _cli) {
 	return {
+		title: 'Setup',
 		args: [
 			{
 				name: 'screen',

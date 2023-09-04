@@ -23,8 +23,16 @@
  * `ti sdk` changes:
    - Added `--json` flag
    - Removed `activeSDK` from JSON result
- * Replaced "winston" based logger with lighter weight logger
+ * Logger changes:
+   - Replaced "winston" based logger with lighter weight logger
+   - Trace and debug log messages written to `stderr` instead of `stdout`
+   - Added total run time trace message at end
  * Updated dependencies, replaced deprecated dependencies
+   - Replaced `colors` with `chalk`
+   - Replaced `fields` with `inquirer`
+   - Replaced `request` with `undici`
+   - Replaced `temp` with `tmp`
+   - Replaced `sprintf` with `sprintf-js`
 
 6.1.1 (7/13/2022)
 -------------------

@@ -14,6 +14,9 @@ import { ProgressBar } from '../util/progress.js';
 import { Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { extractZip } from '../util/extract-zip.js';
+import prompts from 'prompts';
+
+const { prompt } = prompts;
 
 const { cyan, gray, green, magenta, red, yellow } = chalk;
 
@@ -35,6 +38,7 @@ export function config(logger, config, cli) {
 		}
 	}
 	return {
+		title: 'SDK',
 		defaultSubcommand: 'list',
 		skipBanner: true,
 		subcommands
@@ -685,7 +689,6 @@ async function checkSDKFile({ force, logger, filename, name, noPrompt, osName, s
 		}
 	}
 
-	const { prompt } = (await import('prompts')).default;
 	const { action } = await prompt({
 		type: 'select',
 		name: 'action',
@@ -753,8 +756,6 @@ SdkSubcommands.uninstall = {
 				throw new TiError('To uninstall a Titanium SDK in non-interactive mode, you must use --force');
 			}
 		}
-
-		const { prompt } = (await import('prompts')).default;
 
 		if (!versions.length) {
 			({ versions } = await prompt({

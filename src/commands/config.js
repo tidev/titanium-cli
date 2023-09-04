@@ -31,6 +31,7 @@ The config file is located at: __${ticonfig.getConfigPath()}__`;
  */
 export function config(_logger, _config, _cli) {
 	return {
+		title: 'Config',
 		skipBanner: true,
 		flags: {
 			append: {
