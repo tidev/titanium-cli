@@ -23,6 +23,11 @@
  * `ti sdk` changes:
    - Added `--json` flag
    - Removed `activeSDK` from JSON result
+ * `ti setup` changes:
+   - Removed Windows Store publishing info
+   - Removed `haxm` info
+   - Removed `sdk` setup
+   - Removed user locale setup
  * Logger changes:
    - Replaced "winston" based logger with lighter weight logger
    - Trace and debug log messages written to `stderr` instead of `stdout`

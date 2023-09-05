@@ -1,17 +1,27 @@
+import { SetupScreens } from '../util/setup-screens.js';
+import chalk from 'chalk';
+
+const { cyan } = chalk;
+
 export const extendedDesc = `The setup command guides you through the various configuration settings and
 helps detect if your development environment is properly installed.
 
 The first time the Titanium CLI is installed, you should run the __titanium
 setup wizard__ to configure the most common settings.`;
 
+let screens;
+
 /**
  * Returns the configuration for the setup command.
+ *
  * @param {Object} logger - The logger instance
  * @param {Object} config - The CLI config object
  * @param {CLI} cli - The CLI instance
  * @returns {Object} Setup command configuration
  */
-export function config(_logger, _config, _cli) {
+export async function config(logger, config, cli) {
+	screens = new SetupScreens(logger, config, cli);
+
 	return {
 		title: 'Setup',
 		args: [
@@ -19,82 +29,22 @@ export function config(_logger, _config, _cli) {
 				name: 'screen',
 				default: 'mainmenu',
 				desc: 'initial screen',
-				values: Object.keys(SetupScreens.prototype).filter(function (f) {
-					return !/^_|exit/.test(f) && (process.platform === 'darwin' || f !== 'ios') && (process.platform === 'win32' || f !== 'windows');
-				})
+				values: Object.keys(screens.screens).sort()
 			}
 		]
 	};
 }
 
-// 	fields = require('fields'),
-// 	fs = require('fs-extra'),
-// 	path = require('path'),
-// 	proxyDetector = require('./lib/proxy_detect'),
-// 	request = require('request'),
-// 	sdk = require('./sdk'),
-// 	tmp = require('tmp'),
-// 	afs = appc.fs,
-// 	mixObj = appc.util.mixObj,
-// 	i18n = appc.i18n(__dirname),
-// 	__ = i18n.__,
-// 	__f = i18n.__f,
-// 	proxy = [];
-
-// exports.config = function (logger, config, cli) {
-// 	fields.setup({ colors: cli.argv.colors });
-// 	proxyDetector.detect(function (prxy) {
-// 		// this may be async depending on platform
-// 		// so detecting done here during config
-// 		proxy.push(prxy);
-// 	});
-
-
-// };
-
-// /**
-//  * Steps the user through the configuration of their Titanium environment.
-//  * @param {Object} logger - The logger instance
-//  * @param {Object} config - The CLI config object
-//  * @param {CLI} cli - The CLI instance
-//  * @param {Function} finished - Callback when the command finishes
-//  */
-// exports.run = function (logger, config, cli, finished) {
-// 	logger.log(__('Enter %s at any time to quit.', 'ctrl-c'.cyan));
-
-// 	var screens = new SetupScreens(logger, config, cli);
-
-// 	var queue = async.queue(function (screen, callback) {
-// 		try {
-// 			screen.call(screens, callback);
-// 		} catch (ex) {
-// 			if (ex) {
-// 				var s = ex.stack.toString().split('\n');
-// 				logger.error(s.shift());
-// 				logger.log('\n' + s.join('\n').grey);
-// 			}
-// 			callback(ex);
-// 		}
-// 	}, 1);
-
-// 	queue.drain(finished);
-
-// 	function post(err, next) {
-// 		logger.log();
-// 		if (err && err.message === 'cancelled') {
-// 			logger.log();
-// 			process.exit(1);
-// 		}
-// 		screens[next] || (next = 'mainmenu');
-// 		queue.push(screens[next], post);
-// 	}
-
-// 	if (cli.argv.screen && !screens[cli.argv.screen]) {
-// 		logger.log();
-// 		logger.error(__('Invalid setup screen "%s"', cli.argv.screen));
-// 	}
-// 	queue.push(cli.argv.screen && screens[cli.argv.screen] || screens.mainmenu, post);
-// };
+/**
+ * Steps the user through the configuration of their Titanium environment.
+ * @param {Object} logger - The logger instance
+ * @param {Object} config - The CLI config object
+ * @param {CLI} cli - The CLI instance
+ */
+export async function run(logger, _config, _cli) {
+	logger.log(`Enter ${cyan('ctrl-c')} at any time to quit.`);
+	await screens.run();
+}
 
 // /**
 //  * Detects the Android environment using either the new or old detection code.
@@ -164,223 +114,63 @@ export function config(_logger, _config, _cli) {
 // 	});
 // }
 
-// /**
-//  * The setup command screens.
-//  * @class
-//  * @classdesc The setup command screens.
-//  * @param {Object} logger - The logger instance
-//  * @param {Object} config - The CLI config object
-//  * @param {CLI} cli - The CLI instance
-//  * @constructor
-//  */
-// function SetupScreens(logger, config, cli) {
-// 	this._logger = logger;
-// 	this._config = config;
-// 	this._cli = cli;
 
-// 	var activeSdk = cli.env.getSDK(config.get('sdk.selected', config.get('app.sdk', 'latest'))),
-// 		activeSdkLabel = ' [' + __('active') + ']',
-// 		sdkVersions = Object.keys(cli.env.sdks).filter(function (v) {
-// 			return appc.version.gte(cli.env.sdks[v].manifest && cli.env.sdks[v].manifest.version || v, '3.0.0');
-// 		}).sort().reverse();
+		// this.registry = {
+			// user: {
+			// 	name: fields.text({
+			// 		default: config.get('user.name', ''),
+			// 		title: __('What do you want as your "author" name?'),
+			// 		validate: function (value) {
+			// 			if (!value) {
+			// 				throw new Error(__('Invalid name'));
+			// 			}
+			// 			return true;
+			// 		}
+			// 	}),
+			// android: {
+			// 	sdkPath: function (defaultValue) {
+			// 		return fields.file({
+			// 			default: defaultValue || undefined,
+			// 			title: __('Path to the Android SDK'),
+			// 			desc: __('Enter "none" if you don\'t want to build for Android.'),
+			// 			complete: true,
+			// 			showHidden: true,
+			// 			// eslint-disable-next-line security/detect-non-literal-regexp
+			// 			ignoreDirs: new RegExp(config.get('cli.ignoreDirs')),
+			// 			// eslint-disable-next-line security/detect-non-literal-regexp
+			// 			ignoreFiles: new RegExp(config.get('cli.ignoreFiles')),
+			// 			validate: function (value, callback) {
+			// 				if (value.toLowerCase() === 'none') {
+			// 					callback(null, '');
+			// 					return;
+			// 				}
 
-// 	this._registry = {
-// 		user: {
-// 			name: fields.text({
-// 				default: config.get('user.name', ''),
-// 				title: __('What do you want as your "author" name?'),
-// 				validate: function (value) {
-// 					if (!value) {
-// 						throw new Error(__('Invalid name'));
-// 					}
-// 					return true;
-// 				}
-// 			}),
-// 			locale: fields.text({
-// 				default: config.get('user.locale', ''),
-// 				title: __('What would you like as your default locale?'),
-// 				desc: __('(examples: "en", "en-us", "de", "fr")'),
-// 				validate: function (value) {
-// 					if (!value || !/^[A-Za-z]{2}[A-Za-z]?(([-_][A-Za-z0-9]{4})?[-_][A-Za-z0-9]{2}[A-Za-z0-9]?)?$/.test(value)) {
-// 						throw new Error(__('Invalid locale format'));
-// 					}
-// 					return true;
-// 				}
-// 			})
-// 		},
-// 		app: {
-// 			workspace: fields.file({
-// 				default: config.get('app.workspace', ''),
-// 				title: __('Path to your workspace where your projects should be created:'),
-// 				complete: true,
-// 				showHidden: true,
-// 				// eslint-disable-next-line security/detect-non-literal-regexp
-// 				ignoreDirs: new RegExp(config.get('cli.ignoreDirs')),
-// 				// eslint-disable-next-line security/detect-non-literal-regexp
-// 				ignoreFiles: new RegExp(config.get('cli.ignoreFiles')),
-// 				validate: function (value, callback) {
-// 					if (!value) {
-// 						throw new Error(__('Please specify a workspace directory'));
-// 					}
-// 					value = afs.resolvePath(value);
-// 					if (!fs.existsSync(value)) {
-// 						throw new Error(__('Invalid workspace directory'));
-// 					}
-// 					callback(null, value);
-// 				}
-// 			})
-// 		},
-// 		sdk: {
-// 			selected: function () {
-// 				var selectedSdk = cli.env.getSDK(config.get('sdk.selected', config.get('app.sdk', 'latest'))),
-// 					sdkVersionMaxlen = sdkVersions.reduce(function (a, b) {
-// 						return Math.max(a, b.length + (activeSdk && b === activeSdk.name ? activeSdkLabel.length : 0));
-// 					}, 0);
+			// 				if (value && (!fs.existsSync(afs.resolvePath(value) || fs.statSync(value).isDirectory()))) {
+			// 					throw new Error(__('Invalid Android SDK path'));
+			// 				}
 
-// 				return sdkVersions.length && fields.select({
-// 					default: selectedSdk && selectedSdk.name || 'latest',
-// 					label: __('What Titanium SDK would you like to use by default?'),
-// 					complete: true,
-// 					completeIgnoreCase: true,
-// 					suggest: true,
-// 					suggestThreshold: 2,
-// 					numbered: true,
-// 					margin: '',
-// 					formatters: {
-// 						option: function (opt, idx, num) {
-// 							var d = selectedSdk && opt.value === selectedSdk.name ? activeSdkLabel : '',
-// 								n = sdkVersionMaxlen + 2 - opt.value.length - d.length;
-// 							return num + opt.value.cyan + d.grey + new Array(n + 1).join(' ') + opt.path;
-// 						}
-// 					},
-// 					promptLabel: __('Enter # or SDK name'),
-// 					optionLabel: 'value',
-// 					options: sdkVersions.map(function (sdk) {
-// 						return { path: cli.env.sdks[sdk].path, value: sdk };
-// 					}),
-// 					validate: function (value, callback) {
-// 						if (/^latest$/i.test(value)) {
-// 							value = sdkVersions[0];
-// 						} else if (sdkVersions.indexOf(value) === -1) {
-// 							return callback(new Error(__('Invalid Titanium SDK')));
-// 						}
-// 						// set the new sdk
-// 						cli.sdk = cli.env.sdks[value];
-// 						callback(null, value);
-// 					}
-// 				});
-// 			}
-// 		},
-// 		android: {
-// 			sdkPath: function (defaultValue) {
-// 				return fields.file({
-// 					default: defaultValue || undefined,
-// 					title: __('Path to the Android SDK'),
-// 					desc: __('Enter "none" if you don\'t want to build for Android.'),
-// 					complete: true,
-// 					showHidden: true,
-// 					// eslint-disable-next-line security/detect-non-literal-regexp
-// 					ignoreDirs: new RegExp(config.get('cli.ignoreDirs')),
-// 					// eslint-disable-next-line security/detect-non-literal-regexp
-// 					ignoreFiles: new RegExp(config.get('cli.ignoreFiles')),
-// 					validate: function (value, callback) {
-// 						if (value.toLowerCase() === 'none') {
-// 							callback(null, '');
-// 							return;
-// 						}
+			// 				if (process.platform === 'win32' && value.indexOf('&') !== -1) {
+			// 					throw new Error(__('The Android SDK path must not contain ampersands (&) on Windows'));
+			// 				}
 
-// 						if (value && (!fs.existsSync(afs.resolvePath(value) || fs.statSync(value).isDirectory()))) {
-// 							throw new Error(__('Invalid Android SDK path'));
-// 						}
+			// 				var androidExecutable = path.join(value, 'tools', 'android' + (process.platform === 'win32' ? '.bat' : ''));
+			// 				if (!fs.existsSync(androidExecutable)) {
+			// 					throw new Error(__('Invalid Android SDK path') + '\n' + __('Required file does not exist: "%s"', androidExecutable));
+			// 				}
 
-// 						if (process.platform === 'win32' && value.indexOf('&') !== -1) {
-// 							throw new Error(__('The Android SDK path must not contain ampersands (&) on Windows'));
-// 						}
+			// 				var adbExecutable = path.join(value, 'platform-tools', 'adb' + (process.platform === 'win32' ? '.exe' : ''));
+			// 				if (!fs.existsSync(adbExecutable)) {
+			// 					throw new Error(__('Invalid Android SDK path') + '\n' + __('Required file does not exist: %s"', adbExecutable));
+			// 				}
 
-// 						var androidExecutable = path.join(value, 'tools', 'android' + (process.platform === 'win32' ? '.bat' : ''));
-// 						if (!fs.existsSync(androidExecutable)) {
-// 							throw new Error(__('Invalid Android SDK path') + '\n' + __('Required file does not exist: "%s"', androidExecutable));
-// 						}
-
-// 						var adbExecutable = path.join(value, 'platform-tools', 'adb' + (process.platform === 'win32' ? '.exe' : ''));
-// 						if (!fs.existsSync(adbExecutable)) {
-// 							throw new Error(__('Invalid Android SDK path') + '\n' + __('Required file does not exist: %s"', adbExecutable));
-// 						}
-
-// 						return true;
-// 					}
-// 				});
-// 			}
-// 		}
-// 	};
-// }
-
-// /**
-//  * Renders the screen title.
-//  * @param {String} title - The screen title
-//  * @private
-//  */
-// SetupScreens.prototype._title = function _title(title) {
-// 	var width = 50,
-// 		margin = width - title.length + 4,
-// 		pad = Math.floor(margin / 2),
-// 		left = pad ? (new Array(pad + 1)).join('─') : '',
-// 		right = pad ? (new Array(margin - pad + 1)).join('─') : '';
-// 	this._logger.log('\n' + (left + '┤ ').grey + title.bold + (' ├' + right).grey + '\n');
-// };
-
-// /**
-//  * Saves the configuration to disk.
-//  * @param {Object} data - The config data to save
-//  * @private
-//  */
-// SetupScreens.prototype._save = function _save(data) {
-// 	if (data) {
-// 		// we reload the config to always make sure we have a clean state
-// 		this._config.load();
-// 		mixObj(this._config, data);
-// 		this._config.save();
-// 		this._logger.log('\n' + __('Configuration saved!'));
+			// 				return true;
+			// 			}
+			// 		});
+			// 	}
+			// }
+// 		};
 // 	}
-// };
-
-// /**
-//  * Displays the main menu and prompts for selection.
-//  * @param {Function} callback - Function to be called when the prompting finishes
-//  */
-// SetupScreens.prototype.mainmenu = function mainmenu(callback) {
-// 	this._title(__('Main Menu'));
-// 	fields.select({
-// 		numbered: true,
-// 		promptLabel: __('Where do you want to go?'),
-// 		optionLabel: 'key',
-// 		separator: ' ',
-// 		margin: '',
-// 		complete: true,
-// 		completeIgnoreCase: true,
-// 		formatters: {
-// 			option: function (opt, idx, num) {
-// 				return '  ' + num + this._format(opt.key + (new Array(10 - opt.key.replace(/__(.+?)__/g, '?').length)).join(' '), 'option') + opt.label;
-// 			}
-// 		},
-// 		options: [
-// 			{ key: '__q__uick',   	value: 'quick',   label: __('Quick Setup') },
-// 			{ key: 'chec__k__',   	value: 'check',   label: __('Check Environment') },
-// 			{ key: '__u__ser',    	value: 'user',    label: __('User Information') },
-// 			{ key: 'a__p__p',     	value: 'app',     label: __('New App Defaults') },
-// 			{ key: '__n__etwork', 	value: 'network', label: __('Network Settings') },
-// 			{ key: '__c__li',     	value: 'cli',     label: __('Titanium CLI Settings') },
-// 			{ key: '__s__dk',     	value: 'sdk',     label: __('Titanium SDK Settings') },
-// 			{ key: '__i__os',     	value: 'ios',     label: __('iOS Settings') },
-// 			{ key: '__a__ndroid', 	value: 'android', label: __('Android Settings') },
-// 			{ key: '__w__indows',   value: 'windows', label: __('Windows Settings') },
-// 			// { key: 'pa__t__hs',   value: 'paths', label: __('Search Paths') },
-// 			{ key: 'e__x__it',   value: 'exit', label: __('Exit') }
-// 		].filter(function (o) {
-// 			return !((o.value === 'ios' && process.platform !== 'darwin') || (o.value === 'windows' && process.platform !== 'win32'));
-// 		})
-// 	}).prompt(callback);
-// };
+// }
 
 // /**
 //  * Prompts for essential config options.
@@ -399,7 +189,6 @@ export function config(_logger, _config, _cli) {
 
 // 		fields.set({
 // 			name: this._registry.user.name,
-// 			locale: this._registry.user.locale,
 // 			sdk: this._registry.sdk.selected(),
 // 			workspace: this._registry.app.workspace,
 // 			'using android': !androidSdkPath && fields.select({
@@ -541,11 +330,6 @@ export function config(_logger, _config, _cli) {
 // 			},
 // 			java: function (next) {
 // 				appc.jdk.detect(config, function (results) {
-// 					next(null, results);
-// 				});
-// 			},
-// 			haxm: function (next) {
-// 				appc.haxm.detect(config, function (results) {
 // 					next(null, results);
 // 				});
 // 			},
@@ -1058,20 +842,6 @@ export function config(_logger, _config, _cli) {
 // 			}(results.java));
 
 // 			(function (r) {
-// 				log('Intel® Hardware Accelerated Execution Manager (HAXM)');
-// 				if (!r.compatible) {
-// 					note(__('compatible'), __('unsupported, requires an Intel® CPU'));
-// 				} else if (r.installed) {
-// 					ok(__('compatible'));
-// 					ok(__('installed'));
-// 				} else {
-// 					ok(__('compatible'));
-// 					warn(__('installed'), __('not found; install HAXM to use Android x86 emulator'));
-// 				}
-// 				log();
-// 			}(results.haxm));
-
-// 			(function (r) {
 // 				log(__('Network'));
 // 				if (r.online) {
 // 					ok(__('online'));
@@ -1138,229 +908,6 @@ export function config(_logger, _config, _cli) {
 // 	}
 // };
 
-// /**
-//  * Configures user-related settings.
-//  * @param {Function} callback - Function to be called when the prompting finishes
-//  */
-// SetupScreens.prototype.user = function user(callback) {
-// 	this._title(__('User Information'));
-// 	fields.set({
-// 		name: this._registry.user.name,
-// 		locale: this._registry.user.locale
-// 	}).prompt(function (err, data) {
-// 		!err && this._save({ user: data });
-// 		callback();
-// 	}.bind(this));
-// };
-
-// /**
-//  * Configures new app default settings.
-//  * @param {Function} callback - Function to be called when the prompting finishes
-//  */
-// SetupScreens.prototype.app = function app(callback) {
-// 	this._title(__('New App Defaults'));
-// 	fields.set({
-// 		workspace: this._registry.app.workspace,
-// 		idprefix: fields.text({
-// 			default: this._config.get('app.idprefix'),
-// 			title: __('What is your prefix for application IDs?'),
-// 			desc: __('(example: com.mycompany)')
-// 		}),
-// 		publisher: fields.text({
-// 			default: this._config.get('app.publisher'),
-// 			title: __('Used for populating the "publisher" field in new projects:')
-// 		}),
-// 		url: fields.text({
-// 			default: this._config.get('app.url'),
-// 			title: __('Used for populating the "url" field in new projects:')
-// 		})
-// 	}).prompt(function (err, data) {
-// 		!err && this._save({ app: data });
-// 		callback();
-// 	}.bind(this));
-// };
-
-// /**
-//  * Configures network settings.
-//  * @param {Function} callback - Function to be called when the prompting finishes
-//  */
-// SetupScreens.prototype.network = function app(callback) {
-// 	var defaultProxy = '';
-// 	if (this._config.get('cli.httpProxyServer')) {
-// 		defaultProxy = this._config.get('cli.httpProxyServer');
-// 	} else if (proxy.length > 0) {
-// 		var i = 0,
-// 			len = proxy.length;
-// 		for (; i < len; i++) {
-// 			if (proxy[i] && proxy[i].valid) {
-// 				defaultProxy = proxy[i].fullAddress;
-// 				logger.log(defaultProxy);
-// 				break;
-// 			}
-// 		}
-// 	}
-// 	var httpProxyServer = {
-// 		promptLabel: __('Proxy server URL'),
-// 		default: defaultProxy,
-// 		validate: function (value) {
-// 			var u = new URL(value);
-// 			if (!/^https?:$/.test(u.protocol)) {
-// 				throw new Error(__('HTTP proxy url protocol must be either "http" or "https" (ex: http://user:pass@example.com)'));
-// 			}
-// 			if (!(u.host || '')) {
-// 				throw new Error(__('HTTP proxy url must contain a host name (ex: http://user:pass@example.com)'));
-// 			}
-// 			return true;
-// 		}
-// 	};
-// 	httpProxyServer.default || delete httpProxyServer.default;
-
-// 	this._title(__('Network Settings'));
-
-// 	fields.set({
-// 		hasProxy: fields.select({
-// 			promptLabel: __('Are you behind a proxy server?'),
-// 			display: 'prompt',
-// 			default: this._config.get('cli.httpProxyServer') ? 'yes' : 'no',
-// 			options: [ 'yes', 'no' ],
-// 			next: function (err, value) {
-// 				return value === 'yes' ? 'httpProxyServer' : 'rejectUnauthorized';
-// 			}
-// 		}),
-// 		httpProxyServer: fields.text(httpProxyServer),
-// 		rejectUnauthorized: fields.select({
-// 			promptLabel: __('Verify server (SSL) certificates against known certificate authorities?'),
-// 			display: 'prompt',
-// 			default: this._config.get('cli.rejectUnauthorized', true) === false ? 'no' : 'yes',
-// 			options: [ 'yes', 'no' ]
-// 		})
-// 	}).prompt(function (err, data) {
-// 		if (!err) {
-// 			// reset httpProxyServer
-// 			if (data.hasProxy === 'no') {
-// 				data.httpProxyServer = '';
-// 			}
-
-// 			delete data.hasProxy;
-// 			this._save({ cli: data });
-// 		}
-// 		callback();
-// 	}.bind(this));
-// };
-
-// /**
-//  * Configures CLI settings.
-//  * @param {Function} callback - Function to be called when the prompting finishes
-//  */
-// SetupScreens.prototype.cli = function cli(callback) {
-// 	this._title(__('Titanium CLI Settings'));
-
-// 	fields.set({
-// 		colors: fields.select({
-// 			promptLabel: __('Enable colors?'),
-// 			display: 'prompt',
-// 			default: this._config.get('cli.colors', true) === false ? 'no' : 'yes',
-// 			options: [ 'yes', 'no' ]
-// 		}),
-// 		prompt: fields.select({
-// 			promptLabel: __('Enable interactive prompting for missing options and arguments?'),
-// 			display: 'prompt',
-// 			default: this._config.get('cli.prompt', true) === false ? 'no' : 'yes',
-// 			options: [ 'yes', 'no' ]
-// 		}),
-// 		progressBars: fields.select({
-// 			promptLabel: __('Display progress bars when downloading or installing?'),
-// 			display: 'prompt',
-// 			default: this._config.get('cli.progressBars', true) === false ? 'no' : 'yes',
-// 			options: [ 'yes', 'no' ]
-// 		}),
-// 		/* 'completion': fields.select({
-// 			promptLabel: __('Enable bash completion? (Mac OS X and Linux only)'),
-// 			display: 'prompt',
-// 			default: this._config.get('cli.completion', false) === false ? 'no' : 'yes',
-// 			options: [ 'yes', 'no' ]
-// 		}),*/
-// 		logLevel: fields.select({
-// 			title: __('Output log level'),
-// 			promptLabel: __('Enter # or log level'),
-// 			style: {
-// 				option: 'cyan'
-// 			},
-// 			complete: true,
-// 			completeIgnoreCase: true,
-// 			numbered: true,
-// 			suggest: true,
-// 			suggestThreshold: 2,
-// 			default: this._config.get('cli.logLevel', 'trace'),
-// 			options: this._logger.getLevels()
-// 		}),
-// 		width: fields.text({
-// 			title: __('What is the width of the Titanium CLI output?'),
-// 			description: __('Enter 0 for max width of the terminal.'),
-// 			promptLabel: __('CLI width'),
-// 			default: this._config.get('cli.width', 100),
-// 			validate: function (value, callback) {
-// 				value = parseInt(value);
-// 				if (isNaN(value) || value < 0) {
-// 					throw new Error(__('Width must be greater than or equal to zero'));
-// 				}
-// 				callback(null, value);
-// 			}
-// 		}),
-// 		failOnWrongSDK: fields.select({
-// 			promptLabel: __('Fail if selected Titanium SDK differs from <sdk-version> in tiapp.xml?'),
-// 			display: 'prompt',
-// 			default: this._config.get('cli.failOnWrongSDK', false) === false ? 'no' : 'yes',
-// 			options: [ 'yes', 'no' ]
-// 		})
-// 	}).prompt(function (err, data) {
-// 		if (!err) {
-// 			data.colors = (data.colors === 'yes');
-// 			data.prompt = (data.prompt === 'yes');
-// 			data.progressBars = (data.progressBars === 'yes');
-// 			// data.completion = (data.completion === 'yes');
-// 			data.failOnWrongSDK = (data.failOnWrongSDK === 'yes');
-// 			this._save({ cli: data });
-// 		}
-// 		callback();
-// 	}.bind(this));
-// };
-
-// /**
-//  * Configures Titanium SDK settings.
-//  * @param {Function} callback - Function to be called when the prompting finishes
-//  */
-// SetupScreens.prototype.sdk = function sdk(callback) {
-// 	this._title(__('Titanium SDK Settings'));
-// 	fields.set({
-// 		selected: this._registry.sdk.selected(),
-// 		defaultInstallLocation: fields.file({
-// 			default: this._config.get('sdk.defaultInstallLocation', this._cli.env.installPath),
-// 			title: __('Path to find and install Titanium SDKs:'),
-// 			complete: true,
-// 			showHidden: true,
-// 			// eslint-disable-next-line security/detect-non-literal-regexp
-// 			ignoreDirs: new RegExp(this._config.get('cli.ignoreDirs')),
-// 			// eslint-disable-next-line security/detect-non-literal-regexp
-// 			ignoreFiles: new RegExp(this._config.get('cli.ignoreFiles')),
-// 			validate: function (value) {
-// 				if (!value || (fs.existsSync(afs.resolvePath(value)) && !fs.statSync(value).isDirectory())) {
-// 					throw new Error(__('Invalid directory'));
-// 				} else if (!fs.existsSync(afs.resolvePath(value))) {
-// 					if (afs.isDirWritable(afs.resolvePath(value, '..'))) {
-// 						fs.mkdirsSync(value);
-// 					} else {
-// 						throw new Error(__('Invalid path or insufficient permissions'));
-// 					}
-// 				}
-// 				return true;
-// 			}
-// 		})
-// 	}).prompt(function (err, data) {
-// 		!err && this._save({ sdk: data });
-// 		callback();
-// 	}.bind(this));
-// };
 
 // /**
 //  * Configures iOS-related settings.
@@ -1556,55 +1103,4 @@ export function config(_logger, _config, _cli) {
 // 			callback();
 // 		}.bind(this));
 // 	}.bind(this));
-// };
-
-// /**
-//  * Configures Windows Phone/Store settings.
-//  * @param {Function} callback - Function to be called when the prompting finishes
-//  */
-// SetupScreens.prototype.windows = function windows(callback) {
-// 	this._title(__('Windows Settings'));
-
-// 	fields.set({
-// 		publisherGuid: fields.text({
-// 			promptLabel: __('What is your Windows Publisher ID?'),
-// 			default: this._config.get('windows.phone.publisherGuid')
-// 		})
-// 	}).prompt(function (err, data) {
-// 		!err && this._save({ windows: { phone: { publisherGuid: data.publisherGuid } } });
-// 		callback();
-// 	}.bind(this));
-// };
-
-// /**
-//  * Configures search paths.
-//  * @param {Function} callback - Function to be called when the prompting finishes
-//  */
-// SetupScreens.prototype.paths = function paths(callback) {
-// 	this._title(__('Search Paths'));
-// 	// TODO
-// 	// "commands": [],
-// 	// "hooks": [
-// 	// 	"/Users/chris/appc/liveview/hook",
-// 	// 	"/Users/chris/appc/titanium-code-processor/hooks"
-// 	// ],
-// 	// "modules": [
-// 	// 	"/Users/chris/Library/Application Support/Titanium"
-// 	// ],
-// 	// "plugins": [
-// 	// 	"~/appc/ti.alloy"
-// 	// ],
-// 	// "sdks": [
-// 	// 	"/Users/chris/Desktop"
-// 	// ],
-// 	// "xcode": []
-// 	callback();
-// };
-
-// /**
-//  * Exits the setup command.
-//  * @param {Function} callback - Function to be called when the prompting finishes
-//  */
-// SetupScreens.prototype.exit = function exit() {
-// 	process.exit(0);
 // };
