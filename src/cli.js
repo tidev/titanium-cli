@@ -18,9 +18,8 @@ import prompts from 'prompts';
 import { applyCommandConfig } from './util/apply-command-config.js';
 import { TiHelp } from './util/tihelp.js';
 
-const { prompt } = prompts;
-
 const { blue, bold, cyan, gray, green, magenta, red, yellow } = chalk;
+const { prompt } = prompts;
 
 const commands = {
 	config:  'get and set config options',

@@ -15,13 +15,6 @@ import { join } from 'node:path';
 const { bold, cyan, gray, green, magenta, red, yellow } = chalk;
 const { prompt } = prompts;
 
-/**
- * The setup command screens.
- * @class
- * @param {Object} logger - The logger instance
- * @param {Object} config - The CLI config object
- * @param {CLI} cli - The CLI instance
- */
 export class SetupScreens {
 	proxy = [];
 
@@ -196,7 +189,7 @@ export class SetupScreens {
 		this.config.set('user.name', values.name);
 		this.config.set('app.workspace', values.workspace);
 		if (values.androidSdkPath !== undefined) {
-			this.config.set('android.sdk', values.androidSdkPath);
+			this.config.set('android.sdkPath', values.androidSdkPath);
 		}
 		this.config.save();
 		this.logger.log('\nConfiguration saved!');
@@ -289,17 +282,17 @@ export class SetupScreens {
 
 		if (process.platform === 'darwin') {
 			log('iOS Environment');
-// 				var distPPLabel = __('dist provisioning'),
-// 					len = distPPLabel.length;
+// 				const distPPLabel = 'dist provisioning';
+// 				const len = distPPLabel.length;
 
 // 				if (Object.keys(r.xcode).length) {
-// 					ok(appc.string.rpad('Xcode', len), __('installed'), '(' + Object.keys(r.xcode).filter(function (ver) {
+// 					ok('Xcode'.padEnd(len), 'installed', '(' + Object.keys(r.xcode).filter(function (ver) {
 // 						return ver !== '__selected__';
 // 					}).map(function (ver) {
 // 						return r.xcode[ver].version;
 // 					}).sort().join(', ') + ')');
 
-// 					var iosSdks = {};
+// 					const iosSdks = {};
 // 					Object.keys(r.xcode).forEach(function (ver) {
 // 						if (ver !== '__selected__') {
 // 							r.xcode[ver].sdks.forEach(function (v) {
@@ -323,8 +316,8 @@ export class SetupScreens {
 // 					warn(appc.string.rpad(__('WWDR cert'), len), __('not found'));
 // 				}
 
-// 				var devCerts = 0,
-// 					distCerts = 0;
+// 				let devCerts = 0;
+// 				let distCerts = 0;
 
 // 				Object.keys(r.certs.keychains).forEach(function (keychain) {
 // 					if (r.certs.keychains[keychain].developer) {
@@ -699,343 +692,100 @@ export class SetupScreens {
 	}
 
 	async androidScreen() {
-		//
+		this.logger.log(screenTitle('Android Settings'));
+
+		let data;
+		const busy = new BusyIndicator();
+		busy.start();
+
+		try {
+			({ data } = await detect(this.logger, this.config, this.cli, { all: true }));
+		} finally {
+			busy.stop();
+		}
+
+		const values = await prompt([
+			{
+				type: 'text',
+				message: 'Path to the Android SDK',
+				initial: this.config.get('android.sdkPath', data?.android.sdk?.path),
+				name: 'androidSdkPath',
+				validate: value => {
+					if (!value) {
+						return 'Please specify the Android SDK directory';
+					}
+					value = expand(value);
+					if (!existsSync(value)) {
+						return 'Specified Android SDK directory does not exist'
+					}
+					if (process.platform === 'win32' && value.includes('&')) {
+						return 'The Android SDK path must not contain ampersands (&) on Windows';
+					}
+					const adbExecutable = join(value, 'platform-tools', `adb${process.platform === 'win32' ? '.exe' : ''}`);
+					if (!existsSync(adbExecutable)) {
+						return 'Invalid Android SDK path: adb not found';
+					}
+					return true;
+				}
+			},
+			{
+				type: 'toggle',
+				message: 'Do you plan to build native Titanium Modules?',
+				initial: false,
+				name: 'modules',
+				active: 'yes',
+				inactive: 'no'
+			},
+			{
+				type: prev => prev ? 'text' : null,
+				message: 'Path to the Android NDK',
+				initial: this.config.get('android.ndkPath', data?.android.ndk?.path),
+				name: 'androidNdkPath',
+				validate: value => {
+					if (!value) {
+						return 'Please specify the Android NDK directory';
+					}
+					value = expand(value);
+					if (!existsSync(value)) {
+						return 'Specified Android NDK directory does not exist'
+					}
+					const ndkbuildExecutable = join(value, `ndk-build${process.platform === 'win32' ? '.cmd' : ''}`);
+					if (!existsSync(ndkbuildExecutable)) {
+						return 'Invalid Android NDK path: ndk-build not found';
+					}
+					return true;
+				}
+			}
+		]);
+
+		if (values.androidSdkPath !== undefined) {
+			this.config.set('android.sdkPath', values.androidSdkPath);
+		}
+		if (values.androidNdkPath !== undefined) {
+			this.config.set('android.ndkPath', values.androidNdkPath);
+		}
+		if (values.androidSdkPath !== undefined || values.androidNdkPath !== undefined) {
+			this.config.save();
+			this.logger.log('\nConfiguration saved!');
+		}
 	}
 
 	async iosScreen() {
-		//
-	}
-}
-
-function isDirWritable(dir) {
-	dir = expand(dir);
-	if (!existsSync(dir)) {
-		return;
-	}
-
-	const tmpFile = join(dir, `tmp${Math.round(Math.random() * 1e12)}`);
-	try {
-		if (existsSync(tmpFile)) {
-			utimesSync(tmpFile, new Date(), new Date());
-		} else {
-			writeFileSync(tmpFile, '', 'utf-8');
+		if (process.platform !== 'darwin') {
+			return;
 		}
-		if (existsSync(tmpFile)) {
-			return dir;
+
+		this.logger.log(screenTitle('iOS Settings'));
+
+		let data;
+		const busy = new BusyIndicator();
+		busy.start();
+
+		try {
+			({ data } = await detect(this.logger, this.config, this.cli, { all: true }));
+		} finally {
+			busy.stop();
 		}
-	} finally {
-		unlinkSync(tmpFile);
-	}
-}
-
-function screenTitle(title) {
-	const width = 50;
-	const margin = width - title.length + 4;
-	const pad = Math.floor(margin / 2);
-
-	return `\n${
-		gray('┤ '.padStart(pad + 1, '─'))
-	}${
-		bold(title)
-	}${
-		gray(' ├'.padEnd(margin - pad + 1, '─'))
-	}\n`;
-}
-
-// 	try {
-// 		async.parallel({
-// 			nodejs: function (next) {
-// 				cli.env.getOSInfo(function (results) {
-// 					var r = {
-// 						node: {
-// 							current: results.node,
-// 							latest: null
-// 						},
-// 						npm: {
-// 							current: results.npm,
-// 							latest: null
-// 						}
-// 					};
-
-// 					appc.net.online(function (err, online) {
-// 						if (err || !online) {
-// 							return next(null, r);
-// 						}
-
-// 						async.parallel([
-// 							function nodejs(cb) {
-// 								request({
-// 									url: 'http://nodejs.org/dist/',
-// 									proxy: config.get('cli.httpProxyServer'),
-// 									rejectUnauthorized: config.get('cli.rejectUnauthorized', true)
-// 								}, function (error, response, body) {
-// 									if (!error && response.statusCode === 200) {
-// 										var vers, i, l,
-// 											re = /(\d+\.\d+.\d+)/;
-// 										for (i = 0, vers = body.split('\n'), l = vers.length; i < l; i++) {
-// 											var m = vers[i].match(re);
-// 											// we only want stable releases
-// 											if (m && m[1] && m[1].split('.')[1] % 2 !== 1 && appc.version.gt(m[1], r.node.latest)) {
-// 												r.node.latest = m[1];
-// 											}
-// 										}
-// 									}
-// 									cb();
-// 								});
-// 							},
-// 							function npm(cb) {
-// 								appc.subprocess.findExecutable('npm' + (process.platform === 'win32' ? '.cmd' : ''), function (err, npm) {
-// 									if (err) {
-// 										return cb();
-// 									}
-// 									appc.subprocess.run(npm, [ 'info', 'npm', '--json' ], function (err, stdout, _stderr) {
-// 										if (!err) {
-// 											try {
-// 												var info = JSON.parse(stdout);
-// 												r.npm.latest = info && info.version || null;
-// 											} catch (ex) {
-// 												logger.log(ex);
-// 											}
-// 										}
-// 										cb();
-// 									});
-// 								});
-// 							}
-// 						], function () {
-// 							next(null, r);
-// 						});
-// 					});
-// 				});
-// 			},
-// 			ios: function (next) {
-// 				if (process.platform !== 'darwin') {
-// 					return next(null, null);
-// 				}
-// 				detectIos(logger, config, cli, function (results) {
-// 					next(null, results);
-// 				});
-// 			},
-// 			clitools: function (next) {
-// 				if (process.platform !== 'darwin') {
-// 					return next(null, null);
-// 				}
-// 				appc.clitools.detect(config, function (results) {
-// 					next(null, results);
-// 				});
-// 			},
-// 			android: function (next) {
-// 				detectAndroid(logger, config, cli, function (results) {
-// 					next(null, results);
-// 				});
-// 			},
-// 			java: function (next) {
-// 				appc.jdk.detect(config, function (results) {
-// 					next(null, results);
-// 				});
-// 			},
-// 			network: function (next) {
-// 				appc.net.online(function (err, online) {
-// 					var r = {
-// 						online: err ? null : online,
-// 						proxy: config.get('cli.httpProxyServer'),
-// 						unreachable: [],
-// 						javaResults: []
-// 					};
-
-// 					if (!r.online) {
-// 						return next(null, r);
-// 					}
-
-// 					/*
-// 						Test network access and proxy permissions via
-// 						node, cURL, and Java through an async series
-// 						of tests. Start by attempting to access a set
-// 						of necessary http and https endpoints.
-// 					*/
-// 					const urls = [
-// 	"http://google.com",
-// 	"https://github.com",
-// 	"https://registry.npmjs.org"
-// ]
-// ;
-// 					const tasks = urls.map(testUrl => {
-// 						return function (cb) {
-// 							request({
-// 								url: testUrl,
-// 								proxy: config.get('cli.httpProxyServer', ''),
-// 								rejectUnauthorized: config.get('cli.rejectUnauthorized', true)
-// 							}, function (error, response, _body) {
-// 								if (error || (response.statusCode && response.statusCode !== 200 && response.statusCode !== 401)) {
-// 									// if there's an error, response will be null, treat it as a 404
-// 									var statCode = (response && response.statusCode) ? response.statusCode : '404';
-// 									r.unreachable.push(testUrl + ' (HTTP status: ' + statCode + ')');
-// 								}
-// 								cb();
-// 							});
-// 						};
-// 					});
-
-// 					async.parallel(tasks, () => next(null, r));
-// 				});
-// 			},
-// 			cli: function (next) {
-// 				appc.net.online(function (err, online) {
-// 					var r = {
-// 						current: cli.version,
-// 						latest: null
-// 					};
-
-// 					if (err || !online) {
-// 						return next(null, r);
-// 					}
-
-// 					request({
-// 						url: 'http://registry.npmjs.org/titanium',
-// 						proxy: config.get('cli.httpProxyServer'),
-// 						rejectUnauthorized: config.get('cli.rejectUnauthorized', true)
-// 					}, function (error, response, body) {
-// 						if (!error && response.statusCode === 200) {
-// 							try {
-// 								var v = JSON.parse(body),
-// 									re = /(?:alpha|beta|rc|cr)/;
-// 								r.latest = Object.keys(v.versions).sort().filter(v => !re.test(v)).pop();
-// 							} catch (ex) {
-// 								// do nothing
-// 							}
-// 						}
-// 						next(null, r);
-// 					});
-// 				});
-// 			},
-// 			cliDeps: function (next) {
-// 				var cwd = path.resolve(__dirname, '..', '..'),
-// 					root = path.resolve('/');
-
-// 				if (!cwd) {
-// 					return next(null, {});
-// 				}
-
-// 				while (cwd !== root && !fs.existsSync(path.join(cwd, 'package.json'))) {
-// 					cwd = path.dirname(cwd);
-// 				}
-
-// 				if (cwd === root) {
-// 					return next(null, {});
-// 				}
-
-// 				appc.net.online(function (err, online) {
-// 					var results = {};
-
-// 					try {
-// 						var pkginfo = JSON.parse(fs.readFileSync(path.join(cwd, 'package.json')));
-// 						Object.keys(pkginfo.dependencies).forEach(function (name) {
-// 							var p = path.join(cwd, 'node_modules', name, 'package.json');
-// 							results[name] = {};
-// 							if (fs.existsSync(p)) {
-// 								try {
-// 									var pkginfo = JSON.parse(fs.readFileSync(p));
-// 									results[name].current = pkginfo.version;
-// 									results[name].latest = null;
-// 								} catch (ex2) {
-// 									// do nothing
-// 								}
-// 							}
-// 						});
-// 					} catch (ex) {
-// 						// do nothing
-// 					}
-
-// 					if (err || !online) {
-// 						return next(null, results);
-// 					}
-
-// 					appc.subprocess.findExecutable('npm' + (process.platform === 'win32' ? '.cmd' : ''), function (err, npm) {
-// 						if (err) {
-// 							return next(null, results);
-// 						}
-
-// 						appc.subprocess.run(npm, [ 'outdated' ], { cwd: cwd }, function (err, stdout, _stderr) {
-// 							if (!err) {
-// 								stdout.split('\n').forEach(function (line) {
-// 									var parts = line.split(' '),
-// 										m, x, y;
-// 									if (parts.length >= 3) {
-// 										x = parts[0].split('@');
-// 										y = parts[1].split(/\/|\\/);
-// 										if (y.length === 2) {
-// 											m = parts[2].match(/\=(.+)$/); // eslint-disable-line no-useless-escape
-// 											results[x[0]] = {
-// 												latest: x[1],
-// 												current: m && m[1] && m[1].toLowerCase() !== 'missing' ? m[1] : null
-// 											};
-// 										}
-// 									}
-// 								});
-// 							}
-
-// 							Object.keys(results).forEach(function (module) {
-// 								results[module].latest || (results[module].latest = results[module].current);
-// 							});
-
-// 							next(null, results);
-// 						});
-// 					});
-// 				});
-// 			},
-// 			tisdk: function (next) {
-// 				appc.net.online(async function (err, online) {
-// 					var results = {
-// 						current: Object.keys(cli.env.sdks).sort().pop(),
-// 						latest: null
-// 					};
-
-// 					if (err || !online) {
-// 						return next(null, results);
-// 					}
-
-// 					try {
-// 						var os = process.platform === 'darwin' ? 'osx' : process.platform;
-// 						var releases = await sdk.getReleases(config, os);
-// 						var latest =  appc.version.sort(Array.from(releases.keys())).reverse()[0];
-// 						results.latest = latest;
-// 					} catch (error) {
-// 						// ignore
-// 					}
-
-// 					next(null, results);
-
-// 				});
-// 			}
-// 		}, function (err, results) {
-// 			busy.stop();
-
-
-// 			callback();
-// 		});
-// 	} catch (ex) {
-// 		busy.stop();
-// 		throw ex;
-// 	}
-// };
-
-
-// /**
-//  * Configures iOS-related settings.
-//  * @param {Function} callback - Function to be called when the prompting finishes
-//  * @returns {void}
-//  */
-// SetupScreens.prototype.ios = function ios(callback) {
-// 	if (process.platform !== 'darwin') {
-// 		return callback();
-// 	}
-
-// 	var busy = new appc.busyindicator();
-// 	busy.start();
-
-// 	detectIos(this._logger, this._config, this._cli, function (results) {
-// 		busy.stop();
-
-// 		this._title(__('iOS Settings'));
 
 // 		var devList = [],
 // 			devNames = {},
@@ -1161,56 +911,40 @@ function screenTitle(title) {
 // 					throw new Error(__('Invalid iOS distribution certificate'));
 // 				}
 // 			})
-// 		}).prompt(function (err, data) {
-// 			!err && this._save({ ios: data });
-// 			callback();
-// 		}.bind(this));
-// 	}.bind(this));
-// };
+	}
+}
 
-// /**
-//  * Configures Android-related settings.
-//  * @param {Function} callback - Function to be called when the prompting finishes
-//  */
-// SetupScreens.prototype.android = function android(callback) {
-// 	this._title(__('Android Settings'));
+function isDirWritable(dir) {
+	dir = expand(dir);
+	if (!existsSync(dir)) {
+		return;
+	}
 
-// 	var busy = new appc.busyindicator();
-// 	busy.start();
+	const tmpFile = join(dir, `tmp${Math.round(Math.random() * 1e12)}`);
+	try {
+		if (existsSync(tmpFile)) {
+			utimesSync(tmpFile, new Date(), new Date());
+		} else {
+			writeFileSync(tmpFile, '', 'utf-8');
+		}
+		if (existsSync(tmpFile)) {
+			return dir;
+		}
+	} finally {
+		unlinkSync(tmpFile);
+	}
+}
 
-// 	detectAndroid(this._logger, this._config, this._cli, function (results) {
-// 		busy.stop();
+function screenTitle(title) {
+	const width = 50;
+	const margin = width - title.length + 4;
+	const pad = Math.floor(margin / 2);
 
-// 		fields.set({
-// 			sdkPath: this._registry.android.sdkPath(this._config.get('android.sdkPath', results && results.sdk && results.sdk.path)),
-// 			ndkPath: fields.file({
-// 				default: this._config.get('android.ndkPath'),
-// 				title: __('Path to the Android NDK'),
-// 				desc: __('Only required for building native Titainum Modules.'),
-// 				complete: true,
-// 				showHidden: true,
-// 				// eslint-disable-next-line security/detect-non-literal-regexp
-// 				ignoreDirs: new RegExp(this._config.get('cli.ignoreDirs')),
-// 				// eslint-disable-next-line security/detect-non-literal-regexp
-// 				ignoreFiles: new RegExp(this._config.get('cli.ignoreFiles')),
-// 				validate: function (value) {
-// 					if (value) {
-// 						if (!fs.existsSync(afs.resolvePath(value) || fs.statSync(value).isDirectory())) {
-// 							throw new appc.exception(__('Invalid Android NDK path'));
-// 						}
-
-// 						var ndkbuildExecutable = path.join(value, 'ndk-build' + (process.platform === 'win32' ? '.cmd' : ''));
-// 						if (!fs.existsSync(ndkbuildExecutable)) {
-// 							throw new Error(__('Invalid Android NDK path') + '\n' + __('Required file does not exist: "%s"', ndkbuildExecutable));
-// 						}
-// 					}
-
-// 					return true;
-// 				}
-// 			})
-// 		}).prompt(function (err, data) {
-// 			!err && this._save({ android: data });
-// 			callback();
-// 		}.bind(this));
-// 	}.bind(this));
-// };
+	return `\n${
+		gray('┤ '.padStart(pad + 1, '─'))
+	}${
+		bold(title)
+	}${
+		gray(' ├'.padEnd(margin - pad + 1, '─'))
+	}\n`;
+}
