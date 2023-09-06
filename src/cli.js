@@ -340,9 +340,7 @@ export class CLI {
 			return promise;
 		}
 
-		promise
-			.then(result => callback(null, result))
-			.catch(callback);
+		promise.then(result => callback(null, result), callback);
 
 		return this;
 	}
@@ -450,7 +448,7 @@ export class CLI {
 	 */
 	async go() {
 		Command.prototype.createHelp = () => {
-			return Object.assign(new TiHelp(), this.command.configureHelp());
+			return Object.assign(new TiHelp(this), this.command.configureHelp());
 		};
 
 		this.command = program
@@ -567,6 +565,15 @@ export class CLI {
 		this.env.installPath = installPath;
 		this.env.os.sdkPaths = sdkPaths;
 		this.env.sdks = sdks;
+		this.env.getSDK = version => {
+			if (!version || version === 'latest') {
+				return sdk;
+			}
+			const values = Object.values(sdks);
+			return values.find(s => s.name === version) ||
+				values.find(s => s.version === version) ||
+				null;
+		};
 		this.sdk = sdk;
 
 		// if we have an sdk and we're running a sdk command, then scan the sdk for hooks
@@ -795,7 +802,7 @@ export class CLI {
 			return a.orig.order ? -1 : b.orig.order ? 1 : 0;
 		});
 
-		const createQuestion = async (opt, error) => {
+		const ask = async (opt, error) => {
 			if (opt.values) {
 				const choices = opt.values.map(value => ({ value }));
 				if (choices.length === 1) {
@@ -834,17 +841,17 @@ export class CLI {
 				// sometimes required options such as `--device-id` allow an undefined value in the
 				// case when the value is derived by the config or is autoselected
 				if (orig.required && (typeof orig.verifyIfRequired !== 'function' || await new Promise(orig.verifyIfRequired))) {
-					this.argv[name] = await createQuestion(opt, `Missing required option "${name}"`);
+					this.argv[name] = await ask(opt, `Missing required option "${name}"`);
 				}
 			} else if (values && !values.includes(value)) {
-				this.argv[name] = await createQuestion(opt, `Invalid ${name} value "${value}"`);
+				this.argv[name] = await ask(opt, `Invalid ${name} value "${value}"`);
 			} else if (typeof orig.validate === 'function') {
 				this.argv[name] = await new Promise((resolve, reject) => {
 					orig.validate(value, async (err, adjustedValue) => {
 						if (err) {
 							this.logger.trace(`Validation failed for option ${name}: ${err.toString()}`);
 							try {
-								adjustedValue = await createQuestion(opt, `Invalid ${name} value "${value}"`);
+								adjustedValue = await ask(opt, `Invalid ${name} value "${value}"`);
 							} catch (e) {
 								return reject(e);
 							}

@@ -10,6 +10,7 @@ export class TiHelp extends Help {
 		super();
 
 		this.platformCmds = {};
+		this.typeCmds = {};
 
 		if (cli && platforms) {
 			for (const [name, conf] of Object.entries(platforms)) {
@@ -17,6 +18,16 @@ export class TiHelp extends Help {
 				cmd.helpOption(false);
 				applyCommandConfig.call(cli, name, cmd, conf);
 				this.platformCmds[conf.title] = cmd;
+			}
+		}
+
+		if (typeof cli?.command?.conf?.type === 'object') {
+			for (const [type, conf] of Object.entries(cli.command.conf.type)) {
+				const cmd = new Command(type);
+				cmd.helpOption(false);
+				applyCommandConfig.call(cli, type, cmd, conf);
+				const title = `${cli.command.conf.title || cli.command.module?.title || ''} --type=${type}`.trim();
+				this.typeCmds[title] = cmd;
 			}
 		}
 	}
@@ -127,6 +138,15 @@ export class TiHelp extends Help {
 			}
 
 			const optionList = helper.visibleOptions(platformCmd).map((option) => {
+				return formatItem(helper.optionTerm(option), helper.optionDescription(option));
+			});
+			if (optionList.length > 0) {
+				output = output.concat([`${title} Options:`, formatList(optionList), '']);
+			}
+		}
+
+		for (const [title, typeCmd] of Object.entries(this.typeCmds)) {
+			const optionList = helper.visibleOptions(typeCmd).map((option) => {
 				return formatItem(helper.optionTerm(option), helper.optionDescription(option));
 			});
 			if (optionList.length > 0) {
