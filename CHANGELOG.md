@@ -18,6 +18,7 @@
    - Removed macOS info including Xcode CLI Tools
    - Removed `jarsigner` from JDK detection; no longer used thanks to Gradle
    - Removed `nodeAppcVer` from Titanium CLI and Titanium SDKs in info
+   - Removed Xcode CLI tools detection
  * `ti module` changes:
    - Removed global `iphone` modules as it was just a copy of `ios` modules
  * `ti sdk` changes:
@@ -28,6 +29,8 @@
    - Removed `haxm` info
    - Removed `sdk` setup
    - Removed user locale setup
+   - Removed Xcode CLI tools detection
+   - Removed Titanium CLI Dependencies section from check
  * Logger changes:
    - Replaced "winston" based logger with lighter weight logger
    - Trace and debug log messages written to `stderr` instead of `stdout`

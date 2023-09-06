@@ -1,11 +1,15 @@
 import { readdir } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import fs from 'fs-extra';
 import { expand } from './expand.js';
 import { arrayify } from './arrayify.js';
 import * as version from './version.js';
 import { TiError } from './tierror.js';
 import { Tiapp } from './tiapp.js';
+import chalk from 'chalk';
+import { request } from './request.js';
+
+const { cyan } = chalk;
 
 export const locations = {
 	linux: [
@@ -21,12 +25,13 @@ export const locations = {
 	]
 };
 
+const os = process.platform === 'darwin' ? 'osx' : process.platform;
+
 export async function getTitaniumSDKPaths(config) {
-	const os = process.platform === 'darwin' ? 'osx' : process.platform;
 	const sdkPaths = new Set();
 
 	for (const p of locations[os]) {
-		sdkPaths.add(expand(p, 'mobilesdk', os));
+		sdkPaths.add(expand(p));
 	}
 
 	const defaultInstallLocation = config.get('sdk.defaultInstallLocation');
@@ -63,8 +68,13 @@ export async function detectTitaniumSDKs(config) {
 
 	await Promise.all(
 		sdkPaths.map(async sdkPath => {
+			if (basename(sdkPath) !== os && basename(dirname(sdkPath)) !== 'mobilesdk') {
+				sdkPath = join(sdkPath, 'mobilesdk', os);
+			}
+
 			try {
 				const dirs = await readdir(sdkPath);
+
 				return await Promise.all(dirs.map(async name => {
 					const path = join(sdkPath, name);
 					try {
@@ -101,7 +111,6 @@ export async function detectTitaniumSDKs(config) {
 	);
 
 	sdks.sort((a, b) => version.compare(b.version, a.version));
-	sdkPaths = sdkPaths.map(p => dirname(dirname(p)));
 
 	cache = {
 		installPath: defaultInstallLocation || sdkPaths[0],
@@ -132,6 +141,7 @@ export async function initSDK(cwd, selectedSdk, config, logger) {
 		sdks,
 		sdkPaths
 	} = await detectTitaniumSDKs(config);
+
 	if (!latest) {
 		throw new TiError('No Titanium SDKs found', {
 			after: `You can download the latest Titanium SDK by running: ${cyan('titanium sdk install')}`
@@ -185,4 +195,61 @@ export async function initSDK(cwd, selectedSdk, config, logger) {
 			return obj;
 		}, {})
 	};
+}
+
+/**
+ * Retrieves the list of releases.
+ * @param {String} os - The name of the OS (osx, linux, win32)
+ * @param {Boolean} [unstable] - When `true`, returns beta and rc releases along with ga releases.
+ * @returns {Promise<Release[]>}
+ */
+export async function getReleases(unstable) {
+	const releaseRE = /^(\d+)\.(\d+)\.(\d+)\.(\w+)$/;
+	const releaseTypes = [ 'beta', 'rc', 'ga' ];
+
+	const fetches = [
+		unstable && request('https://downloads.titaniumsdk.com/registry/beta.json', {
+			responseType: 'json'
+		}).then(async res => ({ type: 'beta', releases: await res.body.json() })),
+
+		unstable && request('https://downloads.titaniumsdk.com/registry/rc.json', {
+			responseType: 'json'
+		}).then(async res => ({ type: 'rc', releases: await res.body.json() })),
+
+		request('https://downloads.titaniumsdk.com/registry/ga.json', {
+			responseType: 'json'
+		}).then(async res => ({ type: 'ga', releases: await res.body.json() }))
+	];
+
+	const results = await Promise.allSettled(fetches);
+
+	return results
+		.flatMap(r => {
+			return r.status === 'fulfilled' && r.value ? r.value.releases.map(rel => {
+				rel.type = r.value.type;
+				return rel;
+			}) : [];
+		})
+		.filter(r => r.assets.some(a => a.os === os))
+		.sort((a, b) => {
+			const [ , amajor, aminor, apatch, atag ] = a.name.toLowerCase().match(releaseRE);
+			const [ , bmajor, bminor, bpatch, btag ] = b.name.toLowerCase().match(releaseRE);
+
+			let n = parseInt(bmajor) - parseInt(amajor);
+			if (n !== 0) {
+				return n;
+			}
+
+			n = parseInt(bminor) - parseInt(aminor);
+			if (n !== 0) {
+				return n;
+			}
+
+			n = parseInt(bpatch) - parseInt(apatch);
+			if (n !== 0) {
+				return n;
+			}
+
+			return releaseTypes.indexOf(btag) - releaseTypes.indexOf(atag);
+		});
 }

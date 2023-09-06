@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import { TiError } from '../util/tierror.js';
 import { expand } from '../util/expand.js';
 import * as version from '../util/version.js';
-import { request } from 'undici';
+import { request } from '../util/request.js';
 import { BusyIndicator } from '../util/busyindicator.js';
 import fs from 'fs-extra';
 import { mkdir } from 'node:fs/promises';
@@ -15,6 +15,7 @@ import { Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { extractZip } from '../util/extract-zip.js';
 import prompts from 'prompts';
+import { getReleases } from '../util/tisdk.js';
 
 const { prompt } = prompts;
 
@@ -108,7 +109,7 @@ SdkSubcommands.list = {
 		const os = cli.env.os.name;
 
 		const [ releases, branches, branchBuilds ] = (await Promise.allSettled([
-			(cli.argv.releases || cli.argv.unstable) && getReleases(os, cli.argv.unstable),
+			(cli.argv.releases || cli.argv.unstable) && getReleases(cli.argv.unstable),
 			cli.argv.branches && getBranches(),
 			cli.argv.branch && getBranchBuilds(cli.argv.branch, os)
 		])).map(r => {
@@ -481,7 +482,7 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 		// try to find the release by name
 		let release = null;
 
-		const releases = await getReleases(osName, true);
+		const releases = await getReleases(true);
 		if (uri === 'latest') {
 			release = releases.find(r => r.type === 'ga');
 		} else if (uri === 'latest-rc') {
@@ -662,7 +663,7 @@ async function checkSDKFile({ force, logger, filename, name, noPrompt, osName, s
 	}
 
 	// already installed
-	const releases = await getReleases(osName, false);
+	const releases = await getReleases(false);
 	const latest = releases[0];
 	const tip = `Run '${cyan(`titanium sdk install ${latest.name} --force`)}' to re-install`;
 
@@ -842,63 +843,6 @@ SdkSubcommands.uninstall = {
 		}
 	}
 };
-
-/**
- * Retrieves the list of releases.
- * @param {String} os - The name of the OS (osx, linux, win32)
- * @param {Boolean} [unstable] - When `true`, returns beta and rc releases along with ga releases.
- * @returns {Promise<Release[]>}
- */
-async function getReleases(os, unstable) {
-	const releaseRE = /^(\d+)\.(\d+)\.(\d+)\.(\w+)$/;
-	const releaseTypes = [ 'beta', 'rc', 'ga' ];
-
-	const fetches = [
-		unstable && request('https://downloads.titaniumsdk.com/registry/beta.json', {
-			responseType: 'json'
-		}).then(async res => ({ type: 'beta', releases: await res.body.json() })),
-
-		unstable && request('https://downloads.titaniumsdk.com/registry/rc.json', {
-			responseType: 'json'
-		}).then(async res => ({ type: 'rc', releases: await res.body.json() })),
-
-		request('https://downloads.titaniumsdk.com/registry/ga.json', {
-			responseType: 'json'
-		}).then(async res => ({ type: 'ga', releases: await res.body.json() }))
-	];
-
-	const results = await Promise.allSettled(fetches);
-
-	return results
-		.flatMap(r => {
-			return r.status === 'fulfilled' && r.value ? r.value.releases.map(rel => {
-				rel.type = r.value.type;
-				return rel;
-			}) : [];
-		})
-		.filter(r => r.assets.some(a => a.os === os))
-		.sort((a, b) => {
-			const [ , amajor, aminor, apatch, atag ] = a.name.toLowerCase().match(releaseRE);
-			const [ , bmajor, bminor, bpatch, btag ] = b.name.toLowerCase().match(releaseRE);
-
-			let n = parseInt(bmajor) - parseInt(amajor);
-			if (n !== 0) {
-				return n;
-			}
-
-			n = parseInt(bminor) - parseInt(aminor);
-			if (n !== 0) {
-				return n;
-			}
-
-			n = parseInt(bpatch) - parseInt(apatch);
-			if (n !== 0) {
-				return n;
-			}
-
-			return releaseTypes.indexOf(btag) - releaseTypes.indexOf(atag);
-		});
-}
 
 /**
  * Retrieves the list of branches.
