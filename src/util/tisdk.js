@@ -83,7 +83,7 @@ export async function detectTitaniumSDKs(config) {
 						// SDKs before 3.0.0 used Python and thus not supported
 						if (version.gte(manifest.version, '3.0.0')) {
 							if (!latest || version.gt(manifest.version, latest)) {
-								latest = manifest.version;
+								latest = manifest.name;
 							}
 							sdks.push({
 								name: manifest.name,

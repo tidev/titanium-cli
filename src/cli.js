@@ -635,7 +635,7 @@ export class CLI {
 		} else if (desc) {
 			desc = capitalize(desc) + (/[.!]$/.test(desc) ? '' : '.');
 		}
-		desc = desc.replace(/__(.+?)__/g, (s, m) => { return cyan(m); });
+		desc = desc.replace(/__(.+?)__/gs, (s, m) => cyan(m));
 		cmd.description(wrapAnsi(desc, ticonfig.get('cli.width', 80), { hard: true, trim: false }));
 
 		// load the command's config

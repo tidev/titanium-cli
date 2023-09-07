@@ -282,91 +282,107 @@ export class SetupScreens {
 
 		if (process.platform === 'darwin') {
 			log('iOS Environment');
-// 				const distPPLabel = 'dist provisioning';
-// 				const len = distPPLabel.length;
 
-// 				if (Object.keys(r.xcode).length) {
-// 					ok('Xcode'.padEnd(len), 'installed', '(' + Object.keys(r.xcode).filter(function (ver) {
-// 						return ver !== '__selected__';
-// 					}).map(function (ver) {
-// 						return r.xcode[ver].version;
-// 					}).sort().join(', ') + ')');
+			let data;
+			const busy = new BusyIndicator();
+			busy.start();
 
-// 					const iosSdks = {};
-// 					Object.keys(r.xcode).forEach(function (ver) {
-// 						if (ver !== '__selected__') {
-// 							r.xcode[ver].sdks.forEach(function (v) {
-// 								iosSdks[v] = 1;
-// 							});
-// 						}
-// 					});
-// 					if (Object.keys(iosSdks).length) {
-// 						ok(appc.string.rpad(__('iOS SDK'), len), __('installed'), '(' + Object.keys(iosSdks).sort().join(', ') + ')');
-// 					} else {
-// 						warn(appc.string.rpad(__('iOS SDK'), len), __('no iOS SDKs found'));
-// 					}
-// 				} else {
-// 					warn(appc.string.rpad('Xcode', len), __('no Xcode installations found'));
-// 					warn(appc.string.rpad(__('iOS SDK'), len), __('no Xcode installations found'));
-// 				}
+			try {
+				({ data } = await detect(this.logger, this.config, this.cli, { all: true }));
+			} finally {
+				busy.stop();
+			}
 
-// 				if (r.certs.wwdr) {
-// 					ok(appc.string.rpad(__('WWDR cert'), len), __('installed'));
-// 				} else {
-// 					warn(appc.string.rpad(__('WWDR cert'), len), __('not found'));
-// 				}
+			const distPPLabel = 'dist provisioning';
+			const len = distPPLabel.length;
 
-// 				let devCerts = 0;
-// 				let distCerts = 0;
+			if (Object.keys(data.ios.xcode).length) {
+				ok('Xcode'.padEnd(len), 'installed', `(${
+					Object
+						.keys(data.ios.xcode)
+						.filter(ver => ver !== '__selected__')
+						.map(ver => data.ios.xcode[ver].version)
+						.sort()
+						.join(', ')
+				 })`);
 
-// 				Object.keys(r.certs.keychains).forEach(function (keychain) {
-// 					if (r.certs.keychains[keychain].developer) {
-// 						r.certs.keychains[keychain].developer.forEach(function (i) {
-// 							if (!Object.prototype.hasOwnProperty.call(i, 'invalid') || i.invalid === false) {
-// 								devCerts++;
-// 							}
-// 						});
-// 					}
-// 					if (r.certs.keychains[keychain].distribution) {
-// 						r.certs.keychains[keychain].distribution.forEach(function (i) {
-// 							if (!Object.prototype.hasOwnProperty.call(i, 'invalid') || i.invalid === false) {
-// 								distCerts++;
-// 							}
-// 						});
-// 					}
-// 				});
+				const iosSdks = {};
+				for (const ver of Object.keys(data.ios.xcode)) {
+					if (ver !== '__selected__') {
+						for (const v of data.ios.xcode[ver].sdks) {
+							iosSdks[v] = 1;
+						}
+					}
+				}
+				if (Object.keys(iosSdks).length) {
+					ok('iOS SDK'.padEnd(len), 'installed', `(${Object.keys(iosSdks).sort().join(', ')})`);
+				} else {
+					warn('iOS SDK'.padEnd(len), 'no iOS SDKs found');
+				}
+			} else {
+				warn('Xcode'.padEnd(len), 'no Xcode installations found');
+				warn('iOS SDK'.padEnd(len), 'no Xcode installations found');
+			}
 
-// 				if (devCerts) {
-// 					ok(appc.string.rpad(__('developer cert'), len), __('installed'), __('(%s found)', devCerts));
-// 				} else {
-// 					warn(appc.string.rpad(__('developer cert'), len), __('not found'));
-// 				}
+			if (data.ios.certs.wwdr) {
+				ok('WWDR cert'.padEnd(len), 'installed');
+			} else {
+				warn('WWDR cert'.padEnd(len), 'not found');
+			}
 
-// 				if (distCerts) {
-// 					ok(appc.string.rpad(__('distribution cert'), len), __('installed'), __('(%s found)', distCerts));
-// 				} else {
-// 					warn(appc.string.rpad(__('distribution cert'), len), __('not found'));
-// 				}
+			let devCerts = 0;
+			let distCerts = 0;
 
-// 				var devPP = r.provisioningProfiles.development.filter(function (i) {
-// 					return !Object.prototype.hasOwnProperty.call(i, 'expired') || i.expired === false;
-// 				}).length;
-// 				if (devPP) {
-// 					ok(appc.string.rpad(__('dev provisioning'), len), __('installed'), __('(%s found)', devPP));
-// 				} else {
-// 					warn(appc.string.rpad(__('dev provisioning'), len), __('not found'));
-// 				}
+			for (const keychain of Object.keys(data.ios.certs.keychains)) {
+				if (data.ios.certs.keychains[keychain].developer) {
+					for (const i of data.ios.certs.keychains[keychain].developer) {
+						if (!Object.hasOwn(i, 'invalid') || i.invalid === false) {
+							devCerts++;
+						}
+					}
+				}
+				if (data.ios.certs.keychains[keychain].distribution) {
+					for (const i of data.ios.certs.keychains[keychain].distribution) {
+						if (!Object.hasOwn(i, 'invalid') || i.invalid === false) {
+							distCerts++;
+						}
+					}
+				}
+			}
 
-// 				var distPP = r.provisioningProfiles.distribution.filter(function (i) {
-// 					return !Object.prototype.hasOwnProperty.call(i, 'expired') || i.expired === false;
-// 				}).length + r.provisioningProfiles.adhoc.filter(function (i) {
-// 					return !Object.prototype.hasOwnProperty.call(i, 'expired') || i.expired === false;
-// 				}).length;
-// 				if (distPP) {
-// 					ok(distPPLabel, __('installed'), __('(%s found)', distPP));
-// 				} else {
-// 					warn(distPPLabel, __('not found'));
-// 				}
+			if (devCerts) {
+				ok('developer cert'.padEnd(len), 'installed', `(${devCerts} found)`);
+			} else {
+				warn('developer cert'.padEnd(len), 'not found');
+			}
+
+			if (distCerts) {
+				ok('distribution cert'.padEnd(len), 'installed', `(${distCerts} found)`);
+			} else {
+				warn('distribution cert'.padEnd(len), 'not found');
+			}
+
+			const devPP = data.ios.provisioning.development.filter(i => {
+				return !Object.hasOwn(i, 'expired') || i.expired === false;
+			}).length;
+			if (devPP) {
+				ok('dev provisioning'.padEnd(len), 'installed', `(${devPP} found)`);
+			} else {
+				warn('dev provisioning'.padEnd(len), 'not found');
+			}
+
+			const distPP = data.ios.provisioning.distribution.filter(i => {
+				return !Object.hasOwn(i, 'expired') || i.expired === false;
+			}).length + data.ios.provisioning.adhoc.filter(i => {
+				return !Object.hasOwn(i, 'expired') || i.expired === false;
+			}).length + data.ios.provisioning.enterprise.filter(i => {
+				return !Object.hasOwn(i, 'expired') || i.expired === false;
+			}).length;
+			if (distPP) {
+				ok(distPPLabel, 'installed', `(${distPP} found)`);
+			} else {
+				warn(distPPLabel, 'not found');
+			}
 			log();
 		}
 
@@ -787,130 +803,88 @@ export class SetupScreens {
 			busy.stop();
 		}
 
-// 		var devList = [],
-// 			devNames = {},
-// 			currentDevName = this._config.get('ios.developerName'),
-// 			distList = [],
-// 			distNames = {},
-// 			currentDistName = this._config.get('ios.distributionName');
+		const devList = [];
+		const devNames = {};
+		const currentDevName = this.config.get('ios.developerName');
+		const distList = [];
+		const distNames = {};
+		const currentDistName = this.config.get('ios.distributionName');
+		const questions = [];
 
-// 		if (results.detectVersion === '1.0') {
-// 			results.certs.devNames.forEach(function (n) {
-// 				if (!devNames[n]) {
-// 					devList.push({ name: n });
-// 					devNames[n] = 1;
-// 				}
-// 			});
+		for (const keychain of Object.keys(data.ios.certs.keychains)) {
+			if (data.ios.certs.keychains[keychain].developer) {
+				for (const dev of data.ios.certs.keychains[keychain].developer) {
+					const { name, invalid } = dev;
+					if ((name === currentDevName || !invalid) && !devNames[name]) {
+						devList.push(dev);
+						devNames[name] = 1;
+					}
+				}
+			}
 
-// 			results.certs.distNames.forEach(function (n) {
-// 				if (!distNames[n]) {
-// 					distList.push({ name: n });
-// 					distNames[n] = 1;
-// 				}
-// 			});
-// 		} else {
-// 			Object.keys(results.certs.keychains).forEach(function (keychain) {
-// 				(results.certs.keychains[keychain].developer || []).forEach(function (dev) {
-// 					var n = dev.name;
-// 					if ((n === currentDevName || !dev.invalid) && !devNames[n]) {
-// 						devList.push(dev);
-// 						devNames[n] = 1;
-// 					}
-// 				});
+			if (data.ios.certs.keychains[keychain].distribution) {
+				for (const dist of data.ios.certs.keychains[keychain].distribution) {
+					const { name, invalid } = dist;
+					if ((n === currentDistName || !invalid) && !distNames[name]) {
+						distList.push(dist);
+						distNames[name] = 1;
+					}
+				}
+			}
+		}
 
-// 				(results.certs.keychains[keychain].distribution || []).forEach(function (dist) {
-// 					var n = dist.name;
-// 					if ((n === currentDistName || !dist.invalid) && !distNames[n]) {
-// 						distList.push(dist);
-// 						distNames[n] = 1;
-// 					}
-// 				});
-// 			});
-// 		}
+		if (devList.length) {
+			questions.push({
+				type: 'select',
+				message: 'What do you want to be your default iOS developer cert for device builds?',
+				name: 'developerName',
+				initial: currentDevName,
+				choices: devList
+					.sort((a, b) => a.name.localeCompare(b.name))
+					.map(dev => ({
+						title: `${dev.name}${
+							dev.expired ? ` ${red('**EXPIRED**')}` : ''
+						}${
+							dev.invalid ? ` ${red('**NOT VALID**')}` : ''
+						}`,
+						value: dev.name
+					}))
+			});
+		}
 
-// 		fields.set({
-// 			developerName: devList.length && fields.select({
-// 				default: currentDevName,
-// 				title: __('What do you want to be your default iOS developer cert for device builds?'),
-// 				desc: __('(only valid, non-expired developer certs are listed)'),
-// 				promptLabel: __('Enter # or cert name'),
-// 				display: devList.length > 5 ? 'grid' : 'list',
-// 				complete: true,
-// 				completeIgnoreCase: true,
-// 				zeroSkip: true,
-// 				numbered: true,
-// 				suggest: true,
-// 				optionLabel: 'name',
-// 				optionValue: 'name',
-// 				formatters: {
-// 					option: function (opt, i) {
-// 						return '  ' + (i + 1) + ') ' + opt.name.cyan + (opt.expired ? ' ' + __('**EXPIRED**').red : opt.invalid ? ' ' + __('**NOT VALID**').red : '');
-// 					}
-// 				},
-// 				options: devList.sort(function (a, b) {
-// 					return a.name > b.name ? 1 : a.name < b.name ? -1 : 0;
-// 				}),
-// 				validate: function (value, callback) {
-// 					if (value) {
-// 						var i, l;
+		if (distList.length) {
+			questions.push({
+				type: 'select',
+				message: 'What do you want to be your default iOS distribution cert for App Store and Ad Hoc builds?',
+				name: 'distributionName',
+				initial: currentDistName,
+				choices: devList
+					.sort((a, b) => a.name.localeCompare(b.name))
+					.map(dev => ({
+						title: `${dev.name}${
+							dev.expired ? ` ${red('**EXPIRED**')}` : ''
+						}${
+							dev.invalid ? ` ${red('**NOT VALID**')}` : ''
+						}`,
+						value: dev.name
+					}))
+			});
+		}
 
-// 						// try to find an exact match
-// 						for (i = 0, l = devList.length; i < l; i++) {
-// 							if (devList[i].name === value) {
-// 								callback(null, value);
-// 								return;
-// 							}
-// 						}
+		if (questions.length) {
+			const values = await prompt(questions);
 
-// 						value += ' (';
-
-// 						// no match, try partial match without the id
-// 						for (i = 0, l = devList.length; i < l; i++) {
-// 							if (devList[i].name.indexOf(value) === 0) {
-// 								callback(null, devList[i].name);
-// 								return;
-// 							}
-// 						}
-// 					}
-
-// 					throw new Error(__('Invalid iOS developer certificate'));
-// 				}
-// 			}),
-// 			distributionName: distList.length && fields.select({
-// 				default: currentDistName,
-// 				title: __('What do you want to be your default iOS distribution cert for App Store and Ad Hoc builds?'),
-// 				desc: __('(only valid, non-expired distribution certs are listed)'),
-// 				promptLabel: __('Enter # or cert name'),
-// 				display: distList.length > 5 ? 'grid' : 'list',
-// 				complete: true,
-// 				completeIgnoreCase: true,
-// 				zeroSkip: true,
-// 				numbered: true,
-// 				suggest: true,
-// 				optionLabel: 'name',
-// 				optionValue: 'name',
-// 				formatters: {
-// 					option: function (opt, i) {
-// 						return '  ' + (i + 1) + ') ' + opt.name.cyan + (opt.expired ? ' ' + __('**EXPIRED**').red : opt.invalid ? ' ' + __('**NOT VALID**').red : '');
-// 					}
-// 				},
-// 				options: distList.sort(function (a, b) {
-// 					return a.name > b.name ? 1 : a.name < b.name ? -1 : 0;
-// 				}),
-// 				validate: function (value, callback) {
-// 					if (value) {
-// 						// try to find an exact match
-// 						for (var i = 0, l = distList.length; i < l; i++) {
-// 							if (distList[i].name === value) {
-// 								callback(null, value);
-// 								return;
-// 							}
-// 						}
-// 					}
-
-// 					throw new Error(__('Invalid iOS distribution certificate'));
-// 				}
-// 			})
+			if (devList.length) {
+				this.config.set('ios.developerName', values.developerName);
+			}
+			if (distList.length) {
+				this.config.set('ios.distributionName', values.distributionName);
+			}
+			this.config.save();
+			this.logger.log('\nConfiguration saved!');
+		} else {
+			this.logger.log('No developer or distribution certs found, skipping');
+		}
 	}
 }
 

@@ -101,7 +101,7 @@ async function osInfo() {
 	let n;
 
 	if (name === 'darwin') {
-		const { stdout } = $`sw_vers`;
+		const { stdout } = await $`sw_vers`;
 		if (m = stdout.match(/ProductName:\s+(.+)/i)) {
 			name = m[1];
 		}

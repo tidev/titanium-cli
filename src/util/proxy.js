@@ -10,15 +10,19 @@ export async function detect() {
 	if (process.platform === 'darwin') {
 		for (const iface of ['Ethernet', 'Wi-Fi']) {
 			// while this runs for both interfaces, only one will typically be active
-			let { stdout } = await $`networksetup -getsecurewebproxy ${iface}`;
-			if (stdout.includes('Enabled: Yes')) {
-				return parseNetSetup(stdout);
-			}
+			try {
+				const { stdout } = await $`networksetup -getsecurewebproxy ${iface}`;
+				if (stdout.includes('Enabled: Yes')) {
+					return parseNetSetup(stdout);
+				}
+			} catch {}
 
-			({ stdout } = await $`networksetup -getwebproxy ${iface}`);
-			if (stdout.includes('Enabled: Yes')) {
-				return parseNetSetup(stdout);
-			}
+			try {
+				const { stdout } = await $`networksetup -getwebproxy ${iface}`;
+				if (stdout.includes('Enabled: Yes')) {
+					return parseNetSetup(stdout);
+				}
+			} catch {}
 		}
 
 	} else if (process.env.https_proxy !== undefined) {
