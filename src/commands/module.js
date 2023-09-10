@@ -4,6 +4,8 @@ import { TiError } from '../util/tierror.js';
 import { existsSync } from 'node:fs';
 import { dirname, join, parse } from 'node:path';
 import chalk from 'chalk';
+import { detect } from '../util/timodule.js';
+import { capitalize } from '../util/capitalize.js';
 
 const { bold, cyan, gray } = chalk;
 
@@ -143,7 +145,6 @@ ModuleSubcommands.list = {
 			}
 		}
 
-		const { detect } = await import('../util/timodule.js');
 		const results = await detect(searchPaths, config, logger);
 
 		if (isJson) {
@@ -153,8 +154,6 @@ ModuleSubcommands.list = {
 
 		logger.skipBanner(false);
 		logger.banner();
-
-		const { capitalize } = await import('../util/capitalize.js');
 
 		for (const [scope, modules] of Object.entries(results)) {
 			const platforms = Object.keys(modules);

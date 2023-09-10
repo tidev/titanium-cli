@@ -19,6 +19,12 @@ export function applyCommandConfig(cmdName, cmd, conf) {
 
 	if (conf.options) {
 		for (const [name, meta] of Object.entries(conf.options)) {
+			if (name === 'log-level' || name === 'sdk') {
+				// --log-level and --sdk are now a global options
+				this.logger.trace(`Skipping "${cmdName}" option: --${name}`);
+				continue;
+			}
+
 			const long = `--${name}`;
 			const opt = new Option(`${meta.abbr ? `-${meta.abbr}, ` : ''}${long} [value]`, meta.desc);
 			if (meta.hidden) {

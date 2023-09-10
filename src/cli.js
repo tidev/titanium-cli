@@ -176,14 +176,16 @@ export class CLI {
 			this.applyArgv(cmd.parent);
 		}
 		if (Array.isArray(cmd?.options)) {
-			const argv = {};
+			const argv = this.argv;
 			const cargv = cmd.opts();
 			for (const o of cmd.options) {
 				let name = o.name();
 				if (o.negate) {
 					name = name.replace(/^no-/, '');
 				}
-				argv[name] = cargv[o.attributeName()];
+				if (argv[name] === undefined) {
+					argv[name] = cargv[o.attributeName()];
+				}
 			}
 			Object.assign(this.argv, argv);
 		}
@@ -510,6 +512,109 @@ export class CLI {
 				process.exit(0);
 			})
 			.hook('preSubcommand', (_, cmd) => this.loadCommand(cmd))
+			.hook('preAction', async (_, cmd) => {
+				// command is already loaded via `preSubcommand`, but reapply argv due
+				// to commander using an `EventEmitter` to set option values
+				this.applyArgv(cmd);
+
+				const { conf } = cmd;
+				if (!conf) {
+					return;
+				}
+
+				// any keys in the conf object that aren't explicitly 'flags',
+				// 'options', 'args', or 'subcommands' is probably a option branch
+				// that changes the available flags/options
+				const skipRegExp = /^(flags|options|args|subcommands)$/;
+				const optionBranches = Object.keys(conf)
+					.filter(name => conf.options && conf.options[name] && !skipRegExp.test(name))
+					.sort((a, b) => {
+						// if we have multiple option groups, then try to process them in order
+						if (!options[a] || !options[a].order) {
+							return 1;
+						}
+						if (!options[b] || !options[b].order) {
+							return -1;
+						}
+						return options[b].order - options[a].order;
+					});
+
+				for (const name of optionBranches) {
+					const option = conf.options[name];
+					const optionBranch = conf[name];
+
+					// if --<option> was passed in, then mix in the option branch's flags/options
+					if (this.argv[name]) {
+						const src = optionBranch[this.argv[name]];
+						Object.assign(conf.flags, src.flags);
+						Object.assign(conf.options, src.options);
+						await applyCommandConfig(cmd.name(), cmd, {
+							flags: src.flags,
+							options: src.options
+						});
+					}
+
+					if (this.argv[name] !== undefined || !option.required) {
+						// v6 would re-parse, but that is unsupported
+						continue;
+					}
+
+					this.logger.banner();
+
+					if (!this.argv.prompt || !option.prompt || !option.values) {
+						this.logger.error(`Missing required option "--${name}"\n`);
+						if (option.values) {
+							this.logger.log('Allowed values:');
+							for (const v of option.values) {
+								this.logger.log(`   ${cyan(v)}`);
+							}
+							this.logger.log();
+						}
+						process.exit(1);
+					}
+
+					// we need to prompt
+					const field = await new Promise(resolve => option.prompt(resolve));
+					await new Promise(resolve => {
+						field.prompt(async (err, value) => {
+							this.logger.log(); // add a little whitespace after prompting
+
+							if (err) {
+								// we purposely do NOT show the error
+								this.logger.log();
+								process.exit(1);
+							}
+
+							// the option should probably have a callback, so fire it
+							if (conf.options[name].callback) {
+								value = conf.options[name].callback(value);
+							}
+
+							this.argv[name] = value;
+
+							// mix in the option branch's flags/options
+							const src = optionBranch[value];
+							Object.assign(conf.flags, src.flags);
+							Object.assign(conf.options, src.options);
+							await applyCommandConfig.call(this, cmd.name(), cmd, {
+								flags: src.flags,
+								options: src.options
+							});
+
+							// v6 would re-parse, but that is unsupported
+
+							resolve();
+						});
+					});
+				}
+
+				// apply missing option defaults
+				for (const name of Object.keys(conf.options)) {
+					if (!Object.hasOwn(this.argv, name) && conf.options[name].default) {
+						this.argv[name] = conf.options[name].default;
+					}
+				}
+			})
 			.action(() => program.help());
 
 		this.command.title = 'Global';
@@ -630,8 +735,8 @@ export class CLI {
 		this.logger.trace(`Importing: ${commandFile}`);
 		cmd.module = (await import(commandFile)) || {};
 
-		if (typeof this.command.module.extendedDesc === 'string') {
-			desc = this.command.module.extendedDesc;
+		if (typeof cmd.module.extendedDesc === 'string') {
+			desc = cmd.module.extendedDesc;
 		} else if (desc) {
 			desc = capitalize(desc) + (/[.!]$/.test(desc) ? '' : '.');
 		}
@@ -639,8 +744,8 @@ export class CLI {
 		cmd.description(wrapAnsi(desc, ticonfig.get('cli.width', 80), { hard: true, trim: false }));
 
 		// load the command's config
-		if (typeof this.command.module.config === 'function') {
-			const fn = await this.command.module.config(this.logger, this.config, this);
+		if (typeof cmd.module.config === 'function') {
+			const fn = await cmd.module.config(this.logger, this.config, this);
 			const conf = typeof fn === 'function'
 				? await new Promise(resolve => fn(resolve))
 				: fn;
@@ -767,125 +872,324 @@ export class CLI {
 	async validate() {
 		await this.emit('cli:pre-validate', { cli: this, command: this.command });
 
-		// step 1: build a list of all options so we can sort them
-		const options = [];
-		for (const ctx of [ this.command, this.command?.platform ]) {
-			if (ctx?.conf.options) {
-				for (const [ name, opt ] of Object.entries(ctx.conf.options)) {
-					options.push({
-						// this is a sacrificial wrapper that we can throw away after firing and it
-						// handles the boilerplate of checking the callback and result
-						callback(value) {
-							let result;
-							if (typeof opt.callback === 'function') {
-								// technically `opt.callback()` can throw a `GracefulShutdown` error
-								// for both `build` and `clean` commands during the `project-dir`
-								// callback if the `<sdk-version>` in the tiapp.xml is not the same
-								// version loaded by the Titanium SDK, but luckily that will never :)
-								result = opt.callback(value || '');
-							}
-							delete this.callback;
-							return result !== undefined ? result : value;
-						},
-						name,
-						orig: opt,
-						values: /*!opt.skipValueCheck &&*/ Array.isArray(opt.values) ? opt.values : null
-					});
-				}
-			}
-		}
+		await this.handleMissingAndInvalidOptions();
 
-		options.sort((a, b) => {
-			if (a.orig.order && b.orig.order) {
-				return a.orig.order - b.orig.order;
-			}
-			return a.orig.order ? -1 : b.orig.order ? 1 : 0;
-		});
-
-		const ask = async (opt, error) => {
-			if (opt.values) {
-				const choices = opt.values.map(value => ({ value }));
-				if (choices.length === 1) {
-					return choices[0].value;
-				}
-				const { value } = await prompt({
-					choices,
-					error,
-					message: `Please select a valid ${opt.name}`,
-					name:    'value',
-					type:    'select'
-				});
-				return value;
-			}
-
-			if (typeof opt.orig?.prompt === 'function') {
-				return await new Promise(opt.orig.prompt);
-			}
-
-			const { value } = await prompt({
-				error,
-				message: `Please select a valid ${opt.name}`,
-				name:    'value',
-				type:    'text'
-			});
-			return value;
-		};
-
-		// step 2: determine invalid or missing options
-		for (const opt of options) {
-			const { name, orig, values } = opt;
-			const value = this.argv[name];
-
-			if (value === undefined) {
-				// we need to check if the option is required
-				// sometimes required options such as `--device-id` allow an undefined value in the
-				// case when the value is derived by the config or is autoselected
-				if (orig.required && (typeof orig.verifyIfRequired !== 'function' || await new Promise(orig.verifyIfRequired))) {
-					this.argv[name] = await ask(opt, `Missing required option "${name}"`);
-				}
-			} else if (values && !values.includes(value)) {
-				this.argv[name] = await ask(opt, `Invalid ${name} value "${value}"`);
-			} else if (typeof orig.validate === 'function') {
-				this.argv[name] = await new Promise((resolve, reject) => {
-					orig.validate(value, async (err, adjustedValue) => {
-						if (err) {
-							this.logger.trace(`Validation failed for option ${name}: ${err.toString()}`);
-							try {
-								adjustedValue = await ask(opt, `Invalid ${name} value "${value}"`);
-							} catch (e) {
-								return reject(e);
-							}
-						}
-						resolve(opt.callback(adjustedValue));
-					});
-				});
-			} else if (typeof opt.callback === 'function') {
-				this.argv[name] = opt.callback(value);
-			}
-		}
-
-		// step 3: run the command's validate() function, if exists
-
-		const { validate } = this.command.module;
-		if (validate && typeof validate === 'function') {
-			const fn = validate(this.logger, this.config, this);
+		const fn = this.command.module.validate;
+		if (fn && typeof fn === 'function') {
+			const result = validate(this.logger, this.config, this);
 
 			// fn should always be a function for `build` and `clean` commands
-			if (typeof fn === 'function') {
-				await new Promise(resolve => fn(resolve));
+			if (typeof result === 'function') {
+				await new Promise(resolve => result(resolve));
+			} else if (result === false) {
+				this.command.module.run = () => {};
+			}
+		}
+		await this.emit('cli:post-validate', { cli: this, command: this.command });
+
+		// fire all option callbacks for any options we missed above
+		for (const ctx of [this.command, this.command?.platform]) {
+			if (ctx?.conf.options) {
+				for (const opt of Object.values(ctx.conf.options)) {
+					if (typeof opt.callback === 'function') {
+						const val = opt.callback(this.argv[opt.name] || '');
+						if (val !== undefined) {
+							this.argv[opt.name] = val;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	async handleMissingAndInvalidOptions() {
+		const options = {};
+
+		for (const ctx of [this.command, this.command?.platform]) {
+			if (ctx?.conf.options) {
+				Object.assign(options, ctx.conf.options);
 			}
 		}
 
-		await this.emit('cli:post-validate', { cli: this, command: this.command });
+		if (!Object.keys(options).length) {
+			return;
+		}
 
-		// step 4: fire all option callbacks for any options we missed above
-		for (const opt of options) {
-			if (typeof opt.callback === 'function') {
-				const val = opt.callback(this.argv[opt.name] || '');
-				if (val !== undefined) {
-					this.argv[opt.name] = val;
+		const orderedOptionNames = Object.keys(options).sort((a, b) => {
+			if (options[a].order && options[b].order) {
+				return options[a].order - options[b].order;
+			}
+			if (options[a].order) {
+				return -1;
+			}
+			if (options[b].order) {
+				return 1;
+			}
+			return 0;
+		});
+
+		const prompting = this.argv.prompt;
+
+		// this while loop is essentially a pump that processes missing/invalid
+		// options one at a time, recalculating them each iteration
+		while (true) {
+			const invalid = {};
+			let invalidCount = 0;
+			const missing = {};
+			let missingCount = 0;
+
+			for (const name of orderedOptionNames) {
+				if (prompting && (missingCount || invalidCount)) {
+					continue;
+				}
+
+				if (options[name].validated) {
+					continue;
+				}
+
+				// check missing required options and invalid options
+				const opt = options[name];
+				const obj = Object.assign(opt, { name: name });
+
+				if (this.argv[name] === undefined) {
+					// check if the option is required
+					if (opt.required || (opt.conf && opt.conf.required)) {
+						// ok, we have a required option, but it's possible that this option
+						// replaces some legacy option in which case we need to check if the
+						// legacy options were defined
+
+						if (typeof opt.verifyIfRequired === 'function') {
+							await new Promise(resolve => {
+								opt.verifyIfRequired(stillRequired => {
+									if (stillRequired) {
+										missing[name] = obj;
+										missingCount++;
+									}
+									resolve();
+								});
+							});
+							continue;
+						}
+						missing[name] = obj;
+						missingCount++;
+					} else if (Array.isArray(opt.values) && !opt.skipValueCheck && opt.values.indexOf(this.argv[name]) === -1) {
+						invalid[name] = obj;
+						invalidCount++;
+					} else if (!opt.validated && typeof opt.validate === 'function') {
+						try {
+							await new Promise(resolve => {
+								opt.validate(this.argv[name], (err, value) => {
+									if (err) {
+										obj._err = err;
+										invalid[name] = obj;
+										invalidCount++;
+									} else {
+										this.argv[name] = value;
+										opt.validated = true;
+										if (opt.callback) {
+											var val = opt.callback(this.argv[name] || '');
+											val !== undefined && (this.argv[name] = val);
+											delete opt.callback;
+										}
+									}
+									resolve();
+								});
+							});
+						} catch (ex) {
+							if (!(ex instanceof GracefulShutdown)) {
+								throw ex;
+							}
+						}
+						return;
+					} else if (opt.callback) {
+						opt.validated = true;
+						var val = opt.callback(this.argv[name] || '');
+						val !== undefined && (this.argv[name] = val);
+						delete opt.callback;
+					}
 				}
 			}
+
+			// at this point, we know if we have any invalid or missing options
+
+			if (!invalidCount && !missingCount) {
+				break;
+			}
+
+			// we have an invalid option or missing option
+			if (!prompting) {
+				// if we're not prompting, output the invalid/missing options and exit
+				this.logger.banner();
+
+				if (Object.keys(invalid).length) {
+					for (const name of Object.keys(invalid)) {
+						const opt = invalid[name];
+						const msg = `Invalid "${opt.label || `--${name}`}" value "${argv[opt.name]}"`;
+
+						if (typeof opt.helpNoPrompt === 'function') {
+							opt.helpNoPrompt(this.logger, msg);
+						} else {
+							this.logger.error(`${msg}\n`);
+							if (opt.values) {
+								this.logger.log('Accepted values:');
+								for (const v of opt.values) {
+									this.logger.log(`   ${cyan(v)}`);
+								}
+								this.logger.log();
+							}
+						}
+					}
+				}
+
+				if (Object.keys(missing).length) {
+					// if prompting is disabled, then we just print all the problems we encountered
+					for (const name of Object.keys(missing)) {
+						const msg = `Missing required option: --${name} <${missing[name].hint || 'value'}>`;
+						if (typeof missing[name].helpNoPrompt === 'function') {
+							missing[name].helpNoPrompt(this.logger, msg);
+						} else {
+							this.logger.error(`${msg}\n`);
+						}
+					}
+				}
+
+				this.logger.log(`For help, run: ${cyan('titanium ${this.argv.$command} --help')}\n`);
+				process.exit(1);
+			}
+
+			// we are prompting, so find the first invalid or missing option
+			let opt;
+			if (invalidCount) {
+				const name = Object.keys(invalid).shift();
+				opt = invalid[name];
+
+				if (!opt.prompt) {
+					// option doesn't have a prompt, so let's make a generic one
+					opt.prompt = async callback => {
+						// if the option has values, then display a pretty list
+						if (Array.isArray(opt.values)) {
+							const { value } = await prompt({
+								type: 'select',
+								message: `Please select a valid ${cyan(name)} value:`,
+								choices: opt.values.map(v => ({ label: v, value: v }))
+							});
+							return callback(null, value);
+						}
+
+						const pr = opt.prompt || {};
+						const { value } = await prompt({
+							type: opt.password ? 'password' : 'text',
+							message: `Please enter a valid ${cyan(name)}`,
+							validate: opt.validate || (value => {
+								if (pr.validator) {
+									try {
+										pr.validator(value);
+									} catch (ex) {
+										return ex.toString();
+									}
+								} else if (!value.length || (pr.pattern && !pr.pattern.test(value))) {
+									return pr.error;
+								}
+								return true;
+							})
+						})
+						callback(null, value);
+					};
+				}
+			} else {
+				// must be a missing option
+				opt = missing[Object.keys(missing).shift()];
+			}
+
+			// do the prompting
+			await this.prompt(opt);
+			try {
+				opt._err = null;
+				opt.validated = true;
+				if (opt.callback) {
+					try {
+						const val = opt.callback(this.argv[opt.name] || '');
+						if (val !== undefined) {
+							this.argv[opt.name] = val;
+						}
+						delete opt.callback;
+					} catch (e) {
+						if (e instanceof GracefulShutdown) {
+							this.command.module.run = () => {};
+						} else {
+							throw e;
+						}
+					}
+				}
+			} catch {
+				this.argv[opt.name] = undefined;
+			}
+		}
+	}
+
+	async prompt(opt) {
+		if (typeof opt.prompt === 'function') {
+			const field = await new Promise(resolve => opt.prompt(resolve));
+			if (!field) {
+				return;
+			}
+
+			if (opt._err && field.autoSelectOne) {
+				field.autoSelectOne = false;
+			}
+
+			this.argv[opt.name] = await new Promise(resolve => {
+				field.prompt((err, value) => {
+					if (err) {
+						process.exit(1);
+					}
+					resolve(value);
+				});
+			});
+			return;
+		}
+
+		const pr = opt.prompt || {};
+		const p = (pr.label || capitalize(opt.desc || '')).trim().replace(/:$/, '');
+		let def = pr.default || opt.default || '';
+		if (typeof def === 'function') {
+			def = def();
+		} else if (Array.isArray(def)) {
+			def = def.join(',');
+		}
+
+		const validate = pr.validate || (value => {
+			if (pr.validator) {
+				try {
+					pr.validator(value);
+				} catch (ex) {
+					return ex.toString();
+				}
+			} else if (!value.length || (pr.pattern && !pr.pattern.test(value))) {
+				return pr.error;
+			}
+			return true;
+		});
+
+		if (Array.isArray(opt.values)) {
+			const { value } = await prompt({
+				type: 'select',
+				message: p,
+				name: 'value',
+				initial: def || undefined,
+				validate,
+				choices: opt.values.map(v => ({ label: v, value: v }))
+			});
+			this.argv[opt.name] = value;
+		} else {
+			const { value } = await prompt({
+				type: opt.password ? 'password' : 'text',
+				message: p,
+				name: 'value',
+				initial: def || undefined,
+				validate
+			});
+			this.argv[opt.name] = value;
 		}
 	}
 }

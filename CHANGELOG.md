@@ -7,6 +7,7 @@
  * Removed i18n logic; all output rendered in English
  * Removed incomplete tab completion code
  * Removed "default" SDK; `<sdk-version>` in tiapp.xml is source of truth, override with `--sdk <ver>` arg
+ * `--log-level` is now a global option
  * `ti config` changes:
    - Added `--json` flag
    - Replaced `--output json` with `--output json-object` output

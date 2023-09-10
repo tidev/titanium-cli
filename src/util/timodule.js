@@ -3,6 +3,7 @@ import { join, resolve } from 'node:path';
 import { existsSync, unlinkSync } from 'node:fs';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import chalk from 'chalk';
+import { extractZip } from './extract-zip.js';
 
 const { cyan } = chalk;
 
@@ -91,7 +92,6 @@ async function unzipIfNecessary(moduleRoot, name, logger) {
 
 	try {
 		logger.log(`Installing module: ${cyan(name)}`);
-		const { extractZip } = await import('./extract-zip.js');
 		await extractZip({
 			file,
 			dest: moduleRoot

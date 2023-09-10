@@ -16,6 +16,7 @@ import { pipeline } from 'node:stream/promises';
 import { extractZip } from '../util/extract-zip.js';
 import prompts from 'prompts';
 import { getReleases } from '../util/tisdk.js';
+import humanize from 'humanize';
 
 const { prompt } = prompts;
 
@@ -194,8 +195,6 @@ SdkSubcommands.list = {
 			logger.log('No Titanium SDKs are installed\n');
 			logger.log(`You can download the latest Titanium SDK by running: ${cyan(cli.argv.$ + ' sdk install')}\n`);
 		}
-
-		const { default: humanize } = await import('humanize');
 
 		if (releases) {
 			logger.log();

@@ -1,5 +1,7 @@
 import { BusyIndicator } from '../util/busyindicator.js';
 import chalk from 'chalk';
+import { detect } from '../util/detect.js';
+import wrapAnsi from 'wrap-ansi';
 
 const { bold, cyan, gray, magenta, red, yellow } = chalk;
 const typesList = ['all', 'os', 'nodejs', 'titanium', 'jdk', 'android', 'ios'];
@@ -74,7 +76,6 @@ export async function run(logger, config, cli) {
 	let data;
 	let platformInfo;
 	try {
-		const { detect } = await import('../util/detect.js');
 		({
 			data,
 			platformInfo
@@ -193,8 +194,6 @@ export async function run(logger, config, cli) {
 	});
 
 	if (withIssues.length) {
-		const { default: wrapAnsi } = await import('wrap-ansi');
-
 		for (const [type, info] of withIssues) {
 			const section = sections.find(s => s.name === type);
 			logger.log(bold(`${section.title} Issues`));
