@@ -526,6 +526,11 @@ export class CLI {
 					return;
 				}
 
+				// if the command has a --platform option, then we need to load the platform-specific configuration
+				if (conf.options.platform) {
+					this.argv.$platform = this.argv.platform;
+				}
+
 				// any keys in the conf object that aren't explicitly 'flags',
 				// 'options', 'args', or 'subcommands' is probably a option branch
 				// that changes the available flags/options
@@ -895,11 +900,11 @@ export class CLI {
 		// fire all option callbacks for any options we missed above
 		for (const ctx of [this.command, this.command?.platform]) {
 			if (ctx?.conf.options) {
-				for (const opt of Object.values(ctx.conf.options)) {
+				for (const [name, opt] of Object.entries(ctx.conf.options)) {
 					if (typeof opt.callback === 'function') {
-						const val = opt.callback(this.argv[opt.name] || '');
+						const val = opt.callback(this.argv[name] || '');
 						if (val !== undefined) {
-							this.argv[opt.name] = val;
+							this.argv[name] = val;
 						}
 					}
 				}
@@ -977,41 +982,41 @@ export class CLI {
 						}
 						missing[name] = obj;
 						missingCount++;
-					} else if (Array.isArray(opt.values) && !opt.skipValueCheck && opt.values.indexOf(this.argv[name]) === -1) {
-						invalid[name] = obj;
-						invalidCount++;
-					} else if (!opt.validated && typeof opt.validate === 'function') {
-						try {
-							await new Promise(resolve => {
-								opt.validate(this.argv[name], (err, value) => {
-									if (err) {
-										obj._err = err;
-										invalid[name] = obj;
-										invalidCount++;
-									} else {
-										this.argv[name] = value;
-										opt.validated = true;
-										if (opt.callback) {
-											var val = opt.callback(this.argv[name] || '');
-											val !== undefined && (this.argv[name] = val);
-											delete opt.callback;
-										}
-									}
-									resolve();
-								});
-							});
-						} catch (ex) {
-							if (!(ex instanceof GracefulShutdown)) {
-								throw ex;
-							}
-						}
-						return;
-					} else if (opt.callback) {
-						opt.validated = true;
-						var val = opt.callback(this.argv[name] || '');
-						val !== undefined && (this.argv[name] = val);
-						delete opt.callback;
 					}
+				} else if (Array.isArray(opt.values) && !opt.skipValueCheck && opt.values.indexOf(this.argv[name]) === -1) {
+					invalid[name] = obj;
+					invalidCount++;
+				} else if (!opt.validated && typeof opt.validate === 'function') {
+					try {
+						await new Promise(resolve => {
+							opt.validate(this.argv[name], (err, value) => {
+								if (err) {
+									obj._err = err;
+									invalid[name] = obj;
+									invalidCount++;
+								} else {
+									this.argv[name] = value;
+									opt.validated = true;
+									if (opt.callback) {
+										var val = opt.callback(this.argv[name] || '');
+										val !== undefined && (this.argv[name] = val);
+										delete opt.callback;
+									}
+								}
+								resolve();
+							});
+						});
+					} catch (ex) {
+						if (!(ex instanceof GracefulShutdown)) {
+							throw ex;
+						}
+					}
+					return;
+				} else if (opt.callback) {
+					opt.validated = true;
+					var val = opt.callback(this.argv[name] || '');
+					val !== undefined && (this.argv[name] = val);
+					delete opt.callback;
 				}
 			}
 
@@ -1133,6 +1138,8 @@ export class CLI {
 	}
 
 	async prompt(opt) {
+		this.logger.trace(`Prompting for --${opt.name}`);
+
 		if (typeof opt.prompt === 'function') {
 			const field = await new Promise(resolve => opt.prompt(resolve));
 			if (!field) {
