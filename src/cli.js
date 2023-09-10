@@ -378,6 +378,26 @@ export class CLI {
 
 		this.logger.banner();
 
+		if (sdkCommands[this.command.name()]) {
+			// the SDK still uses the `colors` package, so we need to add the
+			// colors to the string prototype
+			const assignColors = proto => Object.defineProperties(proto, {
+				blue: { get() { return blue(`${this}`); } },
+				bold: { get() { return bold(`${this}`); } },
+				cyan: { get() { return cyan(`${this}`); } },
+				gray: { get() { return gray(`${this}`); } },
+				green: { get() { return green(`${this}`); } },
+				grey: { get() { return gray(`${this}`); } },
+				magenta: { get() { return magenta(`${this}`); } },
+				red: { get() { return red(`${this}`); } },
+				yellow: { get() { return yellow(`${this}`); } }
+			});
+
+			assignColors(String.prototype);
+			assignColors(Number.prototype);
+			assignColors(Boolean.prototype);
+		}
+
 		await this.validate();
 
 		await this.emit('cli:pre-execute', { cli: this, command: this.command });
@@ -386,22 +406,6 @@ export class CLI {
 		const { run } = this.command.module;
 		if (typeof run !== 'function') {
 			return;
-		}
-
-		if (sdkCommands[this.command.name()]) {
-			// the SDK still uses the `colors` package, so we need to add the
-			// colors to the string prototype
-			Object.defineProperties(String.prototype, {
-				blue: { get() { return blue(this); } },
-				bold: { get() { return bold(this); } },
-				cyan: { get() { return cyan(this); } },
-				gray: { get() { return gray(this); } },
-				green: { get() { return green(this); } },
-				grey: { get() { return gray(this); } },
-				magenta: { get() { return magenta(this); } },
-				red: { get() { return red(this); } },
-				yellow: { get() { return yellow(this); } }
-			});
 		}
 
 		this.logger.trace(`Executing command: ${this.command.name()}`);
@@ -680,6 +684,7 @@ export class CLI {
 				null;
 		};
 		this.sdk = sdk;
+		this.argv.sdk = sdk.name;
 
 		// if we have an sdk and we're running a sdk command, then scan the sdk for hooks
 		if (this.sdk && sdkCommands[cmdName]) {
@@ -876,7 +881,7 @@ export class CLI {
 
 		const fn = this.command.module.validate;
 		if (fn && typeof fn === 'function') {
-			const result = validate(this.logger, this.config, this);
+			const result = fn(this.logger, this.config, this);
 
 			// fn should always be a function for `build` and `clean` commands
 			if (typeof result === 'function') {
