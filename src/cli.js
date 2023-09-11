@@ -527,7 +527,7 @@ export class CLI {
 				}
 
 				// if the command has a --platform option, then we need to load the platform-specific configuration
-				if (conf.options.platform) {
+				if (conf.options?.platform) {
 					this.argv.$platform = this.argv.platform;
 				}
 
@@ -618,9 +618,11 @@ export class CLI {
 				}
 
 				// apply missing option defaults
-				for (const name of Object.keys(conf.options)) {
-					if (!Object.hasOwn(this.argv, name) && conf.options[name].default) {
-						this.argv[name] = conf.options[name].default;
+				if (conf.options) {
+					for (const name of Object.keys(conf.options)) {
+						if (!Object.hasOwn(this.argv, name) && conf.options[name].default) {
+							this.argv[name] = conf.options[name].default;
+						}
 					}
 				}
 			})
@@ -680,7 +682,7 @@ export class CLI {
 			config: this.config,
 			cwd,
 			logger: this.logger,
-			promptingEnabled: this.argv.prompt,
+			promptingEnabled: this.argv.prompt && !this.argv.$_.includes('-h') && !this.argv.$_.includes('--help'),
 			selectedSdk: this.argv.sdk
 		});
 		this.env.installPath = installPath;
