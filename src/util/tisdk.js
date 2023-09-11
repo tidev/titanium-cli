@@ -8,8 +8,10 @@ import { TiError } from './tierror.js';
 import { Tiapp } from './tiapp.js';
 import chalk from 'chalk';
 import { request } from './request.js';
+import prompts from 'prompts';
 
-const { cyan } = chalk;
+const { cyan, gray } = chalk;
+const { prompt } = prompts;
 
 export const locations = {
 	linux: [
@@ -64,7 +66,6 @@ export async function detectTitaniumSDKs(config) {
 		sdkPaths
 	} = await getTitaniumSDKPaths(config);
 	const sdks = [];
-	let latest = null;
 
 	await Promise.all(
 		sdkPaths.map(async sdkPath => {
@@ -82,9 +83,6 @@ export async function detectTitaniumSDKs(config) {
 
 						// SDKs before 3.0.0 used Python and thus not supported
 						if (version.gte(manifest.version, '3.0.0')) {
-							if (!latest || version.gt(manifest.version, latest)) {
-								latest = manifest.name;
-							}
 							sdks.push({
 								name: manifest.name,
 								manifest,
@@ -97,6 +95,7 @@ export async function detectTitaniumSDKs(config) {
 										return platforms;
 									}, {})
 									: {},
+								type: getSDKType(manifest.name),
 								version: manifest.version
 							});
 						}
@@ -110,11 +109,11 @@ export async function detectTitaniumSDKs(config) {
 		})
 	);
 
-	sdks.sort((a, b) => version.compare(b.version, a.version));
+	sdks.sort((a, b) => version.compare(a.name, b.name)).reverse()
 
 	cache = {
 		installPath: defaultInstallLocation || sdkPaths[0],
-		latest,
+		latest: sdks.find(s => /.GA$/.test(s.name))?.name || sdks[0]?.name || null,
 		sdks,
 		sdkPaths
 	};
@@ -122,7 +121,20 @@ export async function detectTitaniumSDKs(config) {
 	return cache;
 }
 
-export async function initSDK(cwd, selectedSdk, config, logger) {
+function getSDKType(name) {
+	if (/.ga$/i.test(name)) {
+		return 'ga';
+	}
+	if (/.rc$/i.test(name)) {
+		return 'rc';
+	}
+	if (/.beta$/i.test(name)) {
+		return 'beta';
+	}
+	return 'unsupported';
+}
+
+export async function initSDK({ cmdName, config, cwd, logger, promptingEnabled, selectedSdk }) {
 	let sdkVersion;
 
 	// try to read the tiapp.xml
@@ -142,7 +154,7 @@ export async function initSDK(cwd, selectedSdk, config, logger) {
 		sdkPaths
 	} = await detectTitaniumSDKs(config);
 
-	if (!latest) {
+	if (!sdks.length) {
 		throw new TiError('No Titanium SDKs found', {
 			after: `You can download the latest Titanium SDK by running: ${cyan('titanium sdk install')}`
 		});
@@ -154,11 +166,55 @@ export async function initSDK(cwd, selectedSdk, config, logger) {
 		sdkVersion = latest;
 	}
 
+	let sdk = sdks.find(s => s.name === sdkVersion);
+
+	const sortTypes = [ 'unsupported', 'beta', 'rc', 'ga' ];
+	const typeLabels = {
+		unsupported: 'Unsupported',
+		beta: 'Beta',
+		rc: 'Release Candidate',
+		ga: 'Production Stable'
+	}
+
+	// this is a hack... if this is the create command, prompt for
+	if (promptingEnabled && ((selectedSdk && !sdk) || (!selectedSdk && cmdName === 'create'))) {
+		logger.banner();
+
+		const sdkTypes = {};
+		for (const s of sdks) {
+			if (!sdkTypes[s.type]) {
+				sdkTypes[s.type] = [];
+			}
+			sdkTypes[s.type].push(s.name);
+		}
+
+		const choices = [];
+		for (const t of Object.keys(sdkTypes).sort((a, b) => sortTypes.indexOf(b) - sortTypes.indexOf(a))) {
+			for (const s of sdkTypes[t]) {
+				choices.push({ label: s, value: s, description: typeLabels[t] });
+			}
+		}
+
+		({ sdkVersion } = await prompt({
+			type: 'select',
+			message: 'Which Titanium SDK would you like to use?',
+			name: 'sdkVersion',
+			initial: sdk ? choices.find(s => s.name === sdk.name)?.name : undefined,
+			choices
+		}));
+
+		if (sdkVersion === undefined) {
+			// sigint
+			process.exit(0);
+		}
+
+		sdk = sdks.find(s => s.name === sdkVersion);
+	}
+
 	// return the specified sdk
-	const sdk = sdks.find(s => s.name === sdkVersion);
 	if (!sdk) {
 		throw new TiError(`Titanium SDK "${sdkVersion}" not found`, {
-			after: `Available SDKs:\n${sdks.map(sdk => `  ${cyan(sdk.name)}`).join('\n')}`
+			after: `Available SDKs:\n${sdks.map(sdk => `  ${cyan(sdk.name.padEnd(24))} ${gray(typeLabels[sdk.type])}`).join('\n')}`
 		});
 	}
 

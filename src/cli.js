@@ -675,7 +675,14 @@ export class CLI {
 			sdk,
 			sdkPaths,
 			sdks
-		} = await initSDK(cwd, this.argv.sdk, this.config, this.logger);
+		} = await initSDK({
+			cmdName,
+			config: this.config,
+			cwd,
+			logger: this.logger,
+			promptingEnabled: this.argv.prompt,
+			selectedSdk: this.argv.sdk
+		});
 		this.env.installPath = installPath;
 		this.env.os.sdkPaths = sdkPaths;
 		this.env.sdks = sdks;
@@ -1082,8 +1089,13 @@ export class CLI {
 							const { value } = await prompt({
 								type: 'select',
 								message: `Please select a valid ${cyan(name)} value:`,
+								name: 'value',
 								choices: opt.values.map(v => ({ label: v, value: v }))
 							});
+							if (value === undefined) {
+								// sigint
+								process.exit(0);
+							}
 							return callback(null, value);
 						}
 
@@ -1091,6 +1103,7 @@ export class CLI {
 						const { value } = await prompt({
 							type: opt.password ? 'password' : 'text',
 							message: `Please enter a valid ${cyan(name)}`,
+							name: 'value',
 							validate: opt.validate || (value => {
 								if (pr.validator) {
 									try {
@@ -1103,7 +1116,11 @@ export class CLI {
 								}
 								return true;
 							})
-						})
+						});
+						if (value === undefined) {
+							// sigint
+							process.exit(0);
+						}
 						callback(null, value);
 					};
 				}
@@ -1184,25 +1201,33 @@ export class CLI {
 			return true;
 		});
 
+		let value;
+
 		if (Array.isArray(opt.values)) {
-			const { value } = await prompt({
+			const choices = opt.values.map(v => ({ label: v, value: v }));
+			({ value } = await prompt({
 				type: 'select',
 				message: p,
 				name: 'value',
-				initial: def || undefined,
+				initial: def && choices.find(c => c.value === def) || undefined,
 				validate,
-				choices: opt.values.map(v => ({ label: v, value: v }))
-			});
-			this.argv[opt.name] = value;
+				choices
+			}));
 		} else {
-			const { value } = await prompt({
+			({ value } = await prompt({
 				type: opt.password ? 'password' : 'text',
 				message: p,
 				name: 'value',
 				initial: def || undefined,
 				validate
-			});
-			this.argv[opt.name] = value;
+			}));
 		}
+
+		if (value === undefined) {
+			// sigint
+			process.exit(0);
+		}
+
+		this.argv[opt.name] = value;
 	}
 }

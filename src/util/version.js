@@ -28,10 +28,11 @@ export function compare(a, b) {
 	}
 
 	if (atag && btag) {
-		return sortTypes.indexOf(atag) - sortTypes.indexOf(btag);
+		console.log({ atag, btag });
+		return atag.localeCompare(btag); // sortTypes.indexOf(atag) - sortTypes.indexOf(btag);
 	}
 
-	return atag ? -1 : btag ? 1 : 0;
+	return atag ? 1 : btag ? -1 : 0;
 }
 
 /**
