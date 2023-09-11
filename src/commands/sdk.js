@@ -270,10 +270,9 @@ SdkSubcommands.install = {
 			// ti sdk install latest-beta
 			// ti sdk install something.zip
 			// ti sdk install something.zip --default
-			// ti sdk install http://builds.appcelerator.com/mobile/master/mobilesdk-3.2.0.v20130612114042-osx.zip
+			// ti sdk install https://github.com/tidev/titanium-sdk/releases/download/12_1_2_GA/mobilesdk-12.1.2.GA-osx.zip
 			// ti sdk install 3.1.0.GA
 			// ti sdk install 3.1.0.GA --default
-			// ti sdk install master:11.1.0.v20220614174006
 			desc: 'download the latest Titanium SDK or a specific version',
 			args: [
 				{
