@@ -37,7 +37,7 @@
    - Added total run time trace message at end
  * Updated dependencies, replaced deprecated dependencies
    - Replaced `colors` with `chalk`
-   - Replaced `fields` with `inquirer`
+   - Replaced `fields` with `prompts`
    - Replaced `request` with `undici`
    - Replaced `temp` with `tmp`
    - Replaced `sprintf` with `sprintf-js`
