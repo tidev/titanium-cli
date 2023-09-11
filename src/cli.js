@@ -953,14 +953,15 @@ export class CLI {
 					continue;
 				}
 
-				if (options[name].validated) {
+				const opt = options[name];
+
+				if (opt.validated) {
 					continue;
 				}
 
-				// check missing required options and invalid options
-				const opt = options[name];
 				const obj = Object.assign(opt, { name: name });
 
+				// check missing required options and invalid options
 				if (this.argv[name] === undefined) {
 					// check if the option is required
 					if (opt.required || (opt.conf && opt.conf.required)) {
@@ -1011,7 +1012,7 @@ export class CLI {
 							throw ex;
 						}
 					}
-					return;
+					continue;
 				} else if (opt.callback) {
 					opt.validated = true;
 					var val = opt.callback(this.argv[name] || '');
