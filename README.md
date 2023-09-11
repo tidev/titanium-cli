@@ -50,8 +50,6 @@ Displays help or help for a specific command.
 
     ti
 
-    titanium help
-
     titanium --help
 
     titanium <command> --help
@@ -105,7 +103,7 @@ Displays information about your development environment including Xcode installs
 
     titanium info
 
-    titanium info -o json
+    titanium info --json
 
 ## Hacking the Titanium CLI
 
@@ -118,8 +116,8 @@ If you have already installed a previous version of the Titanium CLI, it's recom
 The Titanium CLI is essentially pure JavaScript, so there is no build process.
 You just need to pull the code and resolve the dependendencies.
 
-    git clone git@github.com:tidev/titanium.git
-    cd titanium
+    git clone git@github.com:tidev/titanium-cli.git
+    cd titanium-cli
     npm install
     sudo npm link
 

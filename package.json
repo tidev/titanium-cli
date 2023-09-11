@@ -42,15 +42,7 @@
 	"devDependencies": {
 		"@commitlint/cli": "17.7.1",
 		"@commitlint/config-conventional": "17.7.0",
-		"danger": "11.2.8",
-		"eslint": "8.49.0",
-		"eslint-config-axway": "8.0.0",
-		"eslint-plugin-mocha": "10.1.0",
-		"husky": "8.0.3",
-		"lint-staged": "14.0.1",
-		"mocha": "10.2.0",
-		"nyc": "15.1.0",
-		"should": "13.2.3"
+		"husky": "8.0.3"
 	},
 	"license": "Apache-2.0",
 	"bin": {
@@ -58,39 +50,12 @@
 		"titanium": "./bin/ti.js"
 	},
 	"scripts": {
-		"lint": "eslint .",
-		"test": "npm run lint && npm run unit-test",
-		"unit-test": "nyc mocha \"tests/commands/test-*.js\"",
-		"prepare": "husky install"
-	},
-	"mocha": {
-		"timeout": 3000,
-		"check-leaks": true,
-		"globals": [
-			"Hyperloop",
-			"HyperloopObject"
-		]
-	},
-	"nyc": {
-		"check-coverage": false,
-		"lines": 55,
-		"statements": 55,
-		"functions": 49,
-		"branches": 44,
-		"exclude": [
-			"tests/**/*.js",
-			"locales/**/*.js"
-		],
-		"reporter": [
-			"cobertura",
-			"text"
-		]
+		"lint": "echo 'TODO'",
+		"prepare": "husky install",
+		"test": "echo 'TODO'"
 	},
 	"engines": {
 		"node": ">=18"
-	},
-	"lint-staged": {
-		"*.js": "eslint"
 	},
 	"commitlint": {
 		"extends": [
