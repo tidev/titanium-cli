@@ -6,9 +6,7 @@
 	"type": "module",
 	"about": {
 		"name": "Titanium Command-Line Interface",
-		"author": "TiDev",
-		"copyright": "Copyright TiDev, Inc. 4/7/2022-Present. All Rights Reserved.",
-		"id": "io.tidev.titanium.cli"
+		"copyright": "Copyright TiDev, Inc. 4/7/2022-Present. All Rights Reserved."
 	},
 	"keywords": [
 		"titanium",
