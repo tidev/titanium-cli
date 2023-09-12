@@ -28,6 +28,9 @@ jobs:
     - name: Install dependencies
       run: pnpm install
 
+    - name: Lint
+      run: pnpm lint
+
     - name: Run tests
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

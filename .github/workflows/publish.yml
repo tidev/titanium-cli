@@ -23,6 +23,9 @@ jobs:
       run: pnpm install
       if: steps.node-cache.outputs.cache-hit != 'true'
 
+    - name: Lint
+      run: pnpm lint
+
     - name: Publish to npm
       env:
         GH_TOKEN: ${{ github.token }}
