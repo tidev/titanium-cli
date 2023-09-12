@@ -53,7 +53,7 @@ export async function detect(config) {
 		} catch {}
 
 		try {
-			const p = await which('javac');
+			let p = await which('javac');
 			p = await realpath(dirname(dirname(p)));
 			if (!jdkPaths.includes(p) && isJDK(p)) {
 				jdkPaths.push(p);
@@ -113,8 +113,8 @@ export async function detect(config) {
 				type: 'warning',
 				message: `JDK (Java Development Kit) at ${home} missing required programs: __${missingTools.join(', ')}__
 ${process.env.JAVA_HOME
-	? `Please verify your __JAVA_HOME__ environment variable is correctly set to the JDK install location\n__JAVA_HOME__ is currently set to "${process.env.JAVA_HOME}".`
-	: 'Please set the __JAVA_HOME__ environment variable to the JDK install location and not the JRE (Java Runtime Environment).'}
+		? `Please verify your __JAVA_HOME__ environment variable is correctly set to the JDK install location\n__JAVA_HOME__ is currently set to "${process.env.JAVA_HOME}".`
+		: 'Please set the __JAVA_HOME__ environment variable to the JDK install location and not the JRE (Java Runtime Environment).'}
 The __JAVA_HOME__ environment variable must point to the JDK and not the JRE (Java Runtime Environment).
 You may want to reinstall the JDK by downloading it from __https://www.oracle.com/java/technologies/downloads/__
 or  __https://jdk.java.net/archive/__.`

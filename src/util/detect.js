@@ -6,6 +6,7 @@ import { detectTitaniumSDKs } from './tisdk.js';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import chalk from 'chalk';
+import { readFile } from 'node:fs/promises';
 
 const { cyan } = chalk;
 
@@ -99,6 +100,7 @@ async function osInfo() {
 	let version = '?';
 	let m;
 	let n;
+	let _;
 
 	if (name === 'darwin') {
 		const { stdout } = await $`sw_vers`;
@@ -159,7 +161,7 @@ async function titaniumInfo(config) {
 			platforms: Object.keys(sdk.platforms),
 			githash: sdk.githash,
 			timestamp: sdk.timestamp
-		}
+		};
 	}
 
 	return results;

@@ -1,5 +1,6 @@
 import { Argument, Command, Option } from 'commander';
 import { ticonfig } from './ticonfig.js';
+import { TiError } from './tierror.js';
 
 export function applyCommandConfig(cmdName, cmd, conf) {
 	if (conf.title) {

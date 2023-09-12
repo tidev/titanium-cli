@@ -30,7 +30,7 @@ function levenshtein(s, c) {
 	if (!(len1 || len2)) {
 		return Math.max(len1, len2);
 	}
-	for (; i; a[--i] = [ i ]) {
+	for (; i; a[--i] = [i]) {
 		//
 	}
 	for (i = len2 + 1; a[0][--i] = i;) {

@@ -196,7 +196,7 @@ async function detectModule(modulePath, version, ignoreDirs, logger) {
 
 	if (mod.manifest.platform) {
 		mod.manifest.platform = platformAliases[mod.manifest.platform] || mod.manifest.platform;
-		mod.platform = [ mod.manifest.platform ];
+		mod.platform = [mod.manifest.platform];
 	}
 
 	logger.trace(`Detected ${cyan(mod.platform[0])} module: ${cyan(mod.manifest.moduleid)} @ ${mod.modulePath}`);

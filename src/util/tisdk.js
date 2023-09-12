@@ -102,14 +102,14 @@ export async function detectTitaniumSDKs(config) {
 					} catch {
 						// no manifest (too old)
 					}
-				}))
+				}));
 			} catch {
 				// directory probably does not exist, ignore
 			}
 		})
 	);
 
-	sdks.sort((a, b) => version.compare(a.name, b.name)).reverse()
+	sdks.sort((a, b) => version.compare(a.name, b.name)).reverse();
 
 	cache = {
 		installPath: defaultInstallLocation || sdkPaths[0],
@@ -133,6 +133,8 @@ function getSDKType(name) {
 	}
 	return 'unsupported';
 }
+
+const sortTypes = ['unsupported', 'beta', 'rc', 'ga'];
 
 export async function initSDK({ cmdName, config, cwd, logger, promptingEnabled, selectedSdk }) {
 	let sdkVersion;
@@ -168,13 +170,12 @@ export async function initSDK({ cmdName, config, cwd, logger, promptingEnabled, 
 
 	let sdk = sdks.find(s => s.name === sdkVersion);
 
-	const sortTypes = [ 'unsupported', 'beta', 'rc', 'ga' ];
 	const typeLabels = {
 		unsupported: 'Unsupported',
 		beta: 'Beta',
 		rc: 'Release Candidate',
 		ga: 'Production Stable'
-	}
+	};
 
 	// this is a hack... if this is the create command, prompt for
 	if (promptingEnabled && ((selectedSdk && !sdk) || (!selectedSdk && cmdName === 'create'))) {
@@ -220,7 +221,7 @@ export async function initSDK({ cmdName, config, cwd, logger, promptingEnabled, 
 
 	try {
 		// check if the sdk is compatible with our version of node
-		sdk.packageJson = await readJson(join(sdk.path, 'package.json'));
+		sdk.packageJson = await fs.readJson(join(sdk.path, 'package.json'));
 
 		const current = process.versions.node;
 		const required = sdk.packageJson.vendorDependencies.node;
@@ -228,7 +229,7 @@ export async function initSDK({ cmdName, config, cwd, logger, promptingEnabled, 
 
 		if (supported === false) {
 			throw new TiError(`Titanium SDK v${sdk.name} is incompatible with Node.js v${current}`, {
-				after: `Please install Node.js ${appc.version.parseMax(required)} in order to use this version of the Titanium SDK.`
+				after: `Please install Node.js ${version.parseMax(required)} in order to use this version of the Titanium SDK.`
 			});
 		}
 
@@ -261,7 +262,6 @@ export async function initSDK({ cmdName, config, cwd, logger, promptingEnabled, 
  */
 export async function getReleases(unstable) {
 	const releaseRE = /^(\d+)\.(\d+)\.(\d+)\.(\w+)$/;
-	const releaseTypes = [ 'beta', 'rc', 'ga' ];
 
 	const fetches = [
 		unstable && request('https://downloads.titaniumsdk.com/registry/beta.json', {
@@ -288,8 +288,8 @@ export async function getReleases(unstable) {
 		})
 		.filter(r => r.assets.some(a => a.os === os))
 		.sort((a, b) => {
-			const [ , amajor, aminor, apatch, atag ] = a.name.toLowerCase().match(releaseRE);
-			const [ , bmajor, bminor, bpatch, btag ] = b.name.toLowerCase().match(releaseRE);
+			const [, amajor, aminor, apatch, atag] = a.name.toLowerCase().match(releaseRE);
+			const [, bmajor, bminor, bpatch, btag] = b.name.toLowerCase().match(releaseRE);
 
 			let n = parseInt(bmajor) - parseInt(amajor);
 			if (n !== 0) {
@@ -306,6 +306,6 @@ export async function getReleases(unstable) {
 				return n;
 			}
 
-			return releaseTypes.indexOf(btag) - releaseTypes.indexOf(atag);
+			return sortTypes.indexOf(btag) - sortTypes.indexOf(atag);
 		});
 }

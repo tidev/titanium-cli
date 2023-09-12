@@ -148,7 +148,7 @@ export class SetupScreens {
 					}
 					value = expand(value);
 					if (!existsSync(value)) {
-						return 'Specified workspace directory does not exist'
+						return 'Specified workspace directory does not exist';
 					}
 					return true;
 				}
@@ -172,7 +172,7 @@ export class SetupScreens {
 					}
 					value = expand(value);
 					if (!existsSync(value)) {
-						return 'Specified Android SDK directory does not exist'
+						return 'Specified Android SDK directory does not exist';
 					}
 					if (process.platform === 'win32' && value.includes('&')) {
 						return 'The Android SDK path must not contain ampersands (&) on Windows';
@@ -304,7 +304,7 @@ export class SetupScreens {
 						.map(ver => data.ios.xcode[ver].version)
 						.sort()
 						.join(', ')
-				 })`);
+				})`);
 
 				const iosSdks = {};
 				for (const ver of Object.keys(data.ios.xcode)) {
@@ -498,11 +498,11 @@ export class SetupScreens {
 		log('Directory Permissions');
 		labelPadding = 31;
 		const dirs = [
-			[ '~', 'home directory' ],
-			[ '~/.titanium', 'titanium config directory' ],
-			[ this.cli.env.installPath, 'titanium sdk install directory' ],
-			[ this.config.get('app.workspace'), 'workspace directory' ],
-			[ tmp.tmpdir, 'temp directory' ]
+			['~', 'home directory'],
+			['~/.titanium', 'titanium config directory'],
+			[this.cli.env.installPath, 'titanium sdk install directory'],
+			[this.config.get('app.workspace'), 'workspace directory'],
+			[tmp.tmpdir, 'temp directory']
 		];
 		for (let [dir, desc] of dirs) {
 			if (dir) {
@@ -552,7 +552,7 @@ export class SetupScreens {
 					}
 					value = expand(value);
 					if (!existsSync(value)) {
-						return 'Specified workspace directory does not exist'
+						return 'Specified workspace directory does not exist';
 					}
 					return true;
 				}
@@ -732,7 +732,7 @@ export class SetupScreens {
 					}
 					value = expand(value);
 					if (!existsSync(value)) {
-						return 'Specified Android SDK directory does not exist'
+						return 'Specified Android SDK directory does not exist';
 					}
 					if (process.platform === 'win32' && value.includes('&')) {
 						return 'The Android SDK path must not contain ampersands (&) on Windows';
@@ -763,7 +763,7 @@ export class SetupScreens {
 					}
 					value = expand(value);
 					if (!existsSync(value)) {
-						return 'Specified Android NDK directory does not exist'
+						return 'Specified Android NDK directory does not exist';
 					}
 					const ndkbuildExecutable = join(value, `ndk-build${process.platform === 'win32' ? '.cmd' : ''}`);
 					if (!existsSync(ndkbuildExecutable)) {
@@ -825,7 +825,7 @@ export class SetupScreens {
 			if (data.ios.certs.keychains[keychain].distribution) {
 				for (const dist of data.ios.certs.keychains[keychain].distribution) {
 					const { name, invalid } = dist;
-					if ((n === currentDistName || !invalid) && !distNames[name]) {
+					if ((name === currentDistName || !invalid) && !distNames[name]) {
 						distList.push(dist);
 						distNames[name] = 1;
 					}

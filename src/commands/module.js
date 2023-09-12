@@ -185,4 +185,4 @@ ModuleSubcommands.list = {
 			}
 		}
 	}
-}
+};

@@ -109,7 +109,7 @@ SdkSubcommands.list = {
 	async fn(logger, config, cli) {
 		const os = cli.env.os.name;
 
-		const [ releases, branches, branchBuilds ] = (await Promise.allSettled([
+		const [releases, branches, branchBuilds] = (await Promise.allSettled([
 			(cli.argv.releases || cli.argv.unstable) && getReleases(cli.argv.unstable),
 			cli.argv.branches && getBranches(),
 			cli.argv.branch && getBranchBuilds(cli.argv.branch, os)
@@ -393,7 +393,7 @@ SdkSubcommands.install = {
 							}
 
 							const destDir = join(modulesDest, platform, moduleName, ver);
-							if (!force || fs.statSync(destDir).isDirectory()) {
+							if (!cli.argv.force || fs.statSync(destDir).isDirectory()) {
 								continue;
 							}
 
@@ -677,6 +677,7 @@ async function checkSDKFile({ force, logger, filename, name, noPrompt, osName, s
 	}
 
 	let renameTo;
+	// eslint-disable-next-line no-constant-condition
 	for (let i = 2; true; i++) {
 		try {
 			renameTo = `${name}-${i}`;
@@ -779,7 +780,7 @@ SdkSubcommands.uninstall = {
 
 		if (!found.length) {
 			for (const v of versions) {
-				logger.log(` • ${cyan(v.padEnd(maxlen))}  ${cli.env.sdks[v]?.path || yellow('not found')}`)
+				logger.log(` • ${cyan(v.padEnd(maxlen))}  ${cli.env.sdks[v]?.path || yellow('not found')}`);
 			}
 			process.exit(0);
 		}
@@ -788,7 +789,7 @@ SdkSubcommands.uninstall = {
 			// prompt for confirmation
 			logger.log(`${yellow('WARNING!')} This will permanently remove the following Titanium SDKs:\n`);
 			for (const v of versions) {
-				logger.log(` • ${cyan(v.padEnd(maxlen))}  ${cli.env.sdks[v]?.path || yellow('not found')}`)
+				logger.log(` • ${cyan(v.padEnd(maxlen))}  ${cli.env.sdks[v]?.path || yellow('not found')}`);
 			}
 			logger.log();
 
@@ -852,8 +853,8 @@ async function getBranches() {
 	});
 	return Object
 		.entries(await res.body.json())
-		.filter(([ , count ]) => count)
-		.map(([ name ]) => name);
+		.filter(([, count]) => count)
+		.map(([name]) => name);
 }
 
 /**

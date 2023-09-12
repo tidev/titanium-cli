@@ -82,7 +82,7 @@ export class CLI {
 			sdks: {}
 		},
 		getOSInfo: async (callback) => {
-			const { data } = await detect(this.logger, config, this, { nodejs: true, os: true });
+			const { data } = await detect(this.logger, ticonfig, this, { nodejs: true, os: true });
 			const { node, npm, os } = data;
 			if (typeof callback === 'function') {
 				callback({
@@ -330,7 +330,9 @@ export class CLI {
 		}
 
 		// create each hook and immediately fire them
-		const promise = unique(arrayify(name, true))
+		const events = unique(arrayify(name, true));
+
+		const promise = events
 			.reduce((promise, name) => promise.then(() => new Promise((resolve, reject) => {
 				const hook = this.createHook(name, data);
 				hook((err, result) => {
@@ -342,6 +344,7 @@ export class CLI {
 			return promise;
 		}
 
+		// eslint-disable-next-line promise/catch-or-return
 		promise.then(result => callback(null, result), callback);
 
 		return this;
@@ -409,30 +412,27 @@ export class CLI {
 		}
 
 		this.logger.trace(`Executing command: ${this.command.name()}`);
-		await new Promise((resolve, reject) => {
-			try {
-				const result = run(this.logger, this.config, this, async (err, result) => {
-					// we need to wrap the post-execute emit in a try/catch so that any exceptions
-					// it throws aren't confused with command errors
-					try {
-						await this.emit('cli:post-execute', { cli: this, command: this.command, err, result });
-					} catch (ex) {
-						return reject(ex);
-					}
-
-					if (err) {
-						return reject(err);
-					}
-
-					resolve();
-				});
-				if (result instanceof Promise) {
-					result.then(resolve, reject);
+		const result = await new Promise((resolve, reject) => {
+			return run(this.logger, this.config, this, async (err, result) => {
+				// we need to wrap the post-execute emit in a try/catch so that any exceptions
+				// it throws aren't confused with command errors
+				try {
+					await this.emit('cli:post-execute', { cli: this, command: this.command, err, result });
+				} catch (ex) {
+					return reject(ex);
 				}
-			} catch (e) {
-				reject(e);
-			}
+
+				if (err) {
+					return reject(err);
+				}
+
+				resolve();
+			});
 		});
+
+		if (result instanceof Promise) {
+			await result;
+		}
 	}
 
 	/**
@@ -496,15 +496,15 @@ export class CLI {
 			.option('-s, --sdk [version]', `Titanium SDK version to use ${gray('(default: "latest")')}`)
 			.on('option:config', cfg => {
 				try {
-					config.apply(eval(`(${cfg})`));
-					if (!config.cli?.colors) {
+					this.config.apply(eval(`(${cfg})`));
+					if (!this.config.cli?.colors) {
 						chalk.level = 0;
 					}
 				} catch (e) {
 					throw new Error(`Failed to parse --config: ${e.message}`);
 				}
 			})
-			.on('option:config-file', file => config.load(file))
+			.on('option:config-file', file => this.config.load(file))
 			.on('option:log-level', level => this.logger.setLevel(level))
 			.on('option:no-banner', () => this.logger.bannerEnabled(false))
 			.on('option:no-color', () => chalk.level = 0)
@@ -539,13 +539,13 @@ export class CLI {
 					.filter(name => conf.options && conf.options[name] && !skipRegExp.test(name))
 					.sort((a, b) => {
 						// if we have multiple option groups, then try to process them in order
-						if (!options[a] || !options[a].order) {
+						if (!conf.options[a] || !conf.options[a].order) {
 							return 1;
 						}
-						if (!options[b] || !options[b].order) {
+						if (!conf.options[b] || !conf.options[b].order) {
 							return -1;
 						}
-						return options[b].order - options[a].order;
+						return conf.options[b].order - conf.options[a].order;
 					});
 
 				for (const name of optionBranches) {
@@ -739,7 +739,7 @@ export class CLI {
 						conflicting.map((c, i) => {
 							return i === 0
 								? `    Loaded: ${c.file} ${c.version ? `(version ${version})` : ''}`
-								: `    Didn't load: ${c.file} ${c.version ? `(version ${version})` : ''}`
+								: `    Didn't load: ${c.file} ${c.version ? `(version ${version})` : ''}`;
 						}).join('\n')
 					}`)
 					.join('\n')
@@ -829,7 +829,7 @@ export class CLI {
 		try {
 			const jsfile = /\.js$/;
 			const ignore = /^[._]/;
-			const files = fs.statSync(dir).isDirectory() ? fs.readdirSync(dir).map(n => join(dir, n)) : [ dir ];
+			const files = fs.statSync(dir).isDirectory() ? fs.readdirSync(dir).map(n => join(dir, n)) : [dir];
 			let appc;
 
 			for (const file of files) {
@@ -951,6 +951,7 @@ export class CLI {
 
 		// this while loop is essentially a pump that processes missing/invalid
 		// options one at a time, recalculating them each iteration
+		// eslint-disable-next-line no-constant-condition
 		while (true) {
 			const invalid = {};
 			let invalidCount = 0;
@@ -1044,7 +1045,7 @@ export class CLI {
 				if (Object.keys(invalid).length) {
 					for (const name of Object.keys(invalid)) {
 						const opt = invalid[name];
-						const msg = `Invalid "${opt.label || `--${name}`}" value "${argv[opt.name]}"`;
+						const msg = `Invalid "${opt.label || `--${name}`}" value "${this.argv[opt.name]}"`;
 
 						if (typeof opt.helpNoPrompt === 'function') {
 							opt.helpNoPrompt(this.logger, msg);

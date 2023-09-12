@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+
 import chalk from 'chalk';
 import { ticonfig } from '../util/ticonfig.js';
 import { TiError } from '../util/tierror.js';
@@ -84,7 +86,7 @@ export function validate(_logger, _config, cli) {
 	if (cli.argv.remove) {
 		if (len === 0) {
 			throw new TiError('Missing key of the config setting to remove', {
-				after: `Run ${cyan(`titanium config --remove <key>`)} to remove the config setting.`
+				after: `Run ${cyan('titanium config --remove <key>')} to remove the config setting.`
 			});
 		}
 
@@ -171,7 +173,7 @@ export async function run(logger, config, cli) {
 						for (let v of argv._) {
 							v = expand(v);
 							if (!config.paths[subPath].includes(v)) {
-								config.paths[subPath].push(v)
+								config.paths[subPath].push(v);
 							}
 						}
 					} else if (argv.remove) {

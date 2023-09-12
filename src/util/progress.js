@@ -44,7 +44,7 @@ export class ProgressBar {
 		incomplete = Array(incomplete + 1).join(this.chars.incomplete);
 
 		// The extra space at the end prevents shrinking progress bars from ghosting
-		const str = this.fmt
+		let str = this.fmt
 			.replace(':bar', complete + incomplete)
 			.replace(':current', this.curr)
 			.replace(':total', this.total)

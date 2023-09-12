@@ -2,6 +2,7 @@ import { BusyIndicator } from '../util/busyindicator.js';
 import chalk from 'chalk';
 import { detect } from '../util/detect.js';
 import wrapAnsi from 'wrap-ansi';
+import { basename } from 'node:path';
 
 const { bold, cyan, gray, magenta, red, yellow } = chalk;
 const typesList = ['all', 'os', 'nodejs', 'titanium', 'jdk', 'android', 'ios'];
@@ -179,7 +180,7 @@ export async function run(logger, config, cli) {
 		// the keychain names are the only left side label that isn't fixed length, so
 		// if we're displaying ios info, find the longest keychain name
 		for (const keychain of data.iosKeychains) {
-			indent = max(indent, path.basename(keychain).length + 2);
+			indent = Math.max(indent, basename(keychain).length + 2);
 		}
 	}
 

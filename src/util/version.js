@@ -9,8 +9,8 @@ const versionRegExp = /^(\d+)\.(\d+)\.(\d+)(?:\.\w+)?/i;
  * @returns {Number}
  */
 export function compare(a, b) {
-	const [ , amajor, aminor, apatch, atag ] = a.toLowerCase().match(versionRegExp);
-	const [ , bmajor, bminor, bpatch, btag ] = b.toLowerCase().match(versionRegExp);
+	const [, amajor, aminor, apatch, atag] = a.toLowerCase().match(versionRegExp);
+	const [, bmajor, bminor, bpatch, btag] = b.toLowerCase().match(versionRegExp);
 
 	let n = parseInt(amajor) - parseInt(bmajor);
 	if (n !== 0) {
@@ -28,7 +28,6 @@ export function compare(a, b) {
 	}
 
 	if (atag && btag) {
-		console.log({ atag, btag });
 		return atag.localeCompare(btag); // sortTypes.indexOf(atag) - sortTypes.indexOf(btag);
 	}
 
