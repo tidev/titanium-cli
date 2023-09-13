@@ -37,7 +37,8 @@
    - Added total run time trace message at end
  * Performance improvements:
    - Minify source using `esbuild`
-   - Lazy load modules as much as possible within reason
+   - Lazy load modules as much as possible, within reason
+   - Removed tons of old dead code
    - Use smaller alternative dependencies
    - Added total run time log message when `--log-level trace`
  * Updated dependencies, replaced deprecated dependencies
