@@ -51,7 +51,7 @@
 		"build": "node build.js",
 		"coverage": "vitest run --coverage",
 		"lint": "eslint --cache \"src/**/*.js\"",
-		"prepare": "node build.js",
+		"prepack": "node build.js",
 		"test": "vitest"
 	},
 	"engines": {
