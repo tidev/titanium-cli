@@ -13,6 +13,10 @@ describe('arrayify', () => {
 		expect(arrayify(false)).toEqual([false]);
 	});
 
+	it('should arrayify a set', () => {
+		expect(arrayify(new Set([1, 'a', true]))).toEqual([1, 'a', true]);
+	});
+
 	it('should remove falsey values', () => {
 		expect(arrayify([
 			0,

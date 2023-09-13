@@ -113,6 +113,14 @@ export class TiHelp extends Help {
 			output = output.concat([helper.wrap(commandDescription, helpWidth, 0), '']);
 		}
 
+		// Commands
+		const commandList = helper.visibleCommands(cmd).map((cmd) => {
+			return formatItem(helper.subcommandTerm(cmd), helper.subcommandDescription(cmd));
+		});
+		if (commandList.length > 0) {
+			output = output.concat(['Commands:', formatList(commandList), '']);
+		}
+
 		// Arguments
 		const argumentList = helper.visibleArguments(cmd).map((argument) => {
 			return formatItem(helper.argumentTerm(argument), helper.argumentDescription(argument));
@@ -161,14 +169,6 @@ export class TiHelp extends Help {
 			if (globalOptionList.length > 0) {
 				output = output.concat(['Global Options:', formatList(globalOptionList), '']);
 			}
-		}
-
-		// Commands
-		const commandList = helper.visibleCommands(cmd).map((cmd) => {
-			return formatItem(helper.subcommandTerm(cmd), helper.subcommandDescription(cmd));
-		});
-		if (commandList.length > 0) {
-			output = output.concat(['Commands:', formatList(commandList), '']);
 		}
 
 		return output.join('\n');

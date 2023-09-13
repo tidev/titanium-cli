@@ -1,6 +1,6 @@
 import semver from 'semver';
 
-const versionRegExp = /^(\d+)\.(\d+)\.(\d+)(?:\.\w+)?/i;
+const versionRegExp = /^(\d+)\.(\d+)\.(\d+)(?:\.(\w+))?/i;
 
 /**
  * Compare function for sort().
@@ -9,8 +9,8 @@ const versionRegExp = /^(\d+)\.(\d+)\.(\d+)(?:\.\w+)?/i;
  * @returns {Number}
  */
 export function compare(a, b) {
-	const [, amajor, aminor, apatch, atag] = a.toLowerCase().match(versionRegExp);
-	const [, bmajor, bminor, bpatch, btag] = b.toLowerCase().match(versionRegExp);
+	const [, amajor, aminor, apatch, atag] = format(a, 3).toLowerCase().match(versionRegExp);
+	const [, bmajor, bminor, bpatch, btag] = format(b, 3).toLowerCase().match(versionRegExp);
 
 	let n = parseInt(amajor) - parseInt(bmajor);
 	if (n !== 0) {
@@ -28,7 +28,7 @@ export function compare(a, b) {
 	}
 
 	if (atag && btag) {
-		return atag.localeCompare(btag); // sortTypes.indexOf(atag) - sortTypes.indexOf(btag);
+		return atag.localeCompare(btag);
 	}
 
 	return atag ? 1 : btag ? -1 : 0;
@@ -43,7 +43,7 @@ export function compare(a, b) {
  * @returns {String} The formatted version
  */
 export function format(ver, min, max, chopDash) {
-	ver = ('' + (ver || 0));
+	ver = String(ver || 0);
 	chopDash && (ver = ver.replace(/(-.*)?$/, ''));
 	ver = ver.split('.');
 	if (min !== undefined) {
