@@ -4,10 +4,6 @@
 	"author": "TiDev, Inc. <npm@tidev.io>",
 	"description": "Command line interface for building Titanium SDK apps",
 	"type": "module",
-	"about": {
-		"name": "Titanium Command-Line Interface",
-		"copyright": "Copyright TiDev, Inc. 4/7/2022-Present. All Rights Reserved."
-	},
 	"keywords": [
 		"titanium",
 		"tidev",

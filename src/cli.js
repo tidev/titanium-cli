@@ -129,9 +129,9 @@ export class CLI {
 
 	constructor() {
 		const pkgJsonFile = join(dirname(fileURLToPath(import.meta.url)), '../package.json');
-		const { about, version } = fs.readJsonSync(pkgJsonFile);
-		this.name = about.name;
-		this.copyright = about.copyright;
+		const { version } = fs.readJsonSync(pkgJsonFile);
+		this.name = 'Titanium Command-Line Interface';
+		this.copyright = 'Copyright TiDev, Inc. 4/7/2022-Present. All Rights Reserved.';
 		this.version = version;
 		this.logger.setBanner({
 			name: this.name,
