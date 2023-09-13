@@ -4,16 +4,18 @@ node_modules
 *.sublime-project
 *.sublime-workspace
 docs
+CHANGELOG.md
 
 # proxy detection
 lib/commands/lib/*.java
 
 # Testing/security
-tests/
+test/
 junit_report.xml
 retirejs.output.json
 coverage/
 .nyc_output/
+vitest.config.js
 
 # CI
 dangerfile.js
@@ -21,5 +23,6 @@ npm-audit.json
 .github/
 
 # eslint
-.eslintrc
+.eslintrc.cjs
 .eslintignore
+.eslintcache
