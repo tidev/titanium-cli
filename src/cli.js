@@ -14,12 +14,11 @@ import { capitalize } from './util/capitalize.js';
 import wrapAnsi from 'wrap-ansi';
 import { TiError } from './util/tierror.js';
 import { detect } from './util/detect.js';
-import prompts from 'prompts';
+import { prompt } from './util/prompt.js';
 import { applyCommandConfig } from './util/apply-command-config.js';
 import { TiHelp } from './util/tihelp.js';
 
 const { blue, bold, cyan, gray, green, magenta, red, yellow } = chalk;
-const { prompt } = prompts;
 
 const commands = {
 	config:  'get and set config options',
@@ -496,7 +495,7 @@ export class CLI {
 			.option('-s, --sdk [version]', `Titanium SDK version to use ${gray('(default: "latest")')}`)
 			.on('option:config', cfg => {
 				try {
-					this.config.apply(eval(`(${cfg})`));
+					this.config.apply((0, eval)(`(${cfg})`));
 					if (!this.config.cli?.colors) {
 						chalk.level = 0;
 					}

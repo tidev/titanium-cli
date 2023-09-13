@@ -9,16 +9,14 @@ import { mkdir } from 'node:fs/promises';
 import { suggest } from '../util/suggest.js';
 import { columns } from '../util/columns.js';
 import { basename, dirname, join } from 'node:path';
-import { tmpNameSync } from 'tmp';
+import os from 'node:os';
 import { ProgressBar } from '../util/progress.js';
 import { Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { extractZip } from '../util/extract-zip.js';
-import prompts from 'prompts';
+import { prompt } from './util/prompt.js';
 import { getReleases } from '../util/tisdk.js';
-import humanize from 'humanize';
-
-const { prompt } = prompts;
+import prettyBytes from 'pretty-bytes';
 
 const { cyan, gray, green, magenta, red, yellow } = chalk;
 
@@ -208,7 +206,7 @@ SdkSubcommands.list = {
 				for (const r of releases) {
 					logger.log(`   ${cyan(r.name.padEnd(12))}\
 ${Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date(r.date)).padStart(8)}\
-${humanize.filesize(r.assets.find(a => a.os === os).size, 1024, 1).toUpperCase().padStart(11)}\
+${prettyBytes(r.assets.find(a => a.os === os).size).toUpperCase().padStart(11)}\
 ${Object.prototype.hasOwnProperty.call(sdks, r) ? ' [installed]' : ''}\
 ${r.type !== 'ga' ? gray('  [unstable]') : i++ === 0 ? green('  [latest stable]') : ''}`);
 				}
@@ -239,7 +237,7 @@ ${r.type !== 'ga' ? gray('  [unstable]') : i++ === 0 ? green('  [latest stable]'
 						const dt = Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date(b.date));
 						logger.log(`   ${cyan(b.name)}\
 ${dt.padStart(11)}\
-${humanize.filesize(b.assets.find(a => a.os === os).size, 1024, 1).toUpperCase().padStart(11)}`);
+${prettyBytes(b.assets.find(a => a.os === os).size).toUpperCase().padStart(11)}`);
 					}
 					logger.log(gray('** NOTE: these builds not recommended for production use **'));
 				} else {
@@ -510,10 +508,7 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 
 	// step 1.5: download the file
 
-	const downloadedFile = tmpNameSync({
-		prefix: 'titanium-',
-		postfix: '.zip'
-	});
+	const downloadedFile = join(os.tmpdir(), `titanium-sdk-${Math.floor(Math.round(1e8))}.zip`);
 	const downloadDir = dirname(downloadedFile);
 	await mkdir(downloadDir, { recursive: true });
 
@@ -586,7 +581,7 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 
 async function extractSDK({ file, force, logger, noPrompt, osName, showProgress, subject, titaniumDir }) {
 	const sdkDestRegExp = new RegExp(`^mobilesdk[/\\\\]${osName}[/\\\\]([^/\\\\]+)`);
-	const tempDir = tmpNameSync({ prefix: 'titanium-' });
+	const tempDir = join(os.tmpdir(), `titanium-sdk-${Math.floor(Math.random() * 1e8)}`);
 	let artifact;
 	let bar;
 	let name;
@@ -637,7 +632,7 @@ async function extractSDK({ file, force, logger, noPrompt, osName, showProgress,
 	}
 
 	logger.trace(`Detected artifact: ${artifact}`);
-	const tempDir2 = tmpNameSync({ prefix: 'titanium-' });
+	const tempDir2 = join(os.tmpdir(), `titanium-sdk-${Math.floor(Math.random() * 1e8)}`);
 	file = join(tempDir, artifact);
 
 	logger.trace(`Extracting ${file} -> ${tempDir2}`);

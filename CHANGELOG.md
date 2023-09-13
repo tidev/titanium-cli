@@ -35,12 +35,16 @@
    - Replaced "winston" based logger with lighter weight logger
    - Trace and debug log messages written to `stderr` instead of `stdout`
    - Added total run time trace message at end
+ * Performance improvements:
+   - Minify source using `esbuild`
+   - Lazy load modules as much as possible within reason
+   - Use smaller alternative dependencies
+   - Added total run time log message when `--log-level trace`
  * Updated dependencies, replaced deprecated dependencies
    - Replaced `colors` with `chalk`
    - Replaced `fields` with `prompts`
+   - Replaced `humanize` with `pretty-bytes`
    - Replaced `request` with `undici`
-   - Replaced `temp` with `tmp`
-   - Replaced `sprintf` with `sprintf-js`
 
 6.1.1 (7/13/2022)
 -------------------

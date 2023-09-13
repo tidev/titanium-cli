@@ -8,10 +8,9 @@ import { TiError } from './tierror.js';
 import { Tiapp } from './tiapp.js';
 import chalk from 'chalk';
 import { request } from './request.js';
-import prompts from 'prompts';
+import { prompt } from './prompt.js';
 
 const { cyan, gray } = chalk;
-const { prompt } = prompts;
 
 export const locations = {
 	linux: [

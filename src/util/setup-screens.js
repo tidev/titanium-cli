@@ -1,19 +1,18 @@
-import { detect as proxyDetect } from '../util/proxy.js';
-import prompts from 'prompts';
+import { detect as proxyDetect } from './proxy.js';
+import { prompt } from './prompt.js';
 import chalk from 'chalk';
 import { expand } from './expand.js';
 import { existsSync, unlinkSync, utimesSync, writeFileSync } from 'node:fs';
-import { BusyIndicator } from '../util/busyindicator.js';
-import { detect } from '../util/detect.js';
-import { request } from '../util/request.js';
-import * as version from '../util/version.js';
+import { BusyIndicator } from './busyindicator.js';
+import { detect } from './detect.js';
+import { request } from './request.js';
+import * as version from './version.js';
 import { detectTitaniumSDKs, getReleases } from './tisdk.js';
 import dns from 'node:dns/promises';
-import tmp from 'tmp';
+import os from 'node:os';
 import { join } from 'node:path';
 
 const { bold, cyan, gray, green, magenta, red, yellow } = chalk;
-const { prompt } = prompts;
 
 export class SetupScreens {
 	proxy = [];
@@ -502,7 +501,7 @@ export class SetupScreens {
 			['~/.titanium', 'titanium config directory'],
 			[this.cli.env.installPath, 'titanium sdk install directory'],
 			[this.config.get('app.workspace'), 'workspace directory'],
-			[tmp.tmpdir, 'temp directory']
+			[os.tmpdir(), 'temp directory']
 		];
 		for (let [dir, desc] of dirs) {
 			if (dir) {
