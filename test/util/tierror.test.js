@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { TiError } from '../src/util/tierror.js';
+import { TiError } from '../../src/util/tierror.js';
 
 describe('TiError', () => {
 	it('should support no meta info', () => {

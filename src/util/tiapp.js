@@ -2,9 +2,6 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 
 export class Tiapp {
-	constructor() {
-	}
-
 	async select1(expr, defaultValue) {
 		if (!this.doc) {
 			throw new Error('No tiapp.xml loaded');

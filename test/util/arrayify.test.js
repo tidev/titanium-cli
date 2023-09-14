@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { arrayify } from '../src/util/arrayify.js';
+import { arrayify } from '../../src/util/arrayify.js';
 
 describe('arrayify', () => {
 	it('should init undefined array', () => {

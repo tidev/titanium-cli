@@ -1,8 +1,9 @@
 import { join } from 'node:path';
 import fs from 'fs-extra';
 import { expand } from './expand.js';
+import { TiError } from './tierror.js';
 
-class TiConfig {
+export class TiConfig {
 	#configFile = '';
 
 	#defaults = {
@@ -37,10 +38,10 @@ class TiConfig {
 
 	#titaniumConfigFolder = '';
 
-	constructor() {
+	constructor(file) {
 		this.#titaniumConfigFolder = expand('~/.titanium');
 		this.#configFile = join(this.#titaniumConfigFolder, 'config.json');
-		this.load();
+		this.load(file);
 	}
 
 	/**
@@ -139,6 +140,10 @@ class TiConfig {
 		}
 	}
 
+	setConfigPath(file) {
+		this.#configFile = file;
+	}
+
 	/**
 	 * Saves the config to disk.
 	 */
@@ -150,12 +155,9 @@ class TiConfig {
 			fs.writeFileSync(tmpFile, JSON.stringify(this, null, 2));
 			fs.renameSync(tmpFile, this.#configFile);
 		} catch (e) {
-			if (e.code === 'EACCES') {
-				throw new Error(`Unable to write config file ${this.#configFile}\n` +
-					'Please ensure the Titanium CLI has access to modify this file.');
-			} else {
-				throw new Error('An error occurred trying to save the Titanium CLI config file.');
-			}
+			throw new TiError(`Unable to write config file ${this.#configFile}`, {
+				after: 'Please ensure the Titanium CLI has access to modify this file'
+			});
 		}
 	}
 

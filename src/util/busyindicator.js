@@ -1,26 +1,30 @@
 export class BusyIndicator {
-	_timer = null;
-	_running = false;
+	timer = null;
+	running = false;
 	margin = ' ';
 	sprites = ['|', '/', '-', '\\'];
 	current = 0;
+
+	constructor(stream = process.stdout) {
+		this.stream = stream;
+	}
+
+	render() {
+		this.stream.cursorTo && this.stream.cursorTo(0);
+		this.stream.write(this.margin + this.sprites[this.current++]);
+		if (this.current >= this.sprites.length) {
+			this.current = 0;
+		}
+		this.timer = setTimeout(() => this.render(), 60);
+	}
 
 	/**
 	 * Starts rendering the busy indicator.
 	 */
 	start() {
-		const render = () => {
-			process.stdout.cursorTo && process.stdout.cursorTo(0);
-			process.stdout.write(this.margin + this.sprites[this.current++]);
-			if (this.current >= this.sprites.length) {
-				this.current = 0;
-			}
-			this._timer = setTimeout(render, 60);
-		};
-
-		if (!this._running) {
-			this._running = true;
-			render();
+		if (!this.running) {
+			this.running = true;
+			this.render();
 		}
 	}
 
@@ -28,12 +32,12 @@ export class BusyIndicator {
 	 * Stops rendering the busy indicator.
 	 */
 	stop() {
-		clearTimeout(this._timer);
-		if (this._running) {
-			this._running = false;
-			process.stdout.cursorTo && process.stdout.cursorTo(0);
-			process.stdout.write(new Array(this.margin.length + 2).join(' '));
-			process.stdout.cursorTo && process.stdout.cursorTo(0);
+		clearTimeout(this.timer);
+		if (this.running) {
+			this.running = false;
+			this.stream.cursorTo && this.stream.cursorTo(0);
+			this.stream.write(' '.repeat(this.margin.length + 2));
+			this.stream.cursorTo && this.stream.cursorTo(0);
 		}
 	}
 }

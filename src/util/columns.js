@@ -5,8 +5,8 @@
  * @param {Number} [maxwidth=80] - The the maximum width before wrapping
  * @returns {String} The rendered columns
  */
-export function columns(items, margin, maxwidth = 80) {
-	const longest = items.reduce(function (a, b) {
+export function columns(items, margin = '', maxwidth = 80) {
+	const longest = items.reduce((a, b) => {
 		return Math.max(a, b.length);
 	}, 0) + 6;
 	const curwidth = process.stdout.columns || 80;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import * as version from '../src/util/version.js';
+import * as version from '../../src/util/version.js';
 
 describe('version', () => {
 	describe('compare', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { unique } from '../src/util/unique.js';
+import { unique } from '../../src/util/unique.js';
 
 describe('unique', () => {
 	it('should return empty array if no elements', () => {
