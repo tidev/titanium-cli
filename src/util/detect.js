@@ -1,4 +1,3 @@
-import { $ } from 'execa';
 import { existsSync } from 'node:fs';
 import os from 'node:os';
 import { detect as jdkInfo } from './jdk.js';
@@ -101,6 +100,7 @@ async function osInfo() {
 	let m;
 	let n;
 	let _;
+	const { $ } = await import('execa');
 
 	if (name === 'darwin') {
 		const { stdout } = await $`sw_vers`;
@@ -144,6 +144,7 @@ async function nodeInfo() {
 }
 
 async function npmInfo() {
+	const { $ } = await import('execa');
 	const { stdout: version } = await $`npm --version`;
 	return {
 		version

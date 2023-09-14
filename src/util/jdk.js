@@ -1,4 +1,3 @@
-import { $ } from 'execa';
 import { existsSync } from 'node:fs';
 import { readdir, realpath } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
@@ -25,6 +24,7 @@ export async function detect(config) {
 		executables: executables,
 		issues: []
 	};
+	const { $ } = await import('execa');
 
 	// sanity check the java home
 	if (javaHome) {

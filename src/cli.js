@@ -13,7 +13,6 @@ import { Logger } from './util/logger.js';
 import { capitalize } from './util/capitalize.js';
 import wrapAnsi from 'wrap-ansi';
 import { TiError } from './util/tierror.js';
-import { detect } from './util/detect.js';
 import { prompt } from './util/prompt.js';
 import { applyCommandConfig } from './util/apply-command-config.js';
 import { TiHelp } from './util/tihelp.js';
@@ -81,6 +80,7 @@ export class CLI {
 			sdks: {}
 		},
 		getOSInfo: async (callback) => {
+			const { detect } = await import('./util/detect.js');
 			const { data } = await detect(this.logger, ticonfig, this, { nodejs: true, os: true });
 			const { node, npm, os } = data;
 			if (typeof callback === 'function') {
@@ -412,7 +412,7 @@ export class CLI {
 
 		this.logger.trace(`Executing command: ${this.command.name()}`);
 		const result = await new Promise((resolve, reject) => {
-			return run(this.logger, this.config, this, async (err, result) => {
+			const r = run(this.logger, this.config, this, async (err, result) => {
 				// we need to wrap the post-execute emit in a try/catch so that any exceptions
 				// it throws aren't confused with command errors
 				try {
@@ -427,6 +427,9 @@ export class CLI {
 
 				resolve();
 			});
+			if (r instanceof Promise) {
+				r.then(resolve).catch(reject);
+			}
 		});
 
 		if (result instanceof Promise) {

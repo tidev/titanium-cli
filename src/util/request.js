@@ -1,4 +1,3 @@
-import { Agent, ProxyAgent, request as req } from 'undici';
 import { ticonfig } from './ticonfig.js';
 
 export async function request(url) {
@@ -9,6 +8,8 @@ export async function request(url) {
 	};
 
 	const proxyUrl = ticonfig.get('cli.httpProxyServer');
+
+	const { Agent, ProxyAgent, request: req } = await import('undici');
 
 	const dispatcher = proxyUrl
 		? new ProxyAgent({

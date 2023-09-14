@@ -142,7 +142,7 @@ export async function initSDK({ cmdName, config, cwd, logger, promptingEnabled, 
 	let tiapp = new Tiapp();
 	try {
 		await tiapp.load(join(cwd, 'tiapp.xml'));
-		sdkVersion = tiapp.select1('//sdk-version', 'latest');
+		sdkVersion = await tiapp.select1('//sdk-version', 'latest');
 	} catch {
 		// might not be a project dir or bad tiapp.xml
 	}
@@ -229,13 +229,6 @@ export async function initSDK({ cmdName, config, cwd, logger, promptingEnabled, 
 		if (supported === false) {
 			throw new TiError(`Titanium SDK v${sdk.name} is incompatible with Node.js v${current}`, {
 				after: `Please install Node.js ${version.parseMax(required)} in order to use this version of the Titanium SDK.`
-			});
-		}
-
-		if (supported === 'maybe' && !config.get('cli.hideNodejsWarning')) {
-			logger.on('cli:logger-banner', function () {
-				logger.warn(`Support for Node.js v${current} has not been verified for Titanium SDK ${sdk.name}`);
-				logger.warn(`If you run into issues, try downgrading to Node.js v${required}`);
 			});
 		}
 	} catch (e) {

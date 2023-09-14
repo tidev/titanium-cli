@@ -14,7 +14,7 @@ import { ProgressBar } from '../util/progress.js';
 import { Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { extractZip } from '../util/extract-zip.js';
-import { prompt } from './util/prompt.js';
+import { prompt } from '../util/prompt.js';
 import { getReleases } from '../util/tisdk.js';
 import prettyBytes from 'pretty-bytes';
 

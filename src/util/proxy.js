@@ -1,5 +1,3 @@
-import { $ } from 'execa';
-
 /**
  * Looks for proxy settings in some common places like ENV vars, Mac's
  * `networksetup`.
@@ -8,6 +6,8 @@ import { $ } from 'execa';
  */
 export async function detect() {
 	if (process.platform === 'darwin') {
+		const { $ } = await import('execa');
+
 		for (const iface of ['Ethernet', 'Wi-Fi']) {
 			// while this runs for both interfaces, only one will typically be active
 			try {

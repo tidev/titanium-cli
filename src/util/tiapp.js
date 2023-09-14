@@ -1,17 +1,16 @@
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
-import { DOMParser } from '@xmldom/xmldom';
-import xpath from 'xpath';
 
 export class Tiapp {
 	constructor() {
 	}
 
-	select1(expr, defaultValue) {
+	async select1(expr, defaultValue) {
 		if (!this.doc) {
 			throw new Error('No tiapp.xml loaded');
 		}
-		const nodes = xpath.select1(expr, this.doc);
+		const { select1 } = await import('xpath');
+		const nodes = select1(expr, this.doc);
 		return nodes?.firstChild?.nodeValue ?? defaultValue;
 	}
 
@@ -19,18 +18,13 @@ export class Tiapp {
 		if (!existsSync(file)) {
 			throw new Error(`File not found: ${file}`);
 		}
-		return this.loadFromString(await readFile(file, 'utf8'));
-	}
-
-	loadFromString(str = '<?xml version="1.0" encoding="UTF-8"?>') {
-		if (str && typeof str !== 'string') {
-			throw new TypeError('Expected string containing XML to parse');
-		}
 
 		let errorMsg;
-		const parser = new DOMParser({
+		const { default: xmldom } = await import('@xmldom/xmldom');
+		const parser = new xmldom.DOMParser({
 			errorHandler: err => errorMsg = err
 		});
+		const str = await readFile(file, 'utf8');
 		const doc = parser.parseFromString(str, 'text/xml');
 		if (errorMsg) {
 			throw new Error(errorMsg);

@@ -97,7 +97,7 @@ export class TiHelp extends Help {
 				const fullText = `${cyan(term.padEnd(termWidth + itemSeparatorWidth))}${description}`;
 				return helper.wrap(fullText, helpWidth - itemIndentWidth, termWidth + itemSeparatorWidth);
 			}
-			return term;
+			return cyan(term);
 		}
 
 		function formatList(textArray) {

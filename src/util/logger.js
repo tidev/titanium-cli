@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import { EventEmitter } from 'node:events';
-import { format } from 'util';
+import { format } from 'node:util';
 
 const { bold, cyan, gray, green, magenta, red, yellow } = chalk;
 
