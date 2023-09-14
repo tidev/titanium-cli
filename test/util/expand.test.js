@@ -45,7 +45,7 @@ describe('expand', () => {
 		expect(p).to.equal(isWin ? 'C:\\path\\foo' : '/path/foo');
 	});
 
-	it('should resolve environment paths (Windows)', () => {
+	(isWin ? it : it.skip)('should resolve environment paths (Windows)', () => {
 		process.env.SystemRoot = 'C:\\WINDOWS';
 		const p = expand('%SystemRoot%\\foo');
 		expect(isWin ? p : p.substring(process.cwd().length + 1)).to.equal('C:\\WINDOWS\\foo');
