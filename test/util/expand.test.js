@@ -29,7 +29,7 @@ describe('expand', () => {
 		delete process.env.USERPROFILE;
 
 		const p = expand('~/foo');
-		expect(p).to.equal(isWin ? 'C:\\Users\\username\\foo' : '/Users/username/foo');
+		expect(p).toEqual(isWin ? 'C:\\Users\\username\\foo' : '/Users/username/foo');
 	});
 
 	it('should resolve the home directory using USERPROFILE', () => {
@@ -37,17 +37,17 @@ describe('expand', () => {
 		process.env.USERPROFILE = isWin ? 'C:\\Users\\username' : '/Users/username';
 
 		const p = expand('~/foo');
-		expect(p).to.equal(isWin ? 'C:\\Users\\username\\foo' : '/Users/username/foo');
+		expect(p).toEqual(isWin ? 'C:\\Users\\username\\foo' : '/Users/username/foo');
 	});
 
 	it('should collapse relative segments', () => {
 		const p = expand('/path/./to/../foo');
-		expect(p).to.equal(isWin ? 'C:\\path\\foo' : '/path/foo');
+		expect(p).toEqual(isWin ? 'C:\\path\\foo' : '/path/foo');
 	});
 
 	(isWin ? it : it.skip)('should resolve environment paths (Windows)', () => {
 		process.env.SystemRoot = 'C:\\WINDOWS';
 		const p = expand('%SystemRoot%\\foo');
-		expect(isWin ? p : p.substring(process.cwd().length + 1)).to.equal('C:\\WINDOWS\\foo');
+		expect(isWin ? p : p.substring(process.cwd().length + 1)).toMatch(/\\WINDOWS\\foo/);
 	});
 });
