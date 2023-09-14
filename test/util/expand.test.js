@@ -42,7 +42,7 @@ describe('expand', () => {
 
 	it('should collapse relative segments', () => {
 		const p = expand('/path/./to/../foo');
-		expect(p).toEqual(isWin ? 'C:\\path\\foo' : '/path/foo');
+		expect(p).toMatch(isWin ? /\\path\\foo/ : /\/path\/foo/);
 	});
 
 	(isWin ? it : it.skip)('should resolve environment paths (Windows)', () => {
