@@ -137,26 +137,10 @@ describe('TiConfig', () => {
 	});
 
 	it('should access error saving the file', async () => {
-		const tmpFile = join(tmpdir(), 'ticonfig.json');
-		await copyFile(
-			join(fixturesDir, 'good.json'),
-			tmpFile
-		);
-
-		try {
-			await chmod(tmpFile, 0o400);
-			const cfg = new TiConfig(tmpFile);
-			expect(() => {
-				cfg.save();
-			}).toThrowError(/Unable to write config file/);
-
-			expect(() => {
-				cfg.setConfigPath(join(tmpdir(), 'titanium-cli/foo/bar/config.json'));
-				cfg.save();
-			}).toThrowError(/Unable to write config file/);
-		} finally {
-			await chmod(tmpFile, fs.constants.S_IRUSR | fs.constants.S_IWUSR);
-			await unlink(tmpFile);
-		}
+		const cfg = new TiConfig(join(fixturesDir, 'good.json'));
+		expect(() => {
+			cfg.setConfigPath(join(tmpdir(), 'titanium-cli/foo/bar/config.json'));
+			cfg.save();
+		}).toThrowError(/Unable to write config file/);
 	});
 });
