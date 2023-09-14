@@ -144,7 +144,7 @@ describe('TiConfig', () => {
 		);
 
 		try {
-			await chmod(tmpFile, fs.constants.S_IRUSR);
+			await chmod(tmpFile, 0o400);
 			const cfg = new TiConfig(tmpFile);
 			expect(() => {
 				cfg.save();
