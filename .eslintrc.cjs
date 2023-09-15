@@ -34,6 +34,7 @@ module.exports = {
         'no-mixed-spaces-and-tabs': 'error',
         'no-multi-str': 'error',
         'no-multiple-empty-lines': 'error',
+        'no-regex-spaces': 'off',
         'no-trailing-spaces': 'error',
         'no-unused-vars': 'off',
         'no-useless-escape': 'warn',

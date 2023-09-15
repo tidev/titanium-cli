@@ -7,9 +7,8 @@ export async function request(url) {
 		}
 	};
 
-	const proxyUrl = ticonfig.get('cli.httpProxyServer');
-
 	const { Agent, ProxyAgent, request: req } = await import('undici');
+	const proxyUrl = ticonfig.get('cli.httpProxyServer');
 
 	const dispatcher = proxyUrl
 		? new ProxyAgent({

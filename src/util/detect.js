@@ -9,7 +9,7 @@ import { readFile } from 'node:fs/promises';
 
 const { cyan } = chalk;
 
-export async function detect(logger, config, cli, types) {
+export async function detect(logger, config, cli, types = { all: true }) {
 	const [
 		os,
 		node,
@@ -65,7 +65,7 @@ async function loadPlatformInfo(logger, platform, config) {
 		}
 
 		const fileUrl = pathToFileURL(file);
-		logger.trace(`Importing ${cyan(fileUrl)}`);
+		logger?.trace(`Importing ${cyan(fileUrl)}`);
 		const mod = await import(fileUrl);
 		const dummy = {
 			data: null,
@@ -89,8 +89,8 @@ async function loadPlatformInfo(logger, platform, config) {
 			});
 		});
 	} catch (e) {
-		logger.warn('Failed to load platform info:');
-		logger.warn(e);
+		logger?.warn('Failed to load platform info:');
+		logger?.warn(e);
 	}
 }
 

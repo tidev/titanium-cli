@@ -1,8 +1,9 @@
 import { arrayify } from './arrayify.js';
-import { join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { existsSync, unlinkSync } from 'node:fs';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import chalk from 'chalk';
+import * as version from './version.js';
 import { extractZip } from './extract-zip.js';
 
 const { cyan } = chalk;
@@ -18,20 +19,20 @@ const platformAliases = {
  *
  * @param {Object} searchPaths - An object of scopes to arrays of paths to search for Titanium modules.
  * @param {Object} config - The CLI config.
- * @param {Object} logger - A logger instance.
+ * @param {Object} [logger] - A logger instance.
  * @returns {Promise<object>}
  */
 export async function detect(searchPaths, config, logger) {
-	if (!searchPaths || typeof searchPaths !== 'object') {
-		return;
-	}
-
 	const results = {};
-	for (let [scope, paths] of Object.entries(searchPaths)) {
-		for (const searchPath of arrayify(paths, true)) {
-			results[scope] = await detectModules(searchPath, config, logger);
+
+	if (searchPaths && typeof searchPaths === 'object') {
+		for (let [scope, paths] of Object.entries(searchPaths)) {
+			for (const searchPath of arrayify(paths, true)) {
+				results[scope] = await detectModules(searchPath, config, logger);
+			}
 		}
 	}
+
 	return results;
 }
 
@@ -42,7 +43,7 @@ export async function detect(searchPaths, config, logger) {
  *
  * @param {String} modulesDir - A path/dir to search for Titanium modules.
  * @param {Object} config - The CLI config.
- * @param {Object} logger - A logger instance.
+ * @param {Object} [logger] - A logger instance.
  * @returns {Promise<object>}
  */
 async function detectModules(modulesDir, config, logger) {
@@ -61,7 +62,7 @@ async function detectModules(modulesDir, config, logger) {
 		return {};
 	}
 
-	logger.trace(`Detecting modules in ${cyan(modulesDir)}`);
+	logger?.trace(`Detecting modules in ${cyan(modulesDir)}`);
 
 	const ignoreDirs = new RegExp(config.get('cli.ignoreDirs', '^(.svn|.git|.hg|.?[Cc][Vv][Ss]|.bzr)$'));
 	const osNamesRegExp = /^osx|win32|linux$/;
@@ -91,14 +92,14 @@ async function unzipIfNecessary(moduleRoot, name, logger) {
 	}
 
 	try {
-		logger.log(`Installing module: ${cyan(name)}`);
+		logger?.log(`Installing module: ${cyan(name)}`);
 		await extractZip({
 			file,
 			dest: moduleRoot
 		});
 		unlinkSync(file);
 	} catch (e) {
-		logger.error(`Failed to install module: ${e.message}`);
+		logger?.error(`Failed to install module: ${e.message}`);
 	}
 }
 
@@ -177,29 +178,44 @@ async function detectModulesByPlatformAndName(platformModulesDir, moduleName, ig
  * @returns {Promise<null|object>}
  * @private
  */
-async function detectModule(modulePath, version, ignoreDirs, logger) {
-	if (ignoreDirs.test(version)) {
+async function detectModule(modulePath, ver, ignoreDirs, logger) {
+	if (ignoreDirs.test(ver)) {
 		return null;
 	}
 
-	const versionPath = join(modulePath, version);
+	const versionPath = join(modulePath, ver);
 	const manifestFile = join(versionPath, 'manifest');
 	if (!existsSync(manifestFile)) {
 		return null;
 	}
 
 	const mod = {
-		version,
+		version: ver,
 		modulePath: versionPath,
 		manifest: await readManifest(manifestFile)
 	};
 
-	if (mod.manifest.platform) {
-		mod.manifest.platform = platformAliases[mod.manifest.platform] || mod.manifest.platform;
-		mod.platform = [mod.manifest.platform];
+	if (mod.manifest.version !== undefined) {
+		mod.version = mod.manifest.version;
 	}
 
-	logger.trace(`Detected ${cyan(mod.platform[0])} module: ${cyan(mod.manifest.moduleid)} @ ${mod.modulePath}`);
+	let platform = basename(dirname(dirname(versionPath))).toLowerCase();
+	if (mod.manifest.platform) {
+		platform = mod.manifest.platform.trim().toLowerCase();
+		platform = platformAliases[platform] || platform;
+		mod.manifest.platform = platform;
+		mod.platform = [platform];
+	}
+
+	if (!mod.platform) {
+		return null;
+	}
+
+	if (!version.isValid(mod.version)) {
+		return null;
+	}
+
+	logger?.trace(`Detected ${cyan(mod.platform[0])} module: ${cyan(mod.manifest.moduleid)} @ ${mod.modulePath}`);
 	return mod;
 }
 
@@ -233,13 +249,15 @@ async function readManifest(manifestFile) {
  */
 function convertArrayOfModulesToHierarchy(modules) {
 	const result = {};
-	modules && modules.forEach(m => {
-		const platform = m.platform[0];
-		const name = m.manifest.moduleid;
-		const version = m.version;
-		result[platform] = (result[platform] || {});
-		result[platform][name] = (result[platform][name] || {});
-		result[platform][name][version] = m;
-	});
+	if (Array.isArray(modules)) {
+		for (const m of modules) {
+			const platform = m.platform[0];
+			const name = m.manifest.moduleid;
+			const version = m.version;
+			result[platform] = (result[platform] || {});
+			result[platform][name] = (result[platform][name] || {});
+			result[platform][name][version] = m;
+		}
+	}
 	return result;
 }

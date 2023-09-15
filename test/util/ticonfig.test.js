@@ -3,8 +3,7 @@ import { TiConfig } from '../../src/util/ticonfig.js';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
-import { chmod, copyFile, mkdir, readFile, rmdir, unlink } from 'node:fs/promises';
-import fs from 'node:fs';
+import { copyFile, mkdir, readFile, rmdir, unlink } from 'node:fs/promises';
 
 const fixturesDir = join(fileURLToPath(import.meta.url), '../fixtures/ticonfig');
 

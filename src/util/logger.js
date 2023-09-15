@@ -18,33 +18,38 @@ export class Logger extends EventEmitter {
 		info: 3,
 		warn: 4,
 		error: 5
+		// log: 9
+		// silent: 10
 	};
 
-	constructor(logLevel) {
+	constructor(logLevel, opts = {}) {
 		super();
 
+		this.stdout = opts.stdout || process.stdout;
+		this.stderr = opts.stderr || process.stderr;
+
 		this.log = (msg = '', ...args) => {
-			this.render(9, process.stdout, `${format(msg, ...args)}`);
+			this.render(9, this.stdout, `${format(msg, ...args)}`);
 		};
 
 		this.trace = (msg = '', ...args) => {
-			this.render(1, process.stderr, gray(`[TRACE] ${format(msg, ...args)}`));
+			this.render(1, this.stderr, gray(`[TRACE] ${format(msg, ...args)}`));
 		};
 
 		this.debug = (msg = '', ...args) => {
-			this.render(2, process.stderr, `${magenta('[DEBUG]')} ${format(msg, ...args)}`);
-		};
-
-		this.error = (msg = '', ...args) => {
-			this.render(3, process.stderr, red(`[ERROR] ${format(msg, ...args)}`));
+			this.render(2, this.stderr, `${magenta('[DEBUG]')} ${format(msg, ...args)}`);
 		};
 
 		this.info = (msg = '', ...args) => {
-			this.render(4, process.stdout, `${green('[INFO]')}  ${format(msg, ...args)}`);
+			this.render(3, this.stdout, `${green('[INFO]')}  ${format(msg, ...args)}`);
 		};
 
 		this.warn = (msg = '', ...args) => {
-			this.render(5, process.stdout, `${yellow(`[WARN]  ${format(msg, ...args)}`)}`);
+			this.render(4, this.stderr, `${yellow(`[WARN]  ${format(msg, ...args)}`)}`);
+		};
+
+		this.error = (msg = '', ...args) => {
+			this.render(5, this.stderr, red(`[ERROR] ${format(msg, ...args)}`));
 		};
 
 		if (logLevel !== undefined) {
@@ -54,8 +59,8 @@ export class Logger extends EventEmitter {
 
 	banner() {
 		if (this.#bannerEnabled && !this.#skipBanner && this.#level && !this.#bannerRendered) {
-			process.stdout.write(this.#banner);
-			process.stdout.write('\n');
+			this.stdout.write(this.#banner);
+			this.stdout.write('\n');
 			this.#bannerRendered = true;
 			this.emit('cli:logger-banner');
 		}
@@ -112,7 +117,7 @@ export class Logger extends EventEmitter {
 	}
 
 	silence() {
-		this.#level = 0;
+		this.#level = 10;
 	}
 
 	skipBanner(b) {

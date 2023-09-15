@@ -1,8 +1,6 @@
 /**
  * Looks for proxy settings in some common places like ENV vars, Mac's
  * `networksetup`.
- *
- * @param {Function} callback - Function to run when a value has been determined
  */
 export async function detect() {
 	if (process.platform === 'darwin') {
@@ -48,16 +46,14 @@ function parseNetSetup(str) {
 }
 
 function parseEnv(env) {
-	const p = env.split(':');
-
-	// must account for proxies in the form http://user:pass@example.com:8080
-	if (p && p.length && p.length > 1) {
+	try {
+		const url = new URL(env);
 		return {
 			valid: true,
-			server: p[0] + ':' + p[1],
-			port: (p.length > 2) ? p[2] : '',
-			fullAddress: p[0] + ':' + p[1] + ((p.length > 2) ? p[2] : ''),
+			server: url.hostname,
+			port: url.port,
+			fullAddress: url.href,
 			authenticated: false
 		};
-	}
+	} catch {}
 }

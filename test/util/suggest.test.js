@@ -1,11 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { suggest } from '../../src/util/suggest.js';
+import { stripColor } from '../helpers/strip-color.js';
 
 const cmds = ['build', 'clean', 'config', 'create', 'info'];
-
-function stripColor(str) {
-	return str.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '');
-}
 
 describe('suggest', () => {
 	it('should suggest a value', () => {
