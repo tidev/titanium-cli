@@ -21,9 +21,13 @@
    - Removed `nodeAppcVer` from Titanium CLI and Titanium SDKs in info
  * `ti module` changes:
    - Removed global `iphone` modules as it was just a copy of `ios` modules
+   - Modules with `platform` other than `android`, `commonjs`, `ios`, and `iphone` will be ignored
+   - Modules with invalid semantic version will be ignored
  * `ti sdk` changes:
    - Added `--json` flag
    - Removed `activeSDK` from JSON result
+   - `select` subcommand is a no-op
+   - `install` subommand `--default` flag is a no-op
  * `ti setup` changes:
    - Removed Windows Store publishing info
    - Removed `haxm` info
