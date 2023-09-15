@@ -17,6 +17,7 @@ import { extractZip } from '../util/extract-zip.js';
 import { prompt } from '../util/prompt.js';
 import { getReleases } from '../util/tisdk.js';
 import prettyBytes from 'pretty-bytes';
+import wrapAnsi from 'wrap-ansi';
 
 const { cyan, gray, green, magenta, red, yellow } = chalk;
 
@@ -61,6 +62,31 @@ export async function run(logger, config, cli) {
 	}
 	throw new TiError(`Invalid subcommand "${action}"`, { showHelp: true });
 }
+
+SdkSubcommands.select = {
+	conf() {
+		return {
+			hidden: true
+		};
+	},
+	fn(logger, config, _cli) {
+		logger.skipBanner(false);
+		logger.banner();
+		logger.log(
+			yellow(
+				wrapAnsi(
+					`The "select" subcommand is no longer used.
+
+The Titanium CLI will automatically use the latest stable SDK release, if installed.
+
+If the current working directory is a Titanium app, the Titanium CLI will automatically use the <sdk-version> from the "tiapp.xml".`,
+					config.get('cli.width', 80),
+					{ hard: true, trim: false }
+				)
+			)
+		);
+	}
+};
 
 /**
  * Displays a list of all installed Titanium SDKs.
@@ -281,7 +307,7 @@ SdkSubcommands.install = {
 			flags: {
 				default: {
 					abbr: 'd',
-					desc: 'set as default SDK'
+					hidden: true
 				},
 				force: {
 					abbr: 'f',

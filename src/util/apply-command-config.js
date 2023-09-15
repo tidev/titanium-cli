@@ -14,7 +14,11 @@ export function applyCommandConfig(cmdName, cmd, conf) {
 	if (conf.flags) {
 		for (const [name, meta] of Object.entries(conf.flags)) {
 			this.logger.trace(`Adding "${cmdName}" flag: ${meta.abbr ? `-${meta.abbr}, ` : ''}--${name}`);
-			cmd.option(`${meta.abbr ? `-${meta.abbr}, ` : ''}--${name}`, meta.desc);
+			const opt = new Option(`${meta.abbr ? `-${meta.abbr}, ` : ''}--${name}`, meta.desc);
+			if (meta.hidden) {
+				opt.hideHelp(true);
+			}
+			cmd.addOption(opt);
 		}
 	}
 
@@ -85,6 +89,7 @@ export function applyCommandConfig(cmdName, cmd, conf) {
 					conf.defaultSubcommand === name ? ' (default)' : ''
 				} to "${cmdName}"`
 			);
+
 			const subcmd = new Command(name);
 			subcmd
 				.addHelpText('beforeAll', () => {
@@ -105,10 +110,12 @@ export function applyCommandConfig(cmdName, cmd, conf) {
 						throw new TiError(msg.replace(/^error:\s*/, ''));
 					}
 				});
+
 			this.applyConfig(name, subcmd, subconf);
 			subcmd.action((...args) => this.executeCommand(args, true));
 			cmd.addCommand(subcmd, {
-				isDefault: conf.defaultSubcommand === name
+				isDefault: conf.defaultSubcommand === name,
+				hidden: !!subconf.hidden
 			});
 		}
 	}
