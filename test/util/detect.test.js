@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
 import { detect } from '../../src/util/detect.js';
 import { TiConfig } from '../../src/util/ticonfig.js';
 import { join } from 'node:path';
@@ -12,11 +13,10 @@ describe('detect', () => {
 			version: '1.2.3'
 		};
 		const results = await detect(null, new TiConfig(goodConfig), mockCLI);
-		expect(results).toHaveProperty('data');
-		expect(results).toHaveProperty('platformInfo');
-		expect(results.data.titaniumCLI).toBeInstanceOf(Object);
-		expect(results.data.titaniumCLI).toHaveProperty('version');
-		expect(results.data.titaniumCLI.version).toEqual('1.2.3');
+		assert(Object.hasOwn(results, 'data'));
+		assert(Object.hasOwn(results, 'platformInfo'));
+		assert(Object.hasOwn(results.data.titaniumCLI, 'version'));
+		assert.strictEqual(results.data.titaniumCLI.version, '1.2.3');
 	}, 60000);
 
 	it('should detect just Titanium development environment', async () => {
@@ -24,14 +24,13 @@ describe('detect', () => {
 			version: '1.2.3'
 		};
 		const results = await detect(null, new TiConfig(goodConfig), mockCLI, { titanium: true });
-		expect(results).toHaveProperty('data');
-		expect(results).toHaveProperty('platformInfo');
-		expect(results.data.titaniumCLI).toBeInstanceOf(Object);
-		expect(results.data.titaniumCLI).toHaveProperty('version');
-		expect(results.data.titaniumCLI.version).toEqual('1.2.3');
-		expect(results.data.os).toEqual(undefined);
-		expect(results.data.node).toEqual(undefined);
-		expect(results.data.npm).toEqual(undefined);
-		expect(results.data.jdk).toEqual(undefined);
+		assert(Object.hasOwn(results, 'data'));
+		assert(Object.hasOwn(results, 'platformInfo'));
+		assert(Object.hasOwn(results.data.titaniumCLI, 'version'));
+		assert.strictEqual(results.data.titaniumCLI.version, '1.2.3');
+		assert.strictEqual(results.data.os, undefined);
+		assert.strictEqual(results.data.node, undefined);
+		assert.strictEqual(results.data.npm, undefined);
+		assert.strictEqual(results.data.jdk, undefined);
 	}, 60000);
 });

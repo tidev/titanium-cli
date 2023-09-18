@@ -1,4 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, it } from 'node:test';
+import assert from 'node:assert';
 import { request } from '../../src/util/request.js';
 import { ticonfig } from '../../src/util/ticonfig.js';
 import { createServer } from 'node:http';
@@ -17,20 +18,33 @@ describe('request', () => {
 
 	it('should fetch github page', async () => {
 		const res = await request('https://github.com/tidev/titanium-cli');
-		expect(res.statusCode).toEqual(200);
+		assert.strictEqual(res.statusCode, 200);
 	});
 
 	it('should fetch github page via proxy', async () => {
-		const proxyServer = createProxy(createServer());
-		proxyServer.listen(9999);
+		const connections = {};
+		const server = createServer();
+		server.on('connection', function (conn) {
+			const key = `${conn.remoteAddress}:${conn.remotePort}`;
+			connections[key] = conn;
+			conn.on('close', () => {
+				delete connections[key];
+			});
+		});
+		createProxy(server).listen(9999);
 
 		try {
 			ticonfig.set('cli.httpProxyServer', 'http://localhost:9999');
 
 			const res = await request('https://github.com/tidev/titanium-cli');
-			expect(res.statusCode).toEqual(200);
+			await res.body.text();
+			assert.strictEqual(res.statusCode, 200);
 		} finally {
-			proxyServer.close();
+			for (const conn of Object.values(connections)) {
+				conn.destroy();
+			}
+			await new Promise(resolve => server.close(resolve));
+			// FIX ME: disconnect before 2 minute timeout
 		}
-	});
+	}, 10000);
 });

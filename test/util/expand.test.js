@@ -1,4 +1,5 @@
-import { beforeEach, afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, it } from 'node:test';
+import assert from 'node:assert';
 import { expand } from '../../src/util/expand.js';
 
 const backup = {};
@@ -29,7 +30,7 @@ describe('expand', () => {
 		delete process.env.USERPROFILE;
 
 		const p = expand('~/foo');
-		expect(p).toEqual(isWin ? 'C:\\Users\\username\\foo' : '/Users/username/foo');
+		assert.strictEqual(p, isWin ? 'C:\\Users\\username\\foo' : '/Users/username/foo');
 	});
 
 	it('should resolve the home directory using USERPROFILE', () => {
@@ -37,17 +38,17 @@ describe('expand', () => {
 		process.env.USERPROFILE = isWin ? 'C:\\Users\\username' : '/Users/username';
 
 		const p = expand('~/foo');
-		expect(p).toEqual(isWin ? 'C:\\Users\\username\\foo' : '/Users/username/foo');
+		assert.strictEqual(p, isWin ? 'C:\\Users\\username\\foo' : '/Users/username/foo');
 	});
 
 	it('should collapse relative segments', () => {
 		const p = expand('/path/./to/../foo');
-		expect(p).toMatch(isWin ? /\\path\\foo/ : /\/path\/foo/);
+		assert.match(p, isWin ? /\\path\\foo/ : /\/path\/foo/);
 	});
 
 	(isWin ? it : it.skip)('should resolve environment paths (Windows)', () => {
 		process.env.SystemRoot = 'C:\\WINDOWS';
 		const p = expand('%SystemRoot%\\foo');
-		expect(isWin ? p : p.substring(process.cwd().length + 1)).toMatch(/\\WINDOWS\\foo/);
+		assert.match(isWin ? p : p.substring(process.cwd().length + 1), /\\WINDOWS\\foo/);
 	});
 });

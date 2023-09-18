@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
 import { Tiapp } from '../../src/util/tiapp.js';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -11,7 +12,7 @@ describe('Tiapp', () => {
 		await tiapp.load(join(fixturesDir, 'hassdk.xml'));
 
 		const value = await tiapp.select1('//sdk-version', '0.0.0');
-		expect(value).toEqual('1.2.3');
+		assert.strictEqual(value, '1.2.3');
 	});
 
 	it('should load a tiapp without an sdk version', async () => {
@@ -19,10 +20,10 @@ describe('Tiapp', () => {
 		await tiapp.load(join(fixturesDir, 'nosdk.xml'));
 
 		let value = await tiapp.select1('//sdk-version', '0.0.0');
-		expect(value).toEqual('0.0.0');
+		assert.strictEqual(value, '0.0.0');
 
 		value = await tiapp.select1('//sdk-version');
-		expect(value).toEqual(undefined);
+		assert.strictEqual(value, undefined);
 	});
 
 	it('should load a tiapp without a pin', async () => {
@@ -30,24 +31,39 @@ describe('Tiapp', () => {
 		await tiapp.load(join(fixturesDir, 'nopin.xml'));
 
 		const value = await tiapp.select1('//sdk-version', '0.0.0');
-		expect(value).toEqual('1.2.3');
+		assert.strictEqual(value, '1.2.3');
 	});
 
 	it('should error if file does not exist', async () => {
 		const tiapp = new Tiapp();
-		await expect(tiapp.load(join(fixturesDir, 'does_not_exist')))
-			.rejects.toMatch(/File not found:/);
+		await assert.rejects(
+			tiapp.load(join(fixturesDir, 'does_not_exist')),
+			{
+				name: 'Error',
+				message: /^File not found:/
+			}
+		);
 	});
 
 	it('should error selecting if no file loaded', async () => {
 		const tiapp = new Tiapp();
-		await expect(tiapp.select1())
-			.rejects.toMatch(/No tiapp.xml loaded/);
+		await assert.rejects(
+			tiapp.select1(),
+			{
+				name: 'Error',
+				message: 'No tiapp.xml loaded'
+			}
+		);
 	});
 
 	it('should error loading if file is malformed', async () => {
 		const tiapp = new Tiapp();
-		await expect(tiapp.load(join(fixturesDir, 'bad.xml')))
-			.rejects.toMatch(/xmldom warning/);
+		await assert.rejects(
+			tiapp.load(join(fixturesDir, 'bad.xml')),
+			{
+				name: 'Error',
+				message: /xmldom warning/
+			}
+		);
 	});
 });

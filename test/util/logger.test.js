@@ -1,4 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
 import { Logger } from '../../src/util/logger.js';
 import { WritableStream } from 'memory-streams';
 import { stripColor } from '../helpers/strip-color.js';
@@ -21,21 +22,27 @@ describe('Logger', () => {
 		logger.info('info test');
 		logger.warn('warn test');
 
-		expect(stripColor(stdout.toString())).toEqual([
-			'log test',
-			'log test',
-			'log test',
-			'[INFO]  info test',
-			''
-		].join('\n'));
+		assert.strictEqual(
+			stripColor(stdout.toString()),
+			[
+				'log test',
+				'log test',
+				'log test',
+				'[INFO]  info test',
+				''
+			].join('\n')
+		);
 
-		expect(stripColor(stderr.toString())).toEqual([
-			'[TRACE] trace test',
-			'[DEBUG] debug test',
-			'[ERROR] error test',
-			'[WARN]  warn test',
-			''
-		].join('\n'));
+		assert.strictEqual(
+			stripColor(stderr.toString()),
+			[
+				'[TRACE] trace test',
+				'[DEBUG] debug test',
+				'[ERROR] error test',
+				'[WARN]  warn test',
+				''
+			].join('\n')
+		);
 	});
 
 	it('should only log warnings and above', () => {
@@ -55,18 +62,24 @@ describe('Logger', () => {
 		logger.info('info test');
 		logger.warn('warn test');
 
-		expect(stripColor(stdout.toString())).toEqual([
-			'log test',
-			'log test',
-			'log test',
-			''
-		].join('\n'));
+		assert.strictEqual(
+			stripColor(stdout.toString()),
+			[
+				'log test',
+				'log test',
+				'log test',
+				''
+			].join('\n')
+		);
 
-		expect(stripColor(stderr.toString())).toEqual([
-			'[ERROR] error test',
-			'[WARN]  warn test',
-			''
-		].join('\n'));
+		assert.strictEqual(
+			stripColor(stderr.toString()),
+			[
+				'[ERROR] error test',
+				'[WARN]  warn test',
+				''
+			].join('\n')
+		);
 	});
 
 	it('should allow the level to be dynamically changed', () => {
@@ -81,50 +94,68 @@ describe('Logger', () => {
 		logger.info('info test');
 		logger.warn('warn test');
 
-		expect(stripColor(stdout.toString())).toEqual([
-			'[INFO]  info test',
-			''
-		].join('\n'));
+		assert.strictEqual(
+			stripColor(stdout.toString()),
+			[
+				'[INFO]  info test',
+				''
+			].join('\n')
+		);
 
-		expect(stripColor(stderr.toString())).toEqual([
-			'[WARN]  warn test',
-			''
-		].join('\n'));
+		assert.strictEqual(
+			stripColor(stderr.toString()),
+			[
+				'[WARN]  warn test',
+				''
+			].join('\n')
+		);
 
 		logger.setLevel('warn');
 		logger.debug('debug test');
 		logger.info('info test');
 		logger.warn('warn test');
 
-		expect(stripColor(stdout.toString())).toEqual([
-			'[INFO]  info test',
-			''
-		].join('\n'));
+		assert.strictEqual(
+			stripColor(stdout.toString()),
+			[
+				'[INFO]  info test',
+				''
+			].join('\n')
+		);
 
-		expect(stripColor(stderr.toString())).toEqual([
-			'[WARN]  warn test',
-			'[WARN]  warn test',
-			''
-		].join('\n'));
+		assert.strictEqual(
+			stripColor(stderr.toString()),
+			[
+				'[WARN]  warn test',
+				'[WARN]  warn test',
+				''
+			].join('\n')
+		);
 
 		logger.setLevel(2); // debug
 		logger.debug('debug test');
 		logger.info('info test');
 		logger.warn('warn test');
 
-		expect(stripColor(stdout.toString())).toEqual([
-			'[INFO]  info test',
-			'[INFO]  info test',
-			''
-		].join('\n'));
+		assert.strictEqual(
+			stripColor(stdout.toString()),
+			[
+				'[INFO]  info test',
+				'[INFO]  info test',
+				''
+			].join('\n')
+		);
 
-		expect(stripColor(stderr.toString())).toEqual([
-			'[WARN]  warn test',
-			'[WARN]  warn test',
-			'[DEBUG] debug test',
-			'[WARN]  warn test',
-			''
-		].join('\n'));
+		assert.strictEqual(
+			stripColor(stderr.toString()),
+			[
+				'[WARN]  warn test',
+				'[WARN]  warn test',
+				'[DEBUG] debug test',
+				'[WARN]  warn test',
+				''
+			].join('\n')
+		);
 	});
 
 	it('should be silent', () => {
@@ -140,13 +171,13 @@ describe('Logger', () => {
 		logger.info('info test');
 		logger.warn('warn test');
 
-		expect(stripColor(stdout.toString())).toEqual('');
-		expect(stripColor(stderr.toString())).toEqual('');
+		assert.strictEqual(stripColor(stdout.toString()), '');
+		assert.strictEqual(stripColor(stderr.toString()), '');
 	});
 
 	it('should get the levels', () => {
 		const logger = new Logger();
-		expect(logger.getLevels()).toEqual(['trace', 'debug', 'info', 'warn', 'error']);
+		assert.deepStrictEqual(logger.getLevels(), ['trace', 'debug', 'info', 'warn', 'error']);
 	});
 
 	it('should display the banner', () => {
@@ -156,8 +187,10 @@ describe('Logger', () => {
 			stdout,
 			stderr
 		});
-		const fn = vi.fn(() => {});
-		logger.on('cli:logger-banner', fn);
+		let emittedCount = 0;
+		logger.on('cli:logger-banner', () => {
+			emittedCount++;
+		});
 
 		const expected = new RegExp([
 			'foo v1.2.3 SDK v4.5.6',
@@ -167,23 +200,23 @@ describe('Logger', () => {
 		].join('\n'), 's');
 
 		logger.setBanner({ name: 'foo', copyright: 'bar', version: '1.2.3', sdkVersion: '4.5.6' });
-		expect(stripColor(logger.getBanner())).toMatch(expected);
+		assert.match(stripColor(logger.getBanner()), expected);
 
-		expect(logger.bannerEnabled()).toEqual(true);
-		expect(logger.skipBanner()).toEqual(false);
-		expect(logger.bannerWasRendered()).toEqual(false);
-		expect(fn).not.toHaveBeenCalled();
-
-		logger.banner();
-		expect(logger.bannerWasRendered()).toEqual(true);
-		expect(fn).toHaveBeenCalledOnce();
-
-		expect(stripColor(stdout.toString())).toMatch(expected);
+		assert.strictEqual(logger.bannerEnabled(), true);
+		assert.strictEqual(logger.skipBanner(), false);
+		assert.strictEqual(logger.bannerWasRendered(), false);
+		assert.strictEqual(emittedCount, 0);
 
 		logger.banner();
-		expect(fn).toHaveBeenCalledOnce();
+		assert.strictEqual(logger.bannerWasRendered(), true);
+		assert.strictEqual(emittedCount, 1);
 
-		expect(stripColor(stdout.toString())).toMatch(expected);
+		assert.match(stripColor(stdout.toString()), expected);
+
+		logger.banner();
+		assert.strictEqual(emittedCount, 1);
+
+		assert.match(stripColor(stdout.toString()), expected);
 	});
 
 	it('should not render banner if disabled', () => {
@@ -193,21 +226,23 @@ describe('Logger', () => {
 			stdout,
 			stderr
 		});
-		const fn = vi.fn(() => {});
-		logger.on('cli:logger-banner', fn);
+		let emittedCount = 0;
+		logger.on('cli:logger-banner', () => {
+			emittedCount++;
+		});
 
 		logger.setBanner({ name: 'foo', copyright: 'bar', version: '1.2.3', sdkVersion: '4.5.6' });
 		logger.bannerEnabled(false);
 
-		expect(logger.bannerEnabled()).toEqual(false);
-		expect(logger.skipBanner()).toEqual(false);
-		expect(logger.bannerWasRendered()).toEqual(false);
-		expect(fn).not.toHaveBeenCalled();
+		assert.strictEqual(logger.bannerEnabled(), false);
+		assert.strictEqual(logger.skipBanner(), false);
+		assert.strictEqual(logger.bannerWasRendered(), false);
+		assert.strictEqual(emittedCount, 0);
 
 		logger.banner();
-		expect(logger.bannerWasRendered()).toEqual(false);
-		expect(fn).not.toHaveBeenCalled();
-		expect(stripColor(stdout.toString())).toEqual('');
+		assert.strictEqual(logger.bannerWasRendered(), false);
+		assert.strictEqual(emittedCount, 0);
+		assert.strictEqual(stripColor(stdout.toString()), '');
 	});
 
 	it('should not render banner if skipped', () => {
@@ -217,19 +252,21 @@ describe('Logger', () => {
 			stdout,
 			stderr
 		});
-		const fn = vi.fn(() => {});
-		logger.on('cli:logger-banner', fn);
+		let emittedCount = 0;
+		logger.on('cli:logger-banner', () => {
+			emittedCount++;
+		});
 
 		logger.setBanner({ name: 'foo', copyright: 'bar', version: '1.2.3', sdkVersion: '4.5.6' });
 
-		expect(logger.skipBanner()).toEqual(false);
+		assert.strictEqual(logger.skipBanner(), false);
 		logger.skipBanner(true);
-		expect(logger.skipBanner()).toEqual(true);
+		assert.strictEqual(logger.skipBanner(), true);
 
 		logger.banner();
-		expect(logger.bannerWasRendered()).toEqual(false);
-		expect(fn).not.toHaveBeenCalled();
-		expect(stripColor(stdout.toString())).toEqual('');
+		assert.strictEqual(logger.bannerWasRendered(), false);
+		assert.strictEqual(emittedCount, 0);
+		assert.strictEqual(stripColor(stdout.toString()), '');
 	});
 
 	it('should log with timestamps', () => {
@@ -240,11 +277,11 @@ describe('Logger', () => {
 			stderr
 		});
 
-		expect(logger.timestampEnabled()).toEqual(false);
-		expect(logger.timestampEnabled(false)).toEqual(false);
-		expect(logger.timestampEnabled(true)).toEqual(true);
+		assert.strictEqual(logger.timestampEnabled(), false);
+		assert.strictEqual(logger.timestampEnabled(false), false);
+		assert.strictEqual(logger.timestampEnabled(true), true);
 
 		logger.info('- [INFO]  info test');
-		expect(stripColor(stdout.toString())).toMatch(/\[INFO\]  info test/);
+		assert.match(stripColor(stdout.toString()), /\[INFO\]  info test/);
 	});
 });

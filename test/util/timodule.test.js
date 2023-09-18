@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
 import { detect } from '../../src/util/timodule.js';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,19 +13,19 @@ const goodConfig = join(fileURLToPath(import.meta.url), '../fixtures/ticonfig/go
 describe('timodule', () => {
 	it('should find nothing if no search paths', async () => {
 		let results = await detect();
-		expect(results).toEqual({});
+		assert.deepStrictEqual(results, {});
 
 		results = await detect(null);
-		expect(results).toEqual({});
+		assert.deepStrictEqual(results, {});
 
 		results = await detect({});
-		expect(results).toEqual({});
+		assert.deepStrictEqual(results, {});
 
 		results = await detect(
 			{ global: null },
 			new TiConfig(goodConfig)
 		);
-		expect(results).toEqual({});
+		assert.deepStrictEqual(results, {});
 	});
 
 	it('should find nothing if search path is empty', async () => {
@@ -32,7 +33,7 @@ describe('timodule', () => {
 			{ empty: join(fixturesDir, 'empty') },
 			new TiConfig(goodConfig)
 		);
-		expect(results).toEqual({
+		assert.deepStrictEqual(results, {
 			empty: {}
 		});
 	});
@@ -47,17 +48,20 @@ describe('timodule', () => {
 				new TiConfig(goodConfig)
 			);
 
-			expect(results).toHaveProperty('global');
-			expect(results.global).toHaveProperty('android');
-			expect(results.global).toHaveProperty('commonjs');
-			expect(results.global).toHaveProperty('ios');
+			assert(Object.hasOwn(results, 'global'));
+			assert(Object.hasOwn(results.global, 'android'));
+			assert(Object.hasOwn(results.global, 'commonjs'));
+			assert(Object.hasOwn(results.global, 'ios'));
 
-			expect(results.global.android).toHaveProperty('com.test.module');
+			assert(Object.hasOwn(results.global.android, 'com.test.module'));
 			let mod = results.global.android['com.test.module'];
-			expect(mod).toHaveProperty('1.0.0');
-			expect(mod['1.0.0']).toHaveProperty('version', '1.0.0');
-			expect(mod['1.0.0']).toHaveProperty('platform', ['android']);
-			expect(mod['1.0.0']).toHaveProperty('manifest', {
+			assert(Object.hasOwn(mod, '1.0.0'));
+			assert(Object.hasOwn(mod['1.0.0'], 'version'));
+			assert.strictEqual(mod['1.0.0'].version, '1.0.0');
+			assert(Object.hasOwn(mod['1.0.0'], 'platform'));
+			assert.deepStrictEqual(mod['1.0.0'].platform, ['android']);
+			assert(Object.hasOwn(mod['1.0.0'], 'manifest'));
+			assert.deepStrictEqual(mod['1.0.0'].manifest, {
 				version: '1.0.0',
 				apiversion: 4,
 				architectures: ['arm64-v8a', 'armeabi-v7a', 'x86'],
@@ -72,12 +76,15 @@ describe('timodule', () => {
 				minsdk: '7.2.0'
 			});
 
-			expect(results.global.commonjs).toHaveProperty('com.test.module');
+			assert(Object.hasOwn(results.global.commonjs, 'com.test.module'));
 			mod = results.global.commonjs['com.test.module'];
-			expect(mod).toHaveProperty('1.0.0');
-			expect(mod['1.0.0']).toHaveProperty('version', '1.0.0');
-			expect(mod['1.0.0']).toHaveProperty('platform', ['commonjs']);
-			expect(mod['1.0.0']).toHaveProperty('manifest', {
+			assert(Object.hasOwn(mod, '1.0.0'));
+			assert(Object.hasOwn(mod['1.0.0'], 'version'));
+			assert.strictEqual(mod['1.0.0'].version, '1.0.0');
+			assert(Object.hasOwn(mod['1.0.0'], 'platform'));
+			assert.deepStrictEqual(mod['1.0.0'].platform, ['commonjs']);
+			assert(Object.hasOwn(mod['1.0.0'], 'manifest'));
+			assert.deepStrictEqual(mod['1.0.0'].manifest, {
 				version: '1.0.0',
 				description: 'testModule',
 				author: 'Your Name',
@@ -90,10 +97,13 @@ describe('timodule', () => {
 				minsdk: '7.2.0'
 			});
 
-			expect(mod).toHaveProperty('1.0');
-			expect(mod['1.0']).toHaveProperty('version', '1.0');
-			expect(mod['1.0']).toHaveProperty('platform', ['commonjs']);
-			expect(mod['1.0']).toHaveProperty('manifest', {
+			assert(Object.hasOwn(mod, '1.0'));
+			assert(Object.hasOwn(mod['1.0'], 'version'));
+			assert.strictEqual(mod['1.0'].version, '1.0');
+			assert(Object.hasOwn(mod['1.0'], 'platform'));
+			assert.deepStrictEqual(mod['1.0'].platform, ['commonjs']);
+			assert(Object.hasOwn(mod['1.0'], 'manifest'));
+			assert.deepStrictEqual(mod['1.0'].manifest, {
 				version: '1.0',
 				description: 'testModule',
 				author: 'Your Name',
@@ -106,12 +116,15 @@ describe('timodule', () => {
 				minsdk: '7.2.0'
 			});
 
-			expect(results.global.ios).toHaveProperty('com.test.module');
+			assert(Object.hasOwn(results.global.ios, 'com.test.module'));
 			mod = results.global.ios['com.test.module'];
-			expect(mod).toHaveProperty('1.0.0');
-			expect(mod['1.0.0']).toHaveProperty('version', '1.0.0');
-			expect(mod['1.0.0']).toHaveProperty('platform', ['ios']);
-			expect(mod['1.0.0']).toHaveProperty('manifest', {
+			assert(Object.hasOwn(mod, '1.0.0'));
+			assert(Object.hasOwn(mod['1.0.0'], 'version'));
+			assert.strictEqual(mod['1.0.0'].version, '1.0.0');
+			assert(Object.hasOwn(mod['1.0.0'], 'platform'));
+			assert.deepStrictEqual(mod['1.0.0'].platform, ['ios']);
+			assert(Object.hasOwn(mod['1.0.0'], 'manifest'));
+			assert.deepStrictEqual(mod['1.0.0'].manifest, {
 				version: '1.0.0',
 				apiversion: 2,
 				architectures: ['armv7', 'arm64', 'i386', 'x86_64'],
@@ -128,5 +141,5 @@ describe('timodule', () => {
 		} finally {
 			await fs.remove(tmpModulesDir);
 		}
-	});
+	}, 60000);
 });

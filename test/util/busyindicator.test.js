@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
 import { BusyIndicator } from '../../src/util/busyindicator.js';
 import { setTimeout } from 'node:timers/promises';
 
@@ -23,10 +24,10 @@ describe('BusyIndicator', () => {
 		await setTimeout(200);
 
 		busy.stop();
-		expect(stream.buffer).toMatch(/^ +$/);
+		assert.match(stream.buffer, /^ +$/);
 
 		stream.buffer = 'foo';
 		await setTimeout(100);
-		expect(stream.buffer).toEqual('foo');
+		assert.strictEqual(stream.buffer, 'foo');
 	});
 });
