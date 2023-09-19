@@ -17,7 +17,7 @@ describe('request', () => {
 	});
 
 	it('should fetch github page', async () => {
-		const res = await request('https://github.com/tidev/titanium-cli');
+		const res = await request('https://tidev.io');
 		assert.strictEqual(res.statusCode, 200);
 	});
 
@@ -36,7 +36,12 @@ describe('request', () => {
 		try {
 			ticonfig.set('cli.httpProxyServer', 'http://localhost:9999');
 
-			const res = await request('https://github.com/tidev/titanium-cli');
+			const res = await request('https://tidev.io', {
+				headers: {
+					Connection: 'close'
+				},
+				reset: true
+			});
 			await res.body.text();
 			assert.strictEqual(res.statusCode, 200);
 		} finally {
@@ -44,7 +49,6 @@ describe('request', () => {
 				conn.destroy();
 			}
 			await new Promise(resolve => server.close(resolve));
-			// FIX ME: disconnect before 2 minute timeout
 		}
 	}, 10000);
 });

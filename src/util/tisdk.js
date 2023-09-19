@@ -154,85 +154,82 @@ export async function initSDK({ cmdName, config, cwd, logger, promptingEnabled, 
 		sdks,
 		sdkPaths
 	} = await detectTitaniumSDKs(config);
+	let sdk = null;
 
-	if (!sdks.length) {
-		throw new TiError('No Titanium SDKs found', {
-			after: `You can download the latest Titanium SDK by running: ${cyan('titanium sdk install')}`
-		});
-	}
-
-	// determine version to use
-	sdkVersion = (Boolean(selectedSdk) === selectedSdk ? null : selectedSdk) || sdkVersion || 'latest';
-	if (sdkVersion === 'latest') {
-		sdkVersion = latest;
-	}
-
-	let sdk = sdks.find(s => s.name === sdkVersion);
-
-	const typeLabels = {
-		unsupported: 'Unsupported',
-		beta: 'Beta',
-		rc: 'Release Candidate',
-		ga: 'Production Stable'
-	};
-
-	// this is a hack... if this is the create command, prompt for
-	if (promptingEnabled && ((selectedSdk && !sdk) || (!selectedSdk && cmdName === 'create'))) {
-		logger.banner();
-
-		const sdkTypes = {};
-		for (const s of sdks) {
-			if (!sdkTypes[s.type]) {
-				sdkTypes[s.type] = [];
-			}
-			sdkTypes[s.type].push(s.name);
-		}
-
-		const choices = [];
-		for (const t of Object.keys(sdkTypes).sort((a, b) => sortTypes.indexOf(b) - sortTypes.indexOf(a))) {
-			for (const s of sdkTypes[t]) {
-				choices.push({ label: s, value: s, description: typeLabels[t] });
-			}
-		}
-
-		({ sdkVersion } = await prompt({
-			type: 'select',
-			message: 'Which Titanium SDK would you like to use?',
-			name: 'sdkVersion',
-			initial: sdk ? choices.find(s => s.name === sdk.name)?.name : undefined,
-			choices
-		}));
-
-		if (sdkVersion === undefined) {
-			// sigint
-			process.exit(0);
+	if (sdks.length) {
+		// determine version to use
+		sdkVersion = (Boolean(selectedSdk) === selectedSdk ? null : selectedSdk) || sdkVersion || 'latest';
+		if (sdkVersion === 'latest') {
+			sdkVersion = latest;
 		}
 
 		sdk = sdks.find(s => s.name === sdkVersion);
-	}
 
-	// return the specified sdk
-	if (!sdk) {
-		throw new TiError(`Titanium SDK "${sdkVersion}" not found`, {
-			after: `Available SDKs:\n${sdks.map(sdk => `  ${cyan(sdk.name.padEnd(24))} ${gray(typeLabels[sdk.type])}`).join('\n')}`
-		});
-	}
+		const typeLabels = {
+			unsupported: 'Unsupported',
+			beta: 'Beta',
+			rc: 'Release Candidate',
+			ga: 'Production Stable'
+		};
 
-	try {
-		// check if the sdk is compatible with our version of node
-		sdk.packageJson = await fs.readJson(join(sdk.path, 'package.json'));
+		// this is a hack... if this is the create command, prompt for
+		if (promptingEnabled && ((selectedSdk && !sdk) || (!selectedSdk && cmdName === 'create'))) {
+			logger.banner();
 
-		const current = process.versions.node;
-		const required = sdk.packageJson.vendorDependencies.node;
-		const supported = version.satisfies(current, required, true);
+			const sdkTypes = {};
+			for (const s of sdks) {
+				if (!sdkTypes[s.type]) {
+					sdkTypes[s.type] = [];
+				}
+				sdkTypes[s.type].push(s.name);
+			}
 
-		if (supported === false) {
-			throw new TiError(`Titanium SDK v${sdk.name} is incompatible with Node.js v${current}`, {
-				after: `Please install Node.js ${version.parseMax(required)} in order to use this version of the Titanium SDK.`
+			const choices = [];
+			for (const t of Object.keys(sdkTypes).sort((a, b) => sortTypes.indexOf(b) - sortTypes.indexOf(a))) {
+				for (const s of sdkTypes[t]) {
+					choices.push({ label: s, value: s, description: typeLabels[t] });
+				}
+			}
+
+			({ sdkVersion } = await prompt({
+				type: 'select',
+				message: 'Which Titanium SDK would you like to use?',
+				name: 'sdkVersion',
+				initial: sdk ? choices.find(s => s.name === sdk.name)?.name : undefined,
+				choices
+			}));
+
+			if (sdkVersion === undefined) {
+				// sigint
+				process.exit(0);
+			}
+
+			sdk = sdks.find(s => s.name === sdkVersion);
+		}
+
+		// return the specified sdk
+		if (!sdk) {
+			throw new TiError(`Titanium SDK "${sdkVersion}" not found`, {
+				after: `Available SDKs:\n${sdks.map(sdk => `  ${cyan(sdk.name.padEnd(24))} ${gray(typeLabels[sdk.type])}`).join('\n')}`
 			});
 		}
-	} catch (e) {
-		// do nothing
+
+		try {
+			// check if the sdk is compatible with our version of node
+			sdk.packageJson = await fs.readJson(join(sdk.path, 'package.json'));
+
+			const current = process.versions.node;
+			const required = sdk.packageJson.vendorDependencies.node;
+			const supported = version.satisfies(current, required, true);
+
+			if (supported === false) {
+				throw new TiError(`Titanium SDK v${sdk.name} is incompatible with Node.js v${current}`, {
+					after: `Please install Node.js ${version.parseMax(required)} in order to use this version of the Titanium SDK.`
+				});
+			}
+		} catch (e) {
+			// do nothing
+		}
 	}
 
 	return {

@@ -22,7 +22,7 @@ export async function detect(logger, config, cli, types = { all: true }) {
 		(types.all || types.os) && osInfo(),
 		(types.all || types.nodejs) && nodeInfo(),
 		(types.all || types.nodejs) && npmInfo(),
-		(types.all || types.titanium) && titaniumInfo(config),
+		(types.all || types.titanium) && titaniumSDKInfo(config),
 		(types.all || types.titanium) && titaniumCLIInfo(cli),
 		(types.all || types.jdk) && jdkInfo(config),
 		...Object.keys(cli.sdk?.platforms || {}).sort().map(async name => {
@@ -151,7 +151,7 @@ async function npmInfo() {
 	};
 }
 
-async function titaniumInfo(config) {
+async function titaniumSDKInfo(config) {
 	const { sdks } = await detectTitaniumSDKs(config);
 	const results = {};
 

@@ -216,8 +216,8 @@ SdkSubcommands.list = {
 				logger.log(`   ${cyan(v)}${' '.repeat(n)}${maxname ? magenta(name.padEnd(maxname + 2)) : ''}${sdks[v].path}`);
 			}
 		} else {
-			logger.log('No Titanium SDKs are installed\n');
-			logger.log(`You can download the latest Titanium SDK by running: ${cyan(cli.argv.$ + ' sdk install')}\n`);
+			logger.log(red('No Titanium SDKs found\n'));
+			logger.log(`You can download the latest Titanium SDK by running: ${cyan('titanium sdk install')}\n`);
 		}
 
 		if (releases) {
@@ -255,7 +255,7 @@ ${r.type !== 'ga' ? gray('  [unstable]') : i++ === 0 ? green('  [latest stable]'
 			logger.log();
 			if (branchBuilds instanceof Error) {
 				logger.error(`Invalid branch "${cli.argv.branch}"\n`);
-				logger.log(`Run '${cyan(`${cli.argv.$} sdk --branches`)}' for a list of available branches.\n`);
+				logger.log(`Run '${cyan('titanium sdk --branches')}' for a list of available branches.\n`);
 			} else {
 				logger.log(`'${cli.argv.branch}' Branch Builds:`);
 				if (branchBuilds?.length) {

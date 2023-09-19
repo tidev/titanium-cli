@@ -700,7 +700,7 @@ export class CLI {
 				null;
 		};
 		this.sdk = sdk;
-		this.argv.sdk = sdk.name;
+		this.argv.sdk = sdk?.name;
 
 		// if we have an sdk and we're running a sdk command, then scan the sdk for hooks
 		if (this.sdk && sdkCommands[cmdName]) {
@@ -746,6 +746,12 @@ export class CLI {
 					}`)
 					.join('\n')
 			}\n`);
+		}
+
+		if (sdkCommands[cmdName] && !this.sdk) {
+			throw new TiError('No Titanium SDKs found', {
+				after: `You can download the latest Titanium SDK by running: ${cyan('titanium sdk install')}`
+			});
 		}
 
 		const commandFile = sdkCommands[cmdName]

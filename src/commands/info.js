@@ -123,9 +123,9 @@ export async function run(logger, config, cli) {
 	if (types.all || types.titanium) {
 		sections.push(new Section({
 			name: 'titanium',
-			title: 'Titanium CLI',
+			title: 'Titanium SDK',
 			render() {
-				logger.log(bold(this.title));
+				logger.log(bold('Titanium CLI'));
 				logger.log(`  ${'CLI Version'.padEnd(indent)} = ${magenta(data.titaniumCLI.version)}\n`);
 
 				logger.log(bold('Titanium SDKs'));
@@ -193,6 +193,21 @@ export async function run(logger, config, cli) {
 	const withIssues = Object.entries(data).filter(([type, info]) => {
 		return (types.all || types[type]) && info?.issues?.length;
 	});
+
+	// check for Titanium SDK issues
+	if ((types.all || types.titanium) && !Object.keys(data.titanium).length) {
+		withIssues.unshift([
+			'titanium',
+			{
+				issues: [
+					{
+						message: 'No Titanium SDKs found. You can download the latest Titanium SDK by running: titanium sdk install',
+						type: 'error'
+					}
+				]
+			}
+		]);
+	}
 
 	if (withIssues.length) {
 		for (const [type, info] of withIssues) {
