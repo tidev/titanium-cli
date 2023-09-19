@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { TiConfig } from '../../src/util/ticonfig.js';
 import fs from 'fs-extra';
-import { tmpdir } from 'node:os';
+import { tmpDirName } from '../helpers/tmp-dir-name.js';
 
 const fixturesDir = join(fileURLToPath(import.meta.url), '../fixtures/timodule');
 const goodConfig = join(fileURLToPath(import.meta.url), '../fixtures/ticonfig/good.json');
@@ -39,7 +39,7 @@ describe('timodule', () => {
 	});
 
 	it('should find modules in a search path', async () => {
-		const tmpModulesDir = join(tmpdir(), `titanium-cli-${Math.floor(Math.random() * 1e6)}`);
+		const tmpModulesDir = tmpDirName();
 		try {
 			await fs.copy(join(fixturesDir, 'modules'), tmpModulesDir);
 

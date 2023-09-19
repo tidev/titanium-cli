@@ -3,14 +3,14 @@ import assert from 'node:assert';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'fs-extra';
-import { run } from '../helpers/run.js';
+import { initCLI } from '../helpers/init-cli.js';
 import { stripColor } from '../helpers/strip-color.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = fs.readJsonSync(join(__dirname, '../../package.json'));
 
-describe('ti info', () => {
-	it('should show help', async () => {
+describe('ti info', { concurrency: true }, () => {
+	it('should show help', initCLI(async (run) => {
 		const { exitCode, stdout } = await run(['info', '-h']);
 
 		const output = stripColor(stdout);
@@ -20,9 +20,9 @@ describe('ti info', () => {
 		assert.match(output, /Global Options:/);
 
 		assert.strictEqual(exitCode, 0);
-	}, 60000);
+	}));
 
-	it('should show all info', async () => {
+	it('should show all info', initCLI(async (run) => {
 		const { exitCode, stdout } = await run(['info']);
 
 		const output = stripColor(stdout);
@@ -35,9 +35,9 @@ describe('ti info', () => {
 		assert.match(output, /Issues/);
 
 		assert.strictEqual(exitCode, 0);
-	}, 60000);
+	}), 60000);
 
-	it('should show all info as JSON', async () => {
+	it('should show all info as JSON', initCLI(async (run) => {
 		let { exitCode, stdout } = await run(['info', '--json']);
 
 		let json = JSON.parse(stdout);
@@ -60,9 +60,9 @@ describe('ti info', () => {
 		assert(Object.hasOwn(json, 'jdk'));
 
 		assert.strictEqual(exitCode, 0);
-	}, 60000);
+	}), 60000);
 
-	it('should only show "os" info', async () => {
+	it('should only show "os" info', initCLI(async (run) => {
 		const { exitCode, stdout } = await run(['info', '--types', 'os']);
 
 		const output = stripColor(stdout);
@@ -75,9 +75,9 @@ describe('ti info', () => {
 		assert.match(output, /Issues/);
 
 		assert.strictEqual(exitCode, 0);
-	}, 60000);
+	}), 60000);
 
-	it('should only show "os" info as JSON', async () => {
+	it('should only show "os" info as JSON', initCLI(async (run) => {
 		const { exitCode, stdout } = await run(['info', '--types', 'os', '--json']);
 
 		const json = JSON.parse(stdout);
@@ -89,9 +89,9 @@ describe('ti info', () => {
 		assert(!Object.hasOwn(json, 'jdk'));
 
 		assert.strictEqual(exitCode, 0);
-	}, 60000);
+	}), 60000);
 
-	it('should only show "nodejs" info', async () => {
+	it('should only show "nodejs" info', initCLI(async (run) => {
 		const { exitCode, stdout } = await run(['info', '--types', 'nodejs']);
 
 		const output = stripColor(stdout);
@@ -104,9 +104,9 @@ describe('ti info', () => {
 		assert.match(output, /Issues/);
 
 		assert.strictEqual(exitCode, 0);
-	}, 60000);
+	}), 60000);
 
-	it('should only show "nodejs" info as JSON', async () => {
+	it('should only show "nodejs" info as JSON', initCLI(async (run) => {
 		const { exitCode, stdout } = await run(['info', '--types', 'nodejs', '--json']);
 
 		const json = JSON.parse(stdout);
@@ -119,9 +119,9 @@ describe('ti info', () => {
 		assert(!Object.hasOwn(json, 'jdk'));
 
 		assert.strictEqual(exitCode, 0);
-	}, 60000);
+	}), 60000);
 
-	it('should only show "titanium" info', async () => {
+	it('should only show "titanium" info', initCLI(async (run) => {
 		const { exitCode, stdout } = await run(['info', '--types', 'titanium']);
 
 		const output = stripColor(stdout);
@@ -134,9 +134,9 @@ describe('ti info', () => {
 		assert.match(output, /Issues/);
 
 		assert.strictEqual(exitCode, 0);
-	}, 60000);
+	}), 60000);
 
-	it('should only show "jdk" info', async () => {
+	it('should only show "jdk" info', initCLI(async (run) => {
 		const { exitCode, stdout } = await run(['info', '--types', 'jdk']);
 
 		const output = stripColor(stdout);
@@ -149,5 +149,5 @@ describe('ti info', () => {
 		assert.match(output, /Issues/);
 
 		assert.strictEqual(exitCode, 0);
-	}, 60000);
+	}), 60000);
 });

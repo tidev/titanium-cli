@@ -152,6 +152,8 @@ SdkSubcommands.list = {
 				config.get('paths.sdks')
 			].flat().map(p => p && expand(p)).filter(Boolean))
 		).sort();
+		console.log('>>>>', locations);
+		console.log(config.get());
 
 		if (cli.argv.json || cli.argv.output === 'json') {
 			for (const ver of vers) {
