@@ -10,7 +10,7 @@ import { tmpDirName } from '../helpers/tmp-dir-name.js';
 const fixturesDir = join(fileURLToPath(import.meta.url), '../fixtures/timodule');
 const goodConfig = join(fileURLToPath(import.meta.url), '../fixtures/ticonfig/good.json');
 
-describe('timodule', () => {
+describe('timodule', { concurrency: true }, () => {
 	it('should find nothing if no search paths', async () => {
 		let results = await detect();
 		assert.deepStrictEqual(results, {});

@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { TiError } from '../../src/util/tierror.js';
 
-describe('TiError', () => {
+describe('TiError', { concurrency: true }, () => {
 	it('should support no meta info', () => {
 		const e = new TiError('oh no');
 		assert.strictEqual(e.toString(), 'Error: oh no');

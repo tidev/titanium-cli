@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { unique } from '../../src/util/unique.js';
 
-describe('unique', () => {
+describe('unique', { concurrency: true }, () => {
 	it('should return empty array if no elements', () => {
 		assert.deepStrictEqual(unique(), []);
 		assert.deepStrictEqual(unique([]), []);

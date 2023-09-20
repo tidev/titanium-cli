@@ -4,7 +4,7 @@ import { expand } from '../../src/util/expand.js';
 
 const backup = {};
 
-describe('expand', () => {
+describe('expand', { concurrency: true }, () => {
 	beforeEach(() => {
 		backup.HOME        = process.env.HOME;
 		backup.USERPROFILE = process.env.USERPROFILE;

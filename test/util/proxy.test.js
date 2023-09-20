@@ -2,7 +2,7 @@ import { afterEach, describe, it } from 'node:test';
 import assert from 'node:assert';
 import { detect } from '../../src/util/proxy.js';
 
-describe('proxy', () => {
+describe('proxy', { concurrency: true }, () => {
 	afterEach(() => {
 		delete process.env.http_proxy;
 		delete process.env.https_proxy;

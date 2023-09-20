@@ -4,7 +4,7 @@ import { Logger } from '../../src/util/logger.js';
 import { WritableStream } from 'memory-streams';
 import { stripColor } from '../helpers/strip-color.js';
 
-describe('Logger', () => {
+describe('Logger', { concurrency: true }, () => {
 	it('should log using all log levels', () => {
 		const stderr = new WritableStream();
 		const stdout = new WritableStream();

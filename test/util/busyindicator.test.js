@@ -15,7 +15,7 @@ class MockStream {
 	}
 }
 
-describe('BusyIndicator', () => {
+describe('BusyIndicator', { concurrency: true }, () => {
 	it('should render a busy indicator', async () => {
 		const stream = new MockStream();
 		const busy = new BusyIndicator(stream);

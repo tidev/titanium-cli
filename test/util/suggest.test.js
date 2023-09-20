@@ -5,7 +5,7 @@ import { stripColor } from '../helpers/strip-color.js';
 
 const cmds = ['build', 'clean', 'config', 'create', 'info'];
 
-describe('suggest', () => {
+describe('suggest', { concurrency: true }, () => {
 	it('should suggest a value', () => {
 		assert.strictEqual(
 			stripColor(suggest('buid', cmds)),
