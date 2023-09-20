@@ -21,7 +21,7 @@ describe('request', () => {
 		assert.strictEqual(res.statusCode, 200);
 	});
 
-	(process.platform === 'win32' ? it.skip : it)('should fetch github page via proxy', async () => {
+	it('should fetch github page via proxy', async () => {
 		const connections = {};
 		const server = createServer();
 		server.on('connection', function (conn) {
