@@ -64,7 +64,7 @@ describe('ti sdk', { concurrency: true }, () => {
 			await run(['config', 'paths.sdks', tmpSDKDir]);
 			await run(['config', 'sdk.defaultInstallLocation', tmpSDKDir]);
 
-			const sdkPath = join(tmpSDKDir, 'mobilesdk', 'win32', '12.2.0.GA');
+			const sdkPath = join(tmpSDKDir, 'mobilesdk', process.platform === 'darwin' ? 'osx' : process.platform, '12.2.0.GA');
 
 			// list sdks (no sdks installed)
 			let { exitCode, stdout, stderr } = await run(['sdk']); // no `ls` to test default subcommand
