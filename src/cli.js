@@ -356,26 +356,13 @@ export class CLI {
 	 * @returns {Promise}
 	 * @access private
 	 */
-	async executeCommand(args, isSubcommand) {
-		const cmd = args.pop();
-		this.argv._ = cmd.args;
+	async executeCommand(actionArgs) {
+		const cmd = actionArgs.pop();
+		actionArgs.pop(); // discard argv
 
-		if (isSubcommand) {
-			// Titanium CLI 6 and older had a CLI arg parser that did not
-			// support subcommands of subcommands. We now use Commander and it
-			// does. The problem is the commands expect the args to be relative
-			// to the subcommand and Commander returns them as relative to most
-			// specific subcommand subcommand. This means we need to drill down
-			// all of the command contexts until we find the top most subcommand
-			// and get its args.
-			let ctx = cmd;
-			while (ctx.parent) {
-				ctx = ctx.parent;
-			}
-			// get rid of the subcommand
-			this.argv._.unshift(ctx.args[1]);
-		}
+		this.argv._ = actionArgs;
 
+		this.command = cmd;
 		this.applyArgv(cmd);
 
 		this.logger.banner();
@@ -405,7 +392,7 @@ export class CLI {
 		await this.emit('cli:pre-execute', { cli: this, command: this.command });
 		this.startTime = Date.now();
 
-		const { run } = this.command.module;
+		const run = this.command.module?.run;
 		if (typeof run !== 'function') {
 			return;
 		}
@@ -664,6 +651,7 @@ export class CLI {
 
 		this.command = cmd;
 		this.applyArgv(cmd);
+
 		const cwd = expand(this.argv['project-dir']);
 
 		// load hooks
@@ -901,7 +889,7 @@ export class CLI {
 
 		await this.handleMissingAndInvalidOptions();
 
-		const fn = this.command.module.validate;
+		const fn = this.command.module?.validate;
 		if (fn && typeof fn === 'function') {
 			const result = fn(this.logger, this.config, this);
 
@@ -916,7 +904,7 @@ export class CLI {
 
 		// fire all option callbacks for any options we missed above
 		for (const ctx of [this.command, this.command?.platform]) {
-			if (ctx?.conf.options) {
+			if (ctx?.conf?.options) {
 				for (const [name, opt] of Object.entries(ctx.conf.options)) {
 					if (typeof opt.callback === 'function') {
 						const val = opt.callback(this.argv[name] || '');
@@ -933,7 +921,7 @@ export class CLI {
 		const options = {};
 
 		for (const ctx of [this.command, this.command?.platform]) {
-			if (ctx?.conf.options) {
+			if (ctx?.conf?.options) {
 				Object.assign(options, ctx.conf.options);
 			}
 		}

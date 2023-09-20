@@ -7,24 +7,29 @@ import fs from 'fs-extra';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ti = join(__dirname, '../../src/main.js');
 
-export function initCLI(fixture, fn) {
-	return async () => {
-		if (typeof fixture === 'function') {
-			fn = fixture;
-			fixture = null;
-		}
+export function initCLI(fixture, fn, sharedOpts = {}) {
+	if (typeof fixture === 'function') {
+		sharedOpts = fn || {};
+		fn = fixture;
+		fixture = null;
+	}
 
+	return async () => {
 		const tmpHome = await initHome(fixture);
 
 		try {
-			return await fn((args = [], opts = {}) => execaNode(ti, args, {
-				...opts,
-				env: {
-					...process.env,
-					...opts.env,
-					HOME: tmpHome
-				}
-			}));
+			return await fn((args = [], opts = {}) => {
+				return execaNode(ti, args, {
+					...sharedOpts,
+					...opts,
+					env: {
+						...process.env,
+						...sharedOpts.env,
+						...opts.env,
+						HOME: tmpHome
+					}
+				});
+			});
 		} finally {
 			await fs.remove(tmpHome);
 		}

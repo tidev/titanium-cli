@@ -109,10 +109,16 @@ export function applyCommandConfig(cmdName, cmd, conf) {
 						this.command = subcmd;
 						throw new TiError(msg.replace(/^error:\s*/, ''));
 					}
-				});
+				})
+				.action((...args) => this.executeCommand(args));
 
 			this.applyConfig(name, subcmd, subconf);
-			subcmd.action((...args) => this.executeCommand(args, true));
+
+			subcmd.conf = subconf;
+
+			// subcommand shares parent command's module
+			subcmd.module = cmd.module;
+
 			cmd.addCommand(subcmd, {
 				isDefault: conf.defaultSubcommand === name,
 				hidden: !!subconf.hidden

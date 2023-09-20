@@ -48,6 +48,9 @@ await execa(
 	process.execPath,
 	args,
 	{
+		env: {
+			TI_CLI_SKIP_ENV_PATHS: 1
+		},
 		stdio: 'inherit'
 	}
 );

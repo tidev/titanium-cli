@@ -31,8 +31,10 @@ const os = process.platform === 'darwin' ? 'osx' : process.platform;
 export async function getTitaniumSDKPaths(config) {
 	const sdkPaths = new Set();
 
-	for (const p of locations[os]) {
-		sdkPaths.add(expand(p));
+	if (!process.env.TI_CLI_SKIP_ENV_PATHS) {
+		for (const p of locations[os]) {
+			sdkPaths.add(expand(p));
+		}
 	}
 
 	const defaultInstallLocation = config.get('sdk.defaultInstallLocation');

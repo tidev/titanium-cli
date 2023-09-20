@@ -53,7 +53,7 @@ export function config(logger, config, cli) {
  * @param {CLI} cli - The CLI instance
  */
 export async function run(logger, config, cli) {
-	const action = cli.argv._.shift() || 'list';
+	const action = cli.command.name();
 	for (const [name, subcommand] of Object.entries(SdkSubcommands)) {
 		if (action === name || action === subcommand.alias) {
 			await SdkSubcommands[name].fn(logger, config, cli);
@@ -150,10 +150,8 @@ SdkSubcommands.list = {
 				cli.env.os.sdkPaths,
 				defaultInstallLocation,
 				config.get('paths.sdks')
-			].flat().map(p => p && expand(p)).filter(Boolean))
+			].flat().filter(Boolean).map(p => p && expand(p)))
 		).sort();
-		console.log('>>>>', locations);
-		console.log(config.get());
 
 		if (cli.argv.json || cli.argv.output === 'json') {
 			for (const ver of vers) {
@@ -265,7 +263,7 @@ ${r.type !== 'ga' ? gray('  [unstable]') : i++ === 0 ? green('  [latest stable]'
 						const dt = Intl.DateTimeFormat('en-US', { dateStyle: 'short' }).format(new Date(b.date));
 						logger.log(`   ${cyan(b.name)}\
 ${dt.padStart(11)}\
-${prettyBytes(b.assets.find(a => a.os === os).size).toUpperCase().padStart(11)}`);
+${prettyBytes(b.assets.find(a => a.os === os).size).toUpperCase().padStart(11)}  ${gray('[unstable]')}`);
 					}
 					logger.log(gray('** NOTE: these builds not recommended for production use **'));
 				} else {
@@ -331,7 +329,7 @@ SdkSubcommands.install = {
 	},
 	async fn(logger, config, cli) {
 		const titaniumDir  = expand(cli.env.installPath);
-		const showProgress = !cli.argv.quiet && !cli.argv['no-progress-bars'];
+		const showProgress = !cli.argv.quiet && !!cli.argv['progress-bars'];
 		const osName       = cli.env.os.name;
 		const subject      = cli.argv._.shift() || 'latest';
 
@@ -388,7 +386,10 @@ SdkSubcommands.install = {
 		// step 4: move the sdk files to the dest
 
 		const dest = join(titaniumDir, 'mobilesdk', osName, renameTo || name);
-		logger.log(`\n\nInstalling SDK files to ${cyan(dest)}`);
+		if (showProgress) {
+			logger.log();
+		}
+		logger.log(`\nInstalling SDK files to ${cyan(dest)}`);
 		await fs.mkdirs(dest);
 		await fs.move(src, dest, { overwrite: true });
 
@@ -536,7 +537,7 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 
 	// step 1.5: download the file
 
-	const downloadedFile = join(os.tmpdir(), `titanium-sdk-${Math.floor(Math.round(1e8))}.zip`);
+	const downloadedFile = join(os.tmpdir(), `titanium-cli-${Math.floor(Math.random(1e6))}.zip`);
 	const downloadDir = dirname(downloadedFile);
 	await mkdir(downloadDir, { recursive: true });
 
@@ -609,7 +610,7 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 
 async function extractSDK({ file, force, logger, noPrompt, osName, showProgress, subject, titaniumDir }) {
 	const sdkDestRegExp = new RegExp(`^mobilesdk[/\\\\]${osName}[/\\\\]([^/\\\\]+)`);
-	const tempDir = join(os.tmpdir(), `titanium-sdk-${Math.floor(Math.random() * 1e8)}`);
+	const tempDir = join(os.tmpdir(), `titanium-cli-${Math.floor(Math.random() * 1e6)}`);
 	let artifact;
 	let bar;
 	let name;
@@ -660,7 +661,7 @@ async function extractSDK({ file, force, logger, noPrompt, osName, showProgress,
 	}
 
 	logger.trace(`Detected artifact: ${artifact}`);
-	const tempDir2 = join(os.tmpdir(), `titanium-sdk-${Math.floor(Math.random() * 1e8)}`);
+	const tempDir2 = join(os.tmpdir(), `titanium-cli-${Math.floor(Math.random() * 1e6)}`);
 	file = join(tempDir, artifact);
 
 	logger.trace(`Extracting ${file} -> ${tempDir2}`);
@@ -766,7 +767,7 @@ SdkSubcommands.uninstall = {
 	async fn(logger, _config, cli) {
 		const vers = version.sort(Object.keys(cli.env.sdks)).reverse();
 		const { force } = cli.argv;
-		let versions = cli.argv._;
+		let versions = cli.argv._[0] || [];
 
 		logger.skipBanner(false);
 		logger.banner();

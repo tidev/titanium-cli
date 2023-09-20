@@ -50,7 +50,7 @@ export function config(logger, config, cli) {
  * @param {Function} finished - Callback when the command finishes
  */
 export async function run(logger, config, cli) {
-	let action = cli.argv._.shift() || 'list';
+	const action = cli.command.name();
 	for (const [name, subcommand] of Object.entries(ModuleSubcommands)) {
 		if (action === name || action === subcommand.alias) {
 			await ModuleSubcommands[name].fn(logger, config, cli);
