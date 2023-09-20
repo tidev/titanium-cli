@@ -67,7 +67,7 @@ describe('ti sdk', { concurrency: true }, () => {
 			const sdkPath = join(tmpSDKDir, 'mobilesdk', 'win32', '12.2.0.GA');
 
 			// list sdks (no sdks installed)
-			let { exitCode, stdout } = await run(['sdk']); // no `ls` to test default subcommand
+			let { exitCode, stdout, stderr } = await run(['sdk']); // no `ls` to test default subcommand
 			let output = stripColor(stdout);
 			assert.match(output, /Titanium Command-Line Interface/);
 			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
@@ -91,8 +91,13 @@ describe('ti sdk', { concurrency: true }, () => {
 			assert.strictEqual(exitCode, 0);
 
 			// install an sdk
-			({ exitCode, stdout } = await run(['sdk', 'install', '12.2.0.GA', '--no-progress-bars']));
-			assert.match(stdout, /successfully installed/);
+			({ exitCode, stdout, stderr } = await run(['sdk', 'install', '12.2.0.GA', '--no-progress-bars']));
+			try {
+				assert.match(stdout, /successfully installed/);
+			} catch (e) {
+				console.log(stderr);
+				throw e;
+			}
 			assert.strictEqual(exitCode, 0);
 
 			// list sdks

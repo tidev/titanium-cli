@@ -39,7 +39,7 @@ describe('timodule', () => {
 	});
 
 	it('should find modules in a search path', async () => {
-		const tmpModulesDir = tmpDirName();
+		const tmpModulesDir = join(tmpDirName(), 'modules');
 		try {
 			await fs.copy(join(fixturesDir, 'modules'), tmpModulesDir);
 
