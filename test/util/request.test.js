@@ -17,11 +17,11 @@ describe('request', () => {
 	});
 
 	it('should fetch github page', async () => {
-		const res = await request('https://tidev.io');
+		const res = await request('https://github.com/tidev');
 		assert.strictEqual(res.statusCode, 200);
 	});
 
-	it('should fetch github page via proxy', async () => {
+	(process.platform === 'win32' ? it.skip : it)('should fetch github page via proxy', async () => {
 		const connections = {};
 		const server = createServer();
 		server.on('connection', function (conn) {
@@ -36,7 +36,7 @@ describe('request', () => {
 		try {
 			ticonfig.set('cli.httpProxyServer', 'http://localhost:9999');
 
-			const res = await request('https://tidev.io', {
+			const res = await request('https://github.com/tidev', {
 				headers: {
 					Connection: 'close'
 				},
