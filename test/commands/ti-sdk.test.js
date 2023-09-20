@@ -65,6 +65,10 @@ describe('ti sdk', { concurrency: true }, () => {
 			await run(['config', 'sdk.defaultInstallLocation', tmpSDKDir]);
 
 			const sdkPath = join(tmpSDKDir, 'mobilesdk', process.platform === 'darwin' ? 'osx' : process.platform, '12.2.0.GA');
+			const platforms = ['android'];
+			if (process.platform === 'darwin') {
+				platforms.unshift('iphone');
+			}
 
 			// list sdks (no sdks installed)
 			let { exitCode, stdout, stderr } = await run(['sdk']); // no `ls` to test default subcommand
@@ -137,9 +141,7 @@ describe('ti sdk', { concurrency: true }, () => {
 							},
 							timestamp: '9/15/2023 09:06',
 							githash: '03d8a831eb',
-							platforms: [
-								'android'
-							]
+							platforms
 						},
 						path: sdkPath,
 						type: 'ga',
