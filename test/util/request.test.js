@@ -18,12 +18,7 @@ describe('request', { concurrency: true }, () => {
 	});
 
 	it('should fetch github page', async () => {
-		const res = await request('https://github.com/tidev', {
-			headers: {
-				Connection: 'close'
-			},
-			reset: true
-		});
+		const res = await request('https://github.com/tidev');
 		await res.body.text();
 		assert.strictEqual(res.statusCode, 200);
 	});
@@ -43,12 +38,7 @@ describe('request', { concurrency: true }, () => {
 		try {
 			ticonfig.set('cli.httpProxyServer', 'http://localhost:9999');
 
-			const res = await request('https://github.com/tidev', {
-				headers: {
-					Connection: 'close'
-				},
-				reset: true
-			});
+			const res = await request('https://github.com/tidev');
 			await res.body.text();
 			assert.strictEqual(res.statusCode, 200);
 		} finally {

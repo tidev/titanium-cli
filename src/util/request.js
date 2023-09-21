@@ -1,6 +1,6 @@
 import { ticonfig } from './ticonfig.js';
 
-export async function request(url, opts) {
+export async function request(url, opts = {}) {
 	const { Agent, ProxyAgent, request: req } = await import('undici');
 	const proxyUrl = ticonfig.get('cli.httpProxyServer');
 	const requestTls = {
@@ -18,6 +18,11 @@ export async function request(url, opts) {
 
 	return await req(url, {
 		dispatcher,
-		...opts
+		reset: true,
+		...opts,
+		headers: {
+			Connection: 'close',
+			...opts.headers
+		}
 	});
 }

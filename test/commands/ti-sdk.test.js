@@ -227,4 +227,14 @@ describe('ti sdk', { concurrency: true }, () => {
 			await fs.remove(tmpSDKDir);
 		}
 	}), 120000);
+
+	it('should show message for select command', initCLI(async (run) => {
+		const { exitCode, stdout } = await run(['sdk', 'select']);
+
+		const output = stripColor(stdout);
+		assert.match(output, /Titanium Command-Line Interface/);
+		assert.match(output, /The "select" subcommand is no longer used/);
+
+		assert.strictEqual(exitCode, 0);
+	}));
 });
