@@ -794,7 +794,7 @@ SdkSubcommands.uninstall = {
 				}))
 			}));
 			if (!versions) {
-				process.exit(0);
+				return;
 			}
 			logger.log();
 		}
@@ -806,7 +806,7 @@ SdkSubcommands.uninstall = {
 			for (const v of versions) {
 				logger.log(` • ${cyan(v.padEnd(maxlen))}  ${cli.env.sdks[v]?.path || yellow('not found')}`);
 			}
-			process.exit(0);
+			return;
 		}
 
 		if (!force) {
@@ -826,7 +826,7 @@ SdkSubcommands.uninstall = {
 				inactive: 'no'
 			});
 			if (!confirm) {
-				process.exit(0);
+				return;
 			}
 			logger.log();
 		}
