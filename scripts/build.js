@@ -1,4 +1,4 @@
-import { build } from 'esbuild'
+import { build } from 'esbuild';
 
 await build({
 	entryPoints: ['./src/**/*'],
@@ -6,5 +6,6 @@ await build({
 	format: 'esm',
 	target: 'node18',
 	platform: 'node',
-	minify: true
+	minify: true,
+	sourcemap: 'external'
 });
