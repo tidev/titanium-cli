@@ -19,7 +19,7 @@ export async function detect(logger, config, cli, types = { all: true }) {
 		jdk,
 		...platformData
 	] = await Promise.all([
-		(types.all || types.os) && osInfo(),
+		(types.all || types.os) && osInfo(logger),
 		(types.all || types.nodejs) && nodeInfo(),
 		(types.all || types.nodejs) && npmInfo(),
 		(types.all || types.titanium) && titaniumSDKInfo(config),
@@ -94,7 +94,7 @@ async function loadPlatformInfo(logger, platform, config) {
 	}
 }
 
-async function osInfo() {
+async function osInfo(logger) {
 	let name = process.platform;
 	let version = '?';
 	let m;
@@ -120,7 +120,7 @@ async function osInfo() {
 				n = m[1].replaceAll('"', '');
 			}
 		} else if (existsSync('/etc/system-release')) {
-			[name, _, version] = await readFile('/etc/system-release', 'utf-8').split(' ');
+			[name, _, version] = (await readFile('/etc/system-release', 'utf-8')).split(' ');
 		}
 		name = n || 'GNU/Linux';
 	} else {

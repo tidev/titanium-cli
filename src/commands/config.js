@@ -91,10 +91,10 @@ export function validate(_logger, _config, cli) {
 		}
 
 		// if the key is not a path setting, then we don't allow any values
-		if (len > 1 && !/^paths\..*$/.test(key)) {
+		if (len > 1 && cli.argv._[1] !== undefined && !/^paths\..*$/.test(key)) {
 			throw new TiError('Too many arguments for "--remove" flag', {
 				after: `Run ${cyan(
-					`titanium config --remove${key.includes(' ') ? `"${key}"` : key}`
+					`titanium config --remove ${key.includes(' ') ? `"${key}"` : key}`
 				)} to remove the config setting.`
 			});
 		}

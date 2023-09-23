@@ -448,6 +448,7 @@ export class CLI {
 
 		this.command = program
 			.name('titanium')
+			.allowUnknownOption()
 			.addHelpText('beforeAll', () => {
 				this.logger.bannerEnabled(true);
 				this.logger.skipBanner(false);
@@ -464,6 +465,15 @@ export class CLI {
 				}
 			})
 			.option('--no-banner', 'disable Titanium version banner')
+			.addOption(
+				// completely ignored, we just need the parser to not choke
+				new Option('--color')
+					.hideHelp()
+			)
+			.addOption(
+				new Option('--colors')
+					.hideHelp()
+			)
 			.option('--no-color', 'disable colors')
 			.addOption(
 				new Option('--no-colors')
@@ -479,7 +489,7 @@ export class CLI {
 					.choices(this.logger.getLevels())
 					.default('info')
 			)
-			.option('-d, --project-dir <path>', 'the directory containing the project', '.')
+			.option('-d, --project-dir <path>', 'the directory containing the project')
 			.option('-q, --quiet', 'suppress all output')
 			.option('-v, --version', 'displays the current version')
 			.option('-s, --sdk [version]', `Titanium SDK version to use ${gray('(default: "latest")')}`)
@@ -546,7 +556,7 @@ export class CLI {
 						const src = optionBranch[this.argv[name]];
 						Object.assign(conf.flags, src.flags);
 						Object.assign(conf.options, src.options);
-						await applyCommandConfig(cmd.name(), cmd, {
+						await applyCommandConfig.call(this, cmd.name(), cmd, {
 							flags: src.flags,
 							options: src.options
 						});
@@ -627,6 +637,7 @@ export class CLI {
 			program
 				.command(name)
 				.summary(summary)
+				.allowUnknownOption()
 				.action((...args) => this.executeCommand(args));
 		}
 
@@ -652,7 +663,7 @@ export class CLI {
 		this.command = cmd;
 		this.applyArgv(cmd);
 
-		const cwd = expand(this.argv['project-dir']);
+		const cwd = expand(this.argv['project-dir'] || '.');
 
 		// load hooks
 		const hooks = ticonfig.paths?.hooks;
@@ -1070,7 +1081,13 @@ export class CLI {
 					}
 				}
 
-				this.logger.log(`For help, run: ${cyan('titanium ${this.argv.$command} --help')}\n`);
+				const cmd = ['titanium'];
+				if (this.command) {
+					cmd.push(this.command.name());
+				}
+				cmd.push('--help');
+
+				this.logger.log(`For help, run: ${cyan(cmd.join(' '))}\n`);
 				process.exit(1);
 			}
 
