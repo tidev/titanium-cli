@@ -6,8 +6,15 @@
  * Removed all analytics/telemetry code
  * Removed i18n logic; all output rendered in English
  * Removed incomplete tab completion code
- * Removed "default" SDK; `<sdk-version>` in tiapp.xml is source of truth, override with `--sdk <ver>` arg
+ * Removed "default" SDK; `<sdk-version>` in tiapp.xml is source of truth,
+   override with `--sdk <ver>` arg
  * `--log-level` is now a global option
+   - Used to be associated to SDK commands, but the logger belongs to the CLI
+     and thus the log level option belongs to the CLI
+ * `--project-dir` is now a global option
+   - Used to be `build`, `clean`, and `project` commands only, but needed so
+     the CLI can read the `tiapp.xml` and determine the `<sdk-version>`;
+     defaults to the current working directory
  * `ti config` changes:
    - Added `--json` flag
    - Replaced `--output json` with `--output json-object` output
