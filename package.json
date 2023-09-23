@@ -34,11 +34,11 @@
 		"@reporters/github": "1.5.2",
 		"@vitest/coverage-istanbul": "0.34.5",
 		"c8": "8.0.1",
-		"eslint": "8.49.0",
+		"eslint": "8.50.0",
 		"eslint-plugin-promise": "6.1.1",
 		"eslint-plugin-security": "1.7.1",
 		"fs-extra": "11.1.1",
-		"glob": "10.3.5",
+		"glob": "10.3.6",
 		"memory-streams": "0.1.3",
 		"proxy": "2.1.1"
 	},
