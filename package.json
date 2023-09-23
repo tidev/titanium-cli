@@ -24,7 +24,7 @@
 		"pretty-bytes": "6.1.1",
 		"prompts": "2.4.2",
 		"semver": "7.5.4",
-		"undici": "5.25.1",
+		"undici": "5.25.2",
 		"which": "4.0.0",
 		"wrap-ansi": "8.1.0",
 		"xpath": "0.0.33",
@@ -34,7 +34,6 @@
 		"@reporters/github": "1.5.2",
 		"@vitest/coverage-istanbul": "0.34.5",
 		"c8": "8.0.1",
-		"esbuild": "0.19.3",
 		"eslint": "8.49.0",
 		"eslint-plugin-promise": "6.1.1",
 		"eslint-plugin-security": "1.7.1",
@@ -49,13 +48,11 @@
 		"titanium": "./bin/ti.js"
 	},
 	"files": [
-		"./dist"
+		"./src"
 	],
 	"scripts": {
-		"build": "node scripts/build.js",
 		"coverage": "node scripts/test.js --coverage",
 		"lint": "eslint --cache \"src/**/*.js\"",
-		"prepack": "pnpm build",
 		"test": "node scripts/test.js"
 	},
 	"engines": {
