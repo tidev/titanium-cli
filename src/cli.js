@@ -365,6 +365,8 @@ export class CLI {
 		this.command = cmd;
 		this.applyArgv(cmd);
 
+		this.logger.trace(`Executing command "${this.command.name()}"`);
+
 		this.logger.banner();
 
 		if (sdkCommands[this.command.name()]) {
@@ -516,114 +518,96 @@ export class CLI {
 			})
 			.hook('preSubcommand', (_, cmd) => this.loadCommand(cmd))
 			.hook('preAction', async (_, cmd) => {
-				// command is already loaded via `preSubcommand`, but reapply argv due
-				// to commander using an `EventEmitter` to set option values
-				this.applyArgv(cmd);
+				this.logger.trace('preAction', cmd.name());
 
 				const { conf } = cmd;
 				if (!conf) {
 					return;
 				}
 
-				// if the command has a --platform option, then we need to load the platform-specific configuration
-				if (conf.options?.platform) {
-					this.argv.$platform = this.argv.platform;
-				}
+				// // any keys in the conf object that aren't explicitly 'flags',
+				// // 'options', 'args', or 'subcommands' is probably a option branch
+				// // that changes the available flags/options
+				// const skipRegExp = /^(flags|options|args|subcommands)$/;
+				// const optionBranches = Object.keys(conf)
+				// 	.filter(name => conf.options && conf.options[name] && !skipRegExp.test(name))
+				// 	.sort((a, b) => {
+				// 		// if we have multiple option groups, then try to process them in order
+				// 		if (!conf.options[a] || !conf.options[a].order) {
+				// 			return 1;
+				// 		}
+				// 		if (!conf.options[b] || !conf.options[b].order) {
+				// 			return -1;
+				// 		}
+				// 		return conf.options[b].order - conf.options[a].order;
+				// 	});
 
-				// any keys in the conf object that aren't explicitly 'flags',
-				// 'options', 'args', or 'subcommands' is probably a option branch
-				// that changes the available flags/options
-				const skipRegExp = /^(flags|options|args|subcommands)$/;
-				const optionBranches = Object.keys(conf)
-					.filter(name => conf.options && conf.options[name] && !skipRegExp.test(name))
-					.sort((a, b) => {
-						// if we have multiple option groups, then try to process them in order
-						if (!conf.options[a] || !conf.options[a].order) {
-							return 1;
-						}
-						if (!conf.options[b] || !conf.options[b].order) {
-							return -1;
-						}
-						return conf.options[b].order - conf.options[a].order;
-					});
+				// for (const name of optionBranches) {
+				// 	const option = conf.options[name];
+				// 	const optionBranch = conf[name];
 
-				for (const name of optionBranches) {
-					const option = conf.options[name];
-					const optionBranch = conf[name];
+				// 	if (this.argv[name] !== undefined || !option.required) {
+				// 		// v6 would re-parse, but that is unsupported
+				// 		continue;
+				// 	}
 
-					// if --<option> was passed in, then mix in the option branch's flags/options
-					if (this.argv[name]) {
-						const src = optionBranch[this.argv[name]];
-						Object.assign(conf.flags, src.flags);
-						Object.assign(conf.options, src.options);
-						await applyCommandConfig.call(this, cmd.name(), cmd, {
-							flags: src.flags,
-							options: src.options
-						});
-					}
+				// 	this.logger.banner();
 
-					if (this.argv[name] !== undefined || !option.required) {
-						// v6 would re-parse, but that is unsupported
-						continue;
-					}
+				// 	if (!this.argv.prompt || !option.prompt || !option.values) {
+				// 		this.logger.error(`Missing required option "--${name}"\n`);
+				// 		if (option.values) {
+				// 			this.logger.log('Allowed values:');
+				// 			for (const v of option.values) {
+				// 				this.logger.log(`   ${cyan(v)}`);
+				// 			}
+				// 			this.logger.log();
+				// 		}
+				// 		process.exit(1);
+				// 	}
 
-					this.logger.banner();
+				// 	// we need to prompt
+				// 	const field = await new Promise(resolve => option.prompt(resolve));
+				// 	await new Promise(resolve => {
+				// 		field.prompt(async (err, value) => {
+				// 			this.logger.log(); // add a little whitespace after prompting
 
-					if (!this.argv.prompt || !option.prompt || !option.values) {
-						this.logger.error(`Missing required option "--${name}"\n`);
-						if (option.values) {
-							this.logger.log('Allowed values:');
-							for (const v of option.values) {
-								this.logger.log(`   ${cyan(v)}`);
-							}
-							this.logger.log();
-						}
-						process.exit(1);
-					}
+				// 			if (err) {
+				// 				// we purposely do NOT show the error
+				// 				this.logger.log();
+				// 				process.exit(1);
+				// 			}
 
-					// we need to prompt
-					const field = await new Promise(resolve => option.prompt(resolve));
-					await new Promise(resolve => {
-						field.prompt(async (err, value) => {
-							this.logger.log(); // add a little whitespace after prompting
+				// 			// the option should probably have a callback, so fire it
+				// 			if (conf.options[name].callback) {
+				// 				value = conf.options[name].callback(value);
+				// 			}
 
-							if (err) {
-								// we purposely do NOT show the error
-								this.logger.log();
-								process.exit(1);
-							}
+				// 			this.argv[name] = value;
 
-							// the option should probably have a callback, so fire it
-							if (conf.options[name].callback) {
-								value = conf.options[name].callback(value);
-							}
+				// 			// mix in the option branch's flags/options
+				// 			const src = optionBranch[value];
+				// 			Object.assign(conf.flags, src.flags);
+				// 			Object.assign(conf.options, src.options);
+				// 			applyCommandConfig.call(this, cmd.name(), cmd, {
+				// 				flags: src.flags,
+				// 				options: src.options
+				// 			});
 
-							this.argv[name] = value;
+				// 			// v6 would re-parse, but that is unsupported
 
-							// mix in the option branch's flags/options
-							const src = optionBranch[value];
-							Object.assign(conf.flags, src.flags);
-							Object.assign(conf.options, src.options);
-							await applyCommandConfig.call(this, cmd.name(), cmd, {
-								flags: src.flags,
-								options: src.options
-							});
+				// 			resolve();
+				// 		});
+				// 	});
+				// }
 
-							// v6 would re-parse, but that is unsupported
-
-							resolve();
-						});
-					});
-				}
-
-				// apply missing option defaults
-				if (conf.options) {
-					for (const name of Object.keys(conf.options)) {
-						if (!Object.hasOwn(this.argv, name) && conf.options[name].default) {
-							this.argv[name] = conf.options[name].default;
-						}
-					}
-				}
+				// // apply missing option defaults
+				// if (conf.options) {
+				// 	for (const name of Object.keys(conf.options)) {
+				// 		if (!Object.hasOwn(this.argv, name) && conf.options[name].default) {
+				// 			this.argv[name] = conf.options[name].default;
+				// 		}
+				// 	}
+				// }
 			})
 			.action(() => program.help());
 
@@ -654,6 +638,8 @@ export class CLI {
 	 */
 	async loadCommand(cmd) {
 		const cmdName = cmd.name();
+		this.logger.trace('loadCommand()', cmdName);
+
 		let desc = commands[cmdName] || sdkCommands[cmdName];
 		if (!desc) {
 			this.logger.warn(`Unknown command "${cmdName}"`);
@@ -777,6 +763,48 @@ export class CLI {
 				: fn;
 
 			this.applyConfig(cmdName, cmd, conf);
+		}
+
+		const { conf } = cmd;
+		if (conf) {
+			// if the command has a --platform option, then we need to load the platform-specific configuration
+			if (conf.options?.platform) {
+				this.argv.$platform = this.argv.platform;
+			}
+
+			// any keys in the conf object that aren't explicitly 'flags',
+			// 'options', 'args', or 'subcommands' is probably a option branch
+			// that changes the available flags/options
+			const skipRegExp = /^(flags|options|args|subcommands)$/;
+			const optionBranches = Object.keys(conf)
+				.filter(name => conf.options && conf.options[name] && !skipRegExp.test(name))
+				.sort((a, b) => {
+					// if we have multiple option groups, then try to process them in order
+					if (!conf.options[a] || !conf.options[a].order) {
+						return 1;
+					}
+					if (!conf.options[b] || !conf.options[b].order) {
+						return -1;
+					}
+					return conf.options[b].order - conf.options[a].order;
+				});
+
+			for (const name of optionBranches) {
+				cmd.on(`option:${name}`, value => {
+					this.logger.trace(`Loading option branch for --${name}`);
+
+					this.argv[name] = value;
+
+					// if --<option> was passed in, then mix in the option branch's flags/options
+					const src = conf[name][value];
+					Object.assign(conf.flags, src?.flags);
+					Object.assign(conf.options, src?.options);
+					applyCommandConfig.call(this, cmdName, cmd, {
+						flags: src?.flags,
+						options: src?.options
+					});
+				});
+			}
 		}
 
 		await this.emit('cli:command-loaded', { cli: this, command: this.command });
@@ -956,6 +984,8 @@ export class CLI {
 
 		const prompting = this.argv.prompt;
 
+		this.logger.trace('Checking for missing/invalid options:', orderedOptionNames);
+
 		// this while loop is essentially a pump that processes missing/invalid
 		// options one at a time, recalculating them each iteration
 		// eslint-disable-next-line no-constant-condition
@@ -985,6 +1015,8 @@ export class CLI {
 						// ok, we have a required option, but it's possible that this option
 						// replaces some legacy option in which case we need to check if the
 						// legacy options were defined
+
+						this.logger.trace(`--${name} required, but undefined`);
 
 						if (typeof opt.verifyIfRequired === 'function') {
 							await new Promise(resolve => {

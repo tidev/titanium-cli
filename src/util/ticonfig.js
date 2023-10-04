@@ -8,7 +8,7 @@ export class TiConfig {
 
 	#defaults = {
 		app: {
-			workspace: ''
+			workspace: '.'
 		},
 
 		cli: {
@@ -151,7 +151,7 @@ export class TiConfig {
 		try {
 			fs.ensureDirSync(this.#titaniumConfigFolder);
 
-			var tmpFile = `${this.#configFile}.${Date.now()}.tmp`;
+			const tmpFile = `${this.#configFile}.${Date.now()}.tmp`;
 			fs.writeFileSync(tmpFile, JSON.stringify(this, null, 2));
 			fs.renameSync(tmpFile, this.#configFile);
 		} catch (e) {

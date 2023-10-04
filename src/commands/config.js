@@ -143,7 +143,7 @@ export async function run(logger, config, cli) {
 
 	if (key) {
 		try {
-			if (value) {
+			if (value !== undefined) {
 				// doing a set or removing a list item
 				const listMatch = key.match(/^paths\.(.*)$/);
 				if (listMatch) {
@@ -218,7 +218,7 @@ export async function run(logger, config, cli) {
 			if (obj) {
 				if (argv.remove) {
 					// doing a remove
-					if (Object.prototype.hasOwnProperty.call(obj, q)) {
+					if (Object.hasOwn(obj, q)) {
 						delete obj[q];
 						config.save();
 						logger.log(asJson ? JSON.stringify({ success: true }) : `${cyan(key)} removed`);
