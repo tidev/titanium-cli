@@ -87,7 +87,7 @@ export async function run(logger, config, cli) {
 
 	if (isJson) {
 		logger.log(JSON.stringify(data, null, '\t'));
-		process.exit(0);
+		return;
 	}
 
 	let indent = 27;

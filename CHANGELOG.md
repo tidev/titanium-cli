@@ -8,6 +8,8 @@
  * Removed incomplete tab completion code
  * Removed "default" SDK; `<sdk-version>` in tiapp.xml is source of truth,
    override with `--sdk <ver>` arg
+ * Replaced custom CLI arg parser (based on `optimist`) with Commander.js
+   - Order of arguments matter; command options must come after command
  * `--log-level` is now a global option
    - Used to be associated to SDK commands, but the logger belongs to the CLI
      and thus the log level option belongs to the CLI
@@ -47,7 +49,6 @@
    - Trace and debug log messages written to `stderr` instead of `stdout`
    - Added total run time trace message at end
  * Performance improvements:
-   - Minify source using `esbuild`
    - Lazy load modules as much as possible, within reason
    - Removed tons of old dead code
    - Use smaller alternative dependencies
