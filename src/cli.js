@@ -239,8 +239,8 @@ export class CLI {
 			let data = Object.assign({}, dataPayload, {
 				type: name,
 				args,
-				fn: fn,
-				ctx: ctx
+				fn,
+				ctx
 			});
 			const callback = data.args.pop();
 			const pres = this.hooks.pre[name] || [];
@@ -525,6 +525,8 @@ export class CLI {
 					return;
 				}
 
+				// TODO: Prompt for missing required options
+
 				// // any keys in the conf object that aren't explicitly 'flags',
 				// // 'options', 'args', or 'subcommands' is probably a option branch
 				// // that changes the available flags/options
@@ -764,6 +766,8 @@ export class CLI {
 
 			this.applyConfig(cmdName, cmd, conf);
 		}
+
+		// TODO: load platform specific hooks
 
 		const { conf } = cmd;
 		if (conf) {
