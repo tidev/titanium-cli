@@ -2,7 +2,7 @@ import { Argument, Command, Option } from 'commander';
 import { ticonfig } from './ticonfig.js';
 import { TiError } from './tierror.js';
 
-export function applyCommandConfig(cmdName, cmd, conf) {
+export function applyCommandConfig(cli, cmdName, cmd, conf) {
 	if (conf.title) {
 		cmd.title = conf.title;
 	}
@@ -13,7 +13,7 @@ export function applyCommandConfig(cmdName, cmd, conf) {
 
 	if (conf.flags) {
 		for (const [name, meta] of Object.entries(conf.flags)) {
-			this.logger.trace(`Adding "${cmdName}" flag: ${meta.abbr ? `-${meta.abbr}, ` : ''}--${name}`);
+			cli.debugLogger.trace(`Adding "${cmdName}" flag: ${meta.abbr ? `-${meta.abbr}, ` : ''}--${name}`);
 			const opt = new Option(`${meta.abbr ? `-${meta.abbr}, ` : ''}--${name}`, meta.desc);
 			if (meta.hidden) {
 				opt.hideHelp(true);
@@ -24,9 +24,9 @@ export function applyCommandConfig(cmdName, cmd, conf) {
 
 	if (conf.options) {
 		for (const [name, meta] of Object.entries(conf.options)) {
-			if (name === 'log-level' || name === 'sdk') {
+			if (name === 'sdk') {
 				// --log-level and --sdk are now a global options
-				this.logger.trace(`Skipping "${cmdName}" option: --${name}`);
+				cli.debugLogger.trace(`Skipping "${cmdName}" option: --${name}`);
 				continue;
 			}
 
@@ -41,12 +41,13 @@ export function applyCommandConfig(cmdName, cmd, conf) {
 			if (Array.isArray(meta.values)) {
 				opt.choices(meta.values);
 			}
-			this.logger.trace(`Adding "${cmdName}" option: ${meta.abbr ? `-${meta.abbr}, ` : ''}${long} [value]`);
+			cli.debugLogger.trace(`Adding "${cmdName}" option: ${meta.abbr ? `-${meta.abbr}, ` : ''}${long} [value]`);
 			cmd.addOption(opt);
-			cmd.hook('preAction', (_, actionCommand) => {
-				const opt = actionCommand.options.find(o => o.long === long);
-				if (opt) {
-					const value = actionCommand.getOptionValue(opt.attributeName()) || opt.defaultValue;
+
+			if (typeof meta.callback === 'function' || name === 'platform') {
+				cmd.hook('preAction', () => {
+					console.log(`preAction ${cmd.name()} --${name}`);
+					const value = cmd.getOptionValue(opt.attributeName()) || opt.defaultValue;
 
 					if (typeof meta.callback === 'function') {
 						meta.callback(value);
@@ -56,11 +57,21 @@ export function applyCommandConfig(cmdName, cmd, conf) {
 					if (name === 'platform') {
 						const platformConf = conf.platforms?.[value];
 						if (platformConf) {
-							this.command.platform = {
+							cli.command.platform = {
 								conf: platformConf
 							};
 						}
 					}
+				});
+			}
+		}
+
+		if (conf.options['log-level'] && !conf.options.timestamp) {
+			cli.debugLogger.trace(`Adding "${cmdName}" option: --timestamp`);
+			cmd.option('--timestamp', 'displays a timestamp in front of log lines');
+			cmd.on('option:timestamp', () => {
+				if (cli.ready) {
+					cli.logger.timestampEnabled(true);
 				}
 			});
 		}
@@ -77,14 +88,14 @@ export function applyCommandConfig(cmdName, cmd, conf) {
 			if (Array.isArray(meta.values)) {
 				arg.choices(meta.values);
 			}
-			this.logger.trace(`Adding "${cmdName}" arg: ${fmt}`);
+			cli.debugLogger.trace(`Adding "${cmdName}" arg: ${fmt}`);
 			cmd.addArgument(arg);
 		}
 	}
 
 	if (conf.subcommands) {
 		for (const [name, subconf] of Object.entries(conf.subcommands)) {
-			this.logger.trace(
+			cli.debugLogger.trace(
 				`Adding subcommand "${name}"${
 					conf.defaultSubcommand === name ? ' (default)' : ''
 				} to "${cmdName}"`
@@ -93,9 +104,9 @@ export function applyCommandConfig(cmdName, cmd, conf) {
 			const subcmd = new Command(name);
 			subcmd
 				.addHelpText('beforeAll', () => {
-					this.logger.bannerEnabled(true);
-					this.logger.skipBanner(false);
-					this.logger.banner();
+					cli.logger.bannerEnabled(true);
+					cli.logger.skipBanner(false);
+					cli.logger.banner();
 				})
 				.configureHelp({
 					helpWidth: ticonfig.get('cli.width', 80),
@@ -106,13 +117,13 @@ export function applyCommandConfig(cmdName, cmd, conf) {
 					outputError: msg => {
 						// explicitly set the subcommand so the global error
 						// handler can print the correct help screen
-						this.command = subcmd;
+						cli.command = subcmd;
 						throw new TiError(msg.replace(/^error:\s*/, ''));
 					}
 				})
-				.action((...args) => this.executeCommand(args));
+				.action((...args) => cli.executeCommand(args));
 
-			this.applyConfig(name, subcmd, subconf);
+			cli.applyConfig(name, subcmd, subconf);
 
 			subcmd.conf = subconf;
 

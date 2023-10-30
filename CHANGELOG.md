@@ -48,6 +48,7 @@
    - Replaced "winston" based logger with lighter weight logger
    - Trace and debug log messages written to `stderr` instead of `stdout`
    - Added total run time trace message at end
+   - `--timestamp` option enabled only when command has `--log-level` option
  * Performance improvements:
    - Lazy load modules as much as possible, within reason
    - Removed tons of old dead code

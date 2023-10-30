@@ -16,7 +16,7 @@ export class TiHelp extends Help {
 			for (const [name, conf] of Object.entries(platforms)) {
 				const cmd = new Command(name);
 				cmd.helpOption(false);
-				applyCommandConfig.call(cli, name, cmd, conf);
+				applyCommandConfig(cli, name, cmd, conf);
 				this.platformCmds[conf.title] = cmd;
 			}
 		}
@@ -25,7 +25,7 @@ export class TiHelp extends Help {
 			for (const [type, conf] of Object.entries(cli.command.conf.type)) {
 				const cmd = new Command(type);
 				cmd.helpOption(false);
-				applyCommandConfig.call(cli, type, cmd, conf);
+				applyCommandConfig(cli, type, cmd, conf);
 				const title = `${cli.command.conf.title || cli.command.module?.title || ''} --type=${type}`.trim();
 				this.typeCmds[title] = cmd;
 			}

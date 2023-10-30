@@ -1,10 +1,18 @@
 /**
  * Lazy loads the `prompts` module.
- * @param  {...any} - Args to pass into `prompt()`
+ * @param  {Object} opts - Options to pass into `prompt()`
  * @returns {Promise}
  */
-export async function prompt(...args) {
+export async function prompt(opts) {
 	const { default: prompts } = await import('prompts');
 	const { prompt } = prompts;
-	return prompt(...args);
+	const { value } = await prompt({
+		...opts,
+		name: 'value'
+	});
+	if (value === undefined) {
+		// sigint
+		process.exit(0);
+	}
+	return value;
 }

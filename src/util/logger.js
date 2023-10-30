@@ -89,7 +89,7 @@ export class Logger extends EventEmitter {
 	render(level, out, msg) {
 		if (level >= this.#level) {
 			if (this.#timestampEnabled) {
-				out.write(`${new Date().toISOString()} - `);
+				out.write(gray(`${new Date().toISOString()} - `));
 			}
 			out.write(msg);
 			out.write('\n');
