@@ -535,53 +535,6 @@ export class CLI {
 			// any of the parsed options
 		});
 
-		program.hook('preAction', async (_, cmd) => {
-			// we're finished parsing
-			//
-			// the command is loaded and we need to check if we need to handle
-			// any option branches like --platform
-			//
-			// we can prompt here for --platform, but we'll need to load the
-			// platform, apply the config, and re-parse
-
-			this.applyArgv(cmd);
-
-			const platformOption = cmd.conf?.options?.platform;
-
-			if (!platformOption) {
-				this.debugLogger.trace('Command does not have a --platform, continuing');
-				return;
-			}
-
-			if (!this.argv.platform) {
-				if (!this.promptingEnabled) {
-					throw new TiError('Missing required option: --platform <name>', {
-						after: `Available Platforms:\n${
-							platformOption.values
-								.map(v => `   ${cyan(v)}`)
-								.join('\n')
-						}`
-					});
-				}
-
-				if (platformOption.values.length === 1) {
-					this.argv.platform = platformOption.values[0];
-					this.debugLogger.trace(`Auto-selecting platform "${this.argv.platform}"`);
-				} else {
-					this.argv.platform = await prompt({
-						type: 'select',
-						message: 'Please select a valid platform:',
-						choices: platformOption.values.map(v => ({ label: v, value: v }))
-					});
-					this.debugLogger.trace(`Selecting platform "${this.argv.platform}"`);
-				}
-			}
-
-			applyCommandConfig(this, cmd.name(), cmd, cmd.conf.platforms[this.argv.platform]);
-
-			// we're done with the option branching
-		});
-
 		program.action(() => {
 			if (this.ready) {
 				program.help();
@@ -595,14 +548,79 @@ export class CLI {
 		await program.parseAsync();
 		this.debugLogger.trace('Finished parsing arguments first pass');
 
-		// reset hooks and re-parse
-		const resetHooks = ctx => {
+		// reset hooks
+		const resetHooksAndOptionHandlers = ctx => {
 			ctx._lifeCycleHooks = {};
+
+			const optionEvents = ctx.eventNames().filter(name => name.startsWith('option:'));
+			for (const name of optionEvents) {
+				ctx.removeAllListeners(name);
+			}
+
 			for (const cmd of ctx.commands) {
-				resetHooks(cmd);
+				resetHooksAndOptionHandlers(cmd);
 			}
 		};
-		resetHooks(program);
+		resetHooksAndOptionHandlers(program);
+
+		this.applyArgv(this.command);
+
+		const cmdName = this.command.name();
+
+		// validate --platform
+		const platformOption = cmdName === 'build' && this.command.conf?.options?.platform;
+		if (platformOption) {
+			this.debugLogger.trace('Processing --platform option');
+			try {
+				if (!this.argv.platform) {
+					throw new TiError('Missing required option: --platform <name>', {
+						after: `Available Platforms:\n${
+							platformOption.values
+								.map(v => `   ${cyan(v)}`)
+								.join('\n')
+						}`
+					});
+				} else if (!platformOption.values.includes(this.argv.platform)) {
+					throw new TiError(`Invalid platform "${this.argv.$originalPlatform || this.argv.platform}"`, {
+						code: 'INVALID_PLATFORM'
+					});
+				}
+			} catch (e) {
+				if (!this.promptingEnabled) {
+					throw e;
+				}
+
+				if (platformOption.values.length > 1 || e.code === 'INVALID_PLATFORM') {
+					this.logger.banner();
+
+					if (e.code === 'INVALID_PLATFORM') {
+						this.logger.error(e.message);
+					}
+
+					this.argv.platform = await prompt({
+						type: 'select',
+						message: 'Please select a valid platform:',
+						choices: platformOption.values.map(v => ({ label: v, value: v }))
+					});
+					this.debugLogger.trace(`Selecting platform "${this.argv.platform}"`);
+				} else {
+					this.argv.platform = platformOption.values[0];
+					this.debugLogger.trace(`Auto-selecting platform "${this.argv.platform}"`);
+				}
+			}
+
+			const platformConf = this.command.conf.platforms[this.argv.platform];
+
+			this.argv.$platform = this.argv.platform;
+			this.command.platform = {
+				conf: platformConf
+			};
+
+			this.debugLogger.trace('Applying platform config...');
+			applyCommandConfig(this, cmdName, this.command, platformConf);
+
+			await this.scanHooks(expand(this.sdk.path, this.argv.platform, 'cli', 'hooks'));
+		}
 
 		// wire up the event listeners
 		program
@@ -628,30 +646,10 @@ export class CLI {
 
 		this.ready = true;
 
-		this.debugLogger.trace('Parsing arguments...');
+		this.debugLogger.trace('Parsing arguments second pass...');
 		await program.parseAsync();
-		this.debugLogger.trace('Finished parsing arguments');
+		this.debugLogger.trace('Finished parsing arguments second pass');
 	}
-
-	// if (conf) {
-	// 	// if the command has a --platform option, then we need to load the platform-specific configuration
-	// 	if (conf.options?.platform) {
-	// 		if (this.argv.platform) {
-	// 			this.debugLogger.trace(`Loading platform "${this.argv.platform}"`);
-
-	// 			this.argv.$platform = this.argv.platform;
-
-	// 			await this.scanHooks(expand(this.sdk.path, this.argv.platform, 'cli', 'hooks'));
-	// 		} else {
-	// 			this.debugLogger.trace('Platform not specified, will need to prompt/validate');
-	// 		}
-	// 	}
-
-	// 	if (conf.options?.['log-level']) {
-	// 		this.logger.bannerEnabled(false);
-	// 		this.logger.skipBanner(true);
-	// 		this.logger.setLevel(this.argv['log-level'] || ticonfig.get('cli.logLevel'));
-	// 	}
 
 	// 	// any keys in the conf object that aren't explicitly 'flags',
 	// 	// 'options', 'args', or 'subcommands' is probably a option branch
@@ -911,152 +909,6 @@ export class CLI {
 		}
 
 		await this.emit('cli:command-loaded', { cli: this, command: this.command });
-	}
-
-	/**
-	 * Loads the SDK, inits SDK hooks, and loads the command module.
-	 *
-	 * @param {Command} cmd - The commander command instance.
-	 * @returns {Promise}
-	 * @access private
-	 */
-	async loadCommand2(cmd) {
-		const cmdName = cmd.name();
-		this.debugLogger.trace('loadCommand()', cmdName);
-
-		let desc = commands[cmdName] || sdkCommands[cmdName];
-		if (!desc) {
-			this.debugLogger.warn(`Unknown command "${cmdName}"`);
-			return;
-		}
-
-		this.command = cmd;
-
-		// mix in the global options
-		this.applyArgv(cmd);
-
-		this.promptingEnabled = this.argv.prompt && !this.argv.$_.includes('-h') && !this.argv.$_.includes('--help');
-
-		const cwd = expand(this.argv['project-dir'] || '.');
-
-		// load hooks
-		const hooks = ticonfig.paths?.hooks;
-		if (hooks) {
-			const paths = arrayify(hooks, true);
-			await Promise.all(paths.map(p => this.scanHooks(p)));
-		}
-
-		// load the sdk and its hooks
-		const {
-			installPath,
-			sdk,
-			sdkPaths,
-			sdks
-		} = await initSDK({
-			cmdName,
-			config: this.config,
-			cwd,
-			logger: this.debugLogger,
-			promptingEnabled: this.promptingEnabled,
-			selectedSdk: this.argv.sdk
-		});
-		this.env.installPath = installPath;
-		this.env.os.sdkPaths = sdkPaths;
-		this.env.sdks = sdks;
-		this.env.getSDK = version => {
-			if (!version || version === 'latest') {
-				return sdk;
-			}
-			const values = Object.values(sdks);
-			return values.find(s => s.name === version) ||
-				values.find(s => s.version === version) ||
-				null;
-		};
-		this.sdk = sdk;
-		this.argv.sdk = sdk?.name;
-
-		// if we have an sdk and we're running a sdk command, then scan the sdk for hooks
-		if (this.sdk && sdkCommands[cmdName]) {
-			await this.scanHooks(expand(this.sdk.path, 'cli', 'hooks'));
-		}
-
-		// render the banner
-		this.logger.setBanner({
-			name: this.name,
-			copyright: this.copyright,
-			version: this.version,
-			sdkVersion: this.sdk?.name
-		});
-
-		// display any bad CLI plugins
-		if (this.hooks.incompatibleFilenames.length) {
-			// display all hooks for debugging
-			this.debugLogger.warn(`Incompatible plugin hooks:\n${
-				this.hooks.incompatibleFilenames.map(file => `  ${file}`).join('\n')
-			}\n`);
-		}
-		if (Object.keys(this.hooks.errors).length) {
-			this.debugLogger.warn(`Bad plugin hooks that failed to load:\n${
-				Object.values(this.hooks.errors)
-					.map(e => (e.stack || e.toString())
-						.trim()
-						.split('\n')
-						.map(line => `  ${line}`)
-						.join('\n')
-					)
-					.join('\n')
-			}\n`);
-		}
-		if (Object.keys(this.hooks.ids).some(id => this.hooks.ids[id].length > 1)) {
-			this.debugLogger.warn(`Conflicting plugins that were not loaded:\n${
-				Object.entries(this.hooks.ids)
-					.map(([id, conflicting]) => `  Hook ID: ${cyan(id)}\n${
-						conflicting.map((c, i) => {
-							return i === 0
-								? `    Loaded: ${c.file} ${c.version ? `(version ${version})` : ''}`
-								: `    Didn't load: ${c.file} ${c.version ? `(version ${version})` : ''}`;
-						}).join('\n')
-					}`)
-					.join('\n')
-			}\n`);
-		}
-
-		if (sdkCommands[cmdName] && !this.sdk) {
-			throw new TiError('No Titanium SDKs found', {
-				after: `You can download the latest Titanium SDK by running: ${cyan('titanium sdk install')}`
-			});
-		}
-
-		const commandFile = sdkCommands[cmdName]
-			? pathToFileURL(join(this.sdk.path, `cli/commands/${cmdName}.js`))
-			: join(import.meta.url, `../commands/${cmdName}.js`);
-
-		// load the command
-		this.debugLogger.trace(`Importing: ${commandFile}`);
-		cmd.module = (await import(commandFile)) || {};
-
-		if (typeof cmd.module.extendedDesc === 'string') {
-			desc = cmd.module.extendedDesc;
-		} else if (desc) {
-			desc = capitalize(desc) + (/[.!]$/.test(desc) ? '' : '.');
-		}
-		desc = desc.replace(/__(.+?)__/gs, (s, m) => cyan(m));
-		cmd.description(wrapAnsi(desc, ticonfig.get('cli.width', 80), { hard: true, trim: false }));
-
-		// load the command's config
-		if (typeof cmd.module.config === 'function') {
-			const fn = await cmd.module.config(this.logger, this.config, this);
-			const conf = typeof fn === 'function'
-				? await new Promise(resolve => fn(resolve))
-				: fn;
-
-			this.applyConfig(cmdName, cmd, conf);
-		}
-
-		await this.emit('cli:command-loaded', { cli: this, command: this.command });
-
-		// at this point, we've defined all the command's options, but the
-		// parser isn't done parsing yet, so it'll pick them up
 	}
 
 	/**
@@ -1327,7 +1179,7 @@ export class CLI {
 			// we have an invalid option or missing option
 			if (!this.promptingEnabled) {
 				// if we're not prompting, output the invalid/missing options and exit
-				this.debugLogger.banner();
+				this.logger.banner();
 
 				if (Object.keys(invalid).length) {
 					for (const name of Object.keys(invalid)) {
@@ -1335,15 +1187,15 @@ export class CLI {
 						const msg = `Invalid "${opt.label || `--${name}`}" value "${this.argv[opt.name]}"`;
 
 						if (typeof opt.helpNoPrompt === 'function') {
-							opt.helpNoPrompt(this.debugLogger, msg);
+							opt.helpNoPrompt(this.logger, msg);
 						} else {
-							this.debugLogger.error(`${msg}\n`);
+							this.logger.error(`${msg}\n`);
 							if (opt.values) {
-								this.debugLogger.log('Accepted values:');
+								this.logger.log('Accepted values:');
 								for (const v of opt.values) {
-									this.debugLogger.log(`   ${cyan(v)}`);
+									this.logger.log(`   ${cyan(v)}`);
 								}
-								this.debugLogger.log();
+								this.logger.log();
 							}
 						}
 					}
@@ -1354,9 +1206,9 @@ export class CLI {
 					for (const name of Object.keys(missing)) {
 						const msg = `Missing required option: --${name} <${missing[name].hint || 'value'}>`;
 						if (typeof missing[name].helpNoPrompt === 'function') {
-							missing[name].helpNoPrompt(this.debugLogger, msg);
+							missing[name].helpNoPrompt(this.logger, msg);
 						} else {
-							this.debugLogger.error(`${msg}\n`);
+							this.logger.error(`${msg}\n`);
 						}
 					}
 				}
@@ -1367,7 +1219,7 @@ export class CLI {
 				}
 				cmd.push('--help');
 
-				this.debugLogger.log(`For help, run: ${cyan(cmd.join(' '))}\n`);
+				this.logger.log(`For help, run: ${cyan(cmd.join(' '))}\n`);
 				process.exit(1);
 			}
 

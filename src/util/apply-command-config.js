@@ -38,30 +38,19 @@ export function applyCommandConfig(cli, cmdName, cmd, conf) {
 			if (meta.default !== undefined) {
 				opt.default(meta.default);
 			}
-			if (Array.isArray(meta.values)) {
-				opt.choices(meta.values);
-			}
+
+			// TODO: the list needs to be validated manually in cli.validate()
+			// if (Array.isArray(meta.values)) {
+			// 	opt.choices(meta.values);
+			// }
+
 			cli.debugLogger.trace(`Adding "${cmdName}" option: ${meta.abbr ? `-${meta.abbr}, ` : ''}${long} [value]`);
 			cmd.addOption(opt);
 
-			if (typeof meta.callback === 'function' || name === 'platform') {
-				cmd.hook('preAction', () => {
-					console.log(`preAction ${cmd.name()} --${name}`);
-					const value = cmd.getOptionValue(opt.attributeName()) || opt.defaultValue;
-
-					if (typeof meta.callback === 'function') {
-						meta.callback(value);
-					}
-
-					// the following is `build` command specific
-					if (name === 'platform') {
-						const platformConf = conf.platforms?.[value];
-						if (platformConf) {
-							cli.command.platform = {
-								conf: platformConf
-							};
-						}
-					}
+			if (typeof meta.callback === 'function') {
+				cmd.on(`option:${opt.attributeName()}`, value => {
+					cli.debugLogger.trace(`Firing --${name} option callback: ${value ?? opt.defaultValue}`);
+					meta.callback(value ?? opt.defaultValue);
 				});
 			}
 		}
