@@ -6,6 +6,11 @@
 export async function prompt(opts) {
 	const { default: prompts } = await import('prompts');
 	const { prompt } = prompts;
+
+	if (Array.isArray(opts)) {
+		return await prompt(opts);
+	}
+
 	const { value } = await prompt({
 		...opts,
 		name: 'value'

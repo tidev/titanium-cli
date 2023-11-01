@@ -80,7 +80,7 @@ export async function run(logger, config, cli) {
 		({
 			data,
 			platformInfo
-		} = await detect(logger, config, cli, types));
+		} = await detect(cli.debugLogger, config, cli, types));
 	} finally {
 		busy?.stop();
 	}

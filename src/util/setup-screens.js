@@ -103,10 +103,9 @@ export class SetupScreens {
 			}     Exit`
 		);
 
-		const { value } = await prompt({
+		const value = await prompt({
 			type: 'text',
-			message: 'Where do you want to go?',
-			name: 'value'
+			message: 'Where do you want to go?'
 		});
 
 		const next = lookup[value];
@@ -124,7 +123,7 @@ export class SetupScreens {
 		busy.start();
 
 		try {
-			({ data } = await detect(this.logger, this.config, this.cli, { all: true }));
+			({ data } = await detect(this.cli.debugLogger, this.config, this.cli, { all: true }));
 		} finally {
 			busy.stop();
 		}
@@ -209,7 +208,7 @@ export class SetupScreens {
 		}
 
 		try {
-			({ data } = await detect(this.logger, this.config, this.cli, { all: true }));
+			({ data } = await detect(this.cli.debugLogger, this.config, this.cli, { all: true }));
 
 			data.titaniumCLI.latest = await request('https://registry.npmjs.org/-/package/titanium/dist-tags')
 				.then(res => res.body.json())
@@ -287,7 +286,7 @@ export class SetupScreens {
 			busy.start();
 
 			try {
-				({ data } = await detect(this.logger, this.config, this.cli, { all: true }));
+				({ data } = await detect(this.cli.debugLogger, this.config, this.cli, { all: true }));
 			} finally {
 				busy.stop();
 			}
@@ -714,7 +713,7 @@ export class SetupScreens {
 		busy.start();
 
 		try {
-			({ data } = await detect(this.logger, this.config, this.cli, { all: true }));
+			({ data } = await detect(this.cli.debugLogger, this.config, this.cli, { all: true }));
 		} finally {
 			busy.stop();
 		}
@@ -797,7 +796,7 @@ export class SetupScreens {
 		busy.start();
 
 		try {
-			({ data } = await detect(this.logger, this.config, this.cli, { all: true }));
+			({ data } = await detect(this.cli.debugLogger, this.config, this.cli, { all: true }));
 		} finally {
 			busy.stop();
 		}

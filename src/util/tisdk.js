@@ -193,13 +193,12 @@ export async function initSDK({ cmdName, config, cwd, logger, promptingEnabled, 
 				}
 			}
 
-			({ sdkVersion } = await prompt({
+			sdkVersion = await prompt({
 				type: 'select',
 				message: 'Which Titanium SDK would you like to use?',
-				name: 'sdkVersion',
 				initial: sdk ? choices.find(s => s.name === sdk.name)?.name : undefined,
 				choices
-			}));
+			});
 
 			if (sdkVersion === undefined) {
 				// sigint

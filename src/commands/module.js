@@ -50,7 +50,11 @@ export function config(logger, config, cli) {
  * @param {Function} finished - Callback when the command finishes
  */
 export async function run(logger, config, cli) {
-	const action = cli.command.name();
+	let action = cli.command.name();
+	if (action === 'list' && cli.command.args.length) {
+		action = cli.command.args[0];
+		cli.command = cli.command.parent;
+	}
 	for (const [name, subcommand] of Object.entries(ModuleSubcommands)) {
 		if (action === name || action === subcommand.alias) {
 			await ModuleSubcommands[name].fn(logger, config, cli);
@@ -145,7 +149,7 @@ ModuleSubcommands.list = {
 			}
 		}
 
-		const results = await detect(searchPaths, config, logger);
+		const results = await detect(searchPaths, config, cli.debugLogger);
 
 		if (isJson) {
 			logger.log(JSON.stringify(results, null, '\t'));

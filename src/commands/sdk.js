@@ -53,7 +53,11 @@ export function config(logger, config, cli) {
  * @param {CLI} cli - The CLI instance
  */
 export async function run(logger, config, cli) {
-	const action = cli.command.name();
+	let action = cli.command.name();
+	if (action === 'list' && cli.command.args.length) {
+		action = cli.command.args[0];
+		cli.command = cli.command.parent;
+	}
 	for (const [name, subcommand] of Object.entries(SdkSubcommands)) {
 		if (action === name || action === subcommand.alias) {
 			await SdkSubcommands[name].fn(logger, config, cli);

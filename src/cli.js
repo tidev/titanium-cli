@@ -211,6 +211,7 @@ export class CLI {
 		applyCommandConfig(this, cmdName, cmd, conf);
 
 		if (conf.platforms) {
+			this.debugLogger.trace(`Detected conf.platforms applying config for "${cmd.name()}", overriding createHelp()`);
 			this.command.createHelp = () => {
 				return Object.assign(new TiHelp(this, conf.platforms), this.command.configureHelp());
 			};
@@ -548,6 +549,10 @@ export class CLI {
 		await program.parseAsync();
 		this.debugLogger.trace('Finished parsing arguments first pass');
 
+		if (this.command === program && program.args.length) {
+			throw new TiError(`Unknown command "${program.args[0]}"`, { showHelp: true });
+		}
+
 		// reset hooks
 		const resetHooksAndOptionHandlers = ctx => {
 			ctx._lifeCycleHooks = {};
@@ -612,6 +617,8 @@ export class CLI {
 			const platformConf = this.command.conf.platforms[this.argv.platform];
 
 			this.argv.$platform = this.argv.platform;
+
+			// set platform context
 			this.command.platform = {
 				conf: platformConf
 			};
@@ -687,23 +694,6 @@ export class CLI {
 	// }
 
 	// TODO: Prompt for missing required options
-
-	// // any keys in the conf object that aren't explicitly 'flags',
-	// // 'options', 'args', or 'subcommands' is probably a option branch
-	// // that changes the available flags/options
-	// const skipRegExp = /^(flags|options|args|subcommands)$/;
-	// const optionBranches = Object.keys(conf)
-	// 	.filter(name => conf.options && conf.options[name] && !skipRegExp.test(name))
-	// 	.sort((a, b) => {
-	// 		// if we have multiple option groups, then try to process them in order
-	// 		if (!conf.options[a] || !conf.options[a].order) {
-	// 			return 1;
-	// 		}
-	// 		if (!conf.options[b] || !conf.options[b].order) {
-	// 			return -1;
-	// 		}
-	// 		return conf.options[b].order - conf.options[a].order;
-	// 	});
 
 	// for (const name of optionBranches) {
 	// 	const option = conf.options[name];
@@ -785,7 +775,7 @@ export class CLI {
 			cmdName,
 			config: this.config,
 			cwd,
-			logger: this.debugLogger,
+			logger: this.logger,
 			promptingEnabled: this.promptingEnabled,
 			selectedSdk: this.argv.sdk
 		});
@@ -878,6 +868,13 @@ export class CLI {
 		this.debugLogger.trace(`Importing: ${commandFile}`);
 		cmd.module = (await import(commandFile)) || {};
 
+		// check if this command is compatible with this version of the CLI
+		if (cmd.module.cliVersion && !version.satisfies(this.version, cmd.module.cliVersion)) {
+			throw new TiError(`Command "${cmdName}" incompatible with this version of the CLI`, {
+				after: `Requires version ${cmd.module.cliVersion}, currently ${this.version}`
+			});
+		}
+
 		if (typeof cmd.module.extendedDesc === 'string') {
 			desc = cmd.module.extendedDesc;
 		} else if (desc) {
@@ -900,6 +897,7 @@ export class CLI {
 			}
 
 			if (conf.platforms) {
+				this.debugLogger.trace(`Detected conf.platforms loading "${cmdName}", overriding createHelp()`);
 				this.command.createHelp = () => {
 					return Object.assign(new TiHelp(this, conf.platforms), this.command.configureHelp());
 				};
