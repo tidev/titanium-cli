@@ -7,7 +7,7 @@ import { createProxy } from 'proxy';
 
 let origProxyUrl;
 
-describe('request', { concurrency: true }, () => {
+describe('request', () => {
 	beforeEach(() => {
 		origProxyUrl = ticonfig.get('cli.httpProxyServer');
 		ticonfig.set('cli.httpProxyServer', undefined);
@@ -17,13 +17,13 @@ describe('request', { concurrency: true }, () => {
 		ticonfig.set('cli.httpProxyServer', origProxyUrl);
 	});
 
-	it('should fetch github page', async () => {
-		const res = await request('https://github.com/tidev');
+	it('should fetch TiDev page', async () => {
+		const res = await request('https://tidev.io');
 		await res.body.text();
 		assert.strictEqual(res.statusCode, 200);
 	});
 
-	it('should fetch github page via proxy', async () => {
+	it('should fetch TiDev page via proxy', async () => {
 		const connections = {};
 		const server = createServer();
 		server.on('connection', function (conn) {
@@ -38,7 +38,7 @@ describe('request', { concurrency: true }, () => {
 		try {
 			ticonfig.set('cli.httpProxyServer', 'http://localhost:9999');
 
-			const res = await request('https://github.com/tidev');
+			const res = await request('https://tidev.io');
 			await res.body.text();
 			assert.strictEqual(res.statusCode, 200);
 		} finally {
