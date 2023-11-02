@@ -17,6 +17,7 @@
    - Used to be `build`, `clean`, and `project` commands only, but needed so
      the CLI can read the `tiapp.xml` and determine the `<sdk-version>`;
      defaults to the current working directory
+ * Added a new `--debug` global flag to output CLI debug logging.
  * `ti config` changes:
    - Added `--json` flag
    - Replaced `--output json` with `--output json-object` output
