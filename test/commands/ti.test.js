@@ -9,7 +9,7 @@ import { stripColor } from '../helpers/strip-color.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = fs.readJsonSync(join(__dirname, '../../package.json'));
 
-describe('ti', { concurrency: true }, () => {
+describe('ti', () => {
 	it('should display the version using short flag', initCLI(async (run) => {
 		const { exitCode, stdout } = await run(['-v']);
 		assert.strictEqual(stdout, pkgJson.version);

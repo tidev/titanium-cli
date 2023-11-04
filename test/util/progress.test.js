@@ -1,20 +1,9 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { ProgressBar } from '../../src/util/progress.js';
+import { MockStream } from '../helpers/mock-stream.js';
 
-class MockStream {
-	buffer = '';
-
-	cursorTo(n) {
-		// noop
-	}
-
-	write(str) {
-		this.buffer += str + '\n';
-	}
-}
-
-describe('progress', { concurrency: true }, () => {
+describe('progress', () => {
 	it('should render a progress bar', async () => {
 		const stream = new MockStream();
 		const bar = new ProgressBar(

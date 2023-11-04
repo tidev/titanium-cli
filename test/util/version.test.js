@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import * as version from '../../src/util/version.js';
 
-describe('version', { concurrency: true }, () => {
+describe('version', () => {
 	describe('compare', () => {
 		it('should compare two versions', () => {
 			assert(version.compare('1.0.0', '2.0.0') < 0);

@@ -31,7 +31,7 @@ const data = [
 	'zzzz'
 ];
 
-describe('columns', { concurrency: true }, () => {
+describe('columns', () => {
 	it('should render columns with no wrapping', () => {
 		assert.strictEqual(columns([
 			'foo',

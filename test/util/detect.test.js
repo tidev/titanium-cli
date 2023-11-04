@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const goodConfig = join(fileURLToPath(import.meta.url), '../fixtures/ticonfig/good.json');
 
-describe('detect', { concurrency: true }, () => {
+describe('detect', () => {
 	it('should detect all development environment', async () => {
 		const mockCLI = {
 			version: '1.2.3'

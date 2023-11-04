@@ -9,7 +9,7 @@ import { stripColor } from '../helpers/strip-color.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = fs.readJsonSync(join(__dirname, '../../package.json'));
 
-describe('ti info', { concurrency: true }, () => {
+describe('ti info', () => {
 	it('should show help', initCLI(async (run) => {
 		const { exitCode, stdout } = await run(['info', '-h']);
 

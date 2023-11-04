@@ -10,7 +10,7 @@ import fs from 'fs-extra';
 const goodConfig = join(fileURLToPath(import.meta.url), '../fixtures/ticonfig/good.json');
 const fixturesDir = join(fileURLToPath(import.meta.url), '../fixtures/tisdk');
 
-describe('tisdk', { concurrency: true }, () => {
+describe('tisdk', () => {
 	it('should get user sdk paths', async () => {
 		const tmpSDKDir = tmpDirName();
 		const config = new TiConfig(goodConfig);

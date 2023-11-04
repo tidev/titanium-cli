@@ -7,7 +7,7 @@ import { join } from 'node:path';
 
 const fixturesDir = join(fileURLToPath(import.meta.url), '../fixtures');
 
-describe('ti module', { concurrency: true }, () => {
+describe('ti module', () => {
 	it('should show help', initCLI(async (run) => {
 		const { exitCode, stdout } = await run(['module', '-h']);
 

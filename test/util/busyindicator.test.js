@@ -2,20 +2,9 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { BusyIndicator } from '../../src/util/busyindicator.js';
 import { setTimeout } from 'node:timers/promises';
+import { MockStream } from '../helpers/mock-stream.js';
 
-class MockStream {
-	buffer = '';
-
-	cursorTo(n) {
-		// noop
-	}
-
-	write(str) {
-		this.buffer = str;
-	}
-}
-
-describe('BusyIndicator', { concurrency: true }, () => {
+describe('BusyIndicator', () => {
 	it('should render a busy indicator', async () => {
 		const stream = new MockStream();
 		const busy = new BusyIndicator(stream);

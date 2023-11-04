@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import { initCLI } from '../helpers/init-cli.js';
 import { stripColor } from '../helpers/strip-color.js';
 
-describe('ti setup', { concurrency: true }, () => {
+describe('ti setup', () => {
 	it('should show help', initCLI(async (run) => {
 		const { exitCode, stdout } = await run(['setup', '-h']);
 

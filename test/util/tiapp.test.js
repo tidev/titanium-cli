@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const fixturesDir = join(fileURLToPath(import.meta.url), '../fixtures/tiapp');
 
-describe('Tiapp', { concurrency: true }, () => {
+describe('Tiapp', () => {
 	it('should load a tiapp with an sdk version', async () => {
 		const tiapp = new Tiapp();
 		await tiapp.load(join(fixturesDir, 'hassdk.xml'));

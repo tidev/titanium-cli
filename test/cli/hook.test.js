@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import { CLI } from '../../src/cli.js';
 import { setTimeout } from 'timers/promises';
 
-describe('CLI hooks', { concurrency: true }, () => {
+describe('CLI hooks', () => {
 	it('should fire sync event hooks', async () => {
 		const cli = new CLI();
 		let fooCounter = 0;

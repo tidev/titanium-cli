@@ -6,7 +6,7 @@ import { stripColor } from '../helpers/strip-color.js';
 import { tmpDirName } from '../helpers/tmp-dir-name.js';
 import { join } from 'node:path';
 
-describe('ti sdk', { concurrency: true }, () => {
+describe('ti sdk', () => {
 	it('should show help', initCLI(async (run) => {
 		const { exitCode, stdout } = await run(['sdk', '-h']);
 

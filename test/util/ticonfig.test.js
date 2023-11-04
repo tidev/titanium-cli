@@ -8,7 +8,7 @@ import { copyFile, mkdir, readFile, rmdir, unlink } from 'node:fs/promises';
 
 const fixturesDir = join(fileURLToPath(import.meta.url), '../fixtures/ticonfig');
 
-describe('TiConfig', { concurrency: true }, () => {
+describe('TiConfig', () => {
 	it('should load a config file', () => {
 		new TiConfig(join(fixturesDir, 'good.json'));
 	});

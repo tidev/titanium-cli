@@ -5,7 +5,7 @@ import { stripColor } from '../helpers/strip-color.js';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-describe('ti config', { concurrency: true }, () => {
+describe('ti config', () => {
 	it('should show help', initCLI(async (run) => {
 		const { exitCode, stdout } = await run(['config', '-h']);
 

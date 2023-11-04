@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { arrayify } from '../../src/util/arrayify.js';
 
-describe('arrayify', { concurrency: true }, () => {
+describe('arrayify', () => {
 	it('should init undefined array', () => {
 		assert.deepStrictEqual(arrayify(), []);
 	});
