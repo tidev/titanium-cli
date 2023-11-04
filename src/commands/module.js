@@ -53,6 +53,9 @@ export async function run(logger, config, cli) {
 	let action = cli.command.name();
 	if (action === 'list' && cli.command.args.length) {
 		action = cli.command.args[0];
+		if (cli.argv.$_.includes('list')) {
+			throw new TiError(`Invalid argument "${action}"`, { showHelp: true });
+		}
 		cli.command = cli.command.parent;
 	}
 	for (const [name, subcommand] of Object.entries(ModuleSubcommands)) {
@@ -97,8 +100,8 @@ ModuleSubcommands.list = {
 	},
 	async fn(logger, config, cli) {
 		const isJson = cli.argv.json || cli.argv.output === 'json';
-		const projectDir = cli.argv['project-dir'];
-		let p = expand(projectDir || '.');
+		let projectDir;
+		let p = expand(cli.argv['project-dir'] || '.');
 		const searchPaths = {
 			project: [],
 			config: [],
@@ -119,6 +122,7 @@ ModuleSubcommands.list = {
 			for (const { root } = parse(p); p !== root; p = dirname(p)) {
 				if (existsSync(join(p, 'tiapp.xml'))) {
 					p = join(p, 'modules');
+					projectDir = p;
 					if (existsSync(p)) {
 						searchPaths.project.push(p);
 					}
@@ -131,15 +135,15 @@ ModuleSubcommands.list = {
 		for (let path of confPaths) {
 			path = expand(path);
 			if (existsSync(path) && !searchPaths.project.includes(path) && !searchPaths.config.includes(path)) {
-				searchPaths.config.push(p);
+				searchPaths.config.push(path);
 			}
 		}
 
 		// add any modules from various sdk locations
-		if (!sdkLocations.includes(defaultInstallLocation)) {
+		if (defaultInstallLocation && !sdkLocations.includes(defaultInstallLocation)) {
 			sdkLocations.push(defaultInstallLocation);
 		}
-		if (cli.sdk) {
+		if (cli.sdk?.path) {
 			sdkLocations.push(expand(cli.sdk.path, '..', '..', '..'));
 		}
 		for (let path of sdkLocations) {
@@ -176,17 +180,18 @@ ModuleSubcommands.list = {
 					}
 
 					const platformName = platformNames[platform.toLowerCase()] || capitalize(platform);
-					logger.log(gray(platformName));
+					logger.log(`  ${gray(platformName)}`);
 					for (const [name, versions] of Object.entries(modules[platform])) {
-						logger.log(`  ${name}`);
+						logger.log(`    ${name}`);
 						for (const [ver, mod] of Object.entries(versions)) {
-							logger.log(`    ${cyan(ver.padEnd(7))} ${mod.modulePath}`);
+							logger.log(`      ${cyan(ver.padEnd(7))} ${mod.modulePath}`);
 						}
 					}
 				}
 			} else {
-				logger.log(gray('No modules found'));
+				logger.log(gray('  No modules found'));
 			}
+			logger.log();
 		}
 	}
 };

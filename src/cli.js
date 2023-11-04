@@ -435,7 +435,7 @@ export class CLI {
 		}
 
 		this.debugLogger.trace(`Executing command's run: ${this.command.name()}`);
-		this.debugLogger.trace(this.argv);
+		this.debugLogger.trace('Final argv:', this.argv);
 
 		const result = await new Promise((resolve, reject) => {
 			const r = run(this.logger || this.debugLogger, this.config, this, async (err, result) => {
@@ -582,17 +582,6 @@ export class CLI {
 
 		// wire up the event listeners
 		program
-			.on('option:config', cfg => {
-				try {
-					this.config.apply((0, eval)(`(${cfg})`));
-					if (!this.config.cli?.colors) {
-						chalk.level = 0;
-					}
-				} catch (e) {
-					throw new Error(`Failed to parse --config: ${e.message}`);
-				}
-			})
-			.on('option:config-file', file => this.config.load(file))
 			.on('option:no-banner', () => this.logger.bannerEnabled(false))
 			.on('option:no-color', () => chalk.level = 0)
 			.on('option:no-colors', () => chalk.level = 0)
@@ -702,7 +691,20 @@ export class CLI {
 			.option('-d, --project-dir <path>', 'the directory containing the project')
 			.option('-q, --quiet', 'suppress all output')
 			.option('-v, --version', 'displays the current version')
-			.option('-s, --sdk [version]', `Titanium SDK version to use ${gray('(default: "latest")')}`);
+			.option('-s, --sdk [version]', `Titanium SDK version to use ${gray('(default: "latest")')}`)
+			.on('option:config', cfg => {
+				try {
+					const json = (0, eval)(`(${cfg})`);
+					this.debugLogger.trace(`Applying --config:`, json);
+					this.config.apply(json);
+					if (!this.config.cli?.colors) {
+						chalk.level = 0;
+					}
+				} catch (e) {
+					throw new Error(`Failed to parse --config: ${e.message}`);
+				}
+			})
+			.on('option:config-file', file => this.config.load(file));
 
 		const allCommands = [
 			...Object.entries(commands),
@@ -998,6 +1000,7 @@ export class CLI {
 					if (err) {
 						process.exit(1);
 					}
+					this.logger.log();
 					resolve(value);
 				});
 			});

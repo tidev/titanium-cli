@@ -27,6 +27,7 @@ export async function detect(searchPaths, config, logger) {
 
 	if (searchPaths && typeof searchPaths === 'object') {
 		for (let [scope, paths] of Object.entries(searchPaths)) {
+			results[scope] = {};
 			for (const searchPath of arrayify(paths, true)) {
 				results[scope] = await detectModules(searchPath, config, logger);
 			}

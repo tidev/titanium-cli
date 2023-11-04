@@ -2,6 +2,15 @@ import { Argument, Command, Option } from 'commander';
 import { ticonfig } from './ticonfig.js';
 import { TiError } from './tierror.js';
 
+/**
+ * Takes a Titanium CLI command config with flags, options, args, and
+ * subcommands and adds them to the current Commander.js command context.
+ *
+ * @param {CLI} cli - The CLI instance.
+ * @param {String} cmdName - The name of the command.
+ * @param {Command} cmd - The Commander.js command instance.
+ * @param {Object} conf - The CLI command config to apply.
+ */
 export function applyCommandConfig(cli, cmdName, cmd, conf) {
 	if (conf.title) {
 		cmd.title = conf.title;

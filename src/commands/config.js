@@ -76,22 +76,21 @@ export function config(_logger, _config, _cli) {
  * @param {CLI} cli - The CLI instance
  */
 export function validate(_logger, _config, cli) {
-	const len = cli.argv._.length;
-	const key = cli.argv._[0];
+	const [key, value] = cli.argv._;
 
-	if (len > 0 && !/^([A-Za-z_]{1}[A-Za-z0-9-_]*(\.[A-Za-z-_]{1}[A-Za-z0-9-_]*)*)$/.test(key)) {
+	if (key !== undefined && !/^([A-Za-z_]{1}[A-Za-z0-9-_]*(\.[A-Za-z-_]{1}[A-Za-z0-9-_]*)*)$/.test(key)) {
 		throw new TiError(`Invalid key "${key}"`);
 	}
 
 	if (cli.argv.remove) {
-		if (len === 0) {
+		if (key === undefined) {
 			throw new TiError('Missing key of the config setting to remove', {
 				after: `Run ${cyan('titanium config --remove <key>')} to remove the config setting.`
 			});
 		}
 
 		// if the key is not a path setting, then we don't allow any values
-		if (len > 1 && cli.argv._[1] !== undefined && !/^paths\..*$/.test(key)) {
+		if (value !== undefined && !/^paths\..*$/.test(key)) {
 			throw new TiError('Too many arguments for "--remove" flag', {
 				after: `Run ${cyan(
 					`titanium config --remove ${key.includes(' ') ? `"${key}"` : key}`
@@ -158,8 +157,7 @@ export async function run(logger, config, cli) {
 						'xcode'
 					];
 					if (!validKeys.includes(subPath)) {
-						logger.error(`Unsupported key "${key}"\n`);
-						return;
+						throw new TiError(`Unsupported key "${key}"\n`);
 					}
 
 					if (!config.paths) {
@@ -221,44 +219,31 @@ export async function run(logger, config, cli) {
 					if (Object.hasOwn(obj, q)) {
 						delete obj[q];
 						config.save();
-						logger.log(asJson ? JSON.stringify({ success: true }) : `${cyan(key)} removed`);
-					} else {
-						logger.log(asJson ? JSON.stringify({
-							success: false,
-							reason: `key "${key}" not found`
-						}, null, '\t') : `${cyan(key)} not found`);
-						process.exit(1);
+						logger.log(asJson ? JSON.stringify({ success: true }) : `${cyan(`"${key}"`)} removed`);
+						return;
 					}
-				} else if (obj[q] && typeof obj[q] === 'object') {
-					print(key);
 				} else if (Array.isArray(obj[q])) {
 					if (asJson) {
 						logger.log(JSON.stringify(obj[q]));
 					} else if (obj[q].length) {
 						logger.log(obj[q].join('\n'));
 					}
+					return;
+				} else if (obj[q] && typeof obj[q] === 'object') {
+					print(key);
+					return;
 				} else if (obj[q] !== undefined) {
 					logger.log(asJson ? JSON.stringify(obj[q]) : obj[q]);
-				} else {
-					logger.log(asJson ? JSON.stringify({
-						success: false,
-						reason: `key "${key}" not found`
-					}, null, '\t') : `${cyan(key)} not found`);
-					process.exit(1);
+					return;
 				}
-			} else {
-				logger.log(asJson ? JSON.stringify({
-					success: false,
-					reason: `key "${key}" not found`
-				}, null, '\t') : `${cyan(key)} not found`);
-				process.exit(1);
 			}
+			throw new TiError(`Key "${key}" not found`);
 		} catch (e) {
 			if (asJson) {
-				logger.log(JSON.stringify({ success: false, error: e.toString() }));
-			} else {
-				logger.error(e);
+				logger.logerr(JSON.stringify({ success: false, error: e.message }));
+				process.exit(1);
 			}
+			throw e;
 		}
 	} else {
 		// print all key/values

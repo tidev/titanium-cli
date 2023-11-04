@@ -56,6 +56,9 @@ export async function run(logger, config, cli) {
 	let action = cli.command.name();
 	if (action === 'list' && cli.command.args.length) {
 		action = cli.command.args[0];
+		if (cli.argv.$_.includes('list')) {
+			throw new TiError(`Invalid argument "${action}"`, { showHelp: true });
+		}
 		cli.command = cli.command.parent;
 	}
 	for (const [name, subcommand] of Object.entries(SdkSubcommands)) {

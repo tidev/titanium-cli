@@ -205,6 +205,8 @@ export async function initSDK({ cmdName, config, cwd, logger, promptingEnabled, 
 				process.exit(0);
 			}
 
+			logger.log();
+
 			sdk = sdks.find(s => s.name === sdkVersion);
 		}
 

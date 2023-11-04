@@ -29,7 +29,11 @@ export class Logger extends EventEmitter {
 		this.stderr = opts.stderr || process.stderr;
 
 		this.log = (msg = '', ...args) => {
-			this.render(9, this.stdout, `${format(msg, ...args)}`);
+			this.render(9, this.stdout, format(msg, ...args));
+		};
+
+		this.logerr = (msg = '', ...args) => {
+			this.render(9, this.stderr, format(msg, ...args));
 		};
 
 		this.trace = (msg = '', ...args) => {

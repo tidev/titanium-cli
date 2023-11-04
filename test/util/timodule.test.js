@@ -25,7 +25,9 @@ describe('timodule', { concurrency: true }, () => {
 			{ global: null },
 			new TiConfig(goodConfig)
 		);
-		assert.deepStrictEqual(results, {});
+		assert.deepStrictEqual(results, {
+			global: {}
+		});
 	});
 
 	it('should find nothing if search path is empty', async () => {

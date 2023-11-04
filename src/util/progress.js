@@ -1,10 +1,11 @@
 export class ProgressBar {
 	curr = 0;
 
-	constructor(fmt, opts) {
+	constructor(fmt, opts = {}) {
 		this.fmt = fmt;
 		this.total = opts.total;
 		this.width = opts.width || this.total;
+		this.stream = opts.stream || process.stdout;
 
 		this.chars = {
 			complete: opts.complete || '=',
@@ -61,8 +62,8 @@ export class ProgressBar {
 
 		if (str !== this.str) {
 			this.str = str;
-			process.stdout.cursorTo?.(0);
-			process.stdout.write(str);
+			this.stream.cursorTo?.(0);
+			this.stream.write(str);
 		}
 	}
 }
