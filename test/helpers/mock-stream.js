@@ -6,6 +6,6 @@ export class MockStream {
 	}
 
 	write(str) {
-		this.buffer = str;
+		this.buffer += str + '\n';
 	}
 }

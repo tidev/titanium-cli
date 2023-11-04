@@ -13,7 +13,7 @@ describe('BusyIndicator', () => {
 		await setTimeout(200);
 
 		busy.stop();
-		assert.match(stream.buffer, /^ +$/);
+		assert.match(stream.buffer, / |\n \/\n -\n +\n/);
 
 		stream.buffer = 'foo';
 		await setTimeout(100);
