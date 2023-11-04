@@ -695,7 +695,7 @@ export class CLI {
 			.on('option:config', cfg => {
 				try {
 					const json = (0, eval)(`(${cfg})`);
-					this.debugLogger.trace(`Applying --config:`, json);
+					this.debugLogger.trace('Applying --config:', json);
 					this.config.apply(json);
 					if (!this.config.cli?.colors) {
 						chalk.level = 0;
