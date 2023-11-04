@@ -19,7 +19,7 @@ export async function detect(logger, config, cli, types = { all: true }) {
 		jdk,
 		...platformData
 	] = await Promise.all([
-		(types.all || types.os) && osInfo(logger),
+		(types.all || types.os) && osInfo(),
 		(types.all || types.nodejs) && nodeInfo(),
 		(types.all || types.nodejs) && npmInfo(),
 		(types.all || types.titanium) && titaniumSDKInfo(config),
@@ -94,7 +94,7 @@ async function loadPlatformInfo(logger, platform, config) {
 	}
 }
 
-async function osInfo(logger) {
+async function osInfo() {
 	let name = process.platform;
 	let version = '?';
 	let m;
