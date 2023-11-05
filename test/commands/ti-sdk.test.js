@@ -5,6 +5,14 @@ import { initCLI } from '../helpers/init-cli.js';
 import { stripColor } from '../helpers/strip-color.js';
 import { tmpDirName } from '../helpers/tmp-dir-name.js';
 import { join } from 'node:path';
+import { expand } from '../../src/util/expand.js';
+import { tmpdir } from 'node:os';
+
+const sdkName = '12.2.0.GA';
+const os = process.platform === 'darwin' ? 'osx' : process.platform;
+const sdkFilename = `mobilesdk-${sdkName}-${os}.zip`;
+const sdkZip = join(tmpdir(), sdkFilename);
+const itHasZip = fs.existsSync(sdkZip) ? it : it.skip;
 
 describe('ti sdk', () => {
 	it('should show help', initCLI(async (run) => {
@@ -58,13 +66,13 @@ describe('ti sdk', () => {
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should install an SDK and remove it', initCLI(async (run) => {
+	it('should install an SDK and remove it', initCLI(async (run, tmpHome) => {
 		const tmpSDKDir = tmpDirName();
 		try {
 			await run(['config', 'paths.sdks', tmpSDKDir]);
 			await run(['config', 'sdk.defaultInstallLocation', tmpSDKDir]);
 
-			const sdkPath = join(tmpSDKDir, 'mobilesdk', process.platform === 'darwin' ? 'osx' : process.platform, '12.2.0.GA');
+			const sdkPath = join(tmpSDKDir, 'mobilesdk', os, sdkName);
 			const platforms = ['android'];
 			if (process.platform === 'darwin') {
 				platforms.unshift('iphone');
@@ -95,7 +103,7 @@ describe('ti sdk', () => {
 			assert.strictEqual(exitCode, 0);
 
 			// install an sdk
-			({ exitCode, stdout, stderr } = await run(['sdk', 'install', '12.2.0.GA', '--no-progress-bars']));
+			({ exitCode, stdout, stderr } = await run(['sdk', 'install', sdkName, '--no-progress-bars', '--keep-files']));
 			try {
 				assert.match(stdout, /successfully installed/);
 			} catch (e) {
@@ -104,12 +112,20 @@ describe('ti sdk', () => {
 			}
 			assert.strictEqual(exitCode, 0);
 
+			if (!fs.existsSync(sdkZip)) {
+				// find the downloaded file and move it to the tmp dir for subsequent tests
+				const src = join(tmpHome, '.titanium', 'downloads', sdkFilename);
+				if (fs.existsSync(src)) {
+					await fs.move(src, sdkZip);
+				}
+			}
+
 			// list sdks
 			({ exitCode, stdout } = await run(['sdk', 'ls']));
 			output = stripColor(stdout);
 			assert.match(output, /Titanium Command-Line Interface/);
 			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
-			assert.match(output, new RegExp(`Installed SDKs:\n\\s*12.2.0.GA\\s+12.2.0.GA\\s+${
+			assert.match(output, new RegExp(`Installed SDKs:\n\\s*${sdkName}\\s+${sdkName}\\s+${
 				sdkPath.replace(/\\/g, '\\\\')
 			}`));
 			assert.strictEqual(exitCode, 0);
@@ -126,15 +142,15 @@ describe('ti sdk', () => {
 				defaultInstallLocation: tmpSDKDir,
 				installLocations: [tmpSDKDir],
 				installed: {
-					'12.2.0.GA': sdkPath
+					[sdkName]: sdkPath
 				},
 				releases: {},
 				sdks: {
-					'12.2.0.GA': {
-						name: '12.2.0.GA',
+					[sdkName]: {
+						name: sdkName,
 						manifest: {
-							name: '12.2.0.GA',
-							version: '12.2.0',
+							name: sdkName,
+							version: sdkName.replace(/.GA$/, ''),
 							moduleAPIVersion: {
 								iphone: '2',
 								android: '4'
@@ -145,14 +161,14 @@ describe('ti sdk', () => {
 						},
 						path: sdkPath,
 						type: 'ga',
-						version: '12.2.0'
+						version: sdkName.replace(/.GA$/, '')
 					},
 				}
 			});
 			assert.strictEqual(exitCode, 0);
 
 			// remove the sdk
-			({ exitCode, stdout } = await run(['sdk', 'uninstall', '12.2.0.GA', '--force']));
+			({ exitCode, stdout } = await run(['sdk', 'uninstall', sdkName, '--force']));
 			assert.match(stdout, /removed/);
 			assert.strictEqual(exitCode, 0);
 
@@ -220,7 +236,7 @@ describe('ti sdk', () => {
 			const json = JSON.parse(stdout);
 			assert(json.branches.branches.includes('master'));
 			assert(json.branches.branches.includes('12_2_X'));
-			assert(json.releases['12.2.0.GA']);
+			assert(json.releases[sdkName]);
 
 			assert.strictEqual(exitCode, 0);
 		} finally {

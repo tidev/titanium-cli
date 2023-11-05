@@ -33,7 +33,7 @@ export function initCLI(fixture, fn, sharedOpts = {}) {
 				} catch (e) {
 					return e;
 				}
-			});
+			}, tmpHome);
 		} finally {
 			await fs.remove(tmpHome);
 		}

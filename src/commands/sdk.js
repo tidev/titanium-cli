@@ -544,7 +544,7 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 
 	// step 1.5: download the file
 
-	const downloadedFile = join(os.tmpdir(), `titanium-cli-${Math.floor(Math.random(1e6))}.zip`);
+	let downloadedFile = expand('~', '.titanium', 'downloads', `titanium-sdk-${Math.floor(Math.random(1e6))}.zip`);
 	const downloadDir = dirname(downloadedFile);
 	await mkdir(downloadDir, { recursive: true });
 
@@ -608,6 +608,7 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 	if (filename) {
 		file = join(downloadDir, filename);
 		await fs.move(downloadedFile, file, { overwrite: true });
+		downloadedFile = file;
 	} else {
 		file = downloadedFile;
 	}
