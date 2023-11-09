@@ -232,7 +232,7 @@ describe('ti sdk', () => {
 								windows: '6'
 							},
 							githash: '1234567890',
-							platforms
+							platforms: ['android']
 						},
 						path: sdkPath,
 						type: 'ga',
