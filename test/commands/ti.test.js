@@ -10,19 +10,19 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = fs.readJsonSync(join(__dirname, '../../package.json'));
 
 describe('ti', () => {
-	it('should display the version using short flag', initCLI(async (run) => {
+	it('should display the version using short flag', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['-v']);
 		assert.strictEqual(stdout, pkgJson.version);
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should display the version using long flag', initCLI(async (run) => {
+	it('should display the version using long flag', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['--version']);
 		assert.strictEqual(stdout, pkgJson.version);
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should display the help', initCLI(async (run) => {
+	it('should display the help', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run();
 
 		const output = stripColor(stdout);

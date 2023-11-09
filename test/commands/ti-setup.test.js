@@ -4,7 +4,7 @@ import { initCLI } from '../helpers/init-cli.js';
 import { stripColor } from '../helpers/strip-color.js';
 
 describe('ti setup', () => {
-	it('should show help', initCLI(async (run) => {
+	it('should show help', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['setup', '-h']);
 
 		const output = stripColor(stdout);

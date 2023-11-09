@@ -2,12 +2,22 @@ import { execa } from 'execa';
 import { glob } from 'glob';
 import { basename, join } from 'node:path';
 
-const argv = [...process.argv.slice(2)];
-const p = argv.indexOf('--coverage');
-const cover = p !== -1;
-if (cover) {
-	argv.splice(p, 1);
-}
+let cover = false;
+let only = false;
+
+const argv = process.argv
+	.slice(2)
+	.map(arg => {
+		if (arg === '--coverage') {
+			cover = true;
+		} else if (arg === '--only') {
+			only = true;
+		} else {
+			return arg;
+		}
+	})
+	.filter(Boolean);
+
 const args = [];
 
 if (cover) {
@@ -34,7 +44,7 @@ if (!tests.length) {
 }
 
 args.push(
-	'--test',
+	`--test${only ? '-only' : ''}`,
 	'--test-reporter=@reporters/github',
 	'--test-reporter-destination=stdout',
 	'--test-reporter=spec',

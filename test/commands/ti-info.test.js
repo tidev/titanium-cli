@@ -10,7 +10,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = fs.readJsonSync(join(__dirname, '../../package.json'));
 
 describe('ti info', () => {
-	it('should show help', initCLI(async (run) => {
+	it('should show help', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['info', '-h']);
 
 		const output = stripColor(stdout);
@@ -22,7 +22,7 @@ describe('ti info', () => {
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should show all info', initCLI(async (run) => {
+	it('should show all info', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['info']);
 
 		const output = stripColor(stdout);
@@ -37,7 +37,7 @@ describe('ti info', () => {
 		assert.strictEqual(exitCode, 0);
 	}), 60000);
 
-	it('should show all info as JSON', initCLI(async (run) => {
+	it('should show all info as JSON', initCLI(async ({ run }) => {
 		let { exitCode, stdout } = await run(['info', '--json']);
 
 		let json = JSON.parse(stdout);
@@ -62,7 +62,7 @@ describe('ti info', () => {
 		assert.strictEqual(exitCode, 0);
 	}), 60000);
 
-	it('should only show "os" info', initCLI(async (run) => {
+	it('should only show "os" info', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['info', '--types', 'os']);
 
 		const output = stripColor(stdout);
@@ -77,7 +77,7 @@ describe('ti info', () => {
 		assert.strictEqual(exitCode, 0);
 	}), 60000);
 
-	it('should only show "os" info as JSON', initCLI(async (run) => {
+	it('should only show "os" info as JSON', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['info', '--types', 'os', '--json']);
 
 		const json = JSON.parse(stdout);
@@ -91,7 +91,7 @@ describe('ti info', () => {
 		assert.strictEqual(exitCode, 0);
 	}), 60000);
 
-	it('should only show "nodejs" info', initCLI(async (run) => {
+	it('should only show "nodejs" info', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['info', '--types', 'nodejs']);
 
 		const output = stripColor(stdout);
@@ -106,7 +106,7 @@ describe('ti info', () => {
 		assert.strictEqual(exitCode, 0);
 	}), 60000);
 
-	it('should only show "nodejs" info as JSON', initCLI(async (run) => {
+	it('should only show "nodejs" info as JSON', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['info', '--types', 'nodejs', '--json']);
 
 		const json = JSON.parse(stdout);
@@ -121,7 +121,7 @@ describe('ti info', () => {
 		assert.strictEqual(exitCode, 0);
 	}), 60000);
 
-	it('should only show "titanium" info', initCLI(async (run) => {
+	it('should only show "titanium" info', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['info', '--types', 'titanium']);
 
 		const output = stripColor(stdout);
@@ -136,7 +136,7 @@ describe('ti info', () => {
 		assert.strictEqual(exitCode, 0);
 	}), 60000);
 
-	it('should only show "jdk" info', initCLI(async (run) => {
+	it('should only show "jdk" info', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['info', '--types', 'jdk']);
 
 		const output = stripColor(stdout);

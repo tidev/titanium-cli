@@ -81,25 +81,21 @@ export async function detectTitaniumSDKs(config) {
 					const path = join(sdkPath, name);
 					try {
 						const manifest = await fs.readJson(join(path, 'manifest.json'));
-
-						// SDKs before 3.0.0 used Python and thus not supported
-						if (version.gte(manifest.version, '3.0.0')) {
-							sdks.push({
-								name: manifest.name,
-								manifest,
-								path,
-								platforms: Array.isArray(manifest.platforms)
-									? manifest.platforms.reduce((platforms, name) => {
-										platforms[name] = {
-											path: join(path, name)
-										};
-										return platforms;
-									}, {})
-									: {},
-								type: getSDKType(manifest.name),
-								version: manifest.version
-							});
-						}
+						sdks.push({
+							name: manifest.name,
+							manifest,
+							path,
+							platforms: Array.isArray(manifest.platforms)
+								? manifest.platforms.reduce((platforms, name) => {
+									platforms[name] = {
+										path: join(path, name)
+									};
+									return platforms;
+								}, {})
+								: {},
+							type: getSDKType(manifest.name),
+							version: manifest.version
+						});
 					} catch {
 						// no manifest (too old)
 					}

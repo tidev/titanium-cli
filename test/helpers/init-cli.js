@@ -18,22 +18,25 @@ export function initCLI(fixture, fn, sharedOpts = {}) {
 		const tmpHome = await initHome(fixture);
 
 		try {
-			return await fn(async (args = [], opts = {}) => {
-				try {
-					return await execaNode(ti, args, {
-						...sharedOpts,
-						...opts,
-						env: {
-							...process.env,
-							...sharedOpts.env,
-							...opts.env,
-							HOME: tmpHome
-						}
-					});
-				} catch (e) {
-					return e;
-				}
-			}, tmpHome);
+			return await fn({
+				async run(args = [], opts = {}) {
+					try {
+						return await execaNode(ti, args, {
+							...sharedOpts,
+							...opts,
+							env: {
+								...process.env,
+								...sharedOpts.env,
+								...opts.env,
+								HOME: tmpHome
+							}
+						});
+					} catch (e) {
+						return e;
+					}
+				},
+				tmpHome
+			});
 		} finally {
 			await fs.remove(tmpHome);
 		}

@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 describe('ti config', () => {
-	it('should show help', initCLI(async (run) => {
+	it('should show help', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['config', '-h']);
 
 		const output = stripColor(stdout);
@@ -18,7 +18,7 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should show all config settings', initCLI(async (run) => {
+	it('should show all config settings', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['config']);
 
 		const output = stripColor(stdout);
@@ -26,7 +26,7 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should show all config settings as json', initCLI(async (run) => {
+	it('should show all config settings as json', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['config', '--json']);
 
 		const json = JSON.parse(stdout);
@@ -35,7 +35,7 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should get all config settings matching a namespace', initCLI(async (run) => {
+	it('should get all config settings matching a namespace', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['config', 'cli']);
 
 		const output = stripColor(stdout);
@@ -43,7 +43,7 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should get all config settings matching a namespace as JSON', initCLI(async (run) => {
+	it('should get all config settings matching a namespace as JSON', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['config', 'cli', '--json']);
 
 		const json = JSON.parse(stdout);
@@ -51,7 +51,7 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should get a single config setting', initCLI(async (run) => {
+	it('should get a single config setting', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['config', 'cli.colors']);
 
 		const output = stripColor(stdout);
@@ -59,14 +59,14 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should get a single config setting as JSON', initCLI(async (run) => {
+	it('should get a single config setting as JSON', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['config', 'cli.colors', '--json']);
 
 		assert.match(stdout, /true|false/);
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should error if key is invalid', initCLI(async (run) => {
+	it('should error if key is invalid', initCLI(async ({ run }) => {
 		const { exitCode, stderr } = await run(['config', '123']);
 
 		const output = stripColor(stderr);
@@ -74,7 +74,7 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 1);
 	}));
 
-	it('should error if setting is not found', initCLI(async (run) => {
+	it('should error if setting is not found', initCLI(async ({ run }) => {
 		const { exitCode, stderr } = await run(['config', 'does_not_exist']);
 
 		const output = stripColor(stderr);
@@ -82,7 +82,7 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 1);
 	}));
 
-	it('should error as JSON if setting is not found', initCLI(async (run) => {
+	it('should error as JSON if setting is not found', initCLI(async ({ run }) => {
 		const { exitCode, stderr } = await run(['config', 'does_not_exist', '--json']);
 
 		const json = JSON.parse(stderr);
@@ -93,7 +93,7 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 1);
 	}));
 
-	it('should set a single config setting', initCLI(async (run) => {
+	it('should set a single config setting', initCLI(async ({ run }) => {
 		let { exitCode, stdout } = await run(['config', 'foo', 'bar']);
 
 		let output = stripColor(stdout);
@@ -106,7 +106,7 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should set a nested config setting', initCLI(async (run) => {
+	it('should set a nested config setting', initCLI(async ({ run }) => {
 		let { exitCode, stdout } = await run(['config', 'foo.bar', 'baz']);
 
 		let output = stripColor(stdout);
@@ -119,7 +119,7 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should delete a single config setting', initCLI(async (run) => {
+	it('should delete a single config setting', initCLI(async ({ run }) => {
 		let { exitCode, stdout, stderr } = await run(['config', 'foo', 'bar']);
 
 		let output = stripColor(stdout);
@@ -142,7 +142,7 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 1);
 	}));
 
-	it('should delete a nested config setting', initCLI(async (run) => {
+	it('should delete a nested config setting', initCLI(async ({ run }) => {
 		let { exitCode, stdout, stderr } = await run(['config', 'foo.bar', 'baz']);
 
 		let output = stripColor(stdout);
@@ -165,7 +165,7 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 1);
 	}));
 
-	it('should error deleting without a key', initCLI(async (run) => {
+	it('should error deleting without a key', initCLI(async ({ run }) => {
 		const { exitCode, stderr } = await run(['config', '--remove']);
 
 		const output = stripColor(stderr);
@@ -174,7 +174,7 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 1);
 	}));
 
-	it('should error deleting with too many args', initCLI(async (run) => {
+	it('should error deleting with too many args', initCLI(async ({ run }) => {
 		const { exitCode, stderr } = await run(['config', 'foo', 'bar', '--remove']);
 
 		const output = stripColor(stderr);
@@ -183,7 +183,7 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 1);
 	}));
 
-	it('should error setting an unsupported path', initCLI(async (run) => {
+	it('should error setting an unsupported path', initCLI(async ({ run }) => {
 		const { exitCode, stderr } = await run(['config', 'paths.foo', 'bar']);
 
 		const output = stripColor(stderr);
@@ -191,7 +191,7 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 1);
 	}));
 
-	it('should set a path setting', initCLI(async (run) => {
+	it('should set a path setting', initCLI(async ({ run }) => {
 		const fooPath = join(tmpdir(), 'foo');
 		const barPath = join(tmpdir(), 'bar');
 		const bazPath = join(tmpdir(), 'baz');

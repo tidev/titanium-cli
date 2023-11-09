@@ -53,7 +53,8 @@
 	"scripts": {
 		"coverage": "node scripts/test.js --coverage",
 		"lint": "eslint --cache \"src/**/*.js\"",
-		"test": "node scripts/test.js"
+		"test": "node scripts/test.js",
+		"test-only": "node scripts/test.js --only"
 	},
 	"engines": {
 		"node": ">=18"

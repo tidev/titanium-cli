@@ -8,7 +8,7 @@ import { join } from 'node:path';
 const fixturesDir = join(fileURLToPath(import.meta.url), '../fixtures');
 
 describe('ti module', () => {
-	it('should show help', initCLI(async (run) => {
+	it('should show help', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['module', '-h']);
 
 		const output = stripColor(stdout);
@@ -21,7 +21,7 @@ describe('ti module', () => {
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should show list help', initCLI(async (run) => {
+	it('should show list help', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['module', 'list', '-h']);
 
 		const output = stripColor(stdout);
@@ -33,7 +33,7 @@ describe('ti module', () => {
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should list no installed modules', initCLI(async (run) => {
+	it('should list no installed modules', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['module']);
 
 		const output = stripColor(stdout);
@@ -43,7 +43,7 @@ describe('ti module', () => {
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should list no installed modules as JSON', initCLI(async (run) => {
+	it('should list no installed modules as JSON', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['module', '--json']);
 
 		const json = JSON.parse(stdout);
@@ -56,7 +56,7 @@ describe('ti module', () => {
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should list installed modules', initCLI(async (run) => {
+	it('should list installed modules', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run([
 			'module',
 			'--config',
@@ -94,7 +94,7 @@ Global Modules
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should list installed modules as JSON', initCLI(async (run) => {
+	it('should list installed modules as JSON', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run([
 			'module',
 			'--config',
@@ -248,7 +248,7 @@ Global Modules
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should install module during detection', initCLI(async (run) => {
+	it('should install module during detection', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['module']);
 
 		assert.strictEqual(exitCode, 0);
