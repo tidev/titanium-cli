@@ -850,9 +850,9 @@ export class CLI {
 		// load the command's config
 		if (typeof cmd.module.config === 'function') {
 			const fn = await cmd.module.config(this.logger, this.config, this);
-			const conf = typeof fn === 'function'
+			const conf = (typeof fn === 'function'
 				? await new Promise(resolve => fn(resolve))
-				: fn;
+				: fn) || {};
 
 			cmd.conf = conf;
 

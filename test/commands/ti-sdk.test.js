@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import fs from 'fs-extra';
 import { initCLI } from '../helpers/init-cli.js';
-import { initSDKHome } from '../helpers/init-sdk-home.js';
+import { initSDKHome, initMockSDKHome } from '../helpers/init-sdk-home.js';
 import { stripColor } from '../helpers/strip-color.js';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -297,7 +297,24 @@ describe('ti sdk', () => {
 			assert(json.releases[sdkName]);
 
 			assert.strictEqual(exitCode, 0);
-		}), 120000);
+		}), 60000);
+
+		it('should not find any sdks in empty sdk home directory', initSDKHome(async ({ run, tmpSDKDir }) => {
+			const { exitCode, stdout } = await run(['sdk', 'list']);
+			const output = stripColor(stdout);
+			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
+			assert.match(output, /No Titanium SDKs found/);
+			assert.strictEqual(exitCode, 0);
+		}), 60000);
+
+		it('should list sdks in sdk home directory', initMockSDKHome(async ({ run, tmpSDKDir }) => {
+			const { exitCode, stdout } = await run(['sdk', 'list']);
+			const output = stripColor(stdout);
+			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
+			assert.match(output, /Installed SDKs:/);
+			assert.match(output, new RegExp(`0.0.0.GA\\s+0.0.0.GA\\s+${join(tmpSDKDir, 'mobilesdk', os, '0.0.0.GA').replace(/\\/g, '\\\\')}`));
+			assert.strictEqual(exitCode, 0);
+		}), 60000);
 	});
 
 	describe('select', () => {
