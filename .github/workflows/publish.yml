@@ -1,7 +1,7 @@
 name: Publish
 on:
   release:
-    types: [ created ]
+    types: [published]
 
 jobs:
   publish:
@@ -30,4 +30,5 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      run: npm publish
+        RELEASE_TAG: ${{ github.event.release.prerelease && 'next' || 'latest' }}
+      run: npm publish --tag $RELEASE_TAG

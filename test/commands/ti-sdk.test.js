@@ -2,8 +2,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import fs from 'fs-extra';
 import { initCLI } from '../helpers/init-cli.js';
+import { initSDKHome } from '../helpers/init-sdk-home.js';
 import { stripColor } from '../helpers/strip-color.js';
-import { tmpDirName } from '../helpers/tmp-dir-name.js';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -14,23 +14,6 @@ const sdkFilename = `mobilesdk-${sdkName}-${os}.zip`;
 const platforms = ['android'];
 if (process.platform === 'darwin') {
 	platforms.unshift('iphone');
-}
-
-function initSDK(fn) {
-	return initCLI(async (opts) => {
-		const { run } = opts;
-		const tmpSDKDir = tmpDirName();
-		try {
-			await run(['config', 'paths.sdks', tmpSDKDir]);
-			await run(['config', 'sdk.defaultInstallLocation', tmpSDKDir]);
-			await fn({
-				...opts,
-				tmpSDKDir
-			});
-		} finally {
-			await fs.remove(tmpSDKDir);
-		}
-	});
 }
 
 describe('ti sdk', () => {
@@ -88,7 +71,7 @@ describe('ti sdk', () => {
 	});
 
 	describe('install', () => {
-		it('should install an SDK and remove it', initSDK(async ({ run, tmpHome, tmpSDKDir }) => {
+		it('should install an SDK and remove it', initSDKHome(async ({ run, tmpHome, tmpSDKDir }) => {
 			const sdkPath = join(tmpSDKDir, 'mobilesdk', os, sdkName);
 
 			// list sdks (no sdks installed)
@@ -198,7 +181,7 @@ describe('ti sdk', () => {
 			assert.strictEqual(exitCode, 0);
 		}), 240000);
 
-		it('should install an SDK from a local zip', initSDK(async ({ run, tmpSDKDir }) => {
+		it('should install an SDK from a local zip', initSDKHome(async ({ run, tmpSDKDir }) => {
 			const sdkZipFile = join(fixturesDir, 'mock-sdk.zip');
 			const sdkName = '0.0.0.GA';
 			const sdkPath = join(tmpSDKDir, 'mobilesdk', os, sdkName);
@@ -243,29 +226,29 @@ describe('ti sdk', () => {
 			assert.strictEqual(exitCode, 0);
 		}), 120000);
 
-		it('should error if local zip does not exist', initSDK(async ({ run }) => {
+		it('should error if local zip does not exist', initSDKHome(async ({ run }) => {
 			const { exitCode, stderr } = await run(['sdk', 'install', pathToFileURL(join(fixturesDir, 'does_not_exist')), '--no-progress-bars']);
 			assert.match(stderr, /Specified file does not exist/);
 			assert.strictEqual(exitCode, 1);
 		}));
 
-		it('should error if local zip is not a .zip', initSDK(async ({ run }) => {
+		it('should error if local zip is not a .zip', initSDKHome(async ({ run }) => {
 			const { exitCode, stderr } = await run(['sdk', 'install', join(fixturesDir, 'not_a_zip'), '--no-progress-bars']);
 			assert.match(stderr, /Specified file is not a zip file/);
 			assert.strictEqual(exitCode, 1);
 		}));
 
-		it('should install an SDK from a URL', initSDK(async ({ run }) => {
+		it('should install an SDK from a URL', initSDKHome(async ({ run }) => {
 			const { exitCode, stderr } = await run(['sdk', 'install', pathToFileURL(join(fixturesDir, 'does_not_exist')), '--no-progress-bars']);
 			assert.match(stderr, /Specified file does not exist/);
 			assert.strictEqual(exitCode, 1);
 		}));
 
-		it('should install an SDK from a branch', initSDK(async ({ run }) => {
+		it('should install an SDK from a branch', initSDKHome(async ({ run }) => {
 			// TODO
 		}));
 
-		it('should error if SDK release not found', initSDK(async ({ run }) => {
+		it('should error if SDK release not found', initSDKHome(async ({ run }) => {
 			const { exitCode, stderr } = await run(['sdk', 'install', 'foo', '--no-progress-bars']);
 			assert.match(stderr, /Unable to find any Titanium SDK releases or CI builds that match "foo"/);
 			assert.strictEqual(exitCode, 1);
@@ -273,7 +256,7 @@ describe('ti sdk', () => {
 	});
 
 	describe('list', () => {
-		it('should list releases, branches, and builds', initSDK(async ({ run, tmpSDKDir }) => {
+		it('should list releases, branches, and builds', initSDKHome(async ({ run, tmpSDKDir }) => {
 			// list branches
 			let { exitCode, stdout } = await run(['sdk', 'list', '-b']);
 			let output = stripColor(stdout);
