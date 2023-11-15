@@ -1,35 +1,27 @@
-/*
- * build.js: Titanium Mobile CLI build command
- *
- * Copyright TiDev, Inc. 04/07/2022-Present  All Rights Reserved.
- * See the LICENSE file for more information.
- */
-
 'use strict';
 
-const appc = require('node-appc'),
-	fields = require('fields'),
-	fs = require('fs-extra'),
-	jsanalyze = require('node-titanium-sdk/lib/jsanalyze'),
-	path = require('path'),
-	sprintf = require('sprintf'),
-	ti = require('node-titanium-sdk'),
-	tiappxml = require('node-titanium-sdk/lib/tiappxml');
+// const appc = require('node-appc'),
+// fields = require('fields'),
+const fs = require('fs-extra');
+// jsanalyze = require('node-titanium-sdk/lib/jsanalyze'),
+const path = require('path');
+const ti = require('../lib/node-titanium-sdk');
+// tiappxml = require('node-titanium-sdk/lib/tiappxml');
 
-fields.setup({
-	formatters: {
-		error: function (err) {
-			if (err instanceof Error) {
-				return ('[ERROR] ' + err.message).red + '\n';
-			}
-			err = '' + err;
-			return '\n' + (/^(\[ERROR\])/i.test(err) ? err : '[ERROR] ' + err.replace(/^Error:/i, '').trim()).red;
-		}
-	},
-	style: {
-		accelerator: 'cyan'
-	}
-});
+// fields.setup({
+// 	formatters: {
+// 		error: function (err) {
+// 			if (err instanceof Error) {
+// 				return ('[ERROR] ' + err.message).red + '\n';
+// 			}
+// 			err = '' + err;
+// 			return '\n' + (/^(\[ERROR\])/i.test(err) ? err : '[ERROR] ' + err.replace(/^Error:/i, '').trim()).red;
+// 		}
+// 	},
+// 	style: {
+// 		accelerator: 'cyan'
+// 	}
+// });
 
 exports.cliVersion = '>=3.2.1';
 exports.title = 'Build';

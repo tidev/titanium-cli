@@ -1,6 +1,6 @@
 'use strict';
 
-// 	ti = require('node-titanium-sdk'),
+const ti = require('../lib/node-titanium-sdk');
 const fs = require('fs');
 const path = require('path');
 // 	fields = require('fields');
@@ -13,7 +13,7 @@ exports.config = function (logger, config, cli) {
 	patchLogger(logger, cli);
 
 	return (finished) => {
-		cli.createHook('clean.config', (callback) => {
+		cli.createHook('clean.config', callback => {
 			var conf = {
 				options: Object.assign({
 					platform: {
@@ -68,10 +68,12 @@ exports.config = function (logger, config, cli) {
 							return projectDir;
 						},
 						desc: 'the directory containing the project, otherwise the current working directory',
-						default: process.env.SOURCE_ROOT ? path.join(process.env.SOURCE_ROOT, '..', '..') : '.',
+						default: '.',
 						order: 1,
 						prompt(callback) {
-							callback({});
+							callback({
+								// TODO
+							});
 							// callback(fields.file({
 							// 	promptLabel: 'Where is the __project directory__?'),
 							// 	complete: true,
@@ -90,11 +92,10 @@ exports.config = function (logger, config, cli) {
 							}
 
 							const root = path.resolve('/');
-							let isFound,
-								projDir = dir;
+							let isFound;
+							let projDir = dir;
 
-							['tiapp.xml', 'timodule.xml'].some(function (tiXml) { // eslint-disable-line array-callback-return
-
+							['tiapp.xml', 'timodule.xml'].some(tiXml => {
 								let tiFile = path.join(dir, tiXml);
 
 								while (!fs.existsSync(tiFile)) {
@@ -130,9 +131,7 @@ exports.config = function (logger, config, cli) {
 				}, ti.commonOptions(logger, config))
 			};
 			callback(null, conf);
-		})(function (err, result) {
-			finished(result);
-		});
+		})((_err, result) => finished(result));
 	};
 };
 
@@ -143,8 +142,8 @@ exports.validate = function (logger, config, cli) {
 		// make sure the module manifest is sane
 		ti.validateModuleManifest(logger, cli, cli.manifest);
 
-		return function (finished) {
-			logger.log.init(function () {
+		return finished => {
+			logger.log.init(() => {
 				const result = ti.validatePlatformOptions(logger, config, cli, 'cleanModule');
 				if (result && typeof result === 'function') {
 					result(finished);
@@ -176,10 +175,8 @@ exports.validate = function (logger, config, cli) {
 
 		ti.validateProjectDir(logger, cli, cli.argv, 'project-dir');
 
-		return function (finished) {
-			ti.loadPlugins(logger, config, cli, cli.argv['project-dir'], function () {
-				finished();
-			});
+		return finished =>{
+			ti.loadPlugins(logger, config, cli, cli.argv['project-dir'], () => finished());
 		};
 	}
 };
@@ -195,17 +192,9 @@ exports.run = function (logger, config, cli) {
 		// Now wrap the actual cleaning of the module (specific to a given platform),
 		// in hooks so a module itself could potentially do additional cleanup itself
 		cli.fireHook('clean.module.pre', function () {
-			cli.fireHook(`clean.module.${platform}.pre`, function () {
-
-				// Do the actual cleaning per-sdk _cleanModule command
-				require(cleanModule).run(logger, config, cli, function (err) { // eslint-disable-line security/detect-non-literal-require
-					if (err) {
-						process.exit(1);
-					}
-
-					cli.fireHook(`clean.module.${platform}.post`, () => {
-						cli.fireHook('clean.module.post', () => {});
-					});
+			cli.fireHook(`clean.module.${platform}.pre`, () => {
+				cli.fireHook(`clean.module.${platform}.post`, () => {
+					cli.fireHook('clean.module.post', () => {});
 				});
 			});
 		});
@@ -213,41 +202,39 @@ exports.run = function (logger, config, cli) {
 		const buildDir = path.join(cli.argv['project-dir'], 'build');
 
 		if (cli.argv.platforms) {
-			async.series(cli.argv.platforms.map(function (platform) {
-				return function (next) {
+			cli.argv.platforms.reduce((prom, platform) => {
+				return prom.then(new Promise(resolve => {
 					// scan platform SDK specific clean hooks
 					cli.scanHooks(path.join(__dirname, '..', '..', platform, 'cli', 'hooks'));
 					cli.fireHook('clean.pre', function () {
 						cli.fireHook(`clean.${platform}.pre`, function () {
 							cli.fireHook(`clean.${platform}.post`, function () {
-								cli.fireHook('clean.post', () => {});
+								cli.fireHook('clean.post', () => resolve());
 							});
 						});
 					});
-				};
-			}), () => {});
+				}));
+			}, Promise.resolve());
 		} else if (fs.existsSync(buildDir)) {
 			logger.debug('Deleting all platform build directories');
 
 			// scan platform SDK specific clean hooks
 			if (ti.targetPlatforms) {
-				ti.targetPlatforms.forEach(function (platform) {
+				ti.targetPlatforms.forEach(platform => {
 					cli.scanHooks(path.join(__dirname, '..', '..', platform, 'cli', 'hooks'));
 				});
 			}
 
 			cli.fireHook('clean.pre', function () {
-				async.series(fs.readdirSync(buildDir).map(function (dir) {
-					return function (next) {
-						cli.fireHook('clean.' + dir + '.pre', function () {
-							cli.fireHook('clean.' + dir + '.post', function () {
-								next();
-							});
+				fs.readdirSync(buildDir).reduce((prom, dir) => { // eslint-disable-line
+					return prom.then(new Promise(resolve => {
+						cli.fireHook(`clean.${dir}.pre`, () => {
+							cli.fireHook(`clean.${dir}.post`, () => resolve());
 						});
-					};
-				}), () => {
-					cli.fireHook('clean.post', () => {});
-				});
+					}));
+				}, Promise.resolve()).then(new Promise(resolve => {
+					cli.fireHook('clean.post', () => resolve());
+				}));
 			});
 		}
 	}
@@ -264,9 +251,8 @@ function patchLogger(logger, cli) {
 	// override the existing log function
 	logger.log = function patchedLog() {
 		// most of this copied from the CLI's logger.js logger.log() function
-		var args = Array.prototype.slice.call(arguments),
-			padLevels = logger.padLevels,
-			prefix;
+		let args = Array.prototype.slice.call(arguments);
+		let padLevels = logger.padLevels;
 
 		// if there are no args (i.e. a blank line), we need at least one space
 		args.length || args.unshift(' ');
@@ -291,23 +277,6 @@ function patchLogger(logger, cli) {
 
 		typeof type !== 'string' && (args[1] = '' + args[1]);
 
-		// add [INFO] type prefixes for each line
-		prefix = (args[0] !== '_') ? '[' + args[0].toUpperCase() + ']' + ((args[0].length === 5) ? '  ' : '   ') : '';
-
-		if (logger.fileWriteEnabled) {
-			if (logger.log.filestream) {
-				if (logger.log.buffer) {
-					logger.log.filestream.write(logger.log.buffer);
-					logger.log.buffer = null;
-				}
-
-				// log it to our log file, stripping out the color codes
-				logger.log.filestream.write('\n' + prefix + (args.length > 2 ? sprintf.apply(null, args.slice(1)) : args[1]).replace(/\x1B\[\d+m/g, '')); // eslint-disable-line no-control-regex
-			} else {
-				logger.log.buffer += '\n' + prefix + args[1].replace(/\x1B\[\d+m/g, ''); // eslint-disable-line no-control-regex
-			}
-		}
-
 		// call the original logger with our cleaned up args
 		origLoggerLog.apply(logger, arguments);
 
@@ -316,16 +285,6 @@ function patchLogger(logger, cli) {
 	};
 
 	logger.log.init = function (callback) {
-		var platform = ti.resolvePlatform(cli.argv.platform),
-			buildDir = path.join(cli.argv['project-dir'], 'build');
-
-		logger.fileWriteEnabled = true;
-
-		fs.ensureDirSync(buildDir, 0o766);
-
-		// create our write stream
-		logger.log.filestream = fs.createWriteStream(path.join(buildDir, `clean_${platform}.log`), { flags: 'w', encoding: 'utf8', mode: 0o666 });
-
 		function styleHeading(s) {
 			return ('' + s).bold;
 		}
@@ -335,7 +294,7 @@ function patchLogger(logger, cli) {
 		}
 
 		function rpad(s) {
-			return appc.string.rpad(s, 27);
+			return s.padEnd(27);
 		}
 
 		cli.env.getOSInfo(function (osInfo) {
@@ -372,16 +331,9 @@ function patchLogger(logger, cli) {
 	};
 
 	logger.log.flush = function () {
-		if (logger.log.filestream && logger.log.buffer && logger.fileWriteEnabled) {
-			logger.log.filestream.write(logger.log.buffer);
-			logger.log.buffer = null;
-			logger.log.filestream.end();
-		}
 	};
 
 	logger.log.end = function () {
-		logger.log.filestream && logger.log.filestream.end();
-		logger.fileWriteEnabled = false;
 	};
 
 	logger.log.buffer = '';
