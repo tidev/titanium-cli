@@ -45,6 +45,7 @@
    - Removed user locale setup
    - Removed Xcode CLI tools detection
    - Removed Titanium CLI Dependencies section from check
+   - Removed Java-based connection test from check
  * Logger changes:
    - Replaced "winston" based logger with lighter weight logger
    - Trace and debug log messages written to `stderr` instead of `stdout`
