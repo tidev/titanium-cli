@@ -345,7 +345,6 @@ SdkSubcommands.install = {
 
 		// step 0: make sure the install location exists
 
-		console.log(titaniumDir);
 		await mkdir(titaniumDir, { recursive: true });
 
 		// step 1: determine what the uri is
@@ -457,7 +456,6 @@ SdkSubcommands.install = {
 };
 
 async function getInstallFile({ branch, config, logger, osName, showProgress, subject }) {
-	console.log({ subject });
 	const uriMatch = subject?.match(/^(https?:\/\/.+)|(?:file:\/\/(.+))$/);
 	let file;
 

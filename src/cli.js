@@ -598,7 +598,7 @@ export class CLI {
 			const { conf, optionBranches } = cmd;
 			const cmdName = cmd.name();
 
-			if (optionBranches) {
+			if (optionBranches?.length) {
 				this.debugLogger.trace(`Processing missing option branches: ${optionBranches.join(', ')}`);
 
 				for (const name of optionBranches) {
@@ -789,8 +789,9 @@ export class CLI {
 
 			this.command.optionBranches = optionBranches;
 
-			for (const name of optionBranches) {
+			for (let i = 0; i < optionBranches.length; i++) {
 				// if --<option> was passed in, then mix in the option branch's flags/options
+				const name = optionBranches[i];
 				const cmdName = this.command.name();
 				const value = this.argv[name];
 				if (value !== undefined) {
@@ -801,6 +802,7 @@ export class CLI {
 						flags: src?.flags,
 						options: src?.options
 					});
+					optionBranches.splice(i--, 1);
 				}
 			}
 		}
@@ -886,6 +888,15 @@ export class CLI {
 	async loadSDK({ cmdName, cwd }) {
 		this.debugLogger.trace(`Loading SDK ('${cmdName}')`);
 
+		// this is a hack... if we know this is the "create" command and there
+		// are no options set, then assume we're prompting for everything
+		// including the Titanium SDK version
+		let showSDKPrompt = false;
+		const createOpts = ['-p', '--platforms', '-n', '--name', '-t', '--type'];
+		if (cmdName === 'create' && !this.argv.sdk && !createOpts.some(f => this.argv.$_.includes(f))) {
+			showSDKPrompt = true;
+		}
+
 		// load the sdk and its hooks
 		const {
 			installPath,
@@ -893,12 +904,12 @@ export class CLI {
 			sdkPaths,
 			sdks
 		} = await initSDK({
-			cmdName,
 			config: this.config,
 			cwd,
 			logger: this.logger,
 			promptingEnabled: this.promptingEnabled,
-			selectedSdk: this.argv.sdk
+			selectedSdk: this.argv.sdk,
+			showSDKPrompt
 		});
 		this.env.installPath = installPath;
 		this.env.os.sdkPaths = sdkPaths;

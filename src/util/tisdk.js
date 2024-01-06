@@ -133,7 +133,7 @@ function getSDKType(name) {
 
 const sortTypes = ['unsupported', 'beta', 'rc', 'ga'];
 
-export async function initSDK({ cmdName, config, cwd, logger, promptingEnabled, selectedSdk }) {
+export async function initSDK({ config, cwd, logger, promptingEnabled, selectedSdk, showSDKPrompt }) {
 	let sdkVersion;
 
 	// try to read the tiapp.xml
@@ -170,8 +170,7 @@ export async function initSDK({ cmdName, config, cwd, logger, promptingEnabled, 
 			ga: 'Production Stable'
 		};
 
-		// this is a hack... if this is the create command, prompt for
-		if (promptingEnabled && ((selectedSdk && !sdk) || (!selectedSdk && cmdName === 'create'))) {
+		if (promptingEnabled && ((selectedSdk && !sdk) || showSDKPrompt)) {
 			logger.banner();
 
 			const sdkTypes = {};
