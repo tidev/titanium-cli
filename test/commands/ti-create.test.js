@@ -7,12 +7,6 @@ describe('ti create', () => {
 	it('should show help', initMockSDKHome(async ({ run, tmpSDKDir }) => {
 		const { exitCode, stdout, stderr } = await run(['create', '-h']);
 
-		console.log('-'.repeat(40));
-		console.log(stdout);
-		console.log('-'.repeat(40));
-		console.log(stderr);
-		console.log('-'.repeat(40));
-
 		const output = stripColor(stdout);
 		assert.match(output, /Titanium Command-Line Interface/);
 		assert.match(output, /Usage: titanium create \[options\]/);
