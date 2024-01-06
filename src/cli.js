@@ -1197,6 +1197,14 @@ export class CLI {
 
 			this.debugLogger.trace('Checking for missing/invalid options:', orderedOptionNames);
 
+			// this is a hack... `-d` now conflicts between `--workspace-dir` and
+			// the now global `--project-dir` option causing `--project-dir` to
+			// snipe `--workspace-dir`, so we treat them the same for the `create`
+			// command
+			if (this.command.name() === 'create' && !this.argv['workspace-dir']) {
+				this.argv['workspace-dir'] = this.argv['project-dir'];
+			}
+
 			// this while loop is essentially a pump that processes missing/invalid
 			// options one at a time, recalculating them each iteration
 			// eslint-disable-next-line no-constant-condition
