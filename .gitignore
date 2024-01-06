@@ -4,6 +4,6 @@
 .pnpm-debug.log
 coverage
 dist
-node_modules
+/node_modules
 npm-debug.log
 /*.tgz

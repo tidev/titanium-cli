@@ -1,27 +1,24 @@
 'use strict';
 
-// const appc = require('node-appc'),
-// fields = require('fields'),
-const fs = require('fs-extra');
-// jsanalyze = require('node-titanium-sdk/lib/jsanalyze'),
+const fields = require('fields');
+const fs = require('fs');
 const path = require('path');
 const ti = require('../lib/node-titanium-sdk');
-// tiappxml = require('node-titanium-sdk/lib/tiappxml');
 
-// fields.setup({
-// 	formatters: {
-// 		error: function (err) {
-// 			if (err instanceof Error) {
-// 				return ('[ERROR] ' + err.message).red + '\n';
-// 			}
-// 			err = '' + err;
-// 			return '\n' + (/^(\[ERROR\])/i.test(err) ? err : '[ERROR] ' + err.replace(/^Error:/i, '').trim()).red;
-// 		}
-// 	},
-// 	style: {
-// 		accelerator: 'cyan'
-// 	}
-// });
+fields.setup({
+	formatters: {
+		error(err) {
+			if (err instanceof Error) {
+				return `[ERROR] ${err.message}`.red + '\n';
+			}
+			err = '' + err;
+			return '\n' + (/^(\[ERROR\])/i.test(err) ? err : '[ERROR] ' + err.replace(/^Error:/i, '').trim()).red;
+		}
+	},
+	style: {
+		accelerator: 'cyan'
+	}
+});
 
 exports.cliVersion = '>=3.2.1';
 exports.title = 'Build';
@@ -34,11 +31,11 @@ exports.config = function config(logger, config, cli) {
 	// start patching the logger here
 	patchLogger(logger, cli);
 
-	return function (finished) {
-		cli.createHook('build.config', function (callback) {
+	return finished => {
+		cli.createHook('build.config', callback => {
 			// note: it's currently impossible for the module build to declare any
 			// config options/flags.
-			ti.platformOptions(logger, config, cli, 'build', function (platformConf) {
+			ti.platformOptions(logger, config, cli, 'build', platformConf => {
 				var conf = {
 					flags: {
 						'build-only': {
@@ -54,23 +51,23 @@ exports.config = function config(logger, config, cli) {
 						},
 						'skip-js-minify': {
 							default: false,
-							desc: __('bypasses JavaScript minification; %s builds are never minified; only supported for %s and %s', 'simulator'.cyan, 'Android'.cyan, 'iOS'.cyan)
+							desc: `bypasses JavaScript minification; ${'simulator'.cyan} builds are never minified; only supported for ${'Android'.cyan} and ${'iOS'.cyan}`
 						},
 						'source-maps': {
-							desc: __('generate inline source maps for transpiled JS files')
+							desc: 'generate inline source maps for transpiled JS files'
 						},
 					},
-					options: appc.util.mix({
+					options: Object.assign({
 						platform: {
 							abbr: 'p',
-							callback: function (platform) {
+							callback(platform) {
 								if (!cli.argv.$originalPlatform) {
 									cli.argv.$originalPlatform = platform;
 								}
 								platform = cli.argv.platform = ti.resolvePlatform(platform);
 
 								const p = platformConf[platform];
-								p && p.options && Object.keys(p.options).forEach(function (name) {
+								p && p.options && Object.keys(p.options).forEach(name => {
 									if (p.options[name].default && cli.argv[name] === undefined) {
 										cli.argv[name] = p.options[name].default;
 									}
@@ -78,17 +75,17 @@ exports.config = function config(logger, config, cli) {
 
 								return platform;
 							},
-							desc: __('the target build platform'),
-							hint: __('platform'),
+							desc: 'the target build platform',
+							hint: 'platform',
 							order: 2,
 							prompt: {
-								label: __('Target platform'),
-								error: __('Invalid platform'),
-								validator: function (platform) {
+								label: 'Target platform',
+								error: 'Invalid platform',
+								validator(platform) {
 									if (!platform) {
-										throw new Error(__('Invalid platform'));
+										throw new Error('Invalid platform');
 									} else if (ti.availablePlatforms.indexOf(platform) === -1) {
-										throw new Error(__('Invalid platform: %s', platform));
+										throw new Error(`Invalid platform: ${platform}`);
 									}
 									return true;
 								}
@@ -99,20 +96,20 @@ exports.config = function config(logger, config, cli) {
 						},
 						'project-dir': {
 							abbr: 'd',
-							callback: function (projectDir) {
+							callback(projectDir) {
 								if (projectDir === '') {
 									// no option value was specified
 									// set project dir to current directory
 									projectDir = conf.options['project-dir'].default;
 								}
 
-								projectDir = appc.fs.resolvePath(projectDir);
+								projectDir = path.resolve(projectDir);
 
 								// load the tiapp.xml/timodule.xml
 								if (fs.existsSync(path.join(projectDir, 'tiapp.xml'))) {
 									let tiapp;
 									try {
-										tiapp = cli.tiapp = new tiappxml(path.join(projectDir, 'tiapp.xml'));
+										tiapp = cli.tiapp = {};
 									} catch (ex) {
 										logger.error(ex);
 										logger.log();
@@ -121,20 +118,12 @@ exports.config = function config(logger, config, cli) {
 
 									tiapp.properties || (tiapp.properties = {});
 
-									// make sure the tiapp.xml is sane
-									ti.validateTiappXml(logger, config, tiapp);
-
-									// check that the Titanium SDK version is correct
-									if (!ti.validateCorrectSDK(logger, config, cli, 'build')) {
-										throw new cli.GracefulShutdown();
-									}
-
 									cli.argv.type = 'app';
 
 								} else if (fs.existsSync(path.join(projectDir, 'timodule.xml'))) {
 									let timodule;
 									try {
-										timodule = cli.tiapp = cli.timodule = new tiappxml(path.join(projectDir, 'timodule.xml'));
+										timodule = cli.tiapp = cli.timodule = {};
 									} catch (ex) {
 										logger.error(ex);
 										logger.log();
@@ -163,12 +152,12 @@ exports.config = function config(logger, config, cli) {
 
 								return projectDir;
 							},
-							desc: __('the directory containing the project'),
+							desc: 'the directory containing the project',
 							default: process.env.SOURCE_ROOT ? path.join(process.env.SOURCE_ROOT, '..', '..') : '.',
 							order: 1,
-							prompt: function (callback) {
+							prompt(callback) {
 								callback(fields.file({
-									promptLabel: __('Where is the __project directory__?'),
+									promptLabel: 'Where is the __project directory__?',
 									complete: true,
 									showHidden: true,
 									ignoreDirs: new RegExp(config.get('cli.ignoreDirs')), // eslint-disable-line security/detect-non-literal-regexp
@@ -177,20 +166,19 @@ exports.config = function config(logger, config, cli) {
 								}));
 							},
 							required: true,
-							validate: function (projectDir, callback) {
+							validate(projectDir, callback) {
 								const isDefault = (projectDir == conf.options['project-dir'].default); // eslint-disable-line eqeqeq
-								let dir = appc.fs.resolvePath(projectDir);
+								let dir = path.resovle(projectDir);
 
 								if (!fs.existsSync(dir)) {
-									return callback(new Error(__('Project directory does not exist')));
+									return callback(new Error('Project directory does not exist'));
 								}
 
 								const root = path.resolve('/');
 								let isFound,
 									projDir = dir;
 
-								[ 'tiapp.xml', 'timodule.xml' ].some(function (tiXml) { // eslint-disable-line array-callback-return
-
+								['tiapp.xml', 'timodule.xml'].some(tiXml => { // eslint-disable-line array-callback-return
 									let tiFile = path.join(dir, tiXml);
 
 									while (!fs.existsSync(tiFile)) {
@@ -217,7 +205,7 @@ exports.config = function config(logger, config, cli) {
 								}
 
 								if (!isFound) {
-									callback(new Error(__('Invalid project directory "%s" because tiapp.xml or timodule.xml not found', projectDir)));
+									callback(new Error(`Invalid project directory "${projectDir}" because tiapp.xml or timodule.xml not found`));
 									return;
 								}
 								callback(null, dir);
@@ -228,9 +216,7 @@ exports.config = function config(logger, config, cli) {
 				};
 				callback(null, conf);
 			});
-		})(function (err, result) {
-			finished(result);
-		});
+		})((_err, result) => finished(result));
 	};
 };
 
@@ -242,8 +228,8 @@ exports.validate = function validate(logger, config, cli) {
 		// make sure the module manifest is sane
 		ti.validateModuleManifest(logger, cli, cli.manifest);
 
-		return function (finished) {
-			logger.log.init(function () {
+		return finished => {
+			logger.log.init(() => {
 				const result = ti.validatePlatformOptions(logger, config, cli, 'buildModule');
 				if (result && typeof result === 'function') {
 					result(finished);
@@ -291,17 +277,17 @@ exports.run = function run(logger, config, cli, finished) {
 
 	if (!fs.existsSync(buildModule)) {
 		logger.error('Unable to find platform specific build command\n');
-		logger.log(__('Your SDK installation may be corrupt. You can reinstall it by running \'%s\'.', (cli.argv.$ + ' sdk install --force --default').cyan) + '\n');
+		logger.log(`Your SDK installation may be corrupt. You can reinstall it by running '${(cli.argv.$ + ' sdk install --force --default').cyan}'.\n`);
 		process.exit(1);
 	}
 
 	let counter = 0;
 	require(buildModule).run(logger, config, cli, function (err) { // eslint-disable-line security/detect-non-literal-require
 		if (!counter++) {
-			const delta = appc.time.prettyDiff(cli.startTime, Date.now());
+			const delta = String(cli.startTime - Date.now());
 			if (err) {
-				logger.error(__('An error occurred during build after %s', delta));
-				if (err instanceof appc.exception) {
+				logger.error(`An error occurred during build after ${delta}`);
+				if (err instanceof Error) {
 					err.dump(logger.error);
 				} else if (err !== true) {
 					(err.message || err.toString()).trim().split('\n').forEach(function (msg) {
@@ -309,15 +295,13 @@ exports.run = function run(logger, config, cli, finished) {
 					});
 				}
 				logger.log();
-				logger.log.end();
 				process.exit(1);
 			} else {
 				// eventually all platforms will just show how long the build took since they
 				// are responsible for showing the own logging
 				if (platform !== 'iphone' || cli.argv['build-only']) {
-					logger.info(__('Project built successfully in %s', delta.cyan) + '\n');
+					logger.info(`Project built successfully in ${delta.cyan}\n`);
 				}
-				logger.log.end();
 			}
 
 			finished();
@@ -366,20 +350,6 @@ function patchLogger(logger, cli) {
 		// add [INFO] type prefixes for each line
 		prefix = (args[0] !== '_') ? '[' + args[0].toUpperCase() + ']' + ((args[0].length === 5) ? '  ' : '   ') : '';
 
-		if (logger.fileWriteEnabled) {
-			if (logger.log.filestream) {
-				if (logger.log.buffer) {
-					logger.log.filestream.write(logger.log.buffer);
-					logger.log.buffer = null;
-				}
-
-				// log it to our log file, stripping out the color codes
-				logger.log.filestream.write('\n' + prefix + (args.length > 2 ? sprintf.apply(null, args.slice(1)) : args[1]).replace(/\x1B\[\d+m/g, '')); // eslint-disable-line no-control-regex
-			} else {
-				logger.log.buffer += '\n' + prefix + args[1].replace(/\x1B\[\d+m/g, ''); // eslint-disable-line no-control-regex
-			}
-		}
-
 		// call the original logger with our cleaned up args
 		origLoggerLog.apply(logger, arguments);
 
@@ -388,16 +358,6 @@ function patchLogger(logger, cli) {
 	};
 
 	logger.log.init = function (callback) {
-		var platform = ti.resolvePlatform(cli.argv.platform),
-			buildDir = path.join(cli.argv['project-dir'], 'build');
-
-		logger.fileWriteEnabled = true;
-
-		fs.ensureDirSync(buildDir, 0o766);
-
-		// create our write stream
-		logger.log.filestream = fs.createWriteStream(path.join(buildDir, 'build_' + platform + '.log'), { flags: 'w', encoding: 'utf8', mode: 0o666 });
-
 		function styleHeading(s) {
 			return ('' + s).bold;
 		}
@@ -407,54 +367,37 @@ function patchLogger(logger, cli) {
 		}
 
 		function rpad(s) {
-			return appc.string.rpad(s, 27);
+			return s.padEnd(27);
 		}
 
 		cli.env.getOSInfo(function (osInfo) {
 			logger.log([
 				new Date().toLocaleString(),
 				'',
-				styleHeading(__('Operating System')),
-				'  ' + rpad(__('Name'))            + ' = ' + styleValue(osInfo.os),
-				'  ' + rpad(__('Version'))         + ' = ' + styleValue(osInfo.osver),
-				'  ' + rpad(__('Architecture'))    + ' = ' + styleValue(osInfo.ostype),
-				'  ' + rpad(__('# CPUs'))          + ' = ' + styleValue(osInfo.oscpu),
-				'  ' + rpad(__('Memory'))          + ' = ' + styleValue(osInfo.memory),
+				styleHeading('Operating System'),
+				'  ' + rpad('Name')            + ' = ' + styleValue(osInfo.os),
+				'  ' + rpad('Version')         + ' = ' + styleValue(osInfo.osver),
+				'  ' + rpad('Architecture')    + ' = ' + styleValue(osInfo.ostype),
+				'  ' + rpad('# CPUs')          + ' = ' + styleValue(osInfo.oscpu),
+				'  ' + rpad('Memory')          + ' = ' + styleValue(osInfo.memory),
 				'',
-				styleHeading(__('Node.js')),
-				'  ' + rpad(__('Node.js Version')) + ' = ' + styleValue(osInfo.node),
-				'  ' + rpad(__('npm Version'))     + ' = ' + styleValue(osInfo.npm),
+				styleHeading('Node.js'),
+				'  ' + rpad('Node.js Version') + ' = ' + styleValue(osInfo.node),
+				'  ' + rpad('npm Version')     + ' = ' + styleValue(osInfo.npm),
 				'',
-				styleHeading(__('Titanium CLI')),
-				'  ' + rpad(__('CLI Version'))     + ' = ' + styleValue(cli.version),
+				styleHeading('Titanium CLI'),
+				'  ' + rpad('CLI Version')     + ' = ' + styleValue(cli.version),
 				'',
-				styleHeading(__('Titanium SDK')),
-				'  ' + rpad(__('SDK Version'))     + ' = ' + styleValue(cli.argv.sdk),
-				'  ' + rpad(__('SDK Path'))        + ' = ' + styleValue(cli.sdk.path),
-				'  ' + rpad(__('Target Platform')) + ' = ' + styleValue(ti.resolvePlatform(cli.argv.platform)),
+				styleHeading('Titanium SDK'),
+				'  ' + rpad('SDK Version')     + ' = ' + styleValue(cli.argv.sdk),
+				'  ' + rpad('SDK Path')        + ' = ' + styleValue(cli.sdk.path),
+				'  ' + rpad('Target Platform') + ' = ' + styleValue(ti.resolvePlatform(cli.argv.platform)),
 				'',
-				styleHeading(__('Command')),
+				styleHeading('Command'),
 				'  ' + styleValue(process.argv.join(' ')),
 				''
 			].join('\n'));
-
-			logger.log.flush();
 			callback();
 		});
 	};
-
-	logger.log.flush = function () {
-		if (logger.log.filestream && logger.log.buffer && logger.fileWriteEnabled) {
-			logger.log.filestream.write(logger.log.buffer);
-			logger.log.buffer = null;
-			logger.log.filestream.end();
-		}
-	};
-
-	logger.log.end = function () {
-		logger.log.filestream && logger.log.filestream.end();
-		logger.fileWriteEnabled = false;
-	};
-
-	logger.log.buffer = '';
 }

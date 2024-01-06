@@ -10,7 +10,6 @@ const ADB = require('node-titanium-sdk/lib/adb'),
 	fields = require('fields'),
 	fs = require('fs-extra'),
 	temp = require('temp'),
-	ti = require('node-titanium-sdk'),
 	util = require('util'),
 
 	afs = appc.fs,

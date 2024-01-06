@@ -66,6 +66,79 @@ function loadPlugins(_logger, config, cli, projectDir, finished, silent, compact
 	finished();
 }
 
+function platformOptions(logger, config, cli, commandName, finished) {
+	const result = {};
+	let targetPlatform = !cli.argv.help && (cli.argv.platform || cli.argv.p);
+
+	if (!commandName) {
+		finished(result);
+		return;
+	}
+
+	function set(obj, title, platform) {
+		// add the platform and title to the options and flags
+		['options', 'flags'].forEach(type => {
+			if (obj && obj[type]) {
+				result[platform] || (result[platform] = {
+					platform: platform,
+					title: title || platform
+				});
+				result[platform][type] = obj[type];
+			}
+		});
+	}
+
+	// translate the platform name
+	targetPlatform = platformAliases[targetPlatform] || targetPlatform;
+
+	// for each platform, fetch their specific flags/options
+	manifest.platforms.reduce((promise, platform) => {
+		return promise.then(() => new Promise(resolve => {
+			// only configure target platform
+			if (targetPlatform && platform !== targetPlatform) {
+				return resolve();
+			}
+
+			let platformDir = path.join(path.dirname(module.filename), '..', '..', '..', platform);
+			let platformCommand = path.join(platformDir, 'cli', 'commands', '_' + commandName + '.js');
+			let command;
+			let conf;
+			let title;
+
+			if (!fs.existsSync(platformCommand)) {
+				return resolve();
+			}
+
+			command = require(platformCommand);
+			if (!command || !command.config) {
+				return resolve();
+			}
+
+			// try to get the platform specific configuration
+			conf = command.config(logger, config, cli);
+
+			try {
+				// try to read a title from the platform's package.json
+				title = JSON.parse(fs.readFileSync(path.join(platformDir, 'package.json'))).title;
+			} catch (e) {}
+
+			if (typeof conf === 'function') {
+				// async callback
+				conf(function (obj) {
+					set(obj, title, platform);
+					resolve();
+				});
+				return;
+			}
+
+			set(conf, title, platform);
+			resolve();
+		}));
+	}, Promise.resolve())
+		.then(() => finished(result))
+		.catch(() => finished(result));
+}
+
 function resolvePlatform(platform) {
 	return platformAliases[platform] || platform;
 }
@@ -93,6 +166,74 @@ function scrubPlatforms(platforms) {
 		original: Object.keys(original).sort(),
 		bad: Object.keys(bad).sort()
 	};
+}
+
+function validAppId(id) {
+	const words = {
+		abstract: 1,
+		assert: 1,
+		boolean: 1,
+		break: 1,
+		byte: 1,
+		case: 1,
+		catch: 1,
+		char: 1,
+		class: 1,
+		const: 1,
+		continue: 1,
+		default: 1,
+		do: 1,
+		double: 1,
+		else: 1,
+		enum: 1,
+		extends: 1,
+		false: 1,
+		final: 1,
+		finally: 1,
+		float: 1,
+		for: 1,
+		goto: 1,
+		if: 1,
+		implements: 1,
+		import: 1,
+		instanceof: 1,
+		int: 1,
+		interface: 1,
+		long: 1,
+		native: 1,
+		new: 1,
+		null: 1,
+		package: 1,
+		private: 1,
+		protected: 1,
+		public: 1,
+		return: 1,
+		short: 1,
+		static: 1,
+		strictfp: 1,
+		super: 1,
+		switch: 1,
+		synchronized: 1,
+		this: 1,
+		throw: 1,
+		throws: 1,
+		transient: 1,
+		true: 1,
+		try: 1,
+		void: 1,
+		volatile: 1,
+		while: 1
+	};
+	const parts = id.split('.');
+	const l = parts.length;
+
+	for (let i = 0; i < l; i++) {
+		if (words[parts[i]]) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 function validateModuleManifest(logger, cli, manifest) {
@@ -163,8 +304,10 @@ function validateProjectDir(logger, cli, argv, name) {
 
 exports.commonOptions = commonOptions;
 exports.loadPlugins = loadPlugins;
+exports.platformOptions = platformOptions;
 exports.resolvePlatform = resolvePlatform;
 exports.scrubPlatforms = scrubPlatforms;
+exports.validAppId = validAppId;
 exports.validateModuleManifest = validateModuleManifest;
 exports.validatePlatformOptions = validatePlatformOptions;
 exports.validateProjectDir = validateProjectDir;
