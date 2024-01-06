@@ -497,7 +497,7 @@ export class CLI {
 			return;
 		}
 
-		this.debugLogger.trace('Processing --platform option');
+		this.debugLogger.trace(`Processing --platform option: ${this.argv.platform || 'not specified'}`);
 		try {
 			if (!this.argv.platform) {
 				throw new TiError('Missing required option: --platform <name>', {
@@ -507,7 +507,7 @@ export class CLI {
 							.join('\n')
 					}`
 				});
-			} else if (!platformOption.values.includes(this.argv.platform)) {
+			} else if (!platformOption.skipValueCheck && !platformOption.values.includes(this.argv.platform)) {
 				throw new TiError(`Invalid platform "${this.argv.$originalPlatform || this.argv.platform}"`, {
 					code: 'INVALID_PLATFORM'
 				});
