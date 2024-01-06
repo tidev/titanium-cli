@@ -3,7 +3,7 @@
 const fields = require('fields');
 const fs = require('fs');
 const path = require('path');
-const ti = require('../lib/node-titanium-sdk');
+const ti = require('../lib/node-titanium-sdk/ti');
 
 exports.cliVersion = '>=3.2.1';
 exports.title = 'Create';

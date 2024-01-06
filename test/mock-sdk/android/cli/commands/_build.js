@@ -8,16 +8,12 @@ const ADB = require('node-titanium-sdk/lib/adb'),
 	Builder = require('node-titanium-sdk/lib/builder'),
 	EmulatorManager = require('node-titanium-sdk/lib/emulator'),
 	fields = require('fields'),
-	fs = require('fs-extra'),
+	fs = require('fs'),
 	temp = require('temp'),
-	util = require('util'),
+	util = require('util');
 
-	afs = appc.fs,
-	i18nLib = appc.i18n(__dirname),
-	__ = i18nLib.__,
-	__n = i18nLib.__n,
-	version = appc.version,
-	V8_STRING_VERSION_REGEXP = /(\d+)\.(\d+)\.\d+\.\d+/;
+const version = '0.0.0';
+const V8_STRING_VERSION_REGEXP = /(\d+)\.(\d+)\.\d+\.\d+/;
 
 function AndroidBuilder() {
 	Builder.apply(this, arguments);

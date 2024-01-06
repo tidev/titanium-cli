@@ -1,6 +1,6 @@
 'use strict';
 
-const ti = require('../lib/node-titanium-sdk');
+const ti = require('../lib/node-titanium-sdk/ti');
 
 exports.cliVersion = '>=3.2.1';
 exports.desc = 'get and set tiapp.xml settings';

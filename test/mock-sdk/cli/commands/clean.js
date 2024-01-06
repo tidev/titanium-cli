@@ -1,9 +1,9 @@
 'use strict';
 
-const ti = require('../lib/node-titanium-sdk');
+const ti = require('../lib/node-titanium-sdk/ti');
 const fs = require('fs');
 const path = require('path');
-// 	fields = require('fields');
+const fields = require('fields');
 
 exports.cliVersion = '>=3.2.1';
 exports.desc = 'removes previous build directories';
@@ -71,17 +71,14 @@ exports.config = function (logger, config, cli) {
 						default: '.',
 						order: 1,
 						prompt(callback) {
-							callback({
-								// TODO
-							});
-							// callback(fields.file({
-							// 	promptLabel: 'Where is the __project directory__?'),
-							// 	complete: true,
-							// 	showHidden: true,
-							// 	ignoreDirs: new RegExp(config.get('cli.ignoreDirs')), // eslint-disable-line security/detect-non-literal-regexp
-							// 	ignoreFiles: /.*/,
-							// 	validate: conf.options['project-dir'].validate
-							// }));
+							callback(fields.file({
+								promptLabel: 'Where is the __project directory__?',
+								complete: true,
+								showHidden: true,
+								ignoreDirs: new RegExp(config.get('cli.ignoreDirs')), // eslint-disable-line security/detect-non-literal-regexp
+								ignoreFiles: /.*/,
+								validate: conf.options['project-dir'].validate
+							}));
 						},
 						validate: function (projectDir, callback) {
 							const isDefault = (projectDir == conf.options['project-dir'].default); // eslint-disable-line eqeqeq
