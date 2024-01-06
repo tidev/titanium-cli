@@ -1,7 +1,7 @@
 'use strict';
 
 const Creator = require('../creator');
-const ti = require('../node-titanium-sdk');
+const ti = require('../node-titanium-sdk/ti');
 const util = require('util');
 const fields = require('fields');
 

@@ -4,7 +4,7 @@ const fields = require('fields');
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
-const ti = require('./node-titanium-sdk');
+const ti = require('./node-titanium-sdk/ti');
 
 module.exports = Creator;
 

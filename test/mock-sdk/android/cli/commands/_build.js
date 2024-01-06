@@ -1,19 +1,16 @@
 'use strict';
 
-const ADB = require('node-titanium-sdk/lib/adb'),
-	android = require('node-titanium-sdk/lib/android'),
-	androidDetect = require('../lib/detect').detect,
-	appc = require('node-appc'),
-	async = require('async'),
-	Builder = require('node-titanium-sdk/lib/builder'),
-	EmulatorManager = require('node-titanium-sdk/lib/emulator'),
-	fields = require('fields'),
-	fs = require('fs'),
-	temp = require('temp'),
-	util = require('util');
+const ADB = require('node-titanium-sdk/lib/adb');
+const android = require('node-titanium-sdk/lib/android');
+const androidDetect = require('../lib/detect').detect;
+const Builder = require('../../../cli/lib/node-titanium-sdk/builder');
+const EmulatorManager = require('node-titanium-sdk/lib/emulator');
+const fields = require('fields');
+const fs = require('fs');
+const path = require('path');
+const util = require('util');
 
 const version = '0.0.0';
-const V8_STRING_VERSION_REGEXP = /(\d+)\.(\d+)\.\d+\.\d+/;
 
 function AndroidBuilder() {
 	Builder.apply(this, arguments);
@@ -37,7 +34,7 @@ function AndroidBuilder() {
 		'dist-playstore': 'production'
 	};
 
-	this.targets = [ 'emulator', 'device', 'dist-playstore' ];
+	this.targets = ['emulator', 'device', 'dist-playstore'];
 }
 
 util.inherits(AndroidBuilder, Builder);
@@ -68,137 +65,111 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 	// prompting occurs. because detection is expensive we also do it here instead
 	// of during config() because there's no sense detecting if config() is being
 	// called because of the help command.
-	cli.on('cli:pre-validate', function (obj, callback) {
+	cli.on('cli:pre-validate', function (_obj, callback) {
 		if (cli.argv.platform && cli.argv.platform !== 'android') {
 			return callback();
 		}
 
 		_t.buildOnly = cli.argv['build-only'];
+		_t.jdkInfo = {}; // mock?
 
-		async.series([
-			function (next) {
-				// detect android environment
-				androidDetect(config, { packageJson: _t.packageJson }, function (androidInfo) {
-					_t.androidInfo = androidInfo;
-					assertIssue(logger, androidInfo.issues, 'ANDROID_JDK_NOT_FOUND');
-					assertIssue(logger, androidInfo.issues, 'ANDROID_JDK_PATH_CONTAINS_AMPERSANDS');
+		// detect android environment
+		androidDetect(config, { packageJson: _t.packageJson }, androidInfo => {
+			_t.androidInfo = androidInfo;
+			assertIssue(logger, androidInfo.issues, 'ANDROID_JDK_NOT_FOUND');
+			assertIssue(logger, androidInfo.issues, 'ANDROID_JDK_PATH_CONTAINS_AMPERSANDS');
 
-					// if --android-sdk was not specified, then we simply try to set a default android sdk
-					if (!cli.argv['android-sdk']) {
-						let androidSdkPath = config.android && config.android.sdkPath;
-						if (!androidSdkPath && androidInfo.sdk) {
-							androidSdkPath = androidInfo.sdk.path;
-						}
-						androidSdkPath && (cli.argv['android-sdk'] = afs.resolvePath(androidSdkPath));
-					}
-
-					next();
-				});
-			},
-
-			function (next) {
-				// detect java development kit
-				appc.jdk.detect(config, null, function (jdkInfo) {
-					assertIssue(logger, jdkInfo.issues, 'JDK_NOT_INSTALLED');
-					assertIssue(logger, jdkInfo.issues, 'JDK_MISSING_PROGRAMS');
-					assertIssue(logger, jdkInfo.issues, 'JDK_INVALID_JAVA_HOME');
-
-					if (!jdkInfo.version) {
-						logger.error(__('Unable to locate the Java Development Kit') + '\n');
-						logger.log(__('You can specify the location by setting the %s environment variable.', 'JAVA_HOME'.cyan) + '\n');
-						process.exit(1);
-					}
-
-					if (!version.satisfies(jdkInfo.version, _t.packageJson.vendorDependencies.java)) {
-						logger.error(__('JDK version %s detected, but only version %s is supported', jdkInfo.version, _t.packageJson.vendorDependencies.java) + '\n');
-						process.exit(1);
-					}
-
-					_t.jdkInfo = jdkInfo;
-					next();
-				});
+			// if --android-sdk was not specified, then we simply try to set a default android sdk
+			if (!cli.argv['android-sdk']) {
+				let androidSdkPath = config.android && config.android.sdkPath;
+				if (!androidSdkPath && androidInfo.sdk) {
+					androidSdkPath = androidInfo.sdk.path;
+				}
+				androidSdkPath && (cli.argv['android-sdk'] = path.resolve(androidSdkPath));
 			}
-		], callback);
+
+			callback();
+		});
 	});
 
-	const targetDeviceCache = {},
-		findTargetDevices = function findTargetDevices(target, callback) {
-			if (targetDeviceCache[target]) {
-				return callback(null, targetDeviceCache[target]);
-			}
+	const targetDeviceCache = {};
+	const findTargetDevices = function findTargetDevices(target, callback) {
+		if (targetDeviceCache[target]) {
+			return callback(null, targetDeviceCache[target]);
+		}
 
-			if (target === 'device') {
-				new ADB(config).devices(function (err, devices) {
-					if (err) {
-						callback(err);
-					} else {
-						this.devices = devices.filter(function (d) {
-							return !d.emulator && d.state === 'device';
+		if (target === 'device') {
+			new ADB(config).devices(function (err, devices) {
+				if (err) {
+					callback(err);
+				} else {
+					this.devices = devices.filter(function (d) {
+						return !d.emulator && d.state === 'device';
+					});
+					if (this.devices.length > 1) {
+						// we have more than 1 device, so we should show 'all'
+						this.devices.push({
+							id: 'all',
+							model: 'All Devices'
 						});
-						if (this.devices.length > 1) {
-							// we have more than 1 device, so we should show 'all'
-							this.devices.push({
-								id: 'all',
-								model: 'All Devices'
-							});
-						}
-						callback(null, targetDeviceCache[target] = this.devices.map(function (d) {
+					}
+					callback(null, targetDeviceCache[target] = this.devices.map(function (d) {
+						return {
+							name: d.model || d.manufacturer,
+							id: d.id,
+							version: d.release,
+							abi: Array.isArray(d.abi) ? d.abi.join(',') : d.abi,
+							type: 'device'
+						};
+					}));
+				}
+			}.bind(this));
+		} else if (target === 'emulator') {
+			new EmulatorManager(config).detect(function (err, emus) {
+				if (err) {
+					callback(err);
+				} else {
+					this.devices = emus;
+					callback(null, targetDeviceCache[target] = emus.map(function (emu) {
+						// normalize the emulator info
+						if (emu.type === 'avd') {
 							return {
-								name: d.model || d.manufacturer,
-								id: d.id,
-								version: d.release,
-								abi: Array.isArray(d.abi) ? d.abi.join(',') : d.abi,
-								type: 'device'
+								name: emu.name,
+								id: emu.id,
+								api: emu['api-level'],
+								version: emu['sdk-version'],
+								abi: emu.abi,
+								type: emu.type,
+								googleApis: emu.googleApis,
+								sdcard: emu.sdcard
 							};
-						}));
-					}
-				}.bind(this));
-			} else if (target === 'emulator') {
-				new EmulatorManager(config).detect(function (err, emus) {
-					if (err) {
-						callback(err);
-					} else {
-						this.devices = emus;
-						callback(null, targetDeviceCache[target] = emus.map(function (emu) {
-							// normalize the emulator info
-							if (emu.type === 'avd') {
-								return {
-									name: emu.name,
-									id: emu.id,
-									api: emu['api-level'],
-									version: emu['sdk-version'],
-									abi: emu.abi,
-									type: emu.type,
-									googleApis: emu.googleApis,
-									sdcard: emu.sdcard
-								};
-							} else if (emu.type === 'genymotion') {
-								return {
-									name: emu.name,
-									id: emu.name,
-									api: emu['api-level'],
-									version: emu['sdk-version'],
-									abi: emu.abi,
-									type: emu.type,
-									googleApis: emu.googleApis,
-									sdcard: true
-								};
-							}
-							return emu; // not good
-						}));
-					}
-				}.bind(this));
-			} else {
-				callback();
-			}
-		}.bind(this);
+						} else if (emu.type === 'genymotion') {
+							return {
+								name: emu.name,
+								id: emu.name,
+								api: emu['api-level'],
+								version: emu['sdk-version'],
+								abi: emu.abi,
+								type: emu.type,
+								googleApis: emu.googleApis,
+								sdcard: true
+							};
+						}
+						return emu; // not good
+					}));
+				}
+			}.bind(this));
+		} else {
+			callback();
+		}
+	}.bind(this);
 
 	return function (finished) {
-		cli.createHook('build.android.config', this, function (callback) {
+		cli.createHook('build.android.config', this, callback => {
 			const conf = {
 				flags: {
 					launch: {
-						desc: __('disable launching the app after installing'),
+						desc: 'disable launching the app after installing',
 						default: true,
 						hideDefault: true,
 						negate: true
@@ -207,13 +178,13 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 				options: {
 					alias: {
 						abbr: 'L',
-						desc: __('the alias for the keystore'),
+						desc: 'the alias for the keystore',
 						hint: 'alias',
 						order: 155,
-						prompt: function (callback) {
+						prompt(callback) {
 							callback(fields.select({
-								title: __('What is the name of the keystore\'s certificate alias?'),
-								promptLabel: __('Select a certificate alias by number or name'),
+								title: 'What is the name of the keystore\'s certificate alias?',
+								promptLabel: 'Select a certificate alias by number or name',
 								margin: '',
 								optionLabel: 'name',
 								optionValue: 'name',
@@ -225,13 +196,13 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 								validate: conf.options.alias.validate
 							}));
 						},
-						validate: function (value, callback) {
+						validate(value, callback) {
 							// if there's a value, then they entered something, otherwise let the cli prompt
 							if (value) {
 								const selectedAlias = value.toLowerCase(),
 									alias = _t.keystoreAlias = _t.keystoreAliases.filter(function (a) { return a.name && a.name.toLowerCase() === selectedAlias; }).shift();
 								if (!alias) {
-									return callback(new Error(__('Invalid "--alias" value "%s"', value)));
+									return callback(new Error(`Invalid "--alias" value "${value}"`));
 								}
 							}
 							callback(null, value);
@@ -239,9 +210,9 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 					},
 					'android-sdk': {
 						abbr: 'A',
-						default: config.android && config.android.sdkPath && afs.resolvePath(config.android.sdkPath),
-						desc: __('the path to the Android SDK'),
-						hint: __('path'),
+						default: config.android && config.android.sdkPath && path.resolve(config.android.sdkPath),
+						desc: 'the path to the Android SDK',
+						hint: 'path',
 						order: 100,
 						prompt: function (callback) {
 							let androidSdkPath = config.android && config.android.sdkPath;
@@ -249,14 +220,14 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 								androidSdkPath = _t.androidInfo.sdk.path;
 							}
 							if (androidSdkPath) {
-								androidSdkPath = afs.resolvePath(androidSdkPath);
+								androidSdkPath = path.resolve(androidSdkPath);
 								if (process.platform === 'win32' || androidSdkPath.indexOf('&') !== -1) {
 									androidSdkPath = undefined;
 								}
 							}
 
 							callback(fields.file({
-								promptLabel: __('Where is the Android SDK?'),
+								promptLabel: 'Where is the Android SDK?',
 								default: androidSdkPath,
 								complete: true,
 								showHidden: true,
@@ -268,14 +239,16 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 						required: true,
 						validate: function (value, callback) {
 							if (!value) {
-								callback(new Error(__('Invalid Android SDK path')));
+								callback(new Error('Invalid Android SDK path'));
 							} else if (process.platform === 'win32' && value.indexOf('&') !== -1) {
-								callback(new Error(__('The Android SDK path cannot contain ampersands (&) on Windows')));
-							} else if (_t.androidInfo.sdk && _t.androidInfo.sdk.path === afs.resolvePath(value)) {
+								callback(new Error('The Android SDK path cannot contain ampersands (&) on Windows'));
+							} else if (_t.androidInfo.sdk && _t.androidInfo.sdk.path === path.resolve(value)) {
 								callback(null, value);
 							} else {
 								// attempt to find android sdk
-								android.findSDK(value, config, appc.pkginfo.package(module), function () {
+								const pkginfo = {}; // appc.pkginfo.package(module)
+
+								android.findSDK(value, config, pkginfo, () => {
 
 									// NOTE: ignore errors when finding sdk, let gradle validate the sdk
 
@@ -284,7 +257,7 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 										config.set('android.sdkPath', value);
 
 										// path looks good, do a full scan again
-										androidDetect(config, { packageJson: _t.packageJson, bypassCache: true }, function (androidInfo) {
+										androidDetect(config, { packageJson: _t.packageJson, bypassCache: true }, androidInfo => {
 
 											// assume sdk is valid, let gradle validate the sdk
 											if (!androidInfo.sdk) {
@@ -309,18 +282,18 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 					},
 					'avd-abi': {
 						abbr: 'B',
-						desc: __('the abi for the Android emulator; deprecated, use --device-id'),
-						hint: __('abi')
+						desc: 'the abi for the Android emulator; deprecated, use --device-id',
+						hint: 'abi'
 					},
 					'avd-id': {
 						abbr: 'I',
-						desc: __('the id for the Android emulator; deprecated, use --device-id'),
-						hint: __('id')
+						desc: 'the id for the Android emulator; deprecated, use --device-id',
+						hint: 'id'
 					},
 					'avd-skin': {
 						abbr: 'S',
-						desc: __('the skin for the Android emulator; deprecated, use --device-id'),
-						hint: __('skin')
+						desc: 'the skin for the Android emulator; deprecated, use --device-id',
+						hint: 'skin'
 					},
 					'build-type': {
 						hidden: true
@@ -330,27 +303,27 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 					},
 					'deploy-type': {
 						abbr: 'D',
-						desc: __('the type of deployment; only used when target is %s or %s', 'emulator'.cyan, 'device'.cyan),
-						hint: __('type'),
+						desc: `the type of deployment; only used when target is ${'emulator'.cyan} or ${'device'.cyan}`,
+						hint: 'type',
 						order: 110,
-						values: [ 'test', 'development' ]
+						values: ['test', 'development']
 					},
 					'device-id': {
 						abbr: 'C',
-						desc: __('the id of the Android emulator or the device id to install the application to'),
-						hint: __('name'),
+						desc: 'the id of the Android emulator or the device id to install the application to',
+						hint: 'name',
 						order: 130,
-						prompt: function (callback) {
-							findTargetDevices(cli.argv.target, function (err, results) {
-								var opts = {},
-									title,
-									promptLabel;
+						prompt(callback) {
+							findTargetDevices(cli.argv.target, (_err, results) => {
+								let opts = {};
+								let title;
+								let promptLabel;
 
 								// we need to sort all results into groups for the select field
 								if (cli.argv.target === 'device' && results.length) {
-									opts[__('Devices')] = results;
-									title = __('Which device do you want to install your app on?');
-									promptLabel = __('Select a device by number or name');
+									opts['Devices'] = results;
+									title = 'Which device do you want to install your app on?';
+									promptLabel = 'Select a device by number or name';
 								} else if (cli.argv.target === 'emulator') {
 									// for emulators, we sort by type
 									let emus = results.filter(function (e) {
@@ -358,30 +331,30 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 									});
 
 									if (emus.length) {
-										opts[__('Android Emulators')] = emus;
+										opts['Android Emulators'] = emus;
 									}
 
 									emus = results.filter(function (e) {
 										return e.type === 'genymotion';
 									});
 									if (emus.length) {
-										opts[__('Genymotion Emulators')] = emus;
+										opts['Genymotion Emulators'] = emus;
 
-										logger.log(__('NOTE: Genymotion emulator must be running to detect Google API support').magenta + '\n');
+										logger.log('NOTE: Genymotion emulator must be running to detect Google API support'.magenta + '\n');
 									}
 
-									title = __('Which emulator do you want to launch your app in?');
-									promptLabel = __('Select an emulator by number or name');
+									title = 'Which emulator do you want to launch your app in?';
+									promptLabel = 'Select an emulator by number or name';
 								}
 
 								// if there are no devices/emulators, error
 								if (!Object.keys(opts).length) {
 									if (cli.argv.target === 'device') {
-										logger.warn(__('Unable to find any devices, possibily due to missing dependencies.') + '\n');
-										logger.log(__('Continuing with build... (will attempt to install missing dependencies)') + '\n');
+										logger.warn('Unable to find any devices, possibily due to missing dependencies.\n');
+										logger.log('Continuing with build... (will attempt to install missing dependencies)\n');
 									} else {
-										logger.warn(__('Unable to find any emulators, possibily due to missing dependencies.') + '\n');
-										logger.log(__('Continuing with build... (will attempt to install missing dependencies)') + '\n');
+										logger.warn('Unable to find any emulators, possibily due to missing dependencies.\n');
+										logger.log('Continuing with build... (will attempt to install missing dependencies)\n');
 									}
 									_t.buildOnly = true;
 									return callback();
@@ -393,9 +366,9 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 									formatters: {
 										option: function (opt, idx, num) {
 											return '  ' + num + opt.name.cyan + (opt.version ? ' (' + opt.version + ')' : '') + (opt.googleApis
-												? (' (' + __('Google APIs supported') + ')').grey
+												? ' (Google APIs supported)'.grey
 												: opt.googleApis === null
-													? (' (' + __('Google APIs support unknown') + ')').grey
+													? ' (Google APIs support unknown)'.grey
 													: '');
 										}
 									},
@@ -412,9 +385,9 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 							});
 						},
 						required: true,
-						validate: function (device, callback) {
+						validate(device, callback) {
 							const dev = device.toLowerCase();
-							findTargetDevices(cli.argv.target, function (err, devices) {
+							findTargetDevices(cli.argv.target, function (_err, devices) {
 								if (cli.argv.target === 'device' && dev === 'all') {
 									// we let 'all' slide by
 									return callback(null, dev);
@@ -424,10 +397,10 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 										return callback(null, devices[i].id);
 									}
 								}
-								callback(new Error(cli.argv.target ? __('Invalid Android device "%s"', device) : __('Invalid Android emulator "%s"', device)));
+								callback(new Error(cli.argv.target ? `Invalid Android device "${device}"` : `Invalid Android emulator "${device}"`));
 							});
 						},
-						verifyIfRequired: function (callback) {
+						verifyIfRequired(callback) {
 							if (_t.buildOnly) {
 								// not required if we're build only
 								return callback();
@@ -456,8 +429,8 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 											// next try using the avd skin
 											if (!cli.argv['avd-skin']) {
 												// we have more than one match
-												logger.error(__n('Found %s avd with id "%%s"', 'Found %s avds with id "%%s"', avds.length, cli.argv['avd-id']));
-												logger.error(__('Specify --avd-skin and --avd-abi to select a specific emulator') + '\n');
+												logger.error(`Found ${avds.length} avd with id "${cli.argv['avd-id']}"`);
+												logger.error('Specify --avd-skin and --avd-abi to select a specific emulator\n');
 											} else {
 												name += cli.argv['avd-skin'];
 												// try exact match
@@ -473,14 +446,14 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 													});
 												}
 												if (avds.length === 0) {
-													logger.error(__('No emulators found with id "%s" and skin "%s"', cli.argv['avd-id'], cli.argv['avd-skin']) + '\n');
+													logger.error(`No emulators found with id "${cli.argv['avd-id']}" and skin "${cli.argv['avd-skin']}"\n`);
 												} else if (avds.length === 1) {
 													cli.argv['device-id'] = avds[0];
 													return callback();
 												} else if (!cli.argv['avd-abi']) {
 													// we have more than one matching avd, but no abi to filter by so we have to error
-													logger.error(__n('Found %s avd with id "%%s" and skin "%%s"', 'Found %s avds with id "%%s" and skin "%%s"', avds.length, cli.argv['avd-id'], cli.argv['avd-skin']));
-													logger.error(__('Specify --avd-abi to select a specific emulator') + '\n');
+													logger.error(`Found ${avds.length} avd with id "${cli.argv['avd-id']}" and skin "${cli.argv['avd-skin']}"`);
+													logger.error('Specify --avd-abi to select a specific emulator\n');
 												} else {
 													name += '_' + cli.argv['avd-abi'];
 													// try exact match
@@ -496,7 +469,7 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 														});
 													}
 													if (avds.length === 0) {
-														logger.error(__('No emulators found with id "%s", skin "%s", and abi "%s"', cli.argv['avd-id'], cli.argv['avd-skin'], cli.argv['avd-abi']) + '\n');
+														logger.error(`No emulators found with id "${cli.argv['avd-id']}", skin "${cli.argv['avd-skin']}", and abi "${cli.argv['avd-abi']}"\n`);
 													} else {
 														// there is one or more avds, but we'll just return the first one
 														cli.argv['device-id'] = avds[0];
@@ -507,11 +480,11 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 											}
 										}
 
-										logger.warn(__('%s options have been %s, please use %s', '--avd-*'.cyan, 'deprecated'.red, '--device-id'.cyan) + '\n');
+										logger.warn(`${'--avd-*'.cyan} options have been ${'deprecated'.red}, please use ${'--device-id'.cyan}\n`);
 
 										// print list of available avds
 										if (results.length && !cli.argv.prompt) {
-											logger.log(__('Available Emulators:'));
+											logger.log('Available Emulators:');
 											results.forEach(function (emu) {
 												logger.log('   ' + emu.name.cyan + ' (' + emu.version + ')');
 											});
@@ -522,9 +495,9 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 								} else if (cli.argv['device-id'] === undefined && results && results.length && config.get('android.autoSelectDevice', true)) {
 									// we set the device-id to an array of devices so that later in validate()
 									// after the tiapp.xml has been parsed, we can auto select the best device
-									_t.devicesToAutoSelectFrom = results.sort(function (a, b) {
-										var eq = a.api && b.api && appc.version.eq(a.api, b.api),
-											gt = a.api && b.api && appc.version.gt(a.api, b.api);
+									_t.devicesToAutoSelectFrom = results.sort((a, b) => {
+										const eq = a.api && b.api && a.api === b.api;
+										const gt = a.api && b.api && a.api.localeCompare(b.api) === 1;
 
 										if (eq) {
 											if (a.type === b.type) {
@@ -554,12 +527,12 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 						}
 					},
 					'key-password': {
-						desc: __('the password for the keystore private key (defaults to the store-password)'),
+						desc: 'the password for the keystore private key (defaults to the store-password)',
 						hint: 'keypass',
 						order: 160,
 						prompt: function (callback) {
 							callback(fields.text({
-								promptLabel: __('What is the keystore\'s __key password__?') + ' ' + __('(leave blank to use the store password)').grey,
+								promptLabel: 'What is the keystore\'s __key password__? ' + '(leave blank to use the store password)'.grey,
 								password: true,
 								validate: _t.conf.options['key-password'].validate.bind(_t)
 							}));
@@ -574,56 +547,23 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 									return callback(err);
 								}
 
-								const keystoreFile = cli.argv.keystore,
-									alias = cli.argv.alias,
-									tmpKeystoreFile = temp.path({ suffix: '.jks' });
-
-								if (keystoreFile && storePassword && alias && _t.jdkInfo && _t.jdkInfo.executables.keytool) {
-									// the only way to test the key password is to export the cert
-									appc.subprocess.run(_t.jdkInfo.executables.keytool, [
-										'-J-Duser.language=en',
-										'-importkeystore',
-										'-v',
-										'-srckeystore', keystoreFile,
-										'-destkeystore', tmpKeystoreFile,
-										'-srcstorepass', storePassword,
-										'-deststorepass', storePassword,
-										'-srcalias', alias,
-										'-destalias', alias,
-										'-srckeypass', keyPassword || storePassword,
-										'-noprompt'
-									], function (code, out) {
-										if (code) {
-											if (out.indexOf('java.security.UnrecoverableKeyException') !== -1) {
-												return callback(new Error(__('Bad key password')));
-											}
-											return callback(new Error(out.trim()));
-										}
-
-										// remove the temp keystore
-										fs.existsSync(tmpKeystoreFile) && fs.unlinkSync(tmpKeystoreFile);
-
-										callback(null, keyPassword);
-									});
-								} else {
-									callback(null, keyPassword);
-								}
+								callback(null, keyPassword);
 							});
 						}
 					},
 					keystore: {
 						abbr: 'K',
-						callback: function () {
+						callback() {
 							_t.conf.options['alias'].required = true;
 							_t.conf.options['store-password'].required = true;
 						},
-						desc: __('the location of the keystore file'),
+						desc: 'the location of the keystore file',
 						hint: 'path',
 						order: 140,
-						prompt: function (callback) {
+						prompt(callback) {
 							_t.conf.options['key-password'].required = true;
 							callback(fields.file({
-								promptLabel: __('Where is the __keystore file__ used to sign the app?'),
+								promptLabel: 'Where is the __keystore file__ used to sign the app?',
 								complete: true,
 								showHidden: true,
 								ignoreDirs: _t.ignoreDirs,
@@ -631,13 +571,13 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 								validate: _t.conf.options.keystore.validate.bind(_t)
 							}));
 						},
-						validate: function (keystoreFile, callback) {
+						validate(keystoreFile, callback) {
 							if (!keystoreFile) {
-								callback(new Error(__('Please specify the path to your keystore file')));
+								callback(new Error('Please specify the path to your keystore file'));
 							} else {
-								keystoreFile = afs.resolvePath(keystoreFile);
+								keystoreFile = path.resolve(keystoreFile);
 								if (!fs.existsSync(keystoreFile) || !fs.statSync(keystoreFile).isFile()) {
-									callback(new Error(__('Invalid keystore file')));
+									callback(new Error('Invalid keystore file'));
 								} else {
 									callback(null, keystoreFile);
 								}
@@ -646,13 +586,13 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 					},
 					'output-dir': {
 						abbr: 'O',
-						desc: __('the output directory when using %s', 'dist-playstore'.cyan),
+						desc: `the output directory when using ${'dist-playstore'.cyan}`,
 						hint: 'dir',
 						order: 180,
 						prompt: function (callback) {
 							callback(fields.file({
-								promptLabel: __('Where would you like the output APK file saved?'),
-								default: cli.argv['project-dir'] && afs.resolvePath(cli.argv['project-dir'], 'dist'),
+								promptLabel: 'Where would you like the output APK file saved?',
+								default: cli.argv['project-dir'] && path.resolvePath(cli.argv['project-dir'], 'dist'),
 								complete: true,
 								showHidden: true,
 								ignoreDirs: _t.ignoreDirs,
@@ -661,7 +601,7 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 							}));
 						},
 						validate: function (outputDir, callback) {
-							callback(outputDir || !_t.conf.options['output-dir'].required ? null : new Error(__('Invalid output directory')), outputDir);
+							callback(outputDir || !_t.conf.options['output-dir'].required ? null : new Error('Invalid output directory'), outputDir);
 						}
 					},
 					'profiler-host': {
@@ -669,15 +609,15 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 					},
 					'store-password': {
 						abbr: 'P',
-						desc: __('the password for the keystore'),
+						desc: 'the password for the keystore',
 						hint: 'password',
 						order: 150,
-						prompt: function (callback) {
+						prompt(callback) {
 							callback(fields.text({
 								next: function (err) {
 									return err && err.next || null;
 								},
-								promptLabel: __('What is the keystore\'s __password__?'),
+								promptLabel: 'What is the keystore\'s __password__?',
 								password: true,
 								// if the password fails due to bad keystore file,
 								// we need to prompt for the keystore file again
@@ -686,9 +626,9 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 							}));
 						},
 						secret: true,
-						validate: function (storePassword, callback) {
+						validate(storePassword, callback) {
 							if (!storePassword) {
-								return callback(new Error(__('Please specify a keystore password')));
+								return callback(new Error('Please specify a keystore password'));
 							}
 
 							// sanity check the keystore
@@ -699,71 +639,13 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 									return callback(err);
 								}
 
-								if (keystoreFile && _t.jdkInfo && _t.jdkInfo.executables.keytool) {
-									appc.subprocess.run(_t.jdkInfo.executables.keytool, [
-										'-J-Duser.language=en',
-										'-list',
-										'-v',
-										'-keystore', keystoreFile,
-										'-storepass', storePassword
-									], function (code, out) {
-										if (code) {
-											let msg = out.split('\n').shift().split('java.io.IOException:');
-											if (msg.length > 1) {
-												msg = msg[1].trim();
-												if (/invalid keystore format/i.test(msg)) {
-													msg = __('Invalid keystore file');
-													cli.argv.keystore = undefined;
-													_t.conf.options.keystore.required = true;
-												}
-											} else {
-												msg = out.trim();
-											}
-
-											return callback(new Error(msg));
-										}
-
-										// empty the alias array. it is important that we don't destory the original
-										// instance since it was passed by reference to the alias select list
-										while (_t.keystoreAliases.length) {
-											_t.keystoreAliases.pop();
-										}
-
-										// Parse the keystore's alias name and signature algorithm.
-										// Note: Algorithm can return "MD5withRSA (weak)" on JDK 8 and higher.
-										//       Only extract 1st token since we need a valid algorithm name.
-										const aliasRegExp = /Alias name: (.+)/,
-											sigalgRegExp = /Signature algorithm name: (.[^\s]+)/;
-										out.split('\n\n').forEach(function (chunk) {
-											chunk = chunk.trim();
-											const m = chunk.match(aliasRegExp);
-											if (m) {
-												const sigalg = chunk.match(sigalgRegExp);
-												_t.keystoreAliases.push({
-													name: m[1],
-													sigalg: sigalg && sigalg[1] && sigalg[1].trim()
-												});
-											}
-										});
-
-										if (_t.keystoreAliases.length === 0) {
-											cli.argv.keystore = undefined;
-											return callback(new Error(__('Keystore does not contain any certificates')));
-										} else if (!cli.argv.alias && _t.keystoreAliases.length === 1) {
-											cli.argv.alias = _t.keystoreAliases[0].name;
-										}
-
-										callback(null, storePassword);
-									});
-								} else {
-									callback(null, storePassword);
-								}
+								callback(null, storePassword);
 							});
 						}
 					},
 					target: {
 						abbr: 'T',
-						callback: function (value) {
+						callback(value) {
 							// as soon as we know the target, toggle required options for validation
 							if (value === 'dist-playstore') {
 								_t.conf.options['alias'].required = true;
@@ -784,16 +666,14 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 						desc: 'the type of a digital signature algorithm. only used when overriding keystore signing algorithm',
 						hint: 'signing',
 						order: 170,
-						values: [ 'MD5withRSA', 'SHA1withRSA', 'SHA256withRSA' ]
+						values: ['MD5withRSA', 'SHA1withRSA', 'SHA256withRSA']
 					}
 				}
 			};
 
 			callback(null, _t.conf = conf);
-		})(function (err, result) {
-			finished(result);
-		});
-	}.bind(this);
+		})((_err, result) => finished(result));
+	};
 };
 
 AndroidBuilder.prototype.validate = function validate(_logger, _config, _cli) {
