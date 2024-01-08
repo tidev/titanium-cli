@@ -862,12 +862,22 @@ export class CLI {
 				this.logger.skipBanner(true);
 			}
 
-			// this is for `ti create`
-			if (conf.platforms) {
-				this.debugLogger.trace(`Detected conf.platforms loading "${cmdName}", overriding createHelp()`);
-				this.command.createHelp = () => {
-					return Object.assign(new TiHelp(this, conf.platforms), this.command.configureHelp());
-				};
+			// `ti create` hacks
+			if (cmdName === 'create') {
+				// if `--alloy` is not defined, define it
+				if (!conf.flags.alloy) {
+					conf.flags.alloy = {
+						desc: 'initialize new project as an Alloy project'
+					};
+				}
+
+				// if we have a `--platforms` option branch, override the help
+				if (conf.platforms) {
+					this.debugLogger.trace(`Detected conf.platforms loading "${cmdName}", overriding createHelp()`);
+					this.command.createHelp = () => {
+						return Object.assign(new TiHelp(this, conf.platforms), this.command.configureHelp());
+					};
+				}
 			}
 
 			applyCommandConfig(this, cmdName, cmd, conf);
