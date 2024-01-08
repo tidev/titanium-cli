@@ -726,7 +726,7 @@ async function checkSDKFile({ force, logger, filename, name, noPrompt, osName, s
 		name: 'action',
 		message: `Titanium SDK ${name} is already installed`,
 		instructions: false,
-		hint: 'Space to select. Return to submit',
+		hint: 'Use arrows to select and return to submit',
 		choices: [
 			{ title: 'Overwrite', value: 'overwrite' },
 			{ title: `Rename as ${basename(renameTo)}`, value: 'rename' },
