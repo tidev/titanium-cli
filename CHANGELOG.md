@@ -6,6 +6,10 @@
  * Removed all analytics/telemetry code
  * Removed i18n logic; all output rendered in English
  * Removed incomplete tab completion code
+ * `--sdk <ver>` is now a global option
+   - It assumes the latest installed SDK version...
+   - If executing the `create` command without any options, it will prompt for
+     the SDK version to use
  * Removed "default" SDK; `<sdk-version>` in tiapp.xml is source of truth,
    override with `--sdk <ver>` arg
  * Replaced custom CLI arg parser (based on `optimist`) with Commander.js
@@ -13,11 +17,13 @@
  * `--log-level` is now a global option
    - Used to be associated to SDK commands, but the logger belongs to the CLI
      and thus the log level option belongs to the CLI
- * `--project-dir` is now a global option
+ * `-d`, `--project-dir` is now a global option
    - Used to be `build`, `clean`, and `project` commands only, but needed so
      the CLI can read the `tiapp.xml` and determine the `<sdk-version>`;
      defaults to the current working directory
- * Added a new `--debug` global flag to output CLI debug logging.
+   - Since this conflicts with the `create` command's `-d`, `--workspace-dir`
+     option, special handling treats these two options the same
+ * Added a new `--debug` global flag to output CLI debug logging
  * `ti config` changes:
    - Added `--json` flag
    - Replaced `--output json` with `--output json-object` output
@@ -31,7 +37,8 @@
    - Removed `nodeAppcVer` from Titanium CLI and Titanium SDKs in info
  * `ti module` changes:
    - Removed global `iphone` modules as it was just a copy of `ios` modules
-   - Modules with `platform` other than `android`, `commonjs`, `ios`, and `iphone` will be ignored
+   - Modules with `platform` other than `android`, `commonjs`, `ios`, and
+     `iphone` will be ignored
    - Modules with invalid semantic version will be ignored
  * `ti sdk` changes:
    - Added `--json` flag
