@@ -704,7 +704,8 @@ export class CLI {
 					throw new Error(`Failed to parse --config: ${e.message}`);
 				}
 			})
-			.on('option:config-file', file => this.config.load(file));
+			.on('option:config-file', file => this.config.load(file))
+			.on('option:project-dir', dir => program.setOptionValue('projectDir', expand(dir)));
 
 		const allCommands = [
 			...Object.entries(commands),
