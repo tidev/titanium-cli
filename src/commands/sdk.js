@@ -82,11 +82,11 @@ SdkSubcommands.select = {
 		logger.log(
 			yellow(
 				wrapAnsi(
-					`The "select" subcommand is no longer used.
+					`Good news! The "select" subcommand is no longer required.
 
-The Titanium CLI will automatically use the latest stable SDK release, if installed.
-
-If the current working directory is a Titanium app, the Titanium CLI will automatically use the <sdk-version> from the "tiapp.xml".`,
+If the current working directory is a Titanium app, the Titanium CLI will
+automatically use the <sdk-version> from the "tiapp.xml", otherwise use the
+default to the latest installed SDK.`,
 					config.get('cli.width', 80),
 					{ hard: true, trim: false }
 				)

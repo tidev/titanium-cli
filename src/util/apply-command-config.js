@@ -63,9 +63,6 @@ export function applyCommandConfig(cli, cmdName, cmd, conf) {
 			}
 
 			conf.options[name] = new Proxy(meta, {
-				get(obj, prop) {
-					return obj[prop];
-				},
 				set(obj, prop, value) {
 					const orig = obj[prop];
 					obj[prop] = value;

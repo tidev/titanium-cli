@@ -632,7 +632,7 @@ export class CLI {
 			if (conf.options) {
 				for (const name of Object.keys(conf.options)) {
 					if (!Object.hasOwn(this.argv, name) && conf.options[name].default !== undefined) {
-						this.argv[name] = conf.options[name].default;
+						cmd.setOptionValue(name, this.argv[name] = conf.options[name].default);
 					}
 				}
 			}
@@ -1012,9 +1012,11 @@ export class CLI {
 	 * @access private
 	 */
 	async prompt(opt) {
+		let value;
 		this.debugLogger.trace(`Prompting for --${opt.name}`);
 
 		if (typeof opt.prompt === 'function') {
+			// option has it's own prompt handler which probably uses `fields`
 			const field = await new Promise(resolve => opt.prompt(resolve));
 			if (!field) {
 				return;
@@ -1024,7 +1026,7 @@ export class CLI {
 				field.autoSelectOne = false;
 			}
 
-			const value = await new Promise(resolve => {
+			value = await new Promise(resolve => {
 				field.prompt((err, value) => {
 					if (err) {
 						process.exit(1);
@@ -1033,60 +1035,60 @@ export class CLI {
 					resolve(value);
 				});
 			});
-			return this.argv[opt.name] = value;
-		}
-
-		const pr = opt.prompt || {};
-		const p = (pr.label || capitalize(opt.desc || '')).trim().replace(/:$/, '');
-		let def = pr.default || opt.default || '';
-		if (typeof def === 'function') {
-			def = def();
-		} else if (Array.isArray(def)) {
-			def = def.join(',');
-		}
-
-		const validate = pr.validate || (value => {
-			if (pr.validator) {
-				try {
-					pr.validator(value);
-				} catch (ex) {
-					return ex.toString();
-				}
-			} else if (!value.length || (pr.pattern && !pr.pattern.test(value))) {
-				return pr.error;
-			}
-			return true;
-		});
-
-		let value;
-
-		if (Array.isArray(opt.values)) {
-			if (opt.values.length > 1) {
-				const choices = opt.values.map(v => ({ label: v, value: v }));
-				value = await prompt({
-					type: 'select',
-					message: p,
-					initial: def && choices.find(c => c.value === def) || undefined,
-					validate,
-					choices
-				});
-			} else {
-				value = opt.values[0];
-			}
 		} else {
-			value = await prompt({
-				type: opt.password ? 'password' : 'text',
-				message: p,
-				initial: def || undefined,
-				validate
+			// use the generic prompt
+			const pr = opt.prompt || {};
+			const p = (pr.label || capitalize(opt.desc || '')).trim().replace(/:$/, '');
+			let def = pr.default || opt.default || '';
+			if (typeof def === 'function') {
+				def = def();
+			} else if (Array.isArray(def)) {
+				def = def.join(',');
+			}
+
+			const validate = pr.validate || (value => {
+				if (pr.validator) {
+					try {
+						pr.validator(value);
+					} catch (ex) {
+						return ex.toString();
+					}
+				} else if (!value.length || (pr.pattern && !pr.pattern.test(value))) {
+					return pr.error;
+				}
+				return true;
 			});
+
+			if (Array.isArray(opt.values)) {
+				if (opt.values.length > 1) {
+					const choices = opt.values.map(v => ({ label: v, value: v }));
+					value = await prompt({
+						type: 'select',
+						message: p,
+						initial: def && choices.find(c => c.value === def) || undefined,
+						validate,
+						choices
+					});
+				} else {
+					value = opt.values[0];
+				}
+			} else {
+				value = await prompt({
+					type: opt.password ? 'password' : 'text',
+					message: p,
+					initial: def || undefined,
+					validate
+				});
+			}
+
+			if (value === undefined) {
+				// sigint
+				process.exit(0);
+			}
 		}
 
-		if (value === undefined) {
-			// sigint
-			process.exit(0);
-		}
-
+		this.debugLogger.trace(`Selected value = ${value}`);
+		this.command.setOptionValue(opt.name, value);
 		return this.argv[opt.name] = value;
 	}
 
