@@ -63,6 +63,23 @@ export function applyCommandConfig(cli, cmdName, cmd, conf) {
 					cmd.setOptionValue(opt.name(), result ?? value ?? opt.defaultValue);
 				});
 			}
+
+			conf.options[name] = new Proxy(meta, {
+				get(obj, prop) {
+					return obj[prop];
+				},
+				set(obj, prop, value) {
+					const orig = obj[prop];
+					obj[prop] = value;
+
+					if ((prop === 'required' || prop === 'values') && orig !== value) {
+						cli.debugLogger.trace(`--${name} changed: ${prop}=${value}`);
+						opt[prop] = value;
+					}
+
+					return true;
+				}
+			});
 		}
 
 		if (conf.options['log-level'] && !conf.options.timestamp) {
