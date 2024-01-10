@@ -210,9 +210,7 @@ export class CLI {
 				if (o.negate) {
 					name = name.replace(/^no-/, '');
 				}
-				if (argv[name] === undefined) {
-					argv[name] = cargv[o.attributeName()];
-				}
+				argv[name] = cargv[o.attributeName()];
 			}
 		}
 	}
@@ -393,7 +391,6 @@ export class CLI {
 		args.pop(); // discard argv
 
 		this.argv._ = args;
-
 		this.applyArgv(cmd);
 
 		if (!this.ready) {
@@ -401,7 +398,6 @@ export class CLI {
 		}
 
 		this.command = cmd;
-
 		this.logger.banner();
 
 		if (sdkCommands[this.command.name()]) {
@@ -436,6 +432,11 @@ export class CLI {
 
 		this.debugLogger.trace(`Executing command's run: ${this.command.name()}`);
 		this.debugLogger.trace('Final argv:', this.argv);
+
+		if (this.argv['debug-no-run']) {
+			this.debugLogger.trace('Skipping run()');
+			return;
+		}
 
 		const result = await new Promise((resolve, reject) => {
 			const r = run(this.logger || this.debugLogger, this.config, this, async (err, result) => {
@@ -688,6 +689,10 @@ export class CLI {
 			.option('--config [json]', 'serialized JSON string to mix into the CLI config')
 			.option('--config-file [file]', 'path to CLI config file')
 			.option('--debug', 'display CLI debug log messages')
+			.addOption(
+				new Option('--debug-no-run')
+					.hideHelp()
+			)
 			.option('-d, --project-dir <path>', 'the directory containing the project')
 			.option('-q, --quiet', 'suppress all output')
 			.option('-v, --version', 'displays the current version')

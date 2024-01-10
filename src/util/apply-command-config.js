@@ -59,7 +59,8 @@ export function applyCommandConfig(cli, cmdName, cmd, conf) {
 			if (typeof meta.callback === 'function') {
 				cmd.on(`option:${opt.attributeName()}`, value => {
 					cli.debugLogger.trace(`Firing --${name} option callback: ${value ?? opt.defaultValue}`);
-					meta.callback(value ?? opt.defaultValue);
+					const result = meta.callback(value ?? opt.defaultValue);
+					cmd.setOptionValue(opt.name(), result ?? value ?? opt.defaultValue);
 				});
 			}
 		}
