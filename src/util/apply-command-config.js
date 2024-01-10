@@ -24,6 +24,9 @@ export function applyCommandConfig(cli, cmdName, cmd, conf) {
 		for (const [name, meta] of Object.entries(conf.flags)) {
 			cli.debugLogger.trace(`Adding "${cmdName}" flag: ${meta.abbr ? `-${meta.abbr}, ` : ''}--${name}`);
 			const opt = new Option(`${meta.abbr ? `-${meta.abbr}, ` : ''}--${name}`, meta.desc);
+			if (meta.default) {
+				opt.default(meta.default);
+			}
 			if (meta.hidden) {
 				opt.hideHelp(true);
 			}
@@ -47,11 +50,6 @@ export function applyCommandConfig(cli, cmdName, cmd, conf) {
 			if (meta.default !== undefined) {
 				opt.default(meta.default);
 			}
-
-			// TODO: the list needs to be validated manually in cli.validate()
-			// if (Array.isArray(meta.values)) {
-			// 	opt.choices(meta.values);
-			// }
 
 			cli.debugLogger.trace(`Adding "${cmdName}" option: ${meta.abbr ? `-${meta.abbr}, ` : ''}${long} [value]`);
 			cmd.addOption(opt);
