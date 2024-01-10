@@ -358,6 +358,8 @@ export class CLI {
 		// create each hook and immediately fire them
 		const events = unique(arrayify(name, true));
 
+		this.debugLogger.trace(`Emitting "${name}" (${events.length} listener${events.length !== 1 ? 's' : ''})`);
+
 		const promise = events
 			.reduce((promise, name) => promise.then(() => new Promise((resolve, reject) => {
 				const hook = this.createHook(name, data);
