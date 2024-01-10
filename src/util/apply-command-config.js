@@ -72,7 +72,7 @@ export function applyCommandConfig(cli, cmdName, cmd, conf) {
 					const orig = obj[prop];
 					obj[prop] = value;
 
-					if ((prop === 'required' || prop === 'values') && orig !== value) {
+					if (prop === 'required' && orig !== value) {
 						cli.debugLogger.trace(`--${name} changed: ${prop}=${value}`);
 						opt[prop] = value;
 					}
