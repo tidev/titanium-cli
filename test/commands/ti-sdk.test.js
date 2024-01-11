@@ -323,7 +323,7 @@ describe('ti sdk', () => {
 
 			const output = stripColor(stdout);
 			assert.match(output, /Titanium Command-Line Interface/);
-			assert.match(output, /The "select" subcommand is no longer used/);
+			assert.match(output, /The "select" subcommand is no longer required./);
 
 			assert.strictEqual(exitCode, 0);
 		}));
