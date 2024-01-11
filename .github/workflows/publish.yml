@@ -31,6 +31,8 @@ jobs:
     - name: Publish to npm
       env:
         GH_TOKEN: ${{ github.token }}
+        GITHUB_TOKEN: ${{ github.token }}
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         RELEASE_TAG: ${{ github.event.release.prerelease && 'next' || 'latest' }}
       run: npm publish --tag $RELEASE_TAG
