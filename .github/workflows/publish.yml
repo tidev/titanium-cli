@@ -19,9 +19,11 @@ jobs:
       with:
         node-version: 20
 
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+
     - name: Install dependencies
       run: pnpm install
-      if: steps.node-cache.outputs.cache-hit != 'true'
 
     - name: Lint
       run: pnpm lint
