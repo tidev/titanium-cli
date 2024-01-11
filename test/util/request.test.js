@@ -18,7 +18,7 @@ describe('request', () => {
 	});
 
 	it('should fetch TiDev page', async () => {
-		const res = await request('https://tidev.io');
+		const res = await request('https://github.com');
 		await res.body.text();
 		assert.strictEqual(res.statusCode, 200);
 	});
@@ -38,7 +38,7 @@ describe('request', () => {
 		try {
 			ticonfig.set('cli.httpProxyServer', 'http://localhost:9999');
 
-			const res = await request('https://tidev.io');
+			const res = await request('https://github.com');
 			await res.body.text();
 			assert.strictEqual(res.statusCode, 200);
 		} finally {
