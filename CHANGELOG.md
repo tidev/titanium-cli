@@ -44,7 +44,7 @@
    - Added `--json` flag
    - Removed `activeSDK` from JSON result
    - `select` subcommand is a no-op
-   - `install` subommand `--default` flag is a no-op
+   - `install` subcommand `--default` flag is a no-op
  * `ti setup` changes:
    - Removed Windows Store publishing info
    - Removed `haxm` info
@@ -62,7 +62,6 @@
    - Lazy load modules as much as possible, within reason
    - Removed tons of old dead code
    - Use smaller alternative dependencies
-   - Added total run time log message when `--log-level trace`
  * Updated dependencies, replaced deprecated dependencies
    - Replaced `colors` with `chalk`
    - Replaced `fields` with `prompts`
