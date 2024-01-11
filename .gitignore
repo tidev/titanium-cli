@@ -1,8 +1,9 @@
 ._*
 .DS_Store
+.eslintcache
+.pnpm-debug.log
+coverage
+dist
+/node_modules
 npm-debug.log
-node_modules
-junit_report.xml
-retirejs.output.json
-coverage/
-.nyc_output/
+/*.tgz
