@@ -14,9 +14,6 @@
    override with `--sdk <ver>` arg
  * Replaced custom CLI arg parser (based on `optimist`) with Commander.js
    - Order of arguments matter; command options must come after command
- * `--log-level` is now a global option
-   - Used to be associated to SDK commands, but the logger belongs to the CLI
-     and thus the log level option belongs to the CLI
  * `-d`, `--project-dir` is now a global option
    - Used to be `build`, `clean`, and `project` commands only, but needed so
      the CLI can read the `tiapp.xml` and determine the `<sdk-version>`;
