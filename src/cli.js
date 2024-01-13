@@ -205,11 +205,13 @@ export class CLI {
 		if (Array.isArray(cmd?.options)) {
 			const argv = this.argv;
 			const cargv = cmd.opts();
+			this.debugLogger.trace(`Copying ${cmd.options.length} options...`);
 			for (const o of cmd.options) {
 				let name = o.name();
 				if (o.negate) {
 					name = name.replace(/^no-/, '');
 				}
+				this.debugLogger.trace(`  Setting ${name} = ${cargv[o.attributeName()]}`);
 				argv[name] = cargv[o.attributeName()];
 			}
 		}
@@ -733,6 +735,7 @@ export class CLI {
 		// SDK, load the SDK hooks, and load the actual command module
 		program.hook('preSubcommand', async (_, cmd) => {
 			const cmdName = cmd.name();
+			this.debugLogger.trace(`Initializing command: ${cmdName}`);
 			this.command = cmd;
 
 			this.applyArgv(program);
@@ -904,7 +907,7 @@ export class CLI {
 	 * @access private
 	 */
 	async loadSDK({ cmdName, cwd }) {
-		this.debugLogger.trace(`Loading SDK ('${cmdName}')`);
+		this.debugLogger.trace('Loading SDK...');
 
 		// this is a hack... if we know this is the "create" command and there
 		// are no options set, then assume we're prompting for everything
@@ -924,6 +927,7 @@ export class CLI {
 		} = await initSDK({
 			config: this.config,
 			cwd,
+			debugLogger: this.debugLogger,
 			logger: this.logger,
 			promptingEnabled: this.promptingEnabled,
 			selectedSdk: this.argv.sdk,
@@ -960,7 +964,7 @@ export class CLI {
 
 		// if we're running a sdk command, then scan the sdk for hooks
 		if (sdkCommands[cmdName]) {
-			this.debugLogger.trace(`Loading SDK hooks ('${cmdName}')`);
+			this.debugLogger.trace('Loading SDK hooks...');
 			await this.scanHooks(expand(this.sdk.path, 'cli', 'hooks'));
 		}
 	}
