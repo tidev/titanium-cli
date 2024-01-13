@@ -133,14 +133,17 @@ function getSDKType(name) {
 
 const sortTypes = ['unsupported', 'beta', 'rc', 'ga'];
 
-export async function initSDK({ config, cwd, logger, promptingEnabled, selectedSdk, showSDKPrompt }) {
+export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabled, selectedSdk, showSDKPrompt }) {
 	let sdkVersion;
 
 	// try to read the tiapp.xml
 	let tiapp = new Tiapp();
 	try {
-		await tiapp.load(join(cwd, 'tiapp.xml'));
+		const tiappFile = join(cwd, 'tiapp.xml');
+		await tiapp.load(tiappFile);
+		debugLogger.trace(`Loaded ${tiappFile}`);
 		sdkVersion = await tiapp.select1('//sdk-version', 'latest');
+		debugLogger.trace(`<sdk-version> is ${sdkVersion ? `set to ${sdkVersion}` : 'undefined'}`);
 	} catch {
 		// might not be a project dir or bad tiapp.xml
 	}

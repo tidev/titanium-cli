@@ -51,6 +51,11 @@ export function applyCommandConfig(cli, cmdName, cmd, conf) {
 				opt.default(meta.default);
 			}
 
+			if (optionExists(cmd, name)) {
+				cli.debugLogger.trace(`Option "${name}" already exists, skipping`);
+				continue;
+			}
+
 			cli.debugLogger.trace(`Adding "${cmdName}" option: ${meta.abbr ? `-${meta.abbr}, ` : ''}${long} [value]`);
 			cmd.addOption(opt);
 
@@ -147,4 +152,15 @@ export function applyCommandConfig(cli, cmdName, cmd, conf) {
 			});
 		}
 	}
+}
+
+function optionExists(ctx, name) {
+	const exists = ctx.options.find(o => o.name() === name);
+	if (exists) {
+		return true;
+	}
+	if (ctx.parent) {
+		return optionExists(ctx.parent, name);
+	}
+	return false;
 }
