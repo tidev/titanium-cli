@@ -46,7 +46,7 @@
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^17.1.2",
-		"@commitlint/config-conventional": "^17.1.0",
+		"@commitlint/config-conventional": "^18.4.4",
 		"@seadub/danger-plugin-dependencies": "1.0.0",
 		"@seadub/danger-plugin-eslint": "^2.0.0",
 		"@seadub/danger-plugin-junit": "0.3.0",
