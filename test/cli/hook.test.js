@@ -97,4 +97,31 @@ describe('CLI hooks', () => {
 		await new Promise(resolve => bar(resolve));
 		assert.strictEqual(barCounter, 13);
 	});
+
+	it('should fire event hook with a data payload', async () => {
+		const cli = new CLI();
+		let foo = {
+			counter: 0
+		};
+
+		cli.on('foo', {
+			priority: 1200,
+			post: async (data, callback) => {
+				data.counter++;
+				callback();
+			}
+		});
+
+		await new Promise((resolve, reject) => {
+			const r = cli.emit('foo', foo, err => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve();
+				}
+			});
+		});
+
+		assert.strictEqual(foo.counter, 1);
+	});
 });
