@@ -264,7 +264,7 @@ export class CLI {
 		}
 
 		return (...args) => {
-			let data = Object.assign({}, dataPayload, {
+			let data = Object.assign(dataPayload, {
 				type: name,
 				args,
 				fn,
