@@ -948,7 +948,7 @@ export class CLI {
 						if (!ignoreRE.test(filename) && fs.existsSync(file) && (fs.statSync(file)).isFile() && jsRE.test(file)) {
 							const name = basename(file).replace(jsRE, '');
 							this.debugLogger.trace(`Found custom command "${name}"`);
-							customCommands[name] = file;
+							this.customCommands[name] = file;
 
 							this.command
 								.command(name)
