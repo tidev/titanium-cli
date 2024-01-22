@@ -671,7 +671,6 @@ export class CLI {
 	 * @access private
 	 */
 	initGlobals() {
-		this.command = program;
 		program
 			.name('titanium')
 			.allowUnknownOption()
@@ -784,6 +783,8 @@ export class CLI {
 				program.help();
 			}
 		});
+
+		this.command = program;
 	}
 
 	/**
@@ -854,11 +855,13 @@ export class CLI {
 		this.debugLogger.trace(`loadCommand('${cmdName}')`);
 
 		let commandFile;
-		let desc;
+		let desc = '';
 
 		if (commands[cmdName]) {
+			desc = commands[cmdName];
 			commandFile = join(import.meta.url, `../commands/${cmdName}.js`);
 		} else if (sdkCommands[cmdName]) {
+			desc = sdkCommands[cmdName];
 			commandFile = pathToFileURL(join(this.sdk.path, `cli/commands/${cmdName}.js`));
 		} else if (this.customCommands[cmdName]) {
 			commandFile = pathToFileURL(this.customCommands[cmdName]);
@@ -950,7 +953,7 @@ export class CLI {
 							this.debugLogger.trace(`Found custom command "${name}"`);
 							this.customCommands[name] = file;
 
-							this.command
+							program
 								.command(name)
 								.allowUnknownOption()
 								.action((...args) => this.executeCommand(args));
