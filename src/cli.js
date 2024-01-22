@@ -85,6 +85,11 @@ export class CLI {
 	command = null;
 
 	/**
+	 * A map of discovered custom commands.
+	 */
+	customCommands = {};
+
+	/**
 	 * The Titanium CLI config object.
 	 * @type {Object}
 	 */
@@ -155,9 +160,16 @@ export class CLI {
 	 */
 	startTime = null;
 
+	/**
+	 * A set to track loaded custom paths.
+	 * @type {Set}
+	 */
+	scannedCustomPaths = new Set();
+
 	constructor() {
 		const pkgJsonFile = join(dirname(fileURLToPath(import.meta.url)), '../package.json');
 		const { version } = fs.readJsonSync(pkgJsonFile);
+
 		this.name = 'Titanium Command-Line Interface';
 		this.copyright = 'Copyright TiDev, Inc. 4/7/2022-Present. All Rights Reserved.';
 		this.version = version;
@@ -458,8 +470,12 @@ export class CLI {
 
 				resolve();
 			});
+
 			if (r instanceof Promise) {
 				r.then(resolve).catch(reject);
+			} else if (run.length < 4) {
+				// run doesn't expect a `callback()`
+				resolve();
 			}
 		});
 
@@ -477,83 +493,6 @@ export class CLI {
 	 */
 	fireHook(...args) {
 		return this.emit(...args);
-	}
-
-	/**
-	 * If the current command is the "build" command, this function will check
-	 * if the "build" command has a `--platform` option (which is should), then
-	 * prompt for the platform is not explicitly passed in.
-	 *
-	 * Finally, the platform specific options and flags are added to the
-	 * Commander.js "build" command context so that the second parse will
-	 * pick up the newly defined options/flags.
-	 *
-	 * @returns {Promise}
-	 * @access private
-	 */
-	async initBuildPlatform() {
-		const cmdName = this.command.name();
-		if (cmdName !== 'build') {
-			return;
-		}
-
-		const platformOption = this.command.conf?.options?.platform;
-		if (!platformOption) {
-			return;
-		}
-
-		this.debugLogger.trace(`Processing --platform option: ${this.argv.platform || 'not specified'}`);
-		try {
-			if (!this.argv.platform) {
-				throw new TiError('Missing required option: --platform <name>', {
-					after: `Available Platforms:\n${
-						platformOption.values
-							.map(v => `   ${cyan(v)}`)
-							.join('\n')
-					}`
-				});
-			} else if (!platformOption.skipValueCheck && !platformOption.values.includes(this.argv.platform)) {
-				throw new TiError(`Invalid platform "${this.argv.$originalPlatform || this.argv.platform}"`, {
-					code: 'INVALID_PLATFORM'
-				});
-			}
-		} catch (e) {
-			if (!this.promptingEnabled) {
-				throw e;
-			}
-
-			if (platformOption.values.length > 1 || e.code === 'INVALID_PLATFORM') {
-				this.logger.banner();
-
-				if (e.code === 'INVALID_PLATFORM') {
-					this.logger.error(e.message);
-				}
-
-				this.argv.platform = await prompt({
-					type: 'select',
-					message: 'Please select a valid platform:',
-					choices: platformOption.values.map(v => ({ label: v, value: v }))
-				});
-				this.debugLogger.trace(`Selecting platform "${this.argv.platform}"`);
-			} else {
-				this.argv.platform = platformOption.values[0];
-				this.debugLogger.trace(`Auto-selecting platform "${this.argv.platform}"`);
-			}
-		}
-
-		const platformConf = this.command.conf.platforms[this.argv.platform];
-
-		this.argv.$platform = this.argv.platform;
-
-		// set platform context
-		this.command.platform = {
-			conf: platformConf
-		};
-
-		this.debugLogger.trace('Applying platform config...');
-		applyCommandConfig(this, cmdName, this.command, platformConf);
-
-		await this.scanHooks(expand(this.sdk.path, this.argv.platform, 'cli', 'hooks'));
 	}
 
 	/**
@@ -650,11 +589,89 @@ export class CLI {
 	}
 
 	/**
+	 * If the current command is the "build" command, this function will check
+	 * if the "build" command has a `--platform` option (which is should), then
+	 * prompt for the platform is not explicitly passed in.
+	 *
+	 * Finally, the platform specific options and flags are added to the
+	 * Commander.js "build" command context so that the second parse will
+	 * pick up the newly defined options/flags.
+	 *
+	 * @returns {Promise}
+	 * @access private
+	 */
+	async initBuildPlatform() {
+		const cmdName = this.command.name();
+		if (cmdName !== 'build') {
+			return;
+		}
+
+		const platformOption = this.command.conf?.options?.platform;
+		if (!platformOption) {
+			return;
+		}
+
+		this.debugLogger.trace(`Processing --platform option: ${this.argv.platform || 'not specified'}`);
+		try {
+			if (!this.argv.platform) {
+				throw new TiError('Missing required option: --platform <name>', {
+					after: `Available Platforms:\n${
+						platformOption.values
+							.map(v => `   ${cyan(v)}`)
+							.join('\n')
+					}`
+				});
+			} else if (!platformOption.skipValueCheck && !platformOption.values.includes(this.argv.platform)) {
+				throw new TiError(`Invalid platform "${this.argv.$originalPlatform || this.argv.platform}"`, {
+					code: 'INVALID_PLATFORM'
+				});
+			}
+		} catch (e) {
+			if (!this.promptingEnabled) {
+				throw e;
+			}
+
+			if (platformOption.values.length > 1 || e.code === 'INVALID_PLATFORM') {
+				this.logger.banner();
+
+				if (e.code === 'INVALID_PLATFORM') {
+					this.logger.error(e.message);
+				}
+
+				this.argv.platform = await prompt({
+					type: 'select',
+					message: 'Please select a valid platform:',
+					choices: platformOption.values.map(v => ({ label: v, value: v }))
+				});
+				this.debugLogger.trace(`Selecting platform "${this.argv.platform}"`);
+			} else {
+				this.argv.platform = platformOption.values[0];
+				this.debugLogger.trace(`Auto-selecting platform "${this.argv.platform}"`);
+			}
+		}
+
+		const platformConf = this.command.conf.platforms[this.argv.platform];
+
+		this.argv.$platform = this.argv.platform;
+
+		// set platform context
+		this.command.platform = {
+			conf: platformConf
+		};
+
+		this.debugLogger.trace('Applying platform config...');
+		applyCommandConfig(this, cmdName, this.command, platformConf);
+
+		await this.scanHooks(expand(this.sdk.path, this.argv.platform, 'cli', 'hooks'));
+	}
+
+	/**
 	 * Initialize the global Commander.js context and add the commands.
 	 *
 	 * @access private
 	 */
 	initGlobals() {
+		this.command = program;
 		program
 			.name('titanium')
 			.allowUnknownOption()
@@ -709,11 +726,15 @@ export class CLI {
 					if (!this.config.cli?.colors) {
 						chalk.level = 0;
 					}
+					this.loadCustomCommands();
 				} catch (e) {
 					throw new Error(`Failed to parse --config: ${e.message}`);
 				}
 			})
-			.on('option:config-file', file => this.config.load(file))
+			.on('option:config-file', file => {
+				this.config.load(file);
+				this.loadCustomCommands();
+			})
 			.on('option:project-dir', dir => program.setOptionValue('projectDir', expand(dir)));
 
 		const allCommands = [
@@ -727,6 +748,9 @@ export class CLI {
 				.allowUnknownOption()
 				.action((...args) => this.executeCommand(args));
 		}
+
+		// load custom commands in `paths.commands` from the config file
+		this.loadCustomCommands();
 
 		program.title = 'Global';
 
@@ -760,8 +784,6 @@ export class CLI {
 				program.help();
 			}
 		});
-
-		this.command = program;
 	}
 
 	/**
@@ -831,15 +853,19 @@ export class CLI {
 		const cmdName = cmd.name();
 		this.debugLogger.trace(`loadCommand('${cmdName}')`);
 
-		let desc = commands[cmdName] || sdkCommands[cmdName];
-		if (!desc) {
+		let commandFile;
+		let desc;
+
+		if (commands[cmdName]) {
+			commandFile = join(import.meta.url, `../commands/${cmdName}.js`);
+		} else if (sdkCommands[cmdName]) {
+			commandFile = pathToFileURL(join(this.sdk.path, `cli/commands/${cmdName}.js`));
+		} else if (this.customCommands[cmdName]) {
+			commandFile = pathToFileURL(this.customCommands[cmdName]);
+		} else {
 			this.debugLogger.warn(`Unknown command "${cmdName}"`);
 			return;
 		}
-
-		const commandFile = sdkCommands[cmdName]
-			? pathToFileURL(join(this.sdk.path, `cli/commands/${cmdName}.js`))
-			: join(import.meta.url, `../commands/${cmdName}.js`);
 
 		// load the command
 		this.debugLogger.trace(`Importing: ${commandFile}`);
@@ -895,6 +921,46 @@ export class CLI {
 		}
 
 		await this.emit('cli:command-loaded', { cli: this, command: this.command });
+	}
+
+	/**
+	 * Loads any custom commands found in `paths.commands`.
+	 */
+	loadCustomCommands() {
+		// load any custom commands
+		const customCommandPaths = ticonfig.get('paths.commands');
+		if (Array.isArray(customCommandPaths)) {
+			const jsRE = /\.js$/;
+			const ignoreRE = /^[._]/;
+
+			for (let p of customCommandPaths) {
+				if (this.scannedCustomPaths.has(p)) {
+					continue;
+				}
+				this.scannedCustomPaths.add(p);
+
+				try {
+					p = expand(p);
+					const isDir = fs.statSync(p).isDirectory();
+					const files = isDir ? fs.readdirSync(p) : [p];
+					for (const filename of files) {
+						const file = isDir ? join(p, filename) : filename;
+						if (!ignoreRE.test(filename) && fs.existsSync(file) && (fs.statSync(file)).isFile() && jsRE.test(file)) {
+							const name = basename(file).replace(jsRE, '');
+							this.debugLogger.trace(`Found custom command "${name}"`);
+							customCommands[name] = file;
+
+							this.command
+								.command(name)
+								.allowUnknownOption()
+								.action((...args) => this.executeCommand(args));
+						}
+					}
+				} catch {
+					// squelch
+				}
+			}
+		}
 	}
 
 	/**

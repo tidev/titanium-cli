@@ -24,7 +24,6 @@
  * `ti config` changes:
    - Added `--json` flag
    - Replaced `--output json` with `--output json-object` output
-   - Removed support for `paths.commands` config setting
  * `ti info` changes:
    - Added `--json` flag
    - Removed `haxm` info
