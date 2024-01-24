@@ -296,7 +296,8 @@ export class CLI {
 								pre.call(ctx, data, (err, newData) => {
 									if (err) {
 										return reject(err);
-									} else if (newData) {
+									}
+									if (newData && typeof newData === 'object' && newData.type) {
 										data = newData;
 									}
 									resolve();
@@ -309,9 +310,12 @@ export class CLI {
 
 				if (data.fn) {
 					data.result = await new Promise(resolve => {
-						// call the function
-						data.args.push((...args) => resolve(args));
-						data.fn.apply(data.ctx, data.args);
+						// call the hooked function
+						data.fn.call(
+							data.ctx,
+							...data.args,
+							(...args) => resolve(args)
+						);
 					});
 				}
 
