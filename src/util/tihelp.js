@@ -16,6 +16,7 @@ export class TiHelp extends Help {
 			for (const [name, conf] of Object.entries(platforms)) {
 				const cmd = new Command(name);
 				cmd.helpOption(false);
+				applyCommandConfig(cli, name, cmd, conf);
 				this.platformCmds[conf.title] = cmd;
 			}
 		}

@@ -49,7 +49,6 @@ const sdkCommands = {
  * Since this Titanium CLI shim will ALWAYS match the `<sdk-version>` in the
  * `tiapp.xml`, this really isn't used, but just in case, we'll define it and
  * set it on the `CLI` instance.
- * @deprecated
  */
 class GracefulShutdown extends Error {}
 
@@ -524,7 +523,7 @@ export class CLI {
 
 		this.applyArgv(this.command);
 		this.resetCommander(program);
-		await this.initKnownOptionBranches();
+		this.initKnownOptionBranches();
 		await this.initBuildPlatform();
 		this.validateHooks();
 
@@ -768,7 +767,9 @@ export class CLI {
 			this.applyArgv(program);
 			this.promptingEnabled = this.argv.prompt && !this.argv.$_.includes('-h') && !this.argv.$_.includes('--help');
 
+			// if `--project-dir` was not set, default to the current working directory
 			const cwd = expand(this.argv['project-dir'] || '.');
+			this.argv['project-dir'] = cwd;
 
 			// load hooks
 			const hooks = ticonfig.paths?.hooks;
@@ -808,15 +809,15 @@ export class CLI {
 		// any keys in the conf object that aren't explicitly 'flags',
 		// 'options', 'args', or 'subcommands' is probably a option branch
 		// that changes the available flags/options
-		const skipRegExp = /^flags|options|args|subcommands$/;
+		const skipRegExp = /^(flags|options|args|subcommands)$/;
 		const optionBranches = Object.keys(conf)
-			.filter(name => conf.options && conf.options[name] && !skipRegExp.test(name))
+			.filter(name => conf.options?.[name] && !skipRegExp.test(name))
 			.sort((a, b) => {
 				// if we have multiple option groups, then try to process them in order
-				if (!conf.options[a] || !conf.options[a].order) {
+				if (!conf.options[a]?.order) {
 					return 1;
 				}
-				if (!conf.options[b] || !conf.options[b].order) {
+				if (!conf.options[b]?.order) {
 					return -1;
 				}
 				return conf.options[b].order - conf.options[a].order;
@@ -906,7 +907,7 @@ export class CLI {
 				this.logger.skipBanner(true);
 			}
 
-			// `ti create` hacks
+			// `ti create` hack
 			if (cmdName === 'create') {
 				// if `--alloy` is not defined, define it
 				if (!conf.flags.alloy) {
@@ -914,14 +915,14 @@ export class CLI {
 						desc: 'initialize new project as an Alloy project'
 					};
 				}
+			}
 
-				// if we have a `--platforms` option branch, override the help
-				if (conf.platforms) {
-					this.debugLogger.trace(`Detected conf.platforms loading "${cmdName}", overriding createHelp()`);
-					this.command.createHelp = () => {
-						return Object.assign(new TiHelp(this, conf.platforms), this.command.configureHelp());
-					};
-				}
+			// if we have a `--platforms` option branch, override the help
+			if (conf.platforms) {
+				this.debugLogger.trace(`Detected conf.platforms loading "${cmdName}", overriding createHelp()`);
+				this.command.createHelp = () => {
+					return Object.assign(new TiHelp(this, conf.platforms), this.command.configureHelp());
+				};
 			}
 
 			applyCommandConfig(this, cmdName, cmd, conf);
@@ -1329,7 +1330,7 @@ export class CLI {
 					// check missing required options and invalid options
 					if (this.argv[name] === undefined) {
 						// check if the option is required
-						if (opt.required || (opt.conf && opt.conf.required)) {
+						if (opt.required || opt.conf?.required) {
 							// ok, we have a required option, but it's possible that this option
 							// replaces some legacy option in which case we need to check if the
 							// legacy options were defined
@@ -1382,8 +1383,10 @@ export class CLI {
 						continue;
 					} else if (opt.callback) {
 						opt.validated = true;
-						var val = opt.callback(this.argv[name] || '');
-						val !== undefined && (this.argv[name] = val);
+						const val = opt.callback(this.argv[name] || '');
+						if (val !== undefined) {
+							this.argv[name] = val;
+						}
 						delete opt.callback;
 					}
 				}
