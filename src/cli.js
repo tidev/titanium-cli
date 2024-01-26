@@ -264,7 +264,7 @@ export class CLI {
 	 * @access public
 	 */
 	createHook(name, ctx, fn) {
-		let dataPayload = {};
+		let dataPayload;
 
 		if (typeof ctx === 'function') {
 			fn = ctx;
@@ -274,8 +274,11 @@ export class CLI {
 			ctx = null;
 		}
 
+		const hookType = typeof fn === 'function' ? 'function' : 'event';
+		this.debugLogger.trace(`Creating ${hookType} hook "${name}"`);
+
 		return (...args) => {
-			let data = Object.assign(dataPayload, {
+			let data = Object.assign(dataPayload || {}, {
 				type: name,
 				args,
 				fn,
@@ -284,6 +287,8 @@ export class CLI {
 			const callback = data.args.pop();
 			const pres = this.hooks.pre[name] || [];
 			const posts = this.hooks.post[name] || [];
+
+			this.debugLogger.trace(`Firing ${hookType} hook "${name}" pres=${pres.length}, posts=${posts.length}`);
 
 			(async () => {
 				// call all pre filters
