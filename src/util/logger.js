@@ -4,6 +4,8 @@ import { format } from 'node:util';
 
 const { bold, cyan, gray, green, magenta, red, yellow } = chalk;
 
+const ansiRE = /\x1B\[\d+m/g;
+
 export class Logger extends EventEmitter {
 	#banner = '';
 	#bannerEnabled = true;
@@ -49,11 +51,11 @@ export class Logger extends EventEmitter {
 		};
 
 		this.warn = (msg = '', ...args) => {
-			this.render(4, this.stderr, `${yellow(`[WARN]  ${format(msg, ...args)}`)}`);
+			this.render(4, this.stderr, `${yellow(`[WARN]  ${format(msg, ...args).replace(ansiRE, '')}`)}`);
 		};
 
 		this.error = (msg = '', ...args) => {
-			this.render(5, this.stderr, red(`[ERROR] ${format(msg, ...args)}`));
+			this.render(5, this.stderr, red(`[ERROR] ${format(msg, ...args).replace(ansiRE, '')}`));
 		};
 
 		if (logLevel !== undefined) {
