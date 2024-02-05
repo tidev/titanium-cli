@@ -119,19 +119,22 @@ export async function detectTitaniumSDKs(config) {
 }
 
 function getSDKType(name) {
-	if (/.ga$/i.test(name)) {
+	if (/\.ga$/i.test(name)) {
 		return 'ga';
 	}
-	if (/.rc$/i.test(name)) {
+	if (/\.rc$/i.test(name)) {
 		return 'rc';
 	}
-	if (/.beta$/i.test(name)) {
+	if (/\.beta$/i.test(name)) {
 		return 'beta';
 	}
-	return 'unsupported';
+	if (/\.v\d+$/i.test(name)) {
+		return 'nightly';
+	}
+	return 'local';
 }
 
-const sortTypes = ['unsupported', 'beta', 'rc', 'ga'];
+const sortTypes = ['local', 'nightly', 'beta', 'rc', 'ga'];
 
 export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabled, selectedSdk, showSDKPrompt }) {
 	let sdkVersion;
@@ -167,7 +170,8 @@ export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabl
 		sdk = sdks.find(s => s.name === sdkVersion);
 
 		const typeLabels = {
-			unsupported: 'Unsupported',
+			local: 'Local Build',
+			nightly: 'Nightly Build',
 			beta: 'Beta',
 			rc: 'Release Candidate',
 			ga: 'Production Stable'
