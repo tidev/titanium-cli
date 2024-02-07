@@ -216,13 +216,13 @@ export class CLI {
 		if (Array.isArray(cmd?.options)) {
 			const argv = this.argv;
 			const cargv = cmd.opts();
-			this.debugLogger.trace(`Copying ${cmd.options.length} options...`);
+			this.debugLogger.trace(`Copying ${cmd.options.length} options... (${cmd.name()})`);
 			for (const o of cmd.options) {
 				let name = o.name();
 				if (o.negate) {
 					name = name.replace(/^no-/, '');
 				}
-				this.debugLogger.trace(`  Setting ${name} = ${cargv[o.attributeName()]}`);
+				this.debugLogger.trace(`  Setting ${name} = ${cargv[o.attributeName()]} (prev: ${argv[name]})`);
 				argv[name] = cargv[o.attributeName()];
 			}
 		}
@@ -550,6 +550,15 @@ export class CLI {
 			const { conf, optionBranches } = cmd;
 			const cmdName = cmd.name();
 
+			// this is a hack... `-d` now conflicts between `--workspace-dir` and
+			// the now global `--project-dir` option causing `--project-dir` to
+			// snipe `--workspace-dir`, so we treat them the same for the `create`
+			// command
+			if (cmdName === 'create' && !this.argv['workspace-dir'] && this.argv['project-dir']) {
+				cmd.setOptionValue('workspaceDir', expand(this.argv['project-dir']));
+				this.argv['project-dir'] = undefined;
+			}
+
 			if (optionBranches?.length) {
 				this.debugLogger.trace(`Processing missing option branches: ${optionBranches.join(', ')}`);
 
@@ -774,7 +783,10 @@ export class CLI {
 
 			// if `--project-dir` was not set, default to the current working directory
 			const cwd = expand(this.argv['project-dir'] || '.');
-			this.argv['project-dir'] = cwd;
+			if (cmdName !== 'create') {
+				// create command doesn't have a --project-dir option
+				this.argv['project-dir'] = cwd;
+			}
 
 			// load hooks
 			const hooks = ticonfig.paths?.hooks;
@@ -1301,14 +1313,6 @@ export class CLI {
 			});
 
 			this.debugLogger.trace('Checking for missing/invalid options:', orderedOptionNames);
-
-			// this is a hack... `-d` now conflicts between `--workspace-dir` and
-			// the now global `--project-dir` option causing `--project-dir` to
-			// snipe `--workspace-dir`, so we treat them the same for the `create`
-			// command
-			if (this.command.name() === 'create' && !this.argv['workspace-dir']) {
-				this.argv['workspace-dir'] = this.argv['project-dir'];
-			}
 
 			// this while loop is essentially a pump that processes missing/invalid
 			// options one at a time, recalculating them each iteration
