@@ -1,5 +1,0 @@
-#!/usr/bin/env node
-// --debug-brk
-'use strict';
-
-require('../lib/titanium');

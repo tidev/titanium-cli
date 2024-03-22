@@ -1,5 +1,0 @@
-The setup command guides you through the various configuration settings and
-helps detect if your development environment is properly installed.
-
-The first time the Titanium CLI is installed, you should run the __titanium
-setup wizard__ to configure the most common settings.
