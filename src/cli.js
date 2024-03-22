@@ -1464,36 +1464,44 @@ export class CLI {
 						opt.prompt = async callback => {
 							// if the option has values, then display a pretty list
 							if (Array.isArray(opt.values)) {
-								const value = await prompt({
-									type: 'select',
-									message: `Please select a valid ${cyan(name)} value:`,
-									choices: opt.values.map(v => ({ label: v, value: v }))
+								return callback({
+									async prompt(callback) {
+										const value = await prompt({
+											type: 'select',
+											message: `Please select a valid ${cyan(name)} value:`,
+											choices: opt.values.map(v => ({ label: v, value: v }))
+										});
+										callback(null, value);
+									}
 								});
-								return callback(null, value);
 							}
 
 							const pr = opt.prompt || {};
-							const value = await prompt({
-								type: opt.password ? 'password' : 'text',
-								message: `Please enter a valid ${cyan(name)}`,
-								validate: opt.validate || (value => {
-									if (pr.validator) {
-										try {
-											pr.validator(value);
-										} catch (ex) {
-											return ex.toString();
-										}
-									} else if (!value.length || (pr.pattern && !pr.pattern.test(value))) {
-										return pr.error;
+							return callback({
+								async prompt(callback) {
+									const value = await prompt({
+										type: opt.password ? 'password' : 'text',
+										message: `Please enter a valid ${cyan(name)}`,
+										validate: opt.validate || (value => {
+											if (pr.validator) {
+												try {
+													pr.validator(value);
+												} catch (ex) {
+													return ex.toString();
+												}
+											} else if (!value.length || (pr.pattern && !pr.pattern.test(value))) {
+												return pr.error;
+											}
+											return true;
+										})
+									});
+									if (value === undefined) {
+										// sigint
+										process.exit(0);
 									}
-									return true;
-								})
+									callback(null, value);
+								}
 							});
-							if (value === undefined) {
-								// sigint
-								process.exit(0);
-							}
-							callback(null, value);
 						};
 					}
 				} else {
