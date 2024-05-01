@@ -1,21 +1,17 @@
-module.exports = {
-	env: {
-        es2021: true,
-        node: true
+import js from "@eslint/js";
+import globals from 'globals';
+
+export default {
+    ...js.configs.recommended,
+    files: ["src/**/*.js", "test/**/*.test.js"],
+    languageOptions: {
+        ecmaVersion: 2022,
+        sourceType: "module",
+        globals: {
+            ...globals.node
+        }
     },
-	extends: [
-        'eslint:recommended'
-    ],
-    parserOptions: {
-        "ecmaVersion": "latest",
-        "sourceType": "module"
-    },
-	plugins: [
-		'promise',
-		'security'
-	],
-	root: true,
-	rules: {
+    rules: {
         'array-bracket-spacing': ['warn', 'never'],
         'brace-style': [2, '1tbs', { 'allowSingleLine': true }],
         'camelcase': 'off',
@@ -38,18 +34,6 @@ module.exports = {
         'no-trailing-spaces': 'error',
         'no-unused-vars': 'off',
         'no-useless-escape': 'warn',
-        'promise/always-return': 'off',
-        'promise/no-return-wrap': 'error',
-        'promise/param-names': 'error',
-        'promise/catch-or-return': 'error',
-        'promise/no-native': 'off',
-        'promise/no-nesting': 'warn',
-        'promise/no-promise-in-callback': 'warn',
-        'promise/no-callback-in-promise': 'off',
-        'promise/avoid-new': 'off',
-        'promise/no-new-statics': 'error',
-        'promise/no-return-in-finally': 'warn',
-        'promise/valid-params': 'warn',
         'quotes': ['error', 'single'],
         'semi': ['error', 'always'],
         'space-before-blocks': ['error', 'always'],

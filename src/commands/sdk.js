@@ -709,7 +709,6 @@ async function checkSDKFile({ force, logger, filename, name, noPrompt, osName, s
 	}
 
 	let renameTo;
-	// eslint-disable-next-line no-constant-condition
 	for (let i = 2; true; i++) {
 		try {
 			renameTo = `${name}-${i}`;

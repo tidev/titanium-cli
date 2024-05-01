@@ -160,14 +160,14 @@ exports.config = function config(logger, config, cli) {
 									promptLabel: 'Where is the __project directory__?',
 									complete: true,
 									showHidden: true,
-									ignoreDirs: new RegExp(config.get('cli.ignoreDirs')), // eslint-disable-line security/detect-non-literal-regexp
+									ignoreDirs: new RegExp(config.get('cli.ignoreDirs')),
 									ignoreFiles: /.*/,
 									validate: conf.options['project-dir'].validate
 								}));
 							},
 							required: true,
 							validate(projectDir, callback) {
-								const isDefault = (projectDir == conf.options['project-dir'].default); // eslint-disable-line eqeqeq
+								const isDefault = (projectDir == conf.options['project-dir'].default);
 								let dir = path.resovle(projectDir);
 
 								if (!fs.existsSync(dir)) {
@@ -178,12 +178,12 @@ exports.config = function config(logger, config, cli) {
 								let isFound,
 									projDir = dir;
 
-								['tiapp.xml', 'timodule.xml'].some(tiXml => { // eslint-disable-line array-callback-return
+								['tiapp.xml', 'timodule.xml'].some(tiXml => {
 									let tiFile = path.join(dir, tiXml);
 
 									while (!fs.existsSync(tiFile)) {
 										dir = path.dirname(dir);
-										if (dir == root) { // eslint-disable-line eqeqeq
+										if (dir == root) {
 											isFound = false;
 											break;
 										}
@@ -199,7 +199,7 @@ exports.config = function config(logger, config, cli) {
 									dir = projDir;
 								});
 
-								if (!isFound && dir == root && isDefault) { // eslint-disable-line eqeqeq
+								if (!isFound && dir == root && isDefault) {
 									callback(true);
 									return;
 								}
@@ -282,7 +282,7 @@ exports.run = function run(logger, config, cli, finished) {
 	}
 
 	let counter = 0;
-	require(buildModule).run(logger, config, cli, function (err) { // eslint-disable-line security/detect-non-literal-require
+	require(buildModule).run(logger, config, cli, function (err) {
 		if (!counter++) {
 			const delta = String(cli.startTime - Date.now());
 			if (err) {
@@ -334,7 +334,7 @@ function patchLogger(logger, cli) {
 		logger.padLevels = args[0] !== '_';
 
 		// get rid of any null args
-		while (args.length && args[args.length - 1] == null) { // eslint-disable-line
+		while (args.length && args[args.length - 1] == null) {
 			args.pop();
 		}
 

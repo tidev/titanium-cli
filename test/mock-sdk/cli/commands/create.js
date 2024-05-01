@@ -35,7 +35,7 @@ CreateCommand.prototype.config = function config(logger, config, cli) {
 					return resolve();
 				}
 
-				const CreatorConstructor = require(path.join(creatorDir, filename)); // eslint-disable-line security/detect-non-literal-require
+				const CreatorConstructor = require(path.join(creatorDir, filename));
 				const creator = new CreatorConstructor(logger, config, cli);
 				this.creators[creator.type] = creator;
 

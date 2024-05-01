@@ -320,7 +320,7 @@ Creator.prototype.configOptionWorkspaceDir = function configOptionWorkspaceDir(o
 		// check if the directory is writable
 		let prev = null;
 		let curr = dir;
-		while (curr != prev) { // eslint-disable-line eqeqeq
+		while (curr != prev) {
 			if (fs.existsSync(curr)) {
 				break;
 			}
@@ -351,8 +351,8 @@ Creator.prototype.configOptionWorkspaceDir = function configOptionWorkspaceDir(o
 			callback(fields.file({
 				complete: true,
 				default: workspaceDir || '.',
-				ignoreDirs: new RegExp(config.get('cli.ignoreDirs')), // eslint-disable-line security/detect-non-literal-regexp
-				ignoreFiles: new RegExp(config.get('cli.ignoreFiles')), // eslint-disable-line security/detect-non-literal-regexp
+				ignoreDirs: new RegExp(config.get('cli.ignoreDirs')),
+				ignoreFiles: new RegExp(config.get('cli.ignoreFiles')),
 				promptLabel: 'Directory to place project',
 				showHidden: true,
 				validate: validate

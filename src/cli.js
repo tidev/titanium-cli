@@ -293,7 +293,6 @@ export class CLI {
 			(async () => {
 				// call all pre filters
 				await pres
-					// eslint-disable-next-line promise/no-nesting
 					.reduce((promise, pre) => promise.then(async () => {
 						if (pre.length >= 2) {
 							await new Promise((resolve, reject) => {
@@ -325,7 +324,6 @@ export class CLI {
 
 				// call all post filters
 				await posts
-					// eslint-disable-next-line promise/no-nesting
 					.reduce((promise, post) => promise.then(async () => {
 						if (post.length >= 2) {
 							await new Promise((resolve, reject) => {
@@ -394,7 +392,6 @@ export class CLI {
 			return promise;
 		}
 
-		// eslint-disable-next-line promise/catch-or-return
 		promise.then(result => callback(null, result), callback);
 
 		return this;
@@ -1081,7 +1078,6 @@ export class CLI {
 		if (callback.pre) {
 			const h = this.hooks.pre[name] || (this.hooks.pre[name] = []);
 			callback.pre.priority = priority;
-			// eslint-disable-next-line no-empty
 			for (i = 0; i < h.length && priority >= h[i].priority; i++) {}
 			h.splice(i, 0, callback.pre);
 		}
@@ -1089,7 +1085,6 @@ export class CLI {
 		if (callback.post) {
 			const h = this.hooks.post[name] || (this.hooks.post[name] = []);
 			callback.post.priority = priority;
-			// eslint-disable-next-line no-empty
 			for (i = 0; i < h.length && priority >= h[i].priority; i++) {}
 			h.splice(i, 0, callback.post);
 		}
@@ -1316,7 +1311,6 @@ export class CLI {
 
 			// this while loop is essentially a pump that processes missing/invalid
 			// options one at a time, recalculating them each iteration
-			// eslint-disable-next-line no-constant-condition
 			while (true) {
 				const invalid = {};
 				let invalidCount = 0;

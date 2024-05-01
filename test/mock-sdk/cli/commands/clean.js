@@ -75,13 +75,13 @@ exports.config = function (logger, config, cli) {
 								promptLabel: 'Where is the __project directory__?',
 								complete: true,
 								showHidden: true,
-								ignoreDirs: new RegExp(config.get('cli.ignoreDirs')), // eslint-disable-line security/detect-non-literal-regexp
+								ignoreDirs: new RegExp(config.get('cli.ignoreDirs')),
 								ignoreFiles: /.*/,
 								validate: conf.options['project-dir'].validate
 							}));
 						},
 						validate: function (projectDir, callback) {
-							const isDefault = (projectDir == conf.options['project-dir'].default); // eslint-disable-line eqeqeq
+							const isDefault = (projectDir == conf.options['project-dir'].default);
 							let dir = path.resolve(projectDir);
 
 							if (!fs.existsSync(dir)) {
@@ -97,7 +97,7 @@ exports.config = function (logger, config, cli) {
 
 								while (!fs.existsSync(tiFile)) {
 									dir = path.dirname(dir);
-									if (dir == root) { // eslint-disable-line eqeqeq
+									if (dir == root) {
 										isFound = false;
 										break;
 									}
@@ -113,7 +113,7 @@ exports.config = function (logger, config, cli) {
 								dir = projDir;
 							});
 
-							if (!isFound && dir == root && isDefault) { // eslint-disable-line eqeqeq
+							if (!isFound && dir == root && isDefault) {
 								callback(true);
 								return;
 							}
@@ -223,7 +223,7 @@ exports.run = function (logger, config, cli) {
 			}
 
 			cli.fireHook('clean.pre', function () {
-				fs.readdirSync(buildDir).reduce((prom, dir) => { // eslint-disable-line
+				fs.readdirSync(buildDir).reduce((prom, dir) => {
 					return prom.then(new Promise(resolve => {
 						cli.fireHook(`clean.${dir}.pre`, () => {
 							cli.fireHook(`clean.${dir}.post`, () => resolve());
@@ -261,7 +261,7 @@ function patchLogger(logger, cli) {
 		logger.padLevels = args[0] !== '_';
 
 		// get rid of any null args
-		while (args.length && args[args.length - 1] == null) { // eslint-disable-line
+		while (args.length && args[args.length - 1] == null) {
 			args.pop();
 		}
 
