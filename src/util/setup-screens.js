@@ -448,7 +448,7 @@ export class SetupScreens {
 		log(); // end android
 
 		log('Java Development Kit');
-		if (data.jdk.version == null) { // eslint-disable-line
+		if (data.jdk.version == null) {
 			bad('jdk', 'JDK not found!');
 		} else {
 			ok('jdk', 'installed', `(v${data.jdk.version})`);

@@ -35,7 +35,7 @@ function levenshtein(s, c) {
 	}
 	for (i = -1; ++i < len1;) {
 		for (j = -1; ++j < len2;) {
-			a[i + 1][j + 1] = Math.min(a[i][j + 1] + 1, a[i + 1][j] + 1, a[i][j] + (s[i] != c[j])); // eslint-disable-line eqeqeq
+			a[i + 1][j + 1] = Math.min(a[i][j + 1] + 1, a[i + 1][j] + 1, a[i][j] + (s[i] != c[j]));
 		}
 	}
 	return a[len1][len2];

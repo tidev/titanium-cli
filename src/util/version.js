@@ -179,7 +179,7 @@ export function satisfies(ver, str, maybe) {
 		if (str === '*' || eq(ver, str)) {
 			return true;
 		}
-	} catch (ex) {} // eslint-disable-line no-empty
+	} catch {}
 
 	const r = str.split(/\s*\|\|\s*/).some(range => {
 		// semver is picky with the '-' in comparisons and it just so happens when it

@@ -460,7 +460,6 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 													tmp = avds.filter(function (avd) {
 														return avd === name;
 													});
-													/* eslint-disable max-depth */
 													if (tmp.length) {
 														avds = tmp;
 													} else {
@@ -475,7 +474,6 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 														cli.argv['device-id'] = avds[0];
 														return callback();
 													}
-													/* eslint-enable max-depth */
 												}
 											}
 										}
