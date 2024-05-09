@@ -64,10 +64,10 @@ export async function run(logger, config, cli) {
 	const types = {};
 	let i = 0;
 	const specifiedTypes = (cli.argv.types || 'all').toLowerCase().split(',');
-	for (let t of specifiedTypes) {
-		t = t.trim();
-		if (typesList.indexOf(t) >= 0) {
-			types[t] = ++i;
+	for (let type of specifiedTypes) {
+		type = type.trim();
+		if (typesList.includes(type)) {
+			types[type] = ++i;
 		}
 	}
 	if (i === 0) {
