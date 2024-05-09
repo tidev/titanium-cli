@@ -98,8 +98,6 @@ async function osInfo() {
 	let name = process.platform;
 	let version = '?';
 	let m;
-	let n;
-	let _;
 	const { $ } = await import('execa');
 
 	if (name === 'darwin') {
@@ -111,18 +109,24 @@ async function osInfo() {
 			version = m[1];
 		}
 	} else if (name === 'linux') {
+		name = 'GNU/Linux';
 		if (existsSync('/etc/lsb-release')) {
 			const s = await readFile('/etc/lsb-release', 'utf-8');
 			if (m = s.match(/DISTRIB_DESCRIPTION=(.+)/i)) {
-				n = m[1].replaceAll('"', '');
+				name = m[1].replaceAll('"', '');
 			}
 			if (m = s.match(/DISTRIB_RELEASE=(.+)/i)) {
-				n = m[1].replaceAll('"', '');
+				name = m[1].replaceAll('"', '');
 			}
 		} else if (existsSync('/etc/system-release')) {
-			[name, _, version] = (await readFile('/etc/system-release', 'utf-8')).split(' ');
+			const parts = (await readFile('/etc/system-release', 'utf-8')).split(' ');
+			if (parts.length) {
+				name = parts[0];
+			}
+			if (parts.length > 2) {
+				version = parts[2];
+			}
 		}
-		name = n || 'GNU/Linux';
 	} else {
 		const { stdout } = await $`wmic os get Caption,Version`;
 		[name, version] = stdout.split('\n')[1].split(/ {2,}/);

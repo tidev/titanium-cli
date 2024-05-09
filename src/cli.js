@@ -213,18 +213,21 @@ export class CLI {
 	 * @access private
 	 */
 	applyArgv(cmd) {
-		if (Array.isArray(cmd?.options)) {
-			const argv = this.argv;
-			const cargv = cmd.opts();
-			this.debugLogger.trace(`Copying ${cmd.options.length} options... (${cmd.name()})`);
-			for (const o of cmd.options) {
-				let name = o.name();
-				if (o.negate) {
-					name = name.replace(/^no-/, '');
-				}
-				this.debugLogger.trace(`  Setting ${name} = ${cargv[o.attributeName()]} (prev: ${argv[name]})`);
-				argv[name] = cargv[o.attributeName()];
+		if (!Array.isArray(cmd?.options)) {
+			return;
+		}
+
+		const argv = this.argv;
+		const cargv = cmd.opts();
+		this.debugLogger.trace(`Copying ${cmd.options.length} options... (${cmd.name()})`);
+
+		for (const opt of cmd.options) {
+			let name = opt.name();
+			if (opt.negate) {
+				name = name.replace(/^no-/, '');
 			}
+			this.debugLogger.trace(`  Setting ${name} = ${cargv[opt.attributeName()]} (prev: ${argv[name]})`);
+			argv[name] = cargv[opt.attributeName()];
 		}
 	}
 
