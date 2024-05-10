@@ -1,4 +1,4 @@
-7.0.0
+7.0.0 (5/10/2024)
 -------------------
  * Require Node.js 18 or newer
  * Refactored entire codebase using ESM
