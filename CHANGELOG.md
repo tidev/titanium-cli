@@ -1,3 +1,69 @@
+7.0.0
+-------------------
+ * Require Node.js 18 or newer
+ * Refactored entire codebase using ESM
+ * Removed `login`, `logout`, `plugin`, and `status` commands
+ * Removed all analytics/telemetry code
+ * Removed i18n logic; all output rendered in English
+ * Removed incomplete tab completion code
+ * `--sdk <ver>` is now a global option
+   - It assumes the latest installed SDK version...
+   - If executing the `create` command without any options, it will prompt for
+     the SDK version to use
+ * Removed "default" SDK; `<sdk-version>` in tiapp.xml is source of truth,
+   override with `--sdk <ver>` arg
+ * Replaced custom CLI arg parser (based on `optimist`) with Commander.js
+   - Order of arguments matter; command options must come after command
+ * `-d`, `--project-dir` is now a global option
+   - Used to be `build`, `clean`, and `project` commands only, but needed so
+     the CLI can read the `tiapp.xml` and determine the `<sdk-version>`;
+     defaults to the current working directory
+   - Since this conflicts with the `create` command's `-d`, `--workspace-dir`
+     option, special handling treats these two options the same
+ * Added a new `--debug` global flag to output CLI debug logging
+ * `ti config` changes:
+   - Added `--json` flag
+   - Replaced `--output json` with `--output json-object` output
+ * `ti info` changes:
+   - Added `--json` flag
+   - Removed `haxm` info
+   - Removed `genymotion` and VirtualBox info
+   - Removed macOS info including Xcode CLI Tools
+   - Removed `jarsigner` from JDK detection; no longer used thanks to Gradle
+   - Removed `nodeAppcVer` from Titanium CLI and Titanium SDKs in info
+ * `ti module` changes:
+   - Removed global `iphone` modules as it was just a copy of `ios` modules
+   - Modules with `platform` other than `android`, `commonjs`, `ios`, and
+     `iphone` will be ignored
+   - Modules with invalid semantic version will be ignored
+ * `ti sdk` changes:
+   - Added `--json` flag
+   - Removed `activeSDK` from JSON result
+   - `select` subcommand is a no-op
+   - `install` subcommand `--default` flag is a no-op
+ * `ti setup` changes:
+   - Removed Windows Store publishing info
+   - Removed `haxm` info
+   - Removed `sdk` setup
+   - Removed user locale setup
+   - Removed Xcode CLI tools detection
+   - Removed Titanium CLI Dependencies section from check
+   - Removed Java-based connection test from check
+ * Logger changes:
+   - Replaced "winston" based logger with lighter weight logger
+   - Trace and debug log messages written to `stderr` instead of `stdout`
+   - Added total run time trace message at end
+   - `--timestamp` option enabled only when command has `--log-level` option
+ * Performance improvements:
+   - Lazy load modules as much as possible, within reason
+   - Removed tons of old dead code
+   - Use smaller alternative dependencies
+ * Updated dependencies, replaced deprecated dependencies
+   - Replaced `colors` with `chalk`
+   - Replaced `fields` with `prompts`
+   - Replaced `humanize` with `pretty-bytes`
+   - Replaced `request` with `undici`
+
 6.1.1 (7/13/2022)
 -------------------
  * Allow SDK directories to contain any version suffix
