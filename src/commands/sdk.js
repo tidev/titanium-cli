@@ -824,7 +824,7 @@ SdkSubcommands.uninstall = {
 			}
 			logger.log();
 
-			const { confirm } = await prompt({
+			const confirm = await prompt({
 				type: 'toggle',
 				name: 'confirm',
 				message: 'Proceed?',
