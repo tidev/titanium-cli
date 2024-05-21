@@ -271,12 +271,12 @@ export async function getReleases(unstable) {
 		}).then(async res => ({ type: 'ga', releases: await res.body.json() }))
 	];
 
-	const results = await Promise.allSettled(fetches);
+	const results = await Promise.all(fetches);
 
 	return results
-		.flatMap(r => {
-			return r.status === 'fulfilled' && r.value ? r.value.releases.map(rel => {
-				rel.type = r.value.type;
+		.flatMap(value => {
+			return value ? value.releases.map(rel => {
+				rel.type = value.type;
 				return rel;
 			}) : [];
 		})
