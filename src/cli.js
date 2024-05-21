@@ -16,6 +16,7 @@ import { TiError } from './util/tierror.js';
 import { prompt } from './util/prompt.js';
 import { applyCommandConfig } from './util/apply-command-config.js';
 import { TiHelp } from './util/tihelp.js';
+import semver from 'semver';
 
 const { blue, bold, cyan, gray, green, magenta, red, yellow } = chalk;
 
@@ -167,11 +168,12 @@ export class CLI {
 
 	constructor() {
 		const pkgJsonFile = join(dirname(fileURLToPath(import.meta.url)), '../package.json');
-		const { version } = fs.readJsonSync(pkgJsonFile);
+		const { engines, version } = fs.readJsonSync(pkgJsonFile);
 
 		this.name = 'Titanium Command-Line Interface';
 		this.copyright = 'Copyright TiDev, Inc. 4/7/2022-Present. All Rights Reserved.';
 		this.version = version;
+		this.nodeVersion = engines?.node;
 		this.logger.setBanner({
 			name: this.name,
 			copyright: this.copyright,
@@ -510,6 +512,10 @@ export class CLI {
 	 * @access public
 	 */
 	async go() {
+		if (this.nodeVersion && !semver.satisfies(process.version, this.nodeVersion)) {
+			throw new TiError(`Node.js version ${this.nodeVersion} required, current version is ${process.version}`);
+		}
+
 		Command.prototype.createHelp = () => {
 			return Object.assign(new TiHelp(this), this.command.configureHelp());
 		};
