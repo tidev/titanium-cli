@@ -1,3 +1,7 @@
+7.1.0
+-------------------
+ * feat: Support async hook `init()` functions
+
 7.0.0 (5/10/2024)
 -------------------
  * Require Node.js 18 or newer
