@@ -1260,7 +1260,7 @@ export class CLI {
 								appc = (await import(nodeAppc)).default;
 							}
 							if (typeof mod.init === 'function') {
-								mod.init(this.logger, this.config, this, appc);
+								await mod.init(this.logger, this.config, this, appc);
 							}
 							this.hooks.loadedFilenames.push(file);
 							this.debugLogger.trace(`Loaded CLI hook: ${file} (${Date.now() - startTime} ms)`);
