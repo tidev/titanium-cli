@@ -1,6 +1,8 @@
 7.1.0
 -------------------
  * fix: Surface sdk install errors
+ * fix: `ti sdk rm <ver>` treats confirm prompt as false
+ * fix: Assert required Node.js version
 
 7.0.0 (5/10/2024)
 -------------------
