@@ -109,8 +109,8 @@ export function validate(_logger, _config, cli) {
  */
 export async function run(logger, config, cli) {
 	const { argv } = cli;
-	const key = argv._.length > 0 && argv._.shift();
-	const value = argv._.length > 0 && argv._[0];
+	const key = argv._.length > 0 ? argv._.shift() : undefined;
+	const value = argv._.length > 0 ? argv._[0] : undefined;
 	const results = {};
 	const asJson = argv.json || argv.output === 'json';
 
