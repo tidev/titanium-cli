@@ -416,6 +416,11 @@ export class CLI {
 		const cmd = args.pop();
 		args.pop(); // discard argv
 
+		// remove any trailing undefined args
+		while (args.length && args[args.length - 1] === undefined) {
+			args.pop();
+		}
+
 		this.argv._ = args;
 		this.applyArgv(cmd);
 
