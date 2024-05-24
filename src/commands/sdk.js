@@ -361,7 +361,7 @@ SdkSubcommands.install = {
 
 		// step 2: extract the sdk zip file
 
-		let { name, renameTo, tempDir } = await extractSDK({
+		let { forceModules, name, renameTo, tempDir } = await extractSDK({
 			debugLogger: cli.debugLogger,
 			file,
 			force: cli.argv.force,
@@ -428,7 +428,7 @@ SdkSubcommands.install = {
 						}
 
 						const destDir = join(modulesDest, platform, moduleName, ver);
-						if (!cli.argv.force && fs.existsSync(destDir)) {
+						if (!forceModules && fs.existsSync(destDir)) {
 							trace(`Module ${cyan(`${moduleName}@${ver}`)} already installed`);
 							continue;
 						}
@@ -628,13 +628,14 @@ async function extractSDK({ debugLogger, file, force, logger, noPrompt, osName, 
 	let bar;
 	let name;
 	let renameTo;
+	let forceModules = force;
 
 	const onEntry = async (filename, _idx, total) => {
 		if (total > 1) {
 			const m = !name && filename.match(sdkDestRegExp);
 			if (m) {
 				name = m[1];
-				renameTo = await checkSDKFile({
+				const result = await checkSDKFile({
 					force,
 					logger,
 					filename,
@@ -644,6 +645,9 @@ async function extractSDK({ debugLogger, file, force, logger, noPrompt, osName, 
 					sdkDir: join(titaniumDir, 'mobilesdk', osName, name),
 					subject
 				});
+
+				forceModules = result.forceModules ?? force;
+				renameTo = result.renameTo;
 
 				logger.log('Extracting SDK...');
 				if (showProgress && !bar) {
@@ -670,7 +674,7 @@ async function extractSDK({ debugLogger, file, force, logger, noPrompt, osName, 
 	});
 
 	if (!artifact) {
-		return { name, renameTo, tempDir };
+		return { forceModules, name, renameTo, tempDir };
 	}
 
 	debugLogger.trace(`Detected artifact: ${artifact}`);
@@ -685,7 +689,7 @@ async function extractSDK({ debugLogger, file, force, logger, noPrompt, osName, 
 	});
 
 	await fs.remove(tempDir);
-	return { name, renameTo, tempDir: tempDir2 };
+	return { forceModules, name, renameTo, tempDir: tempDir2 };
 }
 
 async function checkSDKFile({ force, logger, filename, name, noPrompt, osName, sdkDir, subject }) {
@@ -725,7 +729,7 @@ async function checkSDKFile({ force, logger, filename, name, noPrompt, osName, s
 		}
 	}
 
-	const { action } = await prompt({
+	const action = await prompt({
 		type: 'select',
 		name: 'action',
 		message: `Titanium SDK ${name} is already installed`,
@@ -744,9 +748,13 @@ async function checkSDKFile({ force, logger, filename, name, noPrompt, osName, s
 
 	logger.log();
 
+	const result = { action };
 	if (action === 'rename') {
-		return renameTo;
+		result.renameTo = renameTo;
+	} else if (action === 'overwrite') {
+		result.forceModules = true;
 	}
+	return result;
 }
 
 /**
@@ -794,7 +802,7 @@ SdkSubcommands.uninstall = {
 		}
 
 		if (!versions.length) {
-			({ versions } = await prompt({
+			versions = await prompt({
 				type: 'multiselect',
 				name: 'versions',
 				message: 'Which SDKs to uninstall?',
@@ -804,7 +812,7 @@ SdkSubcommands.uninstall = {
 					title: v,
 					value: v
 				}))
-			}));
+			});
 			if (!versions) {
 				return;
 			}

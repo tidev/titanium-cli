@@ -521,7 +521,7 @@ export class SetupScreens {
 	async userScreen() {
 		this.logger.log(screenTitle('User'));
 
-		const { name } = await prompt({
+		const name = await prompt({
 			type: 'text',
 			message: 'What do you want as your "author" name?',
 			initial: this.config.get('user.name', ''),

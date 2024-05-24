@@ -5,7 +5,11 @@
  * fix: `ti sdk rm <ver>` treats confirm prompt as false
  * fix: Assert required Node.js version
  * fix: Clear out undefined command args which fixes `ti project`
- * fix: `ti sdk install` silently fails when installing new modules
+ * fix: `ti sdk install` no longer silently fails when installing new modules
+ * fix: When reinstalling an SDK, choosing "Overwrite" will force modules to
+   also be reinstalled
+ * fix: Properly handle result from `ti sdk install` overwrite prompt,
+   `ti sdk uninstall` version prompt, and `ti setup user` name prompt
 
 7.0.0 (5/10/2024)
 -------------------
