@@ -426,7 +426,7 @@ SdkSubcommands.install = {
 						}
 
 						const destDir = join(modulesDest, platform, moduleName, ver);
-						if (!cli.argv.force || fs.existsSync(destDir)) {
+						if (!cli.argv.force && fs.existsSync(destDir)) {
 							continue;
 						}
 

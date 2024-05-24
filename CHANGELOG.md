@@ -5,7 +5,7 @@
  * fix: `ti sdk rm <ver>` treats confirm prompt as false
  * fix: Assert required Node.js version
  * fix: Clear out undefined command args which fixes `ti project`
- * fix: Fixed `ti sdk install` bug when installing new module files
+ * fix: `ti sdk install` silently fails when installing new modules
 
 7.0.0 (5/10/2024)
 -------------------
