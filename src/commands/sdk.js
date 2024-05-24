@@ -339,6 +339,7 @@ SdkSubcommands.install = {
 		const showProgress = !cli.argv.quiet && !!cli.argv['progress-bars'];
 		const osName       = cli.env.os.name;
 		const subject      = cli.argv._.shift() || 'latest';
+		const { trace }    = cli.debugLogger;
 
 		logger.skipBanner(false);
 		logger.banner();
@@ -361,6 +362,7 @@ SdkSubcommands.install = {
 		// step 2: extract the sdk zip file
 
 		let { name, renameTo, tempDir } = await extractSDK({
+			debugLogger: cli.debugLogger,
 			file,
 			force: cli.argv.force,
 			logger,
@@ -402,7 +404,7 @@ SdkSubcommands.install = {
 
 		// step 5: install the modules
 
-		const modules = [];
+		const modules = {};
 		src = join(tempDir, 'modules');
 		if (fs.statSync(src).isDirectory()) {
 			const modulesDest = join(titaniumDir, 'modules');
@@ -427,19 +429,24 @@ SdkSubcommands.install = {
 
 						const destDir = join(modulesDest, platform, moduleName, ver);
 						if (!cli.argv.force && fs.existsSync(destDir)) {
+							trace(`Module ${cyan(`${moduleName}@${ver}`)} already installed`);
 							continue;
 						}
 
-						modules.push({ src: srcVersionDir, dest: destDir });
+						modules[`${moduleName}@${ver}`] = { src: srcVersionDir, dest: destDir };
 					}
 				}
 			}
 		}
 
-		if (modules.length) {
-			for (const { src, dest } of modules) {
+		if (Object.keys(modules).length) {
+			trace(`Installing ${cyan(Object.keys(modules).length)} modules:`);
+			for (const [name, { src, dest }] of Object.entries(modules)) {
+				trace(`   ${cyan(name)}`);
 				await fs.move(src, dest, { overwrite: true });
 			}
+		} else {
+			trace('SDK has new modules to install');
 		}
 
 		// step 6: cleanup
@@ -614,7 +621,7 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 	return { downloadedFile, file };
 }
 
-async function extractSDK({ file, force, logger, noPrompt, osName, showProgress, subject, titaniumDir }) {
+async function extractSDK({ debugLogger, file, force, logger, noPrompt, osName, showProgress, subject, titaniumDir }) {
 	const sdkDestRegExp = new RegExp(`^mobilesdk[/\\\\]${osName}[/\\\\]([^/\\\\]+)`);
 	const tempDir = join(os.tmpdir(), `titanium-cli-${Math.floor(Math.random() * 1e6)}`);
 	let artifact;
@@ -655,7 +662,7 @@ async function extractSDK({ file, force, logger, noPrompt, osName, showProgress,
 		}
 	};
 
-	logger.trace(`Extracting ${file} -> ${tempDir}`);
+	debugLogger.trace(`Extracting ${file} -> ${tempDir}`);
 	await extractZip({
 		dest: tempDir,
 		file,
@@ -666,11 +673,11 @@ async function extractSDK({ file, force, logger, noPrompt, osName, showProgress,
 		return { name, renameTo, tempDir };
 	}
 
-	logger.trace(`Detected artifact: ${artifact}`);
+	debugLogger.trace(`Detected artifact: ${artifact}`);
 	const tempDir2 = join(os.tmpdir(), `titanium-cli-${Math.floor(Math.random() * 1e6)}`);
 	file = join(tempDir, artifact);
 
-	logger.trace(`Extracting ${file} -> ${tempDir2}`);
+	debugLogger.trace(`Extracting ${file} -> ${tempDir2}`);
 	await extractZip({
 		dest: tempDir2,
 		file,
