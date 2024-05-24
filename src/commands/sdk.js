@@ -404,39 +404,37 @@ SdkSubcommands.install = {
 
 		const modules = [];
 		src = join(tempDir, 'modules');
-		try {
-			if (fs.statSync(src).isDirectory()) {
-				const modulesDest = join(titaniumDir, 'modules');
+		if (fs.statSync(src).isDirectory()) {
+			const modulesDest = join(titaniumDir, 'modules');
 
-				for (const platform of fs.readdirSync(src)) {
-					const srcPlatformDir = join(src, platform);
-					if (!fs.statSync(srcPlatformDir).isDirectory()) {
+			for (const platform of fs.readdirSync(src)) {
+				const srcPlatformDir = join(src, platform);
+				if (!fs.statSync(srcPlatformDir).isDirectory()) {
+					continue;
+				}
+
+				for (const moduleName of fs.readdirSync(srcPlatformDir)) {
+					const srcModuleDir = join(srcPlatformDir, moduleName);
+					if (!fs.statSync(srcModuleDir).isDirectory()) {
 						continue;
 					}
 
-					for (const moduleName of fs.readdirSync(srcPlatformDir)) {
-						const srcModuleDir = join(srcPlatformDir, moduleName);
-						if (!fs.statSync(srcModuleDir).isDirectory()) {
+					for (const ver of fs.readdirSync(srcModuleDir)) {
+						const srcVersionDir = join(srcModuleDir, ver);
+						if (!fs.statSync(srcVersionDir).isDirectory()) {
 							continue;
 						}
 
-						for (const ver of fs.readdirSync(srcModuleDir)) {
-							const srcVersionDir = join(srcModuleDir, ver);
-							if (!fs.statSync(srcVersionDir).isDirectory()) {
-								continue;
-							}
-
-							const destDir = join(modulesDest, platform, moduleName, ver);
-							if (!cli.argv.force || fs.statSync(destDir).isDirectory()) {
-								continue;
-							}
-
-							modules.push({ src: srcVersionDir, dest: destDir });
+						const destDir = join(modulesDest, platform, moduleName, ver);
+						if (!cli.argv.force || fs.existsSync(destDir)) {
+							continue;
 						}
+
+						modules.push({ src: srcVersionDir, dest: destDir });
 					}
 				}
 			}
-		} catch {}
+		}
 
 		if (modules.length) {
 			for (const { src, dest } of modules) {
