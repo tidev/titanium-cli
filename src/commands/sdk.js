@@ -339,6 +339,7 @@ SdkSubcommands.install = {
 		const showProgress = !cli.argv.quiet && !!cli.argv['progress-bars'];
 		const osName       = cli.env.os.name;
 		const subject      = cli.argv._.shift() || 'latest';
+		const { trace }    = cli.debugLogger;
 
 		logger.skipBanner(false);
 		logger.banner();
@@ -360,7 +361,8 @@ SdkSubcommands.install = {
 
 		// step 2: extract the sdk zip file
 
-		let { name, renameTo, tempDir } = await extractSDK({
+		let { forceModules, name, renameTo, tempDir } = await extractSDK({
+			debugLogger: cli.debugLogger,
 			file,
 			force: cli.argv.force,
 			logger,
@@ -402,46 +404,49 @@ SdkSubcommands.install = {
 
 		// step 5: install the modules
 
-		const modules = [];
+		const modules = {};
 		src = join(tempDir, 'modules');
-		try {
-			if (fs.statSync(src).isDirectory()) {
-				const modulesDest = join(titaniumDir, 'modules');
+		if (fs.statSync(src).isDirectory()) {
+			const modulesDest = join(titaniumDir, 'modules');
 
-				for (const platform of fs.readdirSync(src)) {
-					const srcPlatformDir = join(src, platform);
-					if (!fs.statSync(srcPlatformDir).isDirectory()) {
+			for (const platform of fs.readdirSync(src)) {
+				const srcPlatformDir = join(src, platform);
+				if (!fs.statSync(srcPlatformDir).isDirectory()) {
+					continue;
+				}
+
+				for (const moduleName of fs.readdirSync(srcPlatformDir)) {
+					const srcModuleDir = join(srcPlatformDir, moduleName);
+					if (!fs.statSync(srcModuleDir).isDirectory()) {
 						continue;
 					}
 
-					for (const moduleName of fs.readdirSync(srcPlatformDir)) {
-						const srcModuleDir = join(srcPlatformDir, moduleName);
-						if (!fs.statSync(srcModuleDir).isDirectory()) {
+					for (const ver of fs.readdirSync(srcModuleDir)) {
+						const srcVersionDir = join(srcModuleDir, ver);
+						if (!fs.statSync(srcVersionDir).isDirectory()) {
 							continue;
 						}
 
-						for (const ver of fs.readdirSync(srcModuleDir)) {
-							const srcVersionDir = join(srcModuleDir, ver);
-							if (!fs.statSync(srcVersionDir).isDirectory()) {
-								continue;
-							}
-
-							const destDir = join(modulesDest, platform, moduleName, ver);
-							if (!cli.argv.force || fs.statSync(destDir).isDirectory()) {
-								continue;
-							}
-
-							modules.push({ src: srcVersionDir, dest: destDir });
+						const destDir = join(modulesDest, platform, moduleName, ver);
+						if (!forceModules && fs.existsSync(destDir)) {
+							trace(`Module ${cyan(`${moduleName}@${ver}`)} already installed`);
+							continue;
 						}
+
+						modules[`${moduleName}@${ver}`] = { src: srcVersionDir, dest: destDir };
 					}
 				}
 			}
-		} catch {}
+		}
 
-		if (modules.length) {
-			for (const { src, dest } of modules) {
+		if (Object.keys(modules).length) {
+			trace(`Installing ${cyan(Object.keys(modules).length)} modules:`);
+			for (const [name, { src, dest }] of Object.entries(modules)) {
+				trace(`   ${cyan(name)}`);
 				await fs.move(src, dest, { overwrite: true });
 			}
+		} else {
+			trace('SDK has new modules to install');
 		}
 
 		// step 6: cleanup
@@ -616,20 +621,21 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 	return { downloadedFile, file };
 }
 
-async function extractSDK({ file, force, logger, noPrompt, osName, showProgress, subject, titaniumDir }) {
+async function extractSDK({ debugLogger, file, force, logger, noPrompt, osName, showProgress, subject, titaniumDir }) {
 	const sdkDestRegExp = new RegExp(`^mobilesdk[/\\\\]${osName}[/\\\\]([^/\\\\]+)`);
 	const tempDir = join(os.tmpdir(), `titanium-cli-${Math.floor(Math.random() * 1e6)}`);
 	let artifact;
 	let bar;
 	let name;
 	let renameTo;
+	let forceModules = force;
 
 	const onEntry = async (filename, _idx, total) => {
 		if (total > 1) {
 			const m = !name && filename.match(sdkDestRegExp);
 			if (m) {
 				name = m[1];
-				renameTo = await checkSDKFile({
+				const result = await checkSDKFile({
 					force,
 					logger,
 					filename,
@@ -639,6 +645,9 @@ async function extractSDK({ file, force, logger, noPrompt, osName, showProgress,
 					sdkDir: join(titaniumDir, 'mobilesdk', osName, name),
 					subject
 				});
+
+				forceModules = result?.forceModules ?? force;
+				renameTo = result?.renameTo;
 
 				logger.log('Extracting SDK...');
 				if (showProgress && !bar) {
@@ -657,7 +666,7 @@ async function extractSDK({ file, force, logger, noPrompt, osName, showProgress,
 		}
 	};
 
-	logger.trace(`Extracting ${file} -> ${tempDir}`);
+	debugLogger.trace(`Extracting ${file} -> ${tempDir}`);
 	await extractZip({
 		dest: tempDir,
 		file,
@@ -665,14 +674,14 @@ async function extractSDK({ file, force, logger, noPrompt, osName, showProgress,
 	});
 
 	if (!artifact) {
-		return { name, renameTo, tempDir };
+		return { forceModules, name, renameTo, tempDir };
 	}
 
-	logger.trace(`Detected artifact: ${artifact}`);
+	debugLogger.trace(`Detected artifact: ${artifact}`);
 	const tempDir2 = join(os.tmpdir(), `titanium-cli-${Math.floor(Math.random() * 1e6)}`);
 	file = join(tempDir, artifact);
 
-	logger.trace(`Extracting ${file} -> ${tempDir2}`);
+	debugLogger.trace(`Extracting ${file} -> ${tempDir2}`);
 	await extractZip({
 		dest: tempDir2,
 		file,
@@ -680,7 +689,7 @@ async function extractSDK({ file, force, logger, noPrompt, osName, showProgress,
 	});
 
 	await fs.remove(tempDir);
-	return { name, renameTo, tempDir: tempDir2 };
+	return { forceModules, name, renameTo, tempDir: tempDir2 };
 }
 
 async function checkSDKFile({ force, logger, filename, name, noPrompt, osName, sdkDir, subject }) {
@@ -720,7 +729,7 @@ async function checkSDKFile({ force, logger, filename, name, noPrompt, osName, s
 		}
 	}
 
-	const { action } = await prompt({
+	const action = await prompt({
 		type: 'select',
 		name: 'action',
 		message: `Titanium SDK ${name} is already installed`,
@@ -739,9 +748,13 @@ async function checkSDKFile({ force, logger, filename, name, noPrompt, osName, s
 
 	logger.log();
 
+	const result = { action };
 	if (action === 'rename') {
-		return renameTo;
+		result.renameTo = renameTo;
+	} else if (action === 'overwrite') {
+		result.forceModules = true;
 	}
+	return result;
 }
 
 /**
@@ -789,7 +802,7 @@ SdkSubcommands.uninstall = {
 		}
 
 		if (!versions.length) {
-			({ versions } = await prompt({
+			versions = await prompt({
 				type: 'multiselect',
 				name: 'versions',
 				message: 'Which SDKs to uninstall?',
@@ -799,7 +812,7 @@ SdkSubcommands.uninstall = {
 					title: v,
 					value: v
 				}))
-			}));
+			});
 			if (!versions) {
 				return;
 			}
