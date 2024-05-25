@@ -646,8 +646,8 @@ async function extractSDK({ debugLogger, file, force, logger, noPrompt, osName, 
 					subject
 				});
 
-				forceModules = result.forceModules ?? force;
-				renameTo = result.renameTo;
+				forceModules = result?.forceModules ?? force;
+				renameTo = result?.renameTo;
 
 				logger.log('Extracting SDK...');
 				if (showProgress && !bar) {
