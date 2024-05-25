@@ -1,4 +1,4 @@
-7.1.0
+7.1.0 (5/25/2024)
 -------------------
  * feat: Support async hook `init()` functions
  * fix: Surface sdk install errors
