@@ -70,8 +70,8 @@ importers:
         specifier: 0.1.3
         version: 0.1.3
       proxy:
-        specifier: 2.1.1
-        version: 2.1.1
+        specifier: 2.2.0
+        version: 2.2.0
 
 packages:
 
@@ -1149,9 +1149,10 @@ packages:
     resolution: {integrity: sha512-NxNv/kLguCA7p3jE8oL2aEBsrJWgAakBpgmgK6lpPWV+WuOmY6r2/zbAVnP+T8bQlA0nzHXSJSJW0Hq7ylaD2Q==}
     engines: {node: '>= 6'}
 
-  proxy@2.1.1:
-    resolution: {integrity: sha512-nLgd7zdUAOpB3ZO/xCkU8gy74UER7P0aihU8DkUsDS5ZoFwVCX7u8dy+cv5tVK8UaB/yminU1GiLWE26TKPYpg==}
+  proxy@2.2.0:
+    resolution: {integrity: sha512-nYclNIWj9UpXbVJ3W5EXIYiGR88AKZoGt90kyh3zoOBY5QW+7bbtPvMFgKGD4VJmpS3UXQXtlGXSg3lRNLOFLg==}
     engines: {node: '>= 14'}
+    hasBin: true
 
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
@@ -2502,7 +2503,7 @@ snapshots:
       kleur: 3.0.3
       sisteransi: 1.0.5
 
-  proxy@2.1.1:
+  proxy@2.2.0:
     dependencies:
       args: 5.0.3
       basic-auth-parser: 0.0.2-1
