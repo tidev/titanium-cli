@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [18, 20, 22]
+        node: [18, 20, 22.5.1]
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
@@ -33,6 +33,4 @@ jobs:
       run: pnpm lint
 
     - name: Run tests
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: pnpm coverage
