@@ -25,7 +25,7 @@
 		"pretty-bytes": "6.1.1",
 		"prompts": "2.4.2",
 		"semver": "7.6.3",
-		"undici": "6.18.0",
+		"undici": "6.19.2",
 		"which": "4.0.0",
 		"wrap-ansi": "9.0.0",
 		"xpath": "0.0.34",
@@ -35,11 +35,11 @@
 		"@reporters/github": "1.7.0",
 		"@vitest/coverage-istanbul": "1.6.0",
 		"c8": "10.1.2",
-		"eslint": "9.3.0",
+		"eslint": "9.7.0",
 		"glob": "10.3.15",
-		"globals": "15.3.0",
+		"globals": "15.8.0",
 		"memory-streams": "0.1.3",
-		"proxy": "2.1.1"
+		"proxy": "2.2.0"
 	},
 	"license": "Apache-2.0",
 	"bin": {
