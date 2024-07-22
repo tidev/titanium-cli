@@ -13,3 +13,8 @@ updates:
     schedule:
       interval: "daily"
       time: "02:00"
+    ignore:
+      - dependency-name: "execa"
+        versions: [">=9"]
+      - dependency-name: "glob"
+        versions: [">=11"]
