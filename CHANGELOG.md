@@ -1,4 +1,4 @@
-7.1.1
+7.1.1 (7/30/2024)
 -------------------
  * fix: Rename platform config `iphone` to `ios` to align with
    `ti.targetPlatforms`
