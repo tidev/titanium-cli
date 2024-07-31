@@ -1,3 +1,8 @@
+7.1.1
+-------------------
+ * fix: Rename platform config `iphone` to `ios` to align with
+   `ti.targetPlatforms`
+
 7.1.0 (5/25/2024)
 -------------------
  * feat: Support async hook `init()` functions

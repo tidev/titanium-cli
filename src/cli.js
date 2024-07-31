@@ -681,6 +681,7 @@ export class CLI {
 		const platformConf = this.command.conf.platforms[this.argv.platform];
 
 		this.argv.$platform = this.argv.platform;
+		this.command.setOptionValue('platform', this.argv.platform);
 
 		// set platform context
 		this.command.platform = {
@@ -947,6 +948,13 @@ export class CLI {
 
 			// if we have a `--platforms` option branch, override the help
 			if (conf.platforms) {
+				// the build command's config `platforms` uses `iphone`, but
+				// the `ti.targetPlatforms` uses `ios`, so rename the key
+				if (!conf.platforms.ios && conf.platforms.iphone) {
+					conf.platforms.ios = conf.platforms.iphone;
+					delete conf.platforms.iphone;
+				}
+
 				this.debugLogger.trace(`Detected conf.platforms loading "${cmdName}", overriding createHelp()`);
 				this.command.createHelp = () => {
 					return Object.assign(new TiHelp(this, conf.platforms), this.command.configureHelp());
