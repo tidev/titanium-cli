@@ -1,3 +1,9 @@
+
+7.1.2 (7/31/2024)
+-------------------
+ * fix: Force `--platform` to `ios`; the SDK converts `ios` to `iphone`, but
+   the CLI needs to reverse this to be able to look up the platform config
+
 7.1.1 (7/30/2024)
 -------------------
  * fix: Rename platform config `iphone` to `ios` to align with
