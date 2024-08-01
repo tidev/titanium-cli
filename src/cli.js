@@ -656,7 +656,7 @@ export class CLI {
 							.join('\n')
 					}`
 				});
-			} else if (!platformOption.skipValueCheck && !platformOption.values.includes(this.argv.platform)) {
+			} else if (!platformOption.values.includes(this.argv.platform)) {
 				throw new TiError(`Invalid platform "${this.argv.$originalPlatform || this.argv.platform}"`, {
 					code: 'INVALID_PLATFORM'
 				});
@@ -670,7 +670,7 @@ export class CLI {
 				this.logger.banner();
 
 				if (e.code === 'INVALID_PLATFORM') {
-					this.logger.error(e.message);
+					this.logger.error(`${e.message}\n`);
 				}
 
 				this.argv.platform = await prompt({

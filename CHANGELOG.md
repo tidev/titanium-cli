@@ -1,3 +1,7 @@
+7.1.3 (8/1/2024)
+-------------------
+ * fix: Invalid `--platform` would cause crash because the platform
+   validation was being bypassed
 
 7.1.2 (7/31/2024)
 -------------------
