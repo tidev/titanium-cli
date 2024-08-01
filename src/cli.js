@@ -639,6 +639,13 @@ export class CLI {
 			return;
 		}
 
+		// when specifying `--platform ios`, the SDK's option callback converts
+		// it to `iphone`, however the platform config uses `ios` and we must
+		// convert it back
+		if (this.argv.platform === 'iphone') {
+			this.argv.platform = 'ios';
+		}
+
 		this.debugLogger.trace(`Processing --platform option: ${this.argv.platform || 'not specified'}`);
 		try {
 			if (!this.argv.platform) {
@@ -681,6 +688,7 @@ export class CLI {
 		const platformConf = this.command.conf.platforms[this.argv.platform];
 
 		this.argv.$platform = this.argv.platform;
+		// set the platform in Commander so we don't lose it when we re-parse the args
 		this.command.setOptionValue('platform', this.argv.platform);
 
 		// set platform context
