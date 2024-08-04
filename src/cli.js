@@ -700,6 +700,9 @@ export class CLI {
 		applyCommandConfig(this, cmdName, this.command, platformConf);
 
 		await this.scanHooks(expand(this.sdk.path, this.argv.platform, 'cli', 'hooks'));
+		if (this.argv.platform === 'ios') {
+			await this.scanHooks(expand(this.sdk.path, 'iphone', 'cli', 'hooks'));
+		}
 	}
 
 	/**

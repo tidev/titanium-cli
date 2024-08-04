@@ -1,3 +1,7 @@
+7.1.4 (8/4/2024)
+-------------------
+ * fix: Load iOS hooks from `iphone` directory in the SDK
+
 7.1.3 (8/1/2024)
 -------------------
  * fix: Invalid `--platform` would cause crash because the platform
