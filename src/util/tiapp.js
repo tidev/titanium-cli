@@ -19,7 +19,11 @@ export class Tiapp {
 		let errorMsg;
 		const { default: xmldom } = await import('@xmldom/xmldom');
 		const parser = new xmldom.DOMParser({
-			errorHandler: err => errorMsg = err
+			onError(type, err) {
+				if (type === 'fatalError') {
+					errorMsg = err;
+				}
+			}
 		});
 		const str = await readFile(file, 'utf8');
 		const doc = parser.parseFromString(str, 'text/xml');

@@ -61,8 +61,8 @@ describe('Tiapp', () => {
 		await assert.rejects(
 			tiapp.load(join(fixturesDir, 'bad.xml')),
 			{
-				name: 'Error',
-				message: /xmldom warning/
+				name: 'ParseError',
+				message: 'unclosed xml tag(s): ti:app'
 			}
 		);
 	});
