@@ -17,7 +17,7 @@
 	"repository": "https://github.com/tidev/titanium-cli",
 	"preferGlobal": true,
 	"dependencies": {
-		"@xmldom/xmldom": "0.8.10",
+		"@xmldom/xmldom": "0.9.2",
 		"chalk": "5.3.0",
 		"commander": "12.1.0",
 		"execa": "8.0.1",
@@ -35,7 +35,7 @@
 		"@reporters/github": "1.7.0",
 		"@vitest/coverage-istanbul": "2.0.5",
 		"c8": "10.1.2",
-		"eslint": "9.9.1",
+		"eslint": "9.10.0",
 		"glob": "10.4.5",
 		"globals": "15.9.0",
 		"memory-streams": "0.1.3",
