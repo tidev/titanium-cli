@@ -35,7 +35,7 @@
 		"@reporters/github": "1.7.1",
 		"@vitest/coverage-istanbul": "2.1.1",
 		"c8": "10.1.2",
-		"eslint": "9.10.0",
+		"eslint": "9.11.0",
 		"glob": "10.4.5",
 		"globals": "15.9.0",
 		"memory-streams": "0.1.3",
