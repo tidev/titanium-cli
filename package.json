@@ -33,7 +33,7 @@
 	},
 	"devDependencies": {
 		"@reporters/github": "1.7.1",
-		"@vitest/coverage-istanbul": "2.1.1",
+		"@vitest/coverage-istanbul": "2.1.2",
 		"c8": "10.1.2",
 		"eslint": "9.11.1",
 		"glob": "10.4.5",
