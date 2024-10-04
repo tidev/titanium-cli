@@ -1,6 +1,6 @@
 {
 	"name": "titanium",
-	"version": "7.1.4",
+	"version": "7.1.5",
 	"author": "TiDev, Inc. <npm@tidev.io>",
 	"description": "Command line interface for building Titanium SDK apps",
 	"type": "module",
