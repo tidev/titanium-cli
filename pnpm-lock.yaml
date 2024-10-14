@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@xmldom/xmldom':
-        specifier: 0.9.3
-        version: 0.9.3
+        specifier: 0.9.4
+        version: 0.9.4
       chalk:
         specifier: 5.3.0
         version: 5.3.0
@@ -516,8 +516,8 @@ packages:
   '@vitest/utils@1.4.0':
     resolution: {integrity: sha512-mx3Yd1/6e2Vt/PUC98DcqTirtfxUyAZ32uK82r8rZzbtBeBo+nqgnjx/LvqQdWsrvNtm14VmurNgcf4nqY5gJg==}
 
-  '@xmldom/xmldom@0.9.3':
-    resolution: {integrity: sha512-W7fOe0N+t2eyL9sjDE+7bBNo/NZg6U6aU0Rp8wwQV8TRkzLnX13SvROoyJMAH0Kcm9G1DX9b1XI4LxwKxowsXw==}
+  '@xmldom/xmldom@0.9.4':
+    resolution: {integrity: sha512-zglELfWx7g1cEpVMRBZ0srIQO5nEvKvraJ6CVUC/c5Ky1GgX8OIjtUj5qOweTYULYZo5VnXs/LpUUUNiGpX/rA==}
     engines: {node: '>=14.6'}
 
   acorn-jsx@5.3.2:
@@ -1867,7 +1867,7 @@ snapshots:
       loupe: 2.3.7
       pretty-format: 29.7.0
 
-  '@xmldom/xmldom@0.9.3': {}
+  '@xmldom/xmldom@0.9.4': {}
 
   acorn-jsx@5.3.2(acorn@8.12.1):
     dependencies:
