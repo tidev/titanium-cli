@@ -1,3 +1,12 @@
+7.1.6 (2/6/2025)
+-------------------
+ * fix: Fixed command path for Node 22.13.1.
+
+7.1.5 (10/4/2024)
+-------------------
+ * fix: Improve tiapp sdk-version handling
+ * chore: Update dependencies
+
 7.1.4 (8/4/2024)
 -------------------
  * fix: Load iOS hooks from `iphone` directory in the SDK
