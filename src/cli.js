@@ -911,7 +911,7 @@ export class CLI {
 
 		if (commands[cmdName]) {
 			desc = commands[cmdName];
-			commandFile = join(import.meta.url, `../commands/${cmdName}.js`);
+			commandFile = pathToFileURL(join(fileURLToPath(import.meta.url), `../commands/${cmdName}.js`));
 		} else if (sdkCommands[cmdName]) {
 			desc = sdkCommands[cmdName];
 			commandFile = pathToFileURL(join(this.sdk.path, `cli/commands/${cmdName}.js`));
