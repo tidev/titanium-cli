@@ -293,7 +293,7 @@ describe('ti sdk', () => {
 			({ exitCode, stdout } = await run(['sdk', 'ls', '-bu', '--json']));
 			const json = JSON.parse(stdout);
 			assert(json.branches.branches.includes('master'));
-			assert(json.branches.branches.includes('12_2_X'));
+			assert(json.branches.branches.includes('12_6_X'));
 			assert(json.releases[sdkName]);
 
 			assert.strictEqual(exitCode, 0);
