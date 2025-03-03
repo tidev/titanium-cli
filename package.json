@@ -17,7 +17,7 @@
 	"repository": "https://github.com/tidev/titanium-cli",
 	"preferGlobal": true,
 	"dependencies": {
-		"@xmldom/xmldom": "0.9.7",
+		"@xmldom/xmldom": "0.9.8",
 		"chalk": "5.4.1",
 		"commander": "12.1.0",
 		"execa": "8.0.1",
