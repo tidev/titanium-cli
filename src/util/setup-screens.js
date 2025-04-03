@@ -68,7 +68,7 @@ export class SetupScreens {
 		let screen;
 		while (screen = this[`${next}Screen`]) {
 			next = (await screen.call(this)) || 'mainmenu';
-			this.logger.trace(`Next screen: ${next}`);
+			this.cli.debugLogger.trace(`Next screen: ${next}`);
 		}
 	}
 
@@ -162,7 +162,7 @@ export class SetupScreens {
 			{
 				type: prev => prev ? 'text' : null,
 				message: 'Path to the Android SDK',
-				initial: this.config.get('android.sdkPath', data?.android.sdk?.path),
+				initial: this.config.get('android.sdkPath', data?.android?.sdk?.path),
 				name: 'androidSdkPath',
 				validate: value => {
 					if (!value) {
@@ -291,158 +291,168 @@ export class SetupScreens {
 				busy.stop();
 			}
 
-			const distPPLabel = 'dist provisioning';
-			const len = distPPLabel.length;
+			if (data.ios) {
+				const distPPLabel = 'dist provisioning';
+				const len = distPPLabel.length;
 
-			if (Object.keys(data.ios.xcode).length) {
-				ok('Xcode'.padEnd(len), 'installed', `(${
-					Object
-						.keys(data.ios.xcode)
-						.filter(ver => ver !== '__selected__')
-						.map(ver => data.ios.xcode[ver].version)
-						.sort()
-						.join(', ')
-				})`);
+				if (Object.keys(data.ios.xcode).length) {
+					ok('Xcode'.padEnd(len), 'installed', `(${
+						Object
+							.keys(data.ios.xcode)
+							.filter(ver => ver !== '__selected__')
+							.map(ver => data.ios.xcode[ver].version)
+							.sort()
+							.join(', ')
+					})`);
 
-				const iosSdks = {};
-				for (const ver of Object.keys(data.ios.xcode)) {
-					if (ver !== '__selected__') {
-						for (const v of data.ios.xcode[ver].sdks) {
-							iosSdks[v] = 1;
+					const iosSdks = {};
+					for (const ver of Object.keys(data.ios.xcode)) {
+						if (ver !== '__selected__') {
+							for (const v of data.ios.xcode[ver].sdks) {
+								iosSdks[v] = 1;
+							}
 						}
 					}
-				}
-				if (Object.keys(iosSdks).length) {
-					ok('iOS SDK'.padEnd(len), 'installed', `(${Object.keys(iosSdks).sort().join(', ')})`);
+					if (Object.keys(iosSdks).length) {
+						ok('iOS SDK'.padEnd(len), 'installed', `(${Object.keys(iosSdks).sort().join(', ')})`);
+					} else {
+						warn('iOS SDK'.padEnd(len), 'no iOS SDKs found');
+					}
 				} else {
-					warn('iOS SDK'.padEnd(len), 'no iOS SDKs found');
+					warn('Xcode'.padEnd(len), 'no Xcode installations found');
+					warn('iOS SDK'.padEnd(len), 'no Xcode installations found');
 				}
-			} else {
-				warn('Xcode'.padEnd(len), 'no Xcode installations found');
-				warn('iOS SDK'.padEnd(len), 'no Xcode installations found');
-			}
 
-			if (data.ios.certs.wwdr) {
-				ok('WWDR cert'.padEnd(len), 'installed');
-			} else {
-				warn('WWDR cert'.padEnd(len), 'not found');
-			}
+				if (data.ios.certs.wwdr) {
+					ok('WWDR cert'.padEnd(len), 'installed');
+				} else {
+					warn('WWDR cert'.padEnd(len), 'not found');
+				}
 
-			let devCerts = 0;
-			let distCerts = 0;
+				let devCerts = 0;
+				let distCerts = 0;
 
-			for (const keychain of Object.keys(data.ios.certs.keychains)) {
-				if (data.ios.certs.keychains[keychain].developer) {
-					for (const i of data.ios.certs.keychains[keychain].developer) {
-						if (!Object.hasOwn(i, 'invalid') || i.invalid === false) {
-							devCerts++;
+				for (const keychain of Object.keys(data.ios.certs.keychains)) {
+					if (data.ios.certs.keychains[keychain].developer) {
+						for (const i of data.ios.certs.keychains[keychain].developer) {
+							if (!Object.hasOwn(i, 'invalid') || i.invalid === false) {
+								devCerts++;
+							}
+						}
+					}
+					if (data.ios.certs.keychains[keychain].distribution) {
+						for (const i of data.ios.certs.keychains[keychain].distribution) {
+							if (!Object.hasOwn(i, 'invalid') || i.invalid === false) {
+								distCerts++;
+							}
 						}
 					}
 				}
-				if (data.ios.certs.keychains[keychain].distribution) {
-					for (const i of data.ios.certs.keychains[keychain].distribution) {
-						if (!Object.hasOwn(i, 'invalid') || i.invalid === false) {
-							distCerts++;
-						}
-					}
+
+				if (devCerts) {
+					ok('developer cert'.padEnd(len), 'installed', `(${devCerts} found)`);
+				} else {
+					warn('developer cert'.padEnd(len), 'not found');
 				}
-			}
 
-			if (devCerts) {
-				ok('developer cert'.padEnd(len), 'installed', `(${devCerts} found)`);
-			} else {
-				warn('developer cert'.padEnd(len), 'not found');
-			}
+				if (distCerts) {
+					ok('distribution cert'.padEnd(len), 'installed', `(${distCerts} found)`);
+				} else {
+					warn('distribution cert'.padEnd(len), 'not found');
+				}
 
-			if (distCerts) {
-				ok('distribution cert'.padEnd(len), 'installed', `(${distCerts} found)`);
-			} else {
-				warn('distribution cert'.padEnd(len), 'not found');
-			}
+				const devPP = data.ios.provisioning.development.filter(i => {
+					return !Object.hasOwn(i, 'expired') || i.expired === false;
+				}).length;
+				if (devPP) {
+					ok('dev provisioning'.padEnd(len), 'installed', `(${devPP} found)`);
+				} else {
+					warn('dev provisioning'.padEnd(len), 'not found');
+				}
 
-			const devPP = data.ios.provisioning.development.filter(i => {
-				return !Object.hasOwn(i, 'expired') || i.expired === false;
-			}).length;
-			if (devPP) {
-				ok('dev provisioning'.padEnd(len), 'installed', `(${devPP} found)`);
+				const distPP = data.ios.provisioning.distribution.filter(i => {
+					return !Object.hasOwn(i, 'expired') || i.expired === false;
+				}).length + data.ios.provisioning.adhoc.filter(i => {
+					return !Object.hasOwn(i, 'expired') || i.expired === false;
+				}).length + data.ios.provisioning.enterprise.filter(i => {
+					return !Object.hasOwn(i, 'expired') || i.expired === false;
+				}).length;
+				if (distPP) {
+					ok(distPPLabel, 'installed', `(${distPP} found)`);
+				} else {
+					warn(distPPLabel, 'not found');
+				}
 			} else {
-				warn('dev provisioning'.padEnd(len), 'not found');
-			}
-
-			const distPP = data.ios.provisioning.distribution.filter(i => {
-				return !Object.hasOwn(i, 'expired') || i.expired === false;
-			}).length + data.ios.provisioning.adhoc.filter(i => {
-				return !Object.hasOwn(i, 'expired') || i.expired === false;
-			}).length + data.ios.provisioning.enterprise.filter(i => {
-				return !Object.hasOwn(i, 'expired') || i.expired === false;
-			}).length;
-			if (distPP) {
-				ok(distPPLabel, 'installed', `(${distPP} found)`);
-			} else {
-				warn(distPPLabel, 'not found');
+				log(yellow('  A Titanium SDK must be installed to detect Android environment'));
+				log(`  To install the latest SDK, run: ${cyan('titanium sdk install')}`);
 			}
 			log();
 		}
 
 		log('Android Environment');
-		if (data.android.sdk?.path) {
-			ok('sdk', 'installed', `(${data.android.sdk.path})`);
+		if (data.android) {
+			if (data.android.sdk?.path) {
+				ok('sdk', 'installed', `(${data.android.sdk.path})`);
 
-			if (data.android.sdk.platformTools && data.android.sdk.platformTools.path) {
-				if (data.android.sdk.platformTools.supported === 'maybe') {
-					warn('platform tools', `untested version ${data.android.sdk.platformTools.version}; may or may not work`);
-				} else if (data.android.sdk.platformTools.supported) {
-					ok('platform tools', 'installed', `(v${data.android.sdk.platformTools.version})`);
-				} else {
-					bad('platform tools', `unsupported version ${data.android.sdk.platformTools.version}`);
+				if (data.android.sdk.platformTools && data.android.sdk.platformTools.path) {
+					if (data.android.sdk.platformTools.supported === 'maybe') {
+						warn('platform tools', `untested version ${data.android.sdk.platformTools.version}; may or may not work`);
+					} else if (data.android.sdk.platformTools.supported) {
+						ok('platform tools', 'installed', `(v${data.android.sdk.platformTools.version})`);
+					} else {
+						bad('platform tools', `unsupported version ${data.android.sdk.platformTools.version}`);
+					}
 				}
+
+				if (data.android.sdk.buildTools && data.android.sdk.buildTools.path) {
+					if (data.android.sdk.buildTools.supported === 'maybe') {
+						warn('build tools', `untested version ${data.android.sdk.buildTools.version}; may or may not work`);
+					} else if (data.android.sdk.buildTools.supported) {
+						ok('build tools', 'installed', `(v${data.android.sdk.buildTools.version})`);
+					} else {
+						bad('build tools', `unsupported version ${data.android.sdk.buildTools.version}`);
+					}
+				}
+
+				if (data.android.sdk.executables) {
+					if (data.android.sdk.executables.adb) {
+						ok('adb', 'installed', data.android.sdk.executables.adb);
+					} else {
+						bad('adb', '"adb" executable not found; please reinstall Android SDK');
+					}
+					if (data.android.sdk.executables.emulator) {
+						ok('emulator', 'installed', data.android.sdk.executables.emulator);
+					} else {
+						bad('emulator', '"emulator" executable not found; please reinstall Android SDK');
+					}
+				}
+			} else {
+				warn('sdk', 'Android SDK not found');
 			}
 
-			if (data.android.sdk.buildTools && data.android.sdk.buildTools.path) {
-				if (data.android.sdk.buildTools.supported === 'maybe') {
-					warn('build tools', `untested version ${data.android.sdk.buildTools.version}; may or may not work`);
-				} else if (data.android.sdk.buildTools.supported) {
-					ok('build tools', 'installed', `(v${data.android.sdk.buildTools.version})`);
-				} else {
-					bad('build tools', `unsupported version ${data.android.sdk.buildTools.version}`);
-				}
+			if (data.android.targets && Object.keys(data.android.targets).length) {
+				ok('targets', 'installed', `(${Object.keys(data.android.targets).length} found)`);
+			} else {
+				warn('targets', 'no targets found');
 			}
 
-			if (data.android.sdk.executables) {
-				if (data.android.sdk.executables.adb) {
-					ok('adb', 'installed', data.android.sdk.executables.adb);
-				} else {
-					bad('adb', '"adb" executable not found; please reinstall Android SDK');
+			if (data.android.emulators?.length) {
+				ok('emulators', 'installed', `(${data.android.emulators.length} found)`);
+			} else {
+				warn('emulators', 'no emulators found');
+			}
+
+			if (data.android.ndk) {
+				ok('ndk', 'installed', `(${data.android.ndk.version})`);
+				if (data.android.ndk.executables) {
+					ok('ndk-build', 'installed', `(${data.android.ndk.executables.ndkbuild})`);
 				}
-				if (data.android.sdk.executables.emulator) {
-					ok('emulator', 'installed', data.android.sdk.executables.emulator);
-				} else {
-					bad('emulator', '"emulator" executable not found; please reinstall Android SDK');
-				}
+			} else {
+				warn('ndk', 'Android NDK not found');
 			}
 		} else {
-			warn('sdk', 'Android SDK not found');
-		}
-
-		if (data.android.targets && Object.keys(data.android.targets).length) {
-			ok('targets', 'installed', `(${Object.keys(data.android.targets).length} found)`);
-		} else {
-			warn('targets', 'no targets found');
-		}
-
-		if (data.android.emulators?.length) {
-			ok('emulators', 'installed', `(${data.android.emulators.length} found)`);
-		} else {
-			warn('emulators', 'no emulators found');
-		}
-
-		if (data.android.ndk) {
-			ok('ndk', 'installed', `(${data.android.ndk.version})`);
-			if (data.android.ndk.executables) {
-				ok('ndk-build', 'installed', `(${data.android.ndk.executables.ndkbuild})`);
-			}
-		} else {
-			warn('ndk', 'Android NDK not found');
+			log(yellow('  A Titanium SDK must be installed to detect Android environment'));
+			log(`  To install the latest SDK, run: ${cyan('titanium sdk install')}`);
 		}
 
 		log(); // end android
@@ -722,7 +732,7 @@ export class SetupScreens {
 			{
 				type: 'text',
 				message: 'Path to the Android SDK',
-				initial: this.config.get('android.sdkPath', data?.android.sdk?.path),
+				initial: this.config.get('android.sdkPath', data?.android?.sdk?.path),
 				name: 'androidSdkPath',
 				validate: value => {
 					if (!value) {
@@ -753,7 +763,7 @@ export class SetupScreens {
 			{
 				type: prev => prev ? 'text' : null,
 				message: 'Path to the Android NDK',
-				initial: this.config.get('android.ndkPath', data?.android.ndk?.path),
+				initial: this.config.get('android.ndkPath', data?.android?.ndk?.path),
 				name: 'androidNdkPath',
 				validate: value => {
 					if (!value) {

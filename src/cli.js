@@ -5,7 +5,7 @@ import { basename, dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { unique } from './util/unique.js';
 import { ticonfig } from './util/ticonfig.js';
-import { initSDK } from './util/tisdk.js';
+import { initSDK, typeLabels } from './util/tisdk.js';
 import { expand } from './util/expand.js';
 import { arrayify } from './util/arrayify.js';
 import * as version from './util/version.js';
@@ -818,7 +818,14 @@ export class CLI {
 				await Promise.all(paths.map(p => this.scanHooks(p)));
 			}
 
-			await this.loadSDK({ cmdName, cwd });
+			try {
+				await this.loadSDK({ cmdName, cwd });
+			} catch (err) {
+				if (sdkCommands[cmdName]) {
+					throw err;
+				}
+				// if it's not a sdk command, then it's ok if the SDK failed to load
+			}
 			await this.loadCommand(cmd);
 		});
 
@@ -904,7 +911,7 @@ export class CLI {
 
 		if (commands[cmdName]) {
 			desc = commands[cmdName];
-			commandFile = join(import.meta.url, `../commands/${cmdName}.js`);
+			commandFile = pathToFileURL(join(fileURLToPath(import.meta.url), `../commands/${cmdName}.js`));
 		} else if (sdkCommands[cmdName]) {
 			desc = sdkCommands[cmdName];
 			commandFile = pathToFileURL(join(this.sdk.path, `cli/commands/${cmdName}.js`));
@@ -1044,7 +1051,8 @@ export class CLI {
 			installPath,
 			sdk,
 			sdkPaths,
-			sdks
+			sdks,
+			tiappSdkVersion
 		} = await initSDK({
 			config: this.config,
 			cwd,
@@ -1069,10 +1077,36 @@ export class CLI {
 		this.sdk = sdk;
 		this.argv.sdk = sdk?.name;
 
-		if (sdkCommands[cmdName] && !sdk) {
-			throw new TiError('No Titanium SDKs found', {
-				after: `You can download the latest Titanium SDK by running: ${cyan('titanium sdk install')}`
-			});
+		if (sdkCommands[cmdName]) {
+			const hasSDKs = Object.keys(sdks).length > 0;
+			if (!hasSDKs || !sdk) {
+				if (hasSDKs && tiappSdkVersion) {
+					throw new TiError(`The <sdk-version> in the tiapp.xml is set to "${tiappSdkVersion}", but this version is not installed`, {
+						after: `Available SDKs:\n${Object.values(sdks).map(sdk => `  ${cyan(sdk.name.padEnd(24))} ${gray(typeLabels[sdk.type])}`).join('\n')}`
+					});
+				}
+
+				throw new TiError('No Titanium SDKs found', {
+					after: `You can download the latest Titanium SDK by running: ${cyan('titanium sdk install')}`
+				});
+			}
+
+			try {
+				// check if the sdk is compatible with our version of node
+				sdk.packageJson = await fs.readJson(join(sdk.path, 'package.json'));
+
+				const current = process.versions.node;
+				const required = sdk.packageJson.vendorDependencies.node;
+				const supported = version.satisfies(current, required, true);
+
+				if (supported === false) {
+					throw new TiError(`Titanium SDK v${sdk.name} is incompatible with Node.js v${current}`, {
+						after: `Please install Node.js ${version.parseMax(required)} in order to use this version of the Titanium SDK.`
+					});
+				}
+			} catch (e) {
+				// do nothing
+			}
 		}
 
 		// render the banner

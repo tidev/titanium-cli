@@ -136,8 +136,17 @@ function getSDKType(name) {
 
 const sortTypes = ['local', 'nightly', 'beta', 'rc', 'ga'];
 
+export const typeLabels = {
+	local: 'Local Build',
+	nightly: 'Nightly Build',
+	beta: 'Beta',
+	rc: 'Release Candidate',
+	ga: 'Production Stable'
+};
+
 export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabled, selectedSdk, showSDKPrompt }) {
 	let sdkVersion;
+	let tiappSdkVersion;
 
 	// try to read the tiapp.xml
 	let tiapp = new Tiapp();
@@ -145,8 +154,8 @@ export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabl
 		const tiappFile = join(cwd, 'tiapp.xml');
 		await tiapp.load(tiappFile);
 		debugLogger.trace(`Loaded ${tiappFile}`);
-		sdkVersion = await tiapp.select1('//sdk-version', 'latest');
-		debugLogger.trace(`<sdk-version> is ${sdkVersion ? `set to ${sdkVersion}` : 'undefined'}`);
+		sdkVersion = tiappSdkVersion = await tiapp.select1('//sdk-version', 'latest');
+		debugLogger.trace(`<sdk-version> is ${tiappSdkVersion ? `set to ${tiappSdkVersion}` : 'undefined'}`);
 	} catch {
 		// might not be a project dir or bad tiapp.xml
 	}
@@ -168,14 +177,6 @@ export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabl
 		}
 
 		sdk = sdks.find(s => s.name === sdkVersion);
-
-		const typeLabels = {
-			local: 'Local Build',
-			nightly: 'Nightly Build',
-			beta: 'Beta',
-			rc: 'Release Candidate',
-			ga: 'Production Stable'
-		};
 
 		if (promptingEnabled && ((selectedSdk && !sdk) || showSDKPrompt)) {
 			logger.banner();
@@ -211,30 +212,6 @@ export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabl
 
 			sdk = sdks.find(s => s.name === sdkVersion);
 		}
-
-		// return the specified sdk
-		if (!sdk) {
-			throw new TiError(`Titanium SDK "${sdkVersion}" not found`, {
-				after: `Available SDKs:\n${sdks.map(sdk => `  ${cyan(sdk.name.padEnd(24))} ${gray(typeLabels[sdk.type])}`).join('\n')}`
-			});
-		}
-
-		try {
-			// check if the sdk is compatible with our version of node
-			sdk.packageJson = await fs.readJson(join(sdk.path, 'package.json'));
-
-			const current = process.versions.node;
-			const required = sdk.packageJson.vendorDependencies.node;
-			const supported = version.satisfies(current, required, true);
-
-			if (supported === false) {
-				throw new TiError(`Titanium SDK v${sdk.name} is incompatible with Node.js v${current}`, {
-					after: `Please install Node.js ${version.parseMax(required)} in order to use this version of the Titanium SDK.`
-				});
-			}
-		} catch (e) {
-			// do nothing
-		}
 	}
 
 	return {
@@ -244,7 +221,8 @@ export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabl
 		sdks: sdks.reduce((obj, sdk) => {
 			obj[sdk.name] = sdk;
 			return obj;
-		}, {})
+		}, {}),
+		tiappSdkVersion
 	};
 }
 
