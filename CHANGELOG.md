@@ -1,3 +1,8 @@
+7.1.7 (4/3/2025)
+-------------------
+ * fix: Fixed issue installing Hyperloop module where same name and version,
+   but different platform.
+
 7.1.6 (2/6/2025)
 -------------------
  * fix: Fixed command path for Node 22.13.1.
