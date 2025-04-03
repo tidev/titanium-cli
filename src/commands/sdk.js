@@ -433,7 +433,7 @@ SdkSubcommands.install = {
 							continue;
 						}
 
-						modules[`${moduleName}@${ver}`] = { src: srcVersionDir, dest: destDir };
+						modules[`${moduleName}@${ver}@${platform}`] = { src: srcVersionDir, dest: destDir };
 					}
 				}
 			}
