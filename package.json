@@ -22,7 +22,7 @@
 		"commander": "12.1.0",
 		"execa": "8.0.1",
 		"fs-extra": "11.3.0",
-		"pretty-bytes": "6.1.1",
+		"pretty-bytes": "7.0.0",
 		"prompts": "2.4.2",
 		"semver": "7.7.1",
 		"undici": "7.6.0",
