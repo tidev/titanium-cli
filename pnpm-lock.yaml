@@ -33,8 +33,8 @@ importers:
         specifier: 7.7.2
         version: 7.7.2
       undici:
-        specifier: 7.6.0
-        version: 7.6.0
+        specifier: 7.9.0
+        version: 7.9.0
       which:
         specifier: 5.0.0
         version: 5.0.0
@@ -317,10 +317,6 @@ packages:
 
   '@eslint/eslintrc@3.3.1':
     resolution: {integrity: sha512-gtF186CXhIl1p4pJNGZw8Yc6RlshoePRvE0X91oPGb3vZ8pM3qOS9W9NGPat9LziaBV7XrJWGylNQXkGcnM3IQ==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@eslint/js@9.26.0':
-    resolution: {integrity: sha512-I9XlJawFdSMvWjDt6wksMCrgns5ggLNfFwFvnShsleWruvXM514Qxk8V246efTw+eo9JABvVz+u3q2RiAowKxQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@eslint/js@9.27.0':
@@ -1334,8 +1330,8 @@ packages:
     resolution: {integrity: sha512-raqeBD6NQK4SkWhQzeYKd1KmIG6dllBOTt55Rmkt4HtI9mwdWtJljnrXjAFUBLTSN67HWrOIZ3EPF4kjUw80Bg==}
     engines: {node: '>=14.0'}
 
-  undici@7.6.0:
-    resolution: {integrity: sha512-gaFsbThjrDGvAaD670r81RZro/s6H2PVZF640Qn0p5kZK+/rim7/mmyfp2W7VB5vOMaFM8vuFBJUaMlaZTYHlA==}
+  undici@7.9.0:
+    resolution: {integrity: sha512-e696y354tf5cFZPXsF26Yg+5M63+5H3oE6Vtkh2oqbvsE2Oe7s2nIbcQh5lmG7Lp/eS29vJtTpw9+p6PX0qNSg==}
     engines: {node: '>=20.18.1'}
 
   universalify@2.0.1:
@@ -1702,8 +1698,6 @@ snapshots:
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
       - supports-color
-
-  '@eslint/js@9.26.0': {}
 
   '@eslint/js@9.27.0': {}
 
@@ -2670,7 +2664,7 @@ snapshots:
     dependencies:
       '@fastify/busboy': 2.1.1
 
-  undici@7.6.0: {}
+  undici@7.9.0: {}
 
   universalify@2.0.1: {}
 
