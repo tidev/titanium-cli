@@ -49,8 +49,8 @@ importers:
         version: 3.2.0
     devDependencies:
       '@eslint/js':
-        specifier: 9.27.0
-        version: 9.27.0
+        specifier: 9.28.0
+        version: 9.28.0
       '@reporters/github':
         specifier: 1.7.2
         version: 1.7.2
