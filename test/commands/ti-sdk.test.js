@@ -75,7 +75,8 @@ describe('ti sdk', () => {
 			const sdkPath = join(tmpSDKDir, 'mobilesdk', os, sdkName);
 
 			// list sdks (no sdks installed)
-			let { exitCode, stdout } = await run(['sdk']); // no `ls` to test default subcommand
+			// eslint-disable-next-line no-unused-vars
+			let { exitCode, stdout, stderr } = await run(['sdk']); // no `ls` to test default subcommand
 			let output = stripColor(stdout);
 			assert.match(output, /Titanium Command-Line Interface/);
 			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
