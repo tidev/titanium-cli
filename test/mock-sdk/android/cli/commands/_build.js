@@ -538,7 +538,7 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 						secret: true,
 						validate: function (keyPassword, callback) {
 							// sanity check the keystore and store password
-							_t.conf.options['store-password'].validate(cli.argv['store-password'], function (err, storePassword) {
+							_t.conf.options['store-password'].validate(cli.argv['store-password'], function (err, _storePassword) {
 								if (err) {
 									// we have a bad --keystore or --store-password arg
 									cli.argv.keystore = cli.argv['store-password'] = undefined;
@@ -630,7 +630,7 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 							}
 
 							// sanity check the keystore
-							_t.conf.options.keystore.validate(cli.argv.keystore, function (err, keystoreFile) {
+							_t.conf.options.keystore.validate(cli.argv.keystore, function (err, _keystoreFile) {
 								if (err) {
 									// we have a bad --keystore arg
 									cli.argv.keystore = undefined;
@@ -698,7 +698,7 @@ AndroidBuilder.prototype.run = async function run(_logger, _config, cli, finishe
 		await new Promise(resolve => cli.emit('build.post.build', this, resolve));
 		await new Promise(resolve => cli.emit('build.post.compile', this, resolve));
 		await new Promise(resolve => cli.emit('build.finalize', this, resolve));
-	} catch (err) {
+	} catch {
 		process.exit(1);
 	}
 

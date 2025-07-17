@@ -95,7 +95,7 @@ export class TiHelp extends Help {
 		function formatItem(term, description) {
 			if (description) {
 				const fullText = `${cyan(term.padEnd(termWidth + itemSeparatorWidth))}${description}`;
-				return helper.wrap(fullText, helpWidth - itemIndentWidth, termWidth + itemSeparatorWidth);
+				return helper.boxWrap(fullText, helpWidth - itemIndentWidth, termWidth + itemSeparatorWidth);
 			}
 			return cyan(term);
 		}
@@ -110,7 +110,7 @@ export class TiHelp extends Help {
 		// Description
 		const commandDescription = helper.commandDescription(cmd);
 		if (commandDescription.length > 0) {
-			output = output.concat([helper.wrap(commandDescription, helpWidth, 0), '']);
+			output = output.concat([helper.boxWrap(commandDescription, helpWidth, 0), '']);
 		}
 
 		// Commands

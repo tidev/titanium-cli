@@ -215,7 +215,7 @@ SdkSubcommands.list = {
 				if (!name) {
 					try {
 						name = version.format(v, 3, 3);
-					} catch (ex) {
+					} catch {
 						name = '';
 					}
 				}
@@ -384,7 +384,7 @@ SdkSubcommands.install = {
 					manifest.name = renameTo;
 					await fs.writeJson(manifestFile, manifest);
 				}
-			} catch (e) {
+			} catch {
 				name = null;
 			}
 		}
@@ -477,7 +477,7 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 			throw new TiError('Specified file does not exist');
 		}
 
-		if (!/\.zip$/.test(file)) {
+		if (!file.endsWith('.zip')) {
 			throw new TiError('Specified file is not a zip file');
 		}
 		return { file };
@@ -567,8 +567,8 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 	}
 
 	const cd = response.headers['content-disposition'];
-	let m = cd && cd.match(/filename[^;=\n]*=['"]*(.*?\2|[^'";\n]*)/);
-	filename = m && m[1];
+	let m = cd && cd.match(/filename\*?=(?:[^']*'[^']*'([^;]+)|["']([^"']+)["']|([^;\s]+))/i);
+	filename = m && (m[1] || m[2] || m[3]);
 
 	// try to determine the file extension by the filename in the url
 	if (!filename && (m = url.match(/.*\/(.+\.zip)$/))) {
@@ -692,7 +692,7 @@ async function extractSDK({ debugLogger, file, force, logger, noPrompt, osName, 
 	return { forceModules, name, renameTo, tempDir: tempDir2 };
 }
 
-async function checkSDKFile({ force, logger, filename, name, noPrompt, osName, sdkDir, subject }) {
+async function checkSDKFile({ force, logger, _filename, name, noPrompt, _osName, sdkDir, subject }) {
 	try {
 		if (force || !fs.statSync(sdkDir).isDirectory()) {
 			return;
@@ -718,6 +718,7 @@ async function checkSDKFile({ force, logger, filename, name, noPrompt, osName, s
 	}
 
 	let renameTo;
+	// eslint-disable no-constant-condition
 	for (let i = 2; true; i++) {
 		try {
 			renameTo = `${name}-${i}`;

@@ -4,7 +4,7 @@ import { stripColor } from '../helpers/strip-color.js';
 import { initMockSDKHome } from '../helpers/init-sdk-home.js';
 
 describe('ti clean', () => {
-	it('should show help', initMockSDKHome(async ({ run, tmpSDKDir }) => {
+	it('should show help', initMockSDKHome(async ({ run }) => {
 		const { exitCode, stdout } = await run(['clean', '-h']);
 
 		const output = stripColor(stdout);

@@ -134,7 +134,7 @@ export class TiConfig {
 			try {
 				this.apply(fs.readJsonSync(file));
 				this.#configFile = file;
-			} catch (ex) {
+			} catch {
 				throw new Error(`Unable to parse config file "${file}"`);
 			}
 		}
@@ -154,7 +154,7 @@ export class TiConfig {
 			const tmpFile = `${this.#configFile}.${Date.now()}.tmp`;
 			fs.writeFileSync(tmpFile, JSON.stringify(this, null, 2));
 			fs.renameSync(tmpFile, this.#configFile);
-		} catch (e) {
+		} catch {
 			throw new TiError(`Unable to write config file ${this.#configFile}`, {
 				after: 'Please ensure the Titanium CLI has access to modify this file'
 			});

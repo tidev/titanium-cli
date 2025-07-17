@@ -84,10 +84,11 @@ export async function extractZip(params) {
 							readStream.on('data', chunk => chunks.push(chunk));
 							readStream.on('error', abort);
 							readStream.on('end', () => {
-								let str = Buffer.concat(chunks).toString('utf8');
+								let _str = Buffer.concat(chunks).toString('utf8');
 								if (fs.existsSync(fullPath)) {
 									fs.unlinkSync(fullPath);
 								}
+								// Note: I have no idea why this is commented out
 								// fs.symlinkSync(str, fullPath);
 								zipfile.readEntry();
 							});
