@@ -70,7 +70,7 @@ describe('ti sdk', () => {
 		}));
 	});
 
-	describe.only('install', () => {
+	describe('install', () => {
 		it('should install an SDK and remove it', initSDKHome(async ({ run, tmpHome, tmpSDKDir }) => {
 			const sdkPath = join(tmpSDKDir, 'mobilesdk', os, sdkName);
 
