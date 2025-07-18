@@ -1,7 +1,7 @@
-8.0.0
+8.0.0-beta1 (7/18/2025)
 -------------------
- * Require Node.js 20.18.1 or newer
- * Updated dependencies
+ * BREAKING CHANGE: Require Node.js 20.18.1 or newer
+ * chore: Updated dependencies
 
 7.1.7 (4/3/2025)
 -------------------
