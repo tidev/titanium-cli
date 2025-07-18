@@ -714,6 +714,7 @@ export class CLI {
 		program
 			.name('titanium')
 			.allowUnknownOption()
+			.allowExcessArguments()
 			.addHelpText('beforeAll', () => {
 				this.logger.bannerEnabled(true);
 				this.logger.skipBanner(false);
