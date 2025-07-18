@@ -1,52 +1,41 @@
 # Titanium CLI
 
-> [Titanium CLI](https://github.com/tidev/titanium) is a Command Line Tool for creating and building Titanium Mobile applications and modules. It's open-source and easy to use. [We've](https://github.com/tidev) designed Titanium to be suitable for command line beginners, but still be powerful and extensible enough for production usage.
+[Titanium CLI](https://github.com/tidev/titanium) is a Command Line Tool for
+creating and building Titanium Mobile applications and modules. It's
+open-source and easy to use. [We've](https://github.com/tidev) designed
+Titanium to be suitable for command line beginners, but still be powerful
+and extensible enough for production usage.
 
-## Prerequisites
-
-The Titanium CLI requires [Node.js 18](http://nodejs.org/dist/) or newer.
-
-## Installation
+## Installing the Titanium CLI
 
     [sudo] npm install -g titanium
 
 After install, Titanium CLI is executable as `ti` or `titanium`.
 
-## Obtaining a Titanium SDK
+> [!NOTE]
+> The Titanium CLI requires [Node.js 20.18.1](http://nodejs.org/dist/) or newer.
+
+## Installing the Titanium SDK
 
 You will need to download a Titanium SDK:
 
     # stable release (recommended)
-    titanium sdk install
+    ti sdk install latest
 
 ## Setting up the Titanium CLI
 
-Before you begin using the Titanium CLI, you should configure it by running the "setup" command:
+Before you begin using the Titanium CLI, it's a good idea to run the setup:
 
-    titanium setup
+    ti setup
 
-## Usage
+Next, run the info command to ensure Titanium can find the development
+dependencies such as the Android SDK or Xcode.
 
-    titanium <command> [options]
+    ti info
 
-## Built-in Commands
+## Getting Help
 
-### config
-
-Configure your CLI settings.
-
-    # list all config settings
-    titanium config
-
-    # get a config setting
-    titanium config <key>
-
-    # set a config setting
-    titanium config <key> <value>
-
-### help
-
-Displays help or help for a specific command.
+To show help or help for a specific command.
 
     ti
 
@@ -54,78 +43,129 @@ Displays help or help for a specific command.
 
     titanium <command> --help
 
+Visit https://titaniumsdk.com for more info.
+
+
+## Commands
+
+- [`ti build`](#build) - build a project
+- [`ti clean`](#clean) - removes previous build directories
+- [`ti config`](#config) - get and set config options
+- [`ti create`](#create) - creates a new project
+- [`ti info`](#info) - display development environment information
+- [`ti module`](#module) - displays installed Titanium modules
+- [`ti project`](#project) - get and set tiapp.xml settings
+- [`ti sdk`](#sdk) - manages installed Titanium SDKs
+- [`ti setup`](#setup) - sets up the Titanium CLI
+
+### build
+
+Builds a project for Android or iOS. Note that you need a Mac to build for iOS.
+
+    ti build -p android
+
+    ti build -p android -T device
+
+    ti build -p ios
+
+    ti build -p ios -T device
+
+### clean
+
+Removes the artifacts from the last build.
+
+    ti clean
+
+### config
+
+Configure your CLI settings.
+
+    # list all config settings
+    ti config
+
+    # get a config setting
+    ti config <key>
+
+    # set a config setting
+    ti config <key> <value>
+
+### create
+
+Create a new project. The CLI will prompt for project settings.
+
+    ti create
+
+### info
+
+Displays information about your development environment including Xcode
+installs, iOS SDKs, Android SDKs, etc. If there are any issues or missing
+dependencies, the info command will list them at the end.
+
+    ti info
+
+    ti info --json
+
+### module
+
+Show all installed modules.
+
+    ti module
+
+### project
+
+Shows various project info from the `tiapp.xml`.
+
+    ti project
+
+    ti project name
+
 ### sdk
 
-Download and install Titanium SDKs
+Manage Titanium SDKs. There are three subcommands: `list`, `install`, and `uninstall`.
 
-#### sdk install
+### sdk install
 
-Installs a specific version of the Titanium SDK. If no version is specified, it assumes the latest.
+Installs a specific version of the Titanium SDK. If no version is specified, it
+will download the latest stable release.
 
-    titanium sdk install
+    ti sdk i
 
-    titanium sdk install <version>
+    ti sdk install
 
-    titanium sdk install <version> --force
+    ti sdk install <version>
 
-#### sdk uninstall
+### sdk uninstall
 
 Uninstalls a Titanium SDK.
 
-    titanium sdk uninstall <version>
+    ti sdk rm <version>
 
-#### sdk list
+    ti sdk uninstall <version>
 
-Lists all installed Titanium SDKs. Optionally lists all branches and releases.
+### sdk list
 
-    titanium sdk list
+Lists all installed Titanium SDKs.
 
-    titanium sdk list -r
-    titanium sdk list --releases
+    ti sdk
+    ti sdk list
+
+You can display the available releases:
+
+    ti sdk list --releases
 
 ### setup
 
 Reconfigures the Titanium CLI by asking you a series of questions.
 
-    titanium setup
+    ti setup
 
 ### version
 
 Displays the current version of the CLI and exits.
 
-    titanium -v
+    ti -v
 
-    titanium --version
-
-### info
-
-Displays information about your development environment including Xcode installs, iOS SDKs, Android SDKs, and so on.
-
-    titanium info
-
-    titanium info --json
-
-## Hacking the Titanium CLI
-
-In order to begin hacking on the Titanium CLI, you need to download and install [git](http://git-scm.com/).
-
-If you have already installed a previous version of the Titanium CLI, it's recommended you uninstall the old one first:
-
-    [sudo] npm uninstall -g titanium
-
-The Titanium CLI is essentially pure JavaScript, so there is no build process.
-You just need to pull the code and resolve the dependendencies.
-
-    git clone git@github.com:tidev/titanium-cli.git
-    cd titanium-cli
-    npm install
-    sudo npm link
-
-### Running Unit Tests
-
-To run the unit tests, simply run:
-
-    npm test
+    ti --version
 
 ## Contributing
 
