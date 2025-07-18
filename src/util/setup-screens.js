@@ -65,10 +65,11 @@ export class SetupScreens {
 		}
 
 		let next = this.cli.argv._[0] || 'mainmenu';
-		let screen;
-		while (screen = this[`${next}Screen`]) {
+		let screen = this[`${next}Screen`];
+		while (screen) {
 			next = (await screen.call(this)) || 'mainmenu';
 			this.cli.debugLogger.trace(`Next screen: ${next}`);
+			screen = this[`${next}Screen`];
 		}
 	}
 

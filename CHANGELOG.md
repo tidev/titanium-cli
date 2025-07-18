@@ -1,3 +1,8 @@
+8.0.0
+-------------------
+ * Require Node.js 20.18.1 or newer
+ * Updated dependencies
+
 7.1.7 (4/3/2025)
 -------------------
  * fix: Fixed issue installing Hyperloop module where same name and version,

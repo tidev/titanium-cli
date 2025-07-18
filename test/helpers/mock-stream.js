@@ -1,7 +1,7 @@
 export class MockStream {
 	buffer = '';
 
-	cursorTo(n) {
+	cursorTo(_n) {
 		// noop
 	}
 

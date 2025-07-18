@@ -124,7 +124,7 @@ async function detectPlatformModules(modulesDir, platform, osNamesRegExp, ignore
 		if (!st.isDirectory()) {
 			return [];
 		}
-	} catch (e) {
+	} catch {
 		// ignore if can't stat dir
 		return [];
 	}
@@ -160,7 +160,7 @@ async function detectModulesByPlatformAndName(platformModulesDir, moduleName, ig
 		if (!st.isDirectory()) {
 			return [];
 		}
-	} catch (e) {
+	} catch {
 		return [];
 	}
 

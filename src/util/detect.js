@@ -102,20 +102,24 @@ async function osInfo() {
 
 	if (name === 'darwin') {
 		const { stdout } = await $`sw_vers`;
-		if (m = stdout.match(/ProductName:\s+(.+)/i)) {
+		m = stdout.match(/ProductName:\s+(.+)/i)
+		if (m) {
 			name = m[1];
 		}
-		if (m = stdout.match(/ProductVersion:\s+(.+)/i)) {
+		m = stdout.match(/ProductVersion:\s+(.+)/i)
+		if (m) {
 			version = m[1];
 		}
 	} else if (name === 'linux') {
 		name = 'GNU/Linux';
 		if (existsSync('/etc/lsb-release')) {
 			const s = await readFile('/etc/lsb-release', 'utf-8');
-			if (m = s.match(/DISTRIB_DESCRIPTION=(.+)/i)) {
+			m = s.match(/DISTRIB_DESCRIPTION=(.+)/i)
+			if (m) {
 				name = m[1].replaceAll('"', '');
 			}
-			if (m = s.match(/DISTRIB_RELEASE=(.+)/i)) {
+			m = s.match(/DISTRIB_RELEASE=(.+)/i)
+			if (m) {
 				name = m[1].replaceAll('"', '');
 			}
 		} else if (existsSync('/etc/system-release')) {

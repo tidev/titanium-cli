@@ -4,13 +4,9 @@ import fs from 'fs-extra';
 import { expand } from './expand.js';
 import { arrayify } from './arrayify.js';
 import * as version from './version.js';
-import { TiError } from './tierror.js';
 import { Tiapp } from './tiapp.js';
-import chalk from 'chalk';
 import { request } from './request.js';
 import { prompt } from './prompt.js';
-
-const { cyan, gray } = chalk;
 
 export const locations = {
 	linux: [

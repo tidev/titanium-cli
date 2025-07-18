@@ -30,6 +30,7 @@ function levenshtein(s, c) {
 	for (; i; a[--i] = [i]) {
 		//
 	}
+	// eslint-disable-next-line no-cond-assign
 	for (i = len2 + 1; a[0][--i] = i;) {
 		//
 	}

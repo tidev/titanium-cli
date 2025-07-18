@@ -714,6 +714,7 @@ export class CLI {
 		program
 			.name('titanium')
 			.allowUnknownOption()
+			.allowExcessArguments()
 			.addHelpText('beforeAll', () => {
 				this.logger.bannerEnabled(true);
 				this.logger.skipBanner(false);
@@ -1104,7 +1105,7 @@ export class CLI {
 						after: `Please install Node.js ${version.parseMax(required)} in order to use this version of the Titanium SDK.`
 					});
 				}
-			} catch (e) {
+			} catch {
 				// do nothing
 			}
 		}
@@ -1260,6 +1261,7 @@ export class CLI {
 	 */
 	resetCommander(ctx) {
 		ctx._lifeCycleHooks = {};
+		ctx._savedState = null;
 
 		const optionEvents = ctx.eventNames().filter(name => name.startsWith('option:'));
 		for (const name of optionEvents) {

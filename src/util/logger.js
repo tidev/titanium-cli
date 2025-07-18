@@ -4,6 +4,7 @@ import { format } from 'node:util';
 
 const { bold, cyan, gray, green, magenta, red, yellow } = chalk;
 
+// eslint-disable-next-line no-control-regex
 const ansiRE = /\x1B\[\d+m/g;
 
 export class Logger extends EventEmitter {

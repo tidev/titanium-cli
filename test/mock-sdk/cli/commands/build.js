@@ -320,9 +320,8 @@ function patchLogger(logger, cli) {
 	// override the existing log function
 	logger.log = function patchedLog() {
 		// most of this copied from the CLI's logger.js logger.log() function
-		var args = Array.prototype.slice.call(arguments),
-			padLevels = logger.padLevels,
-			prefix;
+		let args = Array.prototype.slice.call(arguments);
+		let padLevels = logger.padLevels;
 
 		// if there are no args (i.e. a blank line), we need at least one space
 		args.length || args.unshift(' ');
@@ -346,9 +345,6 @@ function patchLogger(logger, cli) {
 		}
 
 		typeof type !== 'string' && (args[1] = '' + args[1]);
-
-		// add [INFO] type prefixes for each line
-		prefix = (args[0] !== '_') ? '[' + args[0].toUpperCase() + ']' + ((args[0].length === 5) ? '  ' : '   ') : '';
 
 		// call the original logger with our cleaned up args
 		origLoggerLog.apply(logger, arguments);

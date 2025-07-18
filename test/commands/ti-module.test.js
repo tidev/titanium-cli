@@ -249,7 +249,7 @@ Global Modules
 	}));
 
 	it('should install module during detection', initCLI(async ({ run }) => {
-		const { exitCode, stdout } = await run(['module']);
+		const { exitCode, _stdout } = await run(['module']);
 
 		assert.strictEqual(exitCode, 0);
 	}));

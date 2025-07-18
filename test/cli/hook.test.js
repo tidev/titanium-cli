@@ -113,7 +113,7 @@ describe('CLI hooks', () => {
 		});
 
 		await new Promise((resolve, reject) => {
-			const r = cli.emit('foo', foo, err => {
+			cli.emit('foo', foo, err => {
 				if (err) {
 					reject(err);
 				} else {

@@ -15,7 +15,7 @@ jobs:
     - name: Setup node
       uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: 22
         registry-url: 'https://registry.npmjs.org/'
 
     - name: Install pnpm
@@ -33,3 +33,37 @@ jobs:
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       run: npm publish --tag ${{ github.event.release.prerelease && 'next' || 'latest' }}
+
+    - name: Get package.json info
+      id: get-package-info
+      run: |
+        echo "name=$(node -p "require('./package.json').name")" >> $GITHUB_OUTPUT
+        echo "homepage=$(node -p "require('./package.json').homepage")" >> $GITHUB_OUTPUT
+        echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+    - name: Send Slack notification
+      uses: slackapi/slack-github-action@v2.1.1
+      with:
+        method: chat.postMessage
+        token: ${{ secrets.SLACK_BOT_TOKEN }}
+        payload: |
+          {
+            "channel": "${{ secrets.SLACK_CHANNEL_ID }}",
+            "text": "Published ${{ steps.get-package-info.outputs.name }}@${{ steps.get-package-info.outputs.version }}",
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "Published ${{ steps.get-package-info.outputs.name }}@${{ steps.get-package-info.outputs.version }}"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "${{ steps.get-package-info.outputs.homepage }}/releases/tag/v${{ steps.get-package-info.outputs.version }}"
+                }
+              }
+            ]
+          }

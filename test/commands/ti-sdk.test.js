@@ -75,6 +75,7 @@ describe('ti sdk', () => {
 			const sdkPath = join(tmpSDKDir, 'mobilesdk', os, sdkName);
 
 			// list sdks (no sdks installed)
+			// eslint-disable-next-line no-unused-vars
 			let { exitCode, stdout, stderr } = await run(['sdk']); // no `ls` to test default subcommand
 			let output = stripColor(stdout);
 			assert.match(output, /Titanium Command-Line Interface/);
@@ -227,7 +228,13 @@ describe('ti sdk', () => {
 		}), 120000);
 
 		it('should error if local zip does not exist', initSDKHome(async ({ run }) => {
-			const { exitCode, stderr } = await run(['sdk', 'install', pathToFileURL(join(fixturesDir, 'does_not_exist')), '--no-progress-bars']);
+			const result = await run([
+				'sdk',
+				'install',
+				pathToFileURL(join(fixturesDir, 'does_not_exist')).toString(),
+				'--no-progress-bars'
+			]);
+			const { exitCode, stderr } = result;
 			assert.match(stderr, /Specified file does not exist/);
 			assert.strictEqual(exitCode, 1);
 		}));
@@ -238,13 +245,13 @@ describe('ti sdk', () => {
 			assert.strictEqual(exitCode, 1);
 		}));
 
-		it('should install an SDK from a URL', initSDKHome(async ({ run }) => {
-			const { exitCode, stderr } = await run(['sdk', 'install', pathToFileURL(join(fixturesDir, 'does_not_exist')), '--no-progress-bars']);
-			assert.match(stderr, /Specified file does not exist/);
-			assert.strictEqual(exitCode, 1);
+		it.skip('should install an SDK from a URL', initSDKHome(async ({ _run }) => {
+			// const { exitCode, stderr } = await run(['sdk', 'install', 'https://titaniumsdk.com/', '--no-progress-bars']);
+			// assert.match(stderr, /Specified file does not exist/);
+			// assert.strictEqual(exitCode, 1);
 		}));
 
-		it('should install an SDK from a branch', initSDKHome(async ({ run }) => {
+		it('should install an SDK from a branch', initSDKHome(async ({ _run }) => {
 			// TODO
 		}));
 

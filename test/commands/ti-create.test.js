@@ -4,8 +4,8 @@ import { stripColor } from '../helpers/strip-color.js';
 import { initMockSDKHome } from '../helpers/init-sdk-home.js';
 
 describe('ti create', () => {
-	it('should show help', initMockSDKHome(async ({ run, tmpSDKDir }) => {
-		const { exitCode, stdout, stderr } = await run(['create', '-h']);
+	it('should show help', initMockSDKHome(async ({ run }) => {
+		const { exitCode, stdout } = await run(['create', '-h']);
 
 		const output = stripColor(stdout);
 		assert.match(output, /Titanium Command-Line Interface/);
