@@ -49,8 +49,8 @@ importers:
         version: 3.2.0
     devDependencies:
       '@reporters/github':
-        specifier: 1.8.0
-        version: 1.8.0
+        specifier: 1.9.1
+        version: 1.9.1
       '@vitest/coverage-istanbul':
         specifier: 3.2.4
         version: 3.2.4(vitest@1.4.0)
@@ -385,8 +385,8 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
-  '@reporters/github@1.8.0':
-    resolution: {integrity: sha512-EJNbv7qvqbICrVbyaPLKWT/mGzdkkdskKuPg1hG0tVKeAEtH6D1gCZwZ84N/26CQ8FBsyfiUyVjwtgYEByGKWQ==}
+  '@reporters/github@1.9.1':
+    resolution: {integrity: sha512-MIuO3Ci0vCKV5CkueQOieiYKPqJvHkHJxYsk+raotCHcB4yPU4ns6yfy3tcXDsUFCkj+vbB+XXucdac139J6uA==}
 
   '@rollup/rollup-android-arm-eabi@4.46.2':
     resolution: {integrity: sha512-Zj3Hl6sN34xJtMv7Anwb5Gu01yujyE/cLBDB2gnHTAHaWS1Z38L7kuSG+oAh0giZMqG060f/YBStXtMH6FvPMA==}
@@ -1614,7 +1614,7 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@reporters/github@1.8.0':
+  '@reporters/github@1.9.1':
     dependencies:
       '@actions/core': 1.11.1
       stack-utils: 2.0.6
