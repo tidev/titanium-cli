@@ -35,7 +35,7 @@ jobs:
       run: pnpm lint
 
     - name: Publish to npm
-      run: npm publish --tag ${{ github.event.release.prerelease && 'next' || 'latest' }}
+      run: npm publish --provenance --tag ${{ github.event.release.prerelease && 'next' || 'latest' }}
 
     - name: Get package.json info
       id: get-package-info
