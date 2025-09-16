@@ -1,4 +1,4 @@
-8.0.1 (9/15/2025)
+8.1.0 (9/15/2025)
 -------------------
  * fix: On Windows call `powershell` instead of deprecated `wmic` command to
    get the OS name and version.
