@@ -132,8 +132,10 @@ async function osInfo() {
 			}
 		}
 	} else {
-		const { stdout } = await $`wmic os get Caption,Version`;
-		[name, version] = stdout.split('\n')[1].split(/ {2,}/);
+		try {
+			const { stdout } = await $('powershell', ['-Command', 'Get-CimInstance Win32_OperatingSystem | Select-Object Caption, Version | ConvertTo-Json']);
+			({ Caption: name, Version: version } = JSON.parse(stdout));
+		} catch {}
 	}
 
 	return {

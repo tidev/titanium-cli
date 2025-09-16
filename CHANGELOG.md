@@ -1,3 +1,8 @@
+8.0.1
+-------------------
+ * fix: On Windows call `powershell` instead of deprecated `wmic` command to
+   get the OS name and version.
+
 8.0.0 (8/1/2025)
 -------------------
  * BREAKING CHANGE: Require Node.js 20.18.1 or newer
