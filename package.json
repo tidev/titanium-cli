@@ -14,7 +14,10 @@
 	],
 	"homepage": "https://titaniumsdk.com",
 	"bugs": "https://github.com/tidev/titanium-cli/issues",
-	"repository": "https://github.com/tidev/titanium-cli",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/tidev/titanium-cli.git"
+	},
 	"preferGlobal": true,
 	"dependencies": {
 		"@xmldom/xmldom": "0.9.8",
