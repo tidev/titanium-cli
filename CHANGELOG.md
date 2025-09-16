@@ -1,7 +1,8 @@
-8.0.1
+8.0.1 (9/15/2025)
 -------------------
  * fix: On Windows call `powershell` instead of deprecated `wmic` command to
    get the OS name and version.
+ * chore: Updated dependencies
 
 8.0.0 (8/1/2025)
 -------------------

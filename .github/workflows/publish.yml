@@ -1,7 +1,12 @@
 name: Publish
+
 on:
   release:
     types: [published]
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   publish:
@@ -30,8 +35,6 @@ jobs:
       run: pnpm lint
 
     - name: Publish to npm
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       run: npm publish --tag ${{ github.event.release.prerelease && 'next' || 'latest' }}
 
     - name: Get package.json info
