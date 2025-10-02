@@ -273,34 +273,6 @@ Creator.prototype.configOptionTemplate = function configOptionTemplate(order, de
 	};
 };
 
-Creator.prototype.configOptionUrl = function configOptionUrl(order) {
-	const cli = this.cli;
-	const config = this.config;
-	const logger = this.logger;
-
-	return {
-		abbr: 'u',
-		default: !cli.argv.prompt && config.get('app.url') || undefined,
-		desc: 'your company/personal URL',
-		order: order,
-		prompt(callback) {
-			callback(fields.text({
-				default: config.get('app.url'),
-				promptLabel: 'Your company/personal URL'
-			}));
-		},
-		required: !!cli.argv.prompt,
-		validate(value, callback) {
-			if (!value) {
-				logger.error(`The url value is "${value}"\n`);
-				return callback(true);
-			}
-
-			Array.isArray(value) ? callback(null, value[value.length - 1]) : callback(null, value);
-		}
-	};
-};
-
 Creator.prototype.configOptionWorkspaceDir = function configOptionWorkspaceDir(order) {
 	const cli = this.cli,
 		config = this.config,
