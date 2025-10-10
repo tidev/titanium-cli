@@ -106,13 +106,14 @@ export class Logger extends EventEmitter {
 	setBanner({ name, copyright, version, sdkVersion }) {
 		this.#banner = `${bold(cyan(name))} v${version}${
 			sdkVersion ? ` SDK v${sdkVersion}` : ''
-		}\n${
-			copyright
-		}\n\nWant to help? ${
-			cyan('https://tidev.io/donate')
-		} or ${
-			cyan('https://tidev.io/contribute')
-		}\n`;
+		}
+${copyright}
+
+Please star us on GitHub! ${cyan('https://github.com/tidev/titanium-cli')}
+and ${cyan('https://github.com/tidev/titanium-sdk')}
+
+Want to help? ${cyan('https://tidev.io/donate')} or ${cyan('https://tidev.io/contribute')}
+`;
 	}
 
 	setLevel(level) {
