@@ -196,7 +196,7 @@ describe('Logger', () => {
 			'foo v1.2.3 SDK v4.5.6',
 			'bar',
 			'',
-			'Want to help?'
+			'Please star us on GitHub!'
 		].join('\n'), 's');
 
 		logger.setBanner({ name: 'foo', copyright: 'bar', version: '1.2.3', sdkVersion: '4.5.6' });
