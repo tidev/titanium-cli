@@ -487,7 +487,9 @@ export class CLI {
 			});
 
 			if (r instanceof Promise) {
-				r.then(resolve).catch(reject);
+				r.then(() => this.emit('cli:post-execute', { cli: this, command: this.command }))
+					.then(() => resolve())
+					.catch(reject);
 			} else if (run.length < 4) {
 				// run doesn't expect a `callback()`
 				resolve();
