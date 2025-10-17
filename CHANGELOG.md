@@ -1,3 +1,7 @@
+8.1.1
+-------------------
+ * fix: Emit `post-execute` hook for commands with async `run()`
+
 8.1.0 (9/15/2025)
 -------------------
  * fix: On Windows call `powershell` instead of deprecated `wmic` command to
