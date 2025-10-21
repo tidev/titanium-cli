@@ -2,6 +2,8 @@
 -------------------
  * fix: Emit `post-execute` hook for commands with async `run()`
  * fix: Display SDK name, then the actual version
+ * fix: Skip run if `--sdk` version mismatches `<sdk-version>` in `tiapp.xml`
+   and allow correct command to be forked
 
 8.1.0 (9/15/2025)
 -------------------
