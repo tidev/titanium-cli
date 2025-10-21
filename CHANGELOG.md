@@ -1,4 +1,4 @@
-8.1.1
+8.1.1 (10/21/2025)
 -------------------
  * fix: Emit `post-execute` hook for commands with async `run()`
  * fix: Display SDK name, then the actual version
