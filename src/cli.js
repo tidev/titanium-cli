@@ -429,6 +429,7 @@ export class CLI {
 		}
 
 		this.command = cmd;
+		this.command.skipRun = false;
 		this.logger.banner();
 
 		if (sdkCommands[this.command.name()]) {
@@ -464,7 +465,7 @@ export class CLI {
 		this.debugLogger.trace(`Executing command's run: ${this.command.name()}`);
 		this.debugLogger.trace('Final argv:', this.argv);
 
-		if (this.argv['debug-no-run']) {
+		if (this.command.skipRun || this.argv['debug-no-run']) {
 			this.debugLogger.trace('Skipping run()');
 			return;
 		}
@@ -1610,7 +1611,7 @@ export class CLI {
 			if (typeof result === 'function') {
 				await new Promise(resolve => result(resolve));
 			} else if (result === false) {
-				this.command.module.run = () => {};
+				this.command.skipRun = true;
 			}
 		}
 		await this.emit('cli:post-validate', { cli: this, command: this.command });
@@ -1620,9 +1621,20 @@ export class CLI {
 			if (ctx?.conf?.options) {
 				for (const [name, opt] of Object.entries(ctx.conf.options)) {
 					if (typeof opt.callback === 'function') {
-						const val = opt.callback(this.argv[name] || '');
-						if (val !== undefined) {
-							this.argv[name] = val;
+						try {
+							const val = opt.callback(this.argv[name] || '');
+							if (val !== undefined) {
+								this.argv[name] = val;
+							}
+						} catch (e) {
+							if (e instanceof GracefulShutdown) {
+								// the --sdk differs from the tiapp.xml version,
+								// so gracefully return here and let node-titanium-sdk
+								// fork the command with the correct SDK version
+								this.command.skipRun = true;
+							} else {
+								throw e;
+							}
 						}
 					}
 				}
