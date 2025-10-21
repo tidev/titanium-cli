@@ -9,6 +9,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const fixturesDir = join(fileURLToPath(import.meta.url), '../fixtures/sdk');
 const sdkName = '12.2.0.GA';
+const sdkVersion = '12.2.0';
 const os = process.platform === 'darwin' ? 'osx' : process.platform;
 const sdkFilename = `mobilesdk-${sdkName}-${os}.zip`;
 const platforms = ['android'];
@@ -117,7 +118,7 @@ describe('ti sdk', () => {
 			output = stripColor(stdout);
 			assert.match(output, /Titanium Command-Line Interface/);
 			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
-			assert.match(output, new RegExp(`Installed SDKs:\n\\s*${sdkName}\\s+${sdkName}\\s+${
+			assert.match(output, new RegExp(`Installed SDKs:\n\\s*${sdkName}\\s+${sdkVersion}\\s+${
 				sdkPath.replace(/\\/g, '\\\\')
 			}`));
 			assert.strictEqual(exitCode, 0);
@@ -319,7 +320,7 @@ describe('ti sdk', () => {
 			const output = stripColor(stdout);
 			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
 			assert.match(output, /Installed SDKs:/);
-			assert.match(output, new RegExp(`0.0.0.GA\\s+0.0.0.GA\\s+${join(tmpSDKDir, 'mobilesdk', os, '0.0.0.GA').replace(/\\/g, '\\\\')}`));
+			assert.match(output, new RegExp(`0.0.0.GA\\s+0.0.0\\s+${join(tmpSDKDir, 'mobilesdk', os, '0.0.0.GA').replace(/\\/g, '\\\\')}`));
 			assert.strictEqual(exitCode, 0);
 		}), 60000);
 	});
