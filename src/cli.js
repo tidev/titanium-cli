@@ -1451,11 +1451,12 @@ export class CLI {
 								});
 							});
 						} catch (ex) {
-							if (!(ex instanceof GracefulShutdown)) {
-								throw ex;
+							if (ex instanceof GracefulShutdown) {
+								this.command.skipRun = true;
+								return;
 							}
+							throw ex;
 						}
-						continue;
 					} else if (opt.callback) {
 						opt.validated = true;
 						const val = opt.callback(this.argv[name] || '');
@@ -1589,7 +1590,7 @@ export class CLI {
 							delete opt.callback;
 						} catch (e) {
 							if (e instanceof GracefulShutdown) {
-								this.command.module.run = () => {};
+								this.command.skipRun = true;
 							} else {
 								throw e;
 							}
