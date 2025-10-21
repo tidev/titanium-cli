@@ -1,6 +1,7 @@
 8.1.1
 -------------------
  * fix: Emit `post-execute` hook for commands with async `run()`
+ * fix: Display SDK name, then the actual version
 
 8.1.0 (9/15/2025)
 -------------------

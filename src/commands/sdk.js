@@ -202,14 +202,14 @@ SdkSubcommands.list = {
 		logger.log();
 
 		if (vers.length) {
-			const maxlen = vers.reduce((len, b) => Math.max(len, b.length), 0);
-			const maxname = vers.reduce((len, b) => {
+			const maxVersionLen = vers.reduce((len, b) => Math.max(len, sdks[b].version.length), 0);
+			const maxNameLen = vers.reduce((len, b) => {
 				return Math.max(len, sdks[b].manifest && sdks[b].manifest.name ? sdks[b].manifest.name.length : 0);
 			}, 0);
 
 			logger.log('Installed SDKs:');
 			for (const v of vers) {
-				const n = maxlen + 2 - v.length;
+				const ver = sdks[v].version;
 				let name = sdks[v].manifest && (sdks[v].manifest.name || sdks[v].manifest.version);
 
 				if (!name) {
@@ -220,7 +220,11 @@ SdkSubcommands.list = {
 					}
 				}
 
-				logger.log(`   ${cyan(v)}${' '.repeat(n)}${maxname ? magenta(name.padEnd(maxname + 2)) : ''}${sdks[v].path}`);
+				logger.log(`   ${
+					cyan(name.padEnd(maxNameLen))
+				}   ${
+					magenta(ver.padEnd(maxVersionLen)
+				)}   ${sdks[v].path}`);
 			}
 		} else {
 			logger.log(red('No Titanium SDKs found\n'));
