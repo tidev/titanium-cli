@@ -22,7 +22,7 @@
 	"dependencies": {
 		"@xmldom/xmldom": "0.9.8",
 		"chalk": "5.6.2",
-		"commander": "14.0.1",
+		"commander": "14.0.2",
 		"execa": "9.6.0",
 		"fs-extra": "11.3.2",
 		"pretty-bytes": "7.1.0",
