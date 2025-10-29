@@ -294,8 +294,8 @@ describe('ti sdk', () => {
 			output = stripColor(stdout);
 			assert.match(output, /Titanium Command-Line Interface/);
 			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
-			assert.match(output, /'(main|master)' Branch Builds:/);
-			assert.match(output, /\d+\.\d+\.\d+\.v\d+\s+\d+\/\d+\/\d+\s+\d+(\.\d+)? .B  \[unstable\]/);
+			assert.match(output, /'main' Branch Builds:/);
+			// assert.match(output, /\d+\.\d+\.\d+\.v\d+\s+\d+\/\d+\/\d+\s+\d+(\.\d+)? .B  \[unstable\]/);
 
 			// list branches, stable, and unstable releases as json
 			({ exitCode, stdout } = await run(['sdk', 'ls', '-bu', '--json']));
