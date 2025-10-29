@@ -1,3 +1,7 @@
+8.1.2 (10/28/2025)
+-------------------
+ * fix: Add support for SDK `main` branch builds
+
 8.1.1 (10/21/2025)
 -------------------
  * fix: Emit `post-execute` hook for commands with async `run()`

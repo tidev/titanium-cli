@@ -172,7 +172,7 @@ SdkSubcommands.list = {
 					[cli.argv.branch]: branchBuilds
 				} : {},
 				branches: {
-					defaultBranch: 'master',
+					defaultBranch: 'main',
 					branches: branches || []
 				},
 				defaultInstallLocation,
@@ -257,7 +257,7 @@ ${r.type !== 'ga' ? gray('  [unstable]') : i++ === 0 ? green('  [latest stable]'
 				logger.log(`   ${branches.message.red}`);
 			} else {
 				for (const b of branches) {
-					logger.log(`   ${cyan(b)}${b === 'master' ? gray(' [default]') : ''}`);
+					logger.log(`   ${cyan(b)}${b === 'main' ? gray(' [default]') : ''}`);
 				}
 			}
 		}
