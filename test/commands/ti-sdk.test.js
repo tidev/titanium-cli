@@ -270,7 +270,7 @@ describe('ti sdk', () => {
 			let output = stripColor(stdout);
 			assert.match(output, /Titanium Command-Line Interface/);
 			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
-			assert.match(output, /Branches:\n\s*main/);
+			assert.match(output, /Branches:\n\s*(main|master)/);
 
 			// list stable releases
 			({ exitCode, stdout } = await run(['sdk', 'list', '-r']));
@@ -294,13 +294,13 @@ describe('ti sdk', () => {
 			output = stripColor(stdout);
 			assert.match(output, /Titanium Command-Line Interface/);
 			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
-			assert.match(output, /'main' Branch Builds:/);
+			assert.match(output, /'(main|master)' Branch Builds:/);
 			assert.match(output, /\d+\.\d+\.\d+\.v\d+\s+\d+\/\d+\/\d+\s+\d+(\.\d+)? .B  \[unstable\]/);
 
 			// list branches, stable, and unstable releases as json
 			({ exitCode, stdout } = await run(['sdk', 'ls', '-bu', '--json']));
 			const json = JSON.parse(stdout);
-			assert(json.branches.branches.includes('main'));
+			assert(json.branches.branches.includes('main') || json.branches.branches.includes('master'));
 			assert(json.branches.branches.includes('12_6_X'));
 			assert(json.releases[sdkName]);
 
