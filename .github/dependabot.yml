@@ -1,15 +1,32 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-
 version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/"
     labels:
-      - "automerge"
       - "dependencies"
     schedule:
-      interval: "daily"
-      time: "02:00"
+      interval: "weekly"
+      day: "day"
+      time: "02:34"
+    groups:
+      production:
+        dependency-type: "production"
+        patterns:
+          - "*"
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
+      development:
+        dependency-type: "development"
+        patterns:
+          - "*"
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
+    commit-message:
+      include: "scope"
+      prefix: "chore(deps): "
+    allow:
+      - dependency-type: "all"
