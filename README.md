@@ -177,7 +177,7 @@ Source code contributions are always welcome! Before we can accept your pull req
 
 ### Donations
 
-Please consider supporting this project by making a charitable [donation](https://tidev.io/donate). The money you donate goes to compensate the skilled engineeers and maintainers that keep this project going.
+Please consider supporting this project by making a charitable [donation](https://tidev.io/donate). The money you donate goes to compensate the skilled engineers and maintainers that keep this project going.
 
 ### Code of Conduct
 
@@ -189,7 +189,7 @@ If you find a security related issue, please send an email to [security@tidev.io
 
 ## Stay Connected
 
-For the latest information, please find us on Twitter: [Titanium SDK](https://twitter.com/titaniumsdk) and [TiDev](https://twitter.com/tidevio).
+For the latest information, please find us on X: [Titanium SDK](https://x.com/titaniumsdk) and [TiDev](https://x.com/tidevio).
 
 Join our growing Slack community by visiting https://slack.tidev.io!
 

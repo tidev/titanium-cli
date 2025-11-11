@@ -116,7 +116,7 @@ ModuleSubcommands.list = {
 		const defaultInstallLocation = cli.env.installPath;
 		const sdkLocations = cli.env.os.sdkPaths.map(p => expand(p));
 
-		// attemp to detect if we're in a project folder by scanning for a tiapp.xml
+		// attempt to detect if we're in a project folder by scanning for a tiapp.xml
 		// until we hit the root
 		if (existsSync(p)) {
 			for (const { root } = parse(p); p !== root; p = dirname(p)) {

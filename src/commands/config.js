@@ -9,7 +9,7 @@ const { cyan } = chalk;
 
 export const extendedDesc = `Gets and sets config options. If no key is specified, then all key/values are returned.
 
-When specifying only the __<key>__ and using the __--remove__ flag, the specified key and all of its descendents are removed.
+When specifying only the __<key>__ and using the __--remove__ flag, the specified key and all of its descendants are removed.
 
 The __path.*__ config settings allow lists of values. You can specify multiple __<value>__'s following the __<key>__. Use the __--append__ flag to append a new value and the __--remove__ flag to remove an existing value.
 

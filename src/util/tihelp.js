@@ -51,11 +51,11 @@ export class TiHelp extends Help {
 			extraInfo.push(`default: ${argument.defaultValueDescription || JSON.stringify(argument.defaultValue)}`);
 		}
 		if (extraInfo.length > 0) {
-			const extraDescripton = gray(`(${extraInfo.join(', ')})`);
+			const extraDescription = gray(`(${extraInfo.join(', ')})`);
 			if (argument.description) {
-				return `${argument.description} ${extraDescripton}`;
+				return `${argument.description} ${extraDescription}`;
 			}
-			return extraDescripton;
+			return extraDescription;
 		}
 		return argument.description;
 	}
