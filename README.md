@@ -189,7 +189,7 @@ If you find a security related issue, please send an email to [security@tidev.io
 
 ## Stay Connected
 
-For the latest information, please find us on X: [Titanium SDK](https://x.com/titaniumsdk) and [TiDev](https://x.com/tidevio).
+For the latest information, please find us on [Bluesky](https://bsky.app/profile/titaniumsdk.com) and X: [Titanium SDK](https://x.com/titaniumsdk) and [TiDev](https://x.com/tidevio).
 
 Join our growing Slack community by visiting https://slack.tidev.io!
 
