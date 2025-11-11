@@ -350,10 +350,10 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 								// if there are no devices/emulators, error
 								if (!Object.keys(opts).length) {
 									if (cli.argv.target === 'device') {
-										logger.warn('Unable to find any devices, possibily due to missing dependencies.\n');
+										logger.warn('Unable to find any devices, possibly due to missing dependencies.\n');
 										logger.log('Continuing with build... (will attempt to install missing dependencies)\n');
 									} else {
-										logger.warn('Unable to find any emulators, possibily due to missing dependencies.\n');
+										logger.warn('Unable to find any emulators, possibly due to missing dependencies.\n');
 										logger.log('Continuing with build... (will attempt to install missing dependencies)\n');
 									}
 									_t.buildOnly = true;
@@ -517,7 +517,7 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 								}
 
 								// Failed to find devices, fallback to buildOnly.
-								logger.warn('Unable to find any emulators or devices, possibily due to missing dependencies.');
+								logger.warn('Unable to find any emulators or devices, possibly due to missing dependencies.');
 								logger.warn('Continuing with build... (will attempt to install missing dependencies)');
 								_t.buildOnly = true;
 								return callback();

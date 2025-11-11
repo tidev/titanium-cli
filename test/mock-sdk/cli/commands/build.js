@@ -168,7 +168,7 @@ exports.config = function config(logger, config, cli) {
 							required: true,
 							validate(projectDir, callback) {
 								const isDefault = (projectDir == conf.options['project-dir'].default);
-								let dir = path.resovle(projectDir);
+								let dir = path.resolve(projectDir);
 
 								if (!fs.existsSync(dir)) {
 									return callback(new Error('Project directory does not exist'));
@@ -258,7 +258,7 @@ exports.validate = function validate(logger, config, cli) {
 					}
 				}
 
-				// loads the platform specific bulid command and runs its validate() function
+				// loads the platform specific build command and runs its validate() function
 				const result = ti.validatePlatformOptions(logger, config, cli, 'build');
 				if (result && typeof result === 'function') {
 					result(next);
