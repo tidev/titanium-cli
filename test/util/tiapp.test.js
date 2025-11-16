@@ -62,7 +62,7 @@ describe('Tiapp', () => {
 			tiapp.load(join(fixturesDir, 'bad.xml')),
 			{
 				name: 'ParseError',
-				message: 'unclosed XML tag(s): ti:app'
+				message: 'unclosed xml tag(s): ti:app'
 			}
 		);
 	});
