@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 const fixturesDir = join(fileURLToPath(import.meta.url), '../fixtures/tiapp');
 
 describe('Tiapp', () => {
-	it('should load a tiapp with an sdk version', async () => {
+	it('should load a tiapp with an SDK version', async () => {
 		const tiapp = new Tiapp();
 		await tiapp.load(join(fixturesDir, 'hassdk.xml'));
 
@@ -15,7 +15,7 @@ describe('Tiapp', () => {
 		assert.strictEqual(value, '1.2.3');
 	});
 
-	it('should load a tiapp without an sdk version', async () => {
+	it('should load a tiapp without an SDK version', async () => {
 		const tiapp = new Tiapp();
 		await tiapp.load(join(fixturesDir, 'nosdk.xml'));
 
@@ -62,7 +62,7 @@ describe('Tiapp', () => {
 			tiapp.load(join(fixturesDir, 'bad.xml')),
 			{
 				name: 'ParseError',
-				message: 'unclosed xml tag(s): ti:app'
+				message: 'unclosed XML tag(s): ti:app'
 			}
 		);
 	});

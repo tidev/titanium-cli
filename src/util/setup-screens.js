@@ -625,10 +625,10 @@ export class SetupScreens {
 					try {
 						const u = new URL(value);
 						if (!/^https?:$/.test(u.protocol)) {
-							return 'HTTP proxy url protocol must be either "http" or "https" (ex: http://user:pass@example.com)';
+							return 'HTTP proxy URL protocol must be either "http" or "https" (e.g.: http://user:pass@example.com)';
 						}
 						if (!(u.host || '')) {
-							return 'HTTP proxy url must contain a host name (ex: http://user:pass@example.com)';
+							return 'HTTP proxy URL must contain a host name (e.e.: http://user:pass@example.com)';
 						}
 						return true;
 					} catch (e) {

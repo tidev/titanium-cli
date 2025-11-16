@@ -61,7 +61,7 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 	// we hook into the pre-validate event so that we can stop the build before
 	// prompting if we know the build is going to fail.
 	//
-	// this is also where we can detect android and jdk environments before
+	// this is also where we can detect Android and JDK environments before
 	// prompting occurs. because detection is expensive we also do it here instead
 	// of during config() because there's no sense detecting if config() is being
 	// called because of the help command.
@@ -73,13 +73,13 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 		_t.buildOnly = cli.argv['build-only'];
 		_t.jdkInfo = {}; // mock?
 
-		// detect android environment
+		// detect Android environment
 		androidDetect(config, { packageJson: _t.packageJson }, androidInfo => {
 			_t.androidInfo = androidInfo;
 			assertIssue(logger, androidInfo.issues, 'ANDROID_JDK_NOT_FOUND');
 			assertIssue(logger, androidInfo.issues, 'ANDROID_JDK_PATH_CONTAINS_AMPERSANDS');
 
-			// if --android-sdk was not specified, then we simply try to set a default android sdk
+			// if --android-sdk was not specified, then we simply try to set a default Android SDK
 			if (!cli.argv['android-sdk']) {
 				let androidSdkPath = config.android && config.android.sdkPath;
 				if (!androidSdkPath && androidInfo.sdk) {
@@ -197,7 +197,7 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 							}));
 						},
 						validate(value, callback) {
-							// if there's a value, then they entered something, otherwise let the cli prompt
+							// if there's a value, then they entered something, otherwise let the CLI prompt
 							if (value) {
 								const selectedAlias = value.toLowerCase(),
 									alias = _t.keystoreAlias = _t.keystoreAliases.filter(function (a) { return a.name && a.name.toLowerCase() === selectedAlias; }).shift();
@@ -245,21 +245,21 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 							} else if (_t.androidInfo.sdk && _t.androidInfo.sdk.path === path.resolve(value)) {
 								callback(null, value);
 							} else {
-								// attempt to find android sdk
+								// attempt to find Android SDK
 								const pkginfo = {}; // appc.pkginfo.package(module)
 
 								android.findSDK(value, config, pkginfo, () => {
 
-									// NOTE: ignore errors when finding sdk, let gradle validate the sdk
+									// NOTE: ignore errors when finding SDK, let gradle validate the SDK
 
 									function next() {
-										// set the android sdk in the config just in case a plugin or something needs it
+										// set the Android SDK in the config just in case a plugin or something needs it
 										config.set('android.sdkPath', value);
 
 										// path looks good, do a full scan again
 										androidDetect(config, { packageJson: _t.packageJson, bypassCache: true }, androidInfo => {
 
-											// assume sdk is valid, let gradle validate the sdk
+											// assume SDK is valid, let gradle validate the SDK
 											if (!androidInfo.sdk) {
 												androidInfo.sdk = { path: value };
 											}
@@ -269,8 +269,8 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 										});
 									}
 
-									// new android sdk path looks good
-									// if we found an android sdk in the pre-validate hook, then we need to kill the other sdk's adb server
+									// new Android SDK path looks good
+									// if we found an Android SDK in the pre-validate hook, then we need to kill the other SDK's adb server
 									if (_t.androidInfo.sdk) {
 										new ADB(config).stopServer(next);
 									} else {
@@ -282,7 +282,7 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 					},
 					'avd-abi': {
 						abbr: 'B',
-						desc: 'the abi for the Android emulator; deprecated, use --device-id',
+						desc: 'the ABI for the Android emulator; deprecated, use --device-id',
 						hint: 'abi'
 					},
 					'avd-id': {
@@ -418,7 +418,7 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 										name = 'titanium_' + cli.argv['avd-id'] + '_';
 
 									if (avds.length) {
-										// try finding the first avd that starts with the avd id
+										// try finding the first AVD that starts with the AVD id
 										avds = avds.filter(function (avd) {
 											return avd.indexOf(name) === 0;
 										});
@@ -426,10 +426,10 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 											cli.argv['device-id'] = avds[0];
 											return callback();
 										} else if (avds.length > 1) {
-											// next try using the avd skin
+											// next try using the AVD skin
 											if (!cli.argv['avd-skin']) {
 												// we have more than one match
-												logger.error(`Found ${avds.length} avd with id "${cli.argv['avd-id']}"`);
+												logger.error(`Found ${avds.length} AVD with id "${cli.argv['avd-id']}"`);
 												logger.error('Specify --avd-skin and --avd-abi to select a specific emulator\n');
 											} else {
 												name += cli.argv['avd-skin'];
@@ -451,8 +451,8 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 													cli.argv['device-id'] = avds[0];
 													return callback();
 												} else if (!cli.argv['avd-abi']) {
-													// we have more than one matching avd, but no abi to filter by so we have to error
-													logger.error(`Found ${avds.length} avd with id "${cli.argv['avd-id']}" and skin "${cli.argv['avd-skin']}"`);
+													// we have more than one matching AVD, but no ABI to filter by so we have to error
+													logger.error(`Found ${avds.length} AVD with id "${cli.argv['avd-id']}" and skin "${cli.argv['avd-skin']}"`);
 													logger.error('Specify --avd-abi to select a specific emulator\n');
 												} else {
 													name += '_' + cli.argv['avd-abi'];
@@ -468,9 +468,9 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 														});
 													}
 													if (avds.length === 0) {
-														logger.error(`No emulators found with id "${cli.argv['avd-id']}", skin "${cli.argv['avd-skin']}", and abi "${cli.argv['avd-abi']}"\n`);
+														logger.error(`No emulators found with id "${cli.argv['avd-id']}", skin "${cli.argv['avd-skin']}", and ABI "${cli.argv['avd-abi']}"\n`);
 													} else {
-														// there is one or more avds, but we'll just return the first one
+														// there is one or more AVDs, but we'll just return the first one
 														cli.argv['device-id'] = avds[0];
 														return callback();
 													}
@@ -480,7 +480,7 @@ AndroidBuilder.prototype.config = function config(logger, config, cli) {
 
 										logger.warn(`${'--avd-*'.cyan} options have been ${'deprecated'.red}, please use ${'--device-id'.cyan}\n`);
 
-										// print list of available avds
+										// print list of available AVDs
 										if (results.length && !cli.argv.prompt) {
 											logger.log('Available Emulators:');
 											results.forEach(function (emu) {
@@ -707,7 +707,7 @@ AndroidBuilder.prototype.run = async function run(_logger, _config, cli, finishe
 	}
 };
 
-// create the builder instance and expose the public api
+// create the builder instance and expose the public API
 (function (androidBuilder) {
 	exports.config   = androidBuilder.config.bind(androidBuilder);
 	exports.validate = androidBuilder.validate.bind(androidBuilder);

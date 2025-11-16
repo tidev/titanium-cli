@@ -26,7 +26,7 @@ export async function detect(config) {
 	};
 	const { $ } = await import('execa');
 
-	// sanity check the java home
+	// sanity check the Java home
 	if (javaHome) {
 		javaHome = expand(javaHome);
 		if (existsSync(javaHome) && isJDK(javaHome)) {

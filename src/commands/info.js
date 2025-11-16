@@ -20,7 +20,7 @@ export function config(_logger, _config, _cli) {
 		skipBanner: true,
 		flags: {
 			json: {
-				desc: 'display info as json'
+				desc: 'display info as JSON'
 			}
 		},
 		options: {
@@ -178,7 +178,7 @@ export async function run(logger, config, cli) {
 
 	if (process.platform === 'darwin' && (types.all || types.ios) && data.iosKeychains) {
 		// the keychain names are the only left side label that isn't fixed length, so
-		// if we're displaying ios info, find the longest keychain name
+		// if we're displaying iOS info, find the longest keychain name
 		for (const keychain of data.iosKeychains) {
 			indent = Math.max(indent, basename(keychain).length + 2);
 		}

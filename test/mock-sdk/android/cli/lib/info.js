@@ -19,7 +19,7 @@ exports.detect = function (_types, config, next) {
 
 	const mod = require('./detect');
 
-	// detect android environment
+	// detect Android environment
 	mod.detect(config, null, result => {
 		// detect devices
 		mod.detectDevices(config, (_err, devices) => {

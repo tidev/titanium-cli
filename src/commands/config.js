@@ -41,7 +41,7 @@ export function config(_logger, _config, _cli) {
 				desc: 'appends a value to a key containing a list of values'
 			},
 			json: {
-				desc: 'output config as json'
+				desc: 'output config as JSON'
 			},
 			remove: {
 				abbr: 'r',

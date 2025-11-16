@@ -26,7 +26,7 @@ describe('ti config', () => {
 		assert.strictEqual(exitCode, 0);
 	}));
 
-	it('should show all config settings as json', initCLI(async ({ run }) => {
+	it('should show all config settings as JSON', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['config', '--json']);
 
 		const json = JSON.parse(stdout);

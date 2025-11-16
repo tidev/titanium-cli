@@ -828,7 +828,7 @@ export class CLI {
 				if (sdkCommands[cmdName]) {
 					throw err;
 				}
-				// if it's not a sdk command, then it's ok if the SDK failed to load
+				// if it's not a `sdk` command, then it's ok if the SDK failed to load
 			}
 			await this.loadCommand(cmd);
 		});
@@ -1050,7 +1050,7 @@ export class CLI {
 			showSDKPrompt = true;
 		}
 
-		// load the sdk and its hooks
+		// load the SDK and its hooks
 		const {
 			installPath,
 			sdk,
@@ -1096,7 +1096,7 @@ export class CLI {
 			}
 
 			try {
-				// check if the sdk is compatible with our version of node
+				// check if the SDK is compatible with our version of node
 				sdk.packageJson = await fs.readJson(join(sdk.path, 'package.json'));
 
 				const current = process.versions.node;
@@ -1121,7 +1121,7 @@ export class CLI {
 			sdkVersion: this.sdk?.name
 		});
 
-		// if we're running a sdk command, then scan the sdk for hooks
+		// if we're running a `sdk` command, then scan the SDK for hooks
 		if (sdkCommands[cmdName]) {
 			this.debugLogger.trace('Loading SDK hooks...');
 			await this.scanHooks(expand(this.sdk.path, 'cli', 'hooks'));

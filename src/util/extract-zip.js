@@ -66,7 +66,7 @@ export async function extractZip(params) {
 					const symlink = (mode & fs.constants.S_IFMT) === fs.constants.S_IFLNK;
 					let isDir = (mode & fs.constants.S_IFMT) === fs.constants.S_IFDIR;
 
-					// check for windows weird way of specifying a directory
+					// check for Windows weird way of specifying a directory
 					// https://github.com/maxogden/extract-zip/issues/13#issuecomment-154494566
 					const madeBy = entry.versionMadeBy >> 8;
 					if (!isDir) {

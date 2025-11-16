@@ -105,8 +105,8 @@ async function unzipIfNecessary(moduleRoot, name, logger) {
 }
 
 /**
- * @param {string} modulesDir i.e. '~/Library/APplication Support/Titanium/modules'
- * @param {string} platform i.e. 'android' or 'iphone'
+ * @param {string} modulesDir e.g. '~/Library/APplication Support/Titanium/modules'
+ * @param {string} platform e.g. 'android' or 'iphone'
  * @param {RegExp} osNamesRegExp regexp used to skip certain folder names like 'win32' or 'osx'
  * @param {RegExp} ignoreDirs additional regexp used to filter directories
  * @param {object} [logger] optional logger object
@@ -141,8 +141,8 @@ async function detectPlatformModules(modulesDir, platform, osNamesRegExp, ignore
 }
 
 /**
- * @param {string} platformModulesDir i.e. '~/Library/Application Support/Titanium/modules/android'
- * @param {string} moduleName i.e. 'hyperloop'
+ * @param {string} platformModulesDir e.g. '~/Library/Application Support/Titanium/modules/android'
+ * @param {string} moduleName e.g. 'hyperloop'
  * @param {RegExp} ignoreDirs regexp used to filter directories traversed
  * @param {object} [logger] optional logger object
  * @returns {Promise<object[]>}

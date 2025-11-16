@@ -156,7 +156,7 @@ export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabl
 		// might not be a project dir or bad tiapp.xml
 	}
 
-	// detect sdks
+	// detect SDKs
 	const {
 		installPath,
 		latest,
