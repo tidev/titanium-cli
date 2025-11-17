@@ -116,7 +116,7 @@ CreateCommand.prototype.run = function run(_logger, _config, _cli, finished) {
 	finished();
 };
 
-// create the builder instance and expose the public api
+// create the builder instance and expose the public API
 (function (createCommand) {
 	exports.config   = createCommand.config.bind(createCommand);
 	exports.run      = createCommand.run.bind(createCommand);

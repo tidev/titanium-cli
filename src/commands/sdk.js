@@ -113,7 +113,7 @@ SdkSubcommands.list = {
 					desc: 'retrieve and print all branches'
 				},
 				json: {
-					desc: 'display installed modules as json'
+					desc: 'display installed modules as JSON'
 				},
 				releases: {
 					abbr: 'r',
@@ -352,7 +352,7 @@ SdkSubcommands.install = {
 
 		await mkdir(titaniumDir, { recursive: true });
 
-		// step 1: determine what the uri is
+		// step 1: determine what the URI is
 
 		const { downloadedFile, file } = await getInstallFile({
 			branch: cli.argv.branch,
@@ -363,7 +363,7 @@ SdkSubcommands.install = {
 			subject
 		});
 
-		// step 2: extract the sdk zip file
+		// step 2: extract the SDK zip file
 
 		let { forceModules, name, renameTo, tempDir } = await extractSDK({
 			debugLogger: cli.debugLogger,
@@ -396,7 +396,7 @@ SdkSubcommands.install = {
 			throw new TiError('Zip file does not contain a valid Titanium SDK');
 		}
 
-		// step 4: move the sdk files to the dest
+		// step 4: move the SDK files to the dest
 
 		const dest = join(titaniumDir, 'mobilesdk', osName, renameTo || name);
 		if (showProgress) {
@@ -487,15 +487,15 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 		return { file };
 	}
 
-	// we are downloading an sdk
+	// we are downloading an SDK
 
 	let url;
 	let uri = subject.toLowerCase();
 	if (uriMatch && uriMatch[1]) {
-		// we have a http url
+		// we have a http URL
 		url = uriMatch[1];
 	} else if (branch) {
-		// we have a ci build
+		// we have a CI build
 		const branches = await getBranches();
 		if (!branches.includes(branch)) {
 			throw new TiError(`Branch "${branch}" does not exist`, {
@@ -574,7 +574,7 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 	let m = cd && cd.match(/filename\*?=(?:[^']*'[^']*'([^;]+)|["']([^"']+)["']|([^;\s]+))/i);
 	filename = m && (m[1] || m[2] || m[3]);
 
-	// try to determine the file extension by the filename in the url
+	// try to determine the file extension by the filename in the URL
 	if (!filename && (m = url.match(/.*\/(.+\.zip)$/))) {
 		filename = m[1];
 	}

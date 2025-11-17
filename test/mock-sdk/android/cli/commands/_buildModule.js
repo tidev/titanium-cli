@@ -34,7 +34,7 @@ AndroidModuleBuilder.prototype.validate = function validate(logger, config, cli)
 
 		this.manifest = this.cli.manifest;
 
-		// detect android environment
+		// detect Android environment
 		androidDetect(config, { packageJson: this.packageJson }, androidInfo => {
 			this.androidInfo = androidInfo;
 
@@ -55,7 +55,7 @@ AndroidModuleBuilder.prototype.validate = function validate(logger, config, cli)
 			// check the Android SDK we require to build exists
 			this.androidCompileSDK = targetSDKMap[this.compileSdkVersion];
 
-			// if no target sdk, then default to most recent supported/installed
+			// if no target SDK, then default to most recent supported/installed
 			if (!this.targetSDK) {
 				this.targetSDK = this.maxSupportedApiLevel;
 			}
@@ -95,7 +95,7 @@ AndroidModuleBuilder.prototype.validate = function validate(logger, config, cli)
 				this.javacMaxMemory = cli.timodule.properties['android.javac.maxMemory'].value;
 			}
 
-			// detect java development kit
+			// detect JDK
 			this.jdkInfo = {}; // mocked
 
 			finished();
@@ -109,7 +109,7 @@ AndroidModuleBuilder.prototype.run = function run(_logger, _config, _cli, finish
 	}
 };
 
-// create the builder instance and expose the public api
+// create the builder instance and expose the public API
 (function (androidModuleBuilder) {
 	exports.config   = androidModuleBuilder.config.bind(androidModuleBuilder);
 	exports.validate = androidModuleBuilder.validate.bind(androidModuleBuilder);

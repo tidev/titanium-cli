@@ -49,7 +49,7 @@ function loadPlugins(_logger, config, cli, projectDir, finished, silent, compact
 		p && fs.existsSync(p = path.resolve(p)) && searchPaths.project.indexOf(p) === -1 && searchPaths.config.indexOf(p) === -1 && (searchPaths.config.push(p));
 	});
 
-	// add any plugins from various sdk locations
+	// add any plugins from various SDK locations
 	sdkLocations.indexOf(defaultInstallLocation) === -1 && sdkLocations.push(defaultInstallLocation);
 	cli.sdk && sdkLocations.push(path.resolve(cli.sdk.path, '..', '..', '..'));
 	sdkLocations.forEach(p => {

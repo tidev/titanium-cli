@@ -190,7 +190,7 @@ exports.config = function config(logger, config, cli) {
 										tiFile = path.join(dir, tiXml);
 									}
 
-									// Found the xml file, break the loop
+									// Found the XML file, break the loop
 									if (fs.existsSync(tiFile)) {
 										isFound = true;
 										return true;
@@ -323,7 +323,7 @@ function patchLogger(logger, cli) {
 		let args = Array.prototype.slice.call(arguments);
 		let padLevels = logger.padLevels;
 
-		// if there are no args (i.e. a blank line), we need at least one space
+		// if there are no args (e.g. a blank line), we need at least one space
 		args.length || args.unshift(' ');
 
 		// if we're not being called from info/warn/error/debug, then set this as a general log entry

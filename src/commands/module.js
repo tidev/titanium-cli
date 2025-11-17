@@ -82,7 +82,7 @@ ModuleSubcommands.list = {
 			desc: 'print a list of installed modules',
 			flags: {
 				json: {
-					desc: 'display installed modules as json'
+					desc: 'display installed modules as JSON'
 				}
 			},
 			options: {
@@ -139,7 +139,7 @@ ModuleSubcommands.list = {
 			}
 		}
 
-		// add any modules from various sdk locations
+		// add any modules from various SDK locations
 		if (defaultInstallLocation && !sdkLocations.includes(defaultInstallLocation)) {
 			sdkLocations.push(defaultInstallLocation);
 		}

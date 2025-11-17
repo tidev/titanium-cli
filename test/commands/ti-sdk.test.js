@@ -75,7 +75,7 @@ describe('ti sdk', () => {
 		it('should install an SDK and remove it', initSDKHome(async ({ run, tmpHome, tmpSDKDir }) => {
 			const sdkPath = join(tmpSDKDir, 'mobilesdk', os, sdkName);
 
-			// list sdks (no sdks installed)
+			// list SDKs (no SDKs installed)
 			// eslint-disable-next-line no-unused-vars
 			let { exitCode, stdout, stderr } = await run(['sdk']); // no `ls` to test default subcommand
 			let output = stripColor(stdout);
@@ -83,7 +83,7 @@ describe('ti sdk', () => {
 			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
 			assert.match(output, /No Titanium SDKs found/);
 
-			// list sdks as json (no sdks installed)
+			// list SDKs as JSON (no SDKs installed)
 			({ exitCode, stdout } = await run(['sdk', 'ls', '--json']));
 			let json = JSON.parse(stdout);
 			assert.deepStrictEqual(json, {
@@ -100,7 +100,7 @@ describe('ti sdk', () => {
 			});
 			assert.strictEqual(exitCode, 0);
 
-			// install an sdk
+			// install an SDK
 			({ exitCode, stdout, stderr } = await run(['sdk', 'install', sdkName, '--no-progress-bars', '--keep-files']));
 			assert.match(stdout, /successfully installed/);
 			assert.strictEqual(exitCode, 0);
@@ -113,7 +113,7 @@ describe('ti sdk', () => {
 				throw new Error(`SDK file does not exist: ${src}`);
 			}
 
-			// list sdks
+			// list SDKs
 			({ exitCode, stdout } = await run(['sdk', 'ls']));
 			output = stripColor(stdout);
 			assert.match(output, /Titanium Command-Line Interface/);
@@ -123,7 +123,7 @@ describe('ti sdk', () => {
 			}`));
 			assert.strictEqual(exitCode, 0);
 
-			// list sdks as json
+			// list SDKs as JSON
 			({ exitCode, stdout } = await run(['sdk', 'ls', '--json']));
 			json = JSON.parse(stdout);
 			assert.deepStrictEqual(json, {
@@ -160,7 +160,7 @@ describe('ti sdk', () => {
 			});
 			assert.strictEqual(exitCode, 0);
 
-			// remove the sdk
+			// remove the SDK
 			({ exitCode, stdout } = await run(['sdk', 'uninstall', sdkName, '--force']));
 			assert.match(stdout, /removed/);
 			assert.strictEqual(exitCode, 0);
@@ -297,7 +297,7 @@ describe('ti sdk', () => {
 			assert.match(output, /'main' Branch Builds:/);
 			// assert.match(output, /\d+\.\d+\.\d+\.v\d+\s+\d+\/\d+\/\d+\s+\d+(\.\d+)? .B  \[unstable\]/);
 
-			// list branches, stable, and unstable releases as json
+			// list branches, stable, and unstable releases as JSON
 			({ exitCode, stdout } = await run(['sdk', 'ls', '-bu', '--json']));
 			const json = JSON.parse(stdout);
 			assert(json.branches.branches.includes('main') || json.branches.branches.includes('master'));
@@ -307,7 +307,7 @@ describe('ti sdk', () => {
 			assert.strictEqual(exitCode, 0);
 		}), 60000);
 
-		it('should not find any sdks in empty sdk home directory', initSDKHome(async ({ run, tmpSDKDir }) => {
+		it('should not find any SDKs in empty SDK home directory', initSDKHome(async ({ run, tmpSDKDir }) => {
 			const { exitCode, stdout } = await run(['sdk', 'list']);
 			const output = stripColor(stdout);
 			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
@@ -315,7 +315,7 @@ describe('ti sdk', () => {
 			assert.strictEqual(exitCode, 0);
 		}), 60000);
 
-		it('should list sdks in sdk home directory', initMockSDKHome(async ({ run, tmpSDKDir }) => {
+		it('should list SDKs in SDK home directory', initMockSDKHome(async ({ run, tmpSDKDir }) => {
 			const { exitCode, stdout } = await run(['sdk', 'list']);
 			const output = stripColor(stdout);
 			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
