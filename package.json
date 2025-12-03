@@ -23,7 +23,7 @@
 		"@xmldom/xmldom": "0.9.8",
 		"chalk": "5.6.2",
 		"commander": "14.0.2",
-		"execa": "9.6.0",
+		"execa": "9.6.1",
 		"fs-extra": "11.3.2",
 		"pretty-bytes": "7.1.0",
 		"prompts": "2.4.2",
