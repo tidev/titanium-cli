@@ -28,7 +28,7 @@
 		"pretty-bytes": "7.1.0",
 		"prompts": "2.4.2",
 		"semver": "7.7.3",
-		"undici": "7.16.0",
+		"undici": "7.18.2",
 		"which": "6.0.0",
 		"wrap-ansi": "9.0.2",
 		"xpath": "0.0.34",
