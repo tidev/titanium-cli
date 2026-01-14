@@ -103,9 +103,8 @@ export class TiConfig {
 
 		if (obj && q && Object.hasOwn(obj, q)) {
 			return obj[q] === '' && defaultValue !== undefined ? defaultValue : obj[q];
-		} else {
-			return defaultValue;
 		}
+		return defaultValue;
 	}
 
 	/**
