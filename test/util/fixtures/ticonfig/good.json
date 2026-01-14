@@ -1,4 +1,7 @@
 {
+	"cli": {
+    	"width": ""
+	},
 	"user": {
 		"name": "Titanium"
 	}
