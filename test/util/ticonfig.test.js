@@ -45,6 +45,7 @@ describe('TiConfig', () => {
 		assert.strictEqual(cfg.user.name, 'Titanium');
 		assert.strictEqual(cfg.get().user.name, 'Titanium');
 		assert.strictEqual(cfg.get('foo', 'bar'), 'bar');
+		assert.strictEqual(cfg.get('cli.width', 80), 80);
 	});
 
 	it('should get the config path', () => {
@@ -58,12 +59,14 @@ describe('TiConfig', () => {
 			truthy: 'true',
 			falsey: 'false',
 			undef: undefined,
-			nil: 'null'
+			nil: 'null',
+			empty: ''
 		});
 		assert.strictEqual(cfg.get('truthy'), true);
 		assert.strictEqual(cfg.get('falsey'), false);
 		assert.strictEqual(cfg.get('undef'), '');
 		assert.strictEqual(cfg.get('nil'), null);
+		assert.strictEqual(cfg.get('empty'), '');
 	});
 
 	it('should set values', () => {
@@ -106,6 +109,10 @@ describe('TiConfig', () => {
 
 		cfg.set('bar', 1.23);
 		assert.strictEqual(cfg.get('bar'), '1.23');
+
+		cfg.set('bar', '');
+		assert.strictEqual(cfg.get('bar'), '');
+		assert.strictEqual(cfg.get('bar', 123), 123);
 	});
 
 	it('should save the config', async () => {

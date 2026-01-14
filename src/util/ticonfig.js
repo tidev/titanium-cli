@@ -77,7 +77,7 @@ export class TiConfig {
 	 * Gets a value for a given key. Keys may use dot notation to get values from
 	 * nested objects. For example, "cli.colors" maps to { cli: { colors: true } }.
 	 * @param {String} key - The config object name
-	 * @param {string} defaultValue - A default value if the value does not exist
+	 * @param {string} defaultValue - A default value if the value does not exist or is empty
 	 * @returns {*} The value
 	 */
 	get(key, defaultValue) {
@@ -101,7 +101,11 @@ export class TiConfig {
 			} while (obj && (p = parts[i++]));
 		}
 
-		return obj && q && Object.hasOwn(obj, q) ? obj[q] : defaultValue;
+		if (obj && q && Object.hasOwn(obj, q)) {
+			return obj[q] === '' && defaultValue !== undefined ? defaultValue : obj[q];
+		} else {
+			return defaultValue;
+		}
 	}
 
 	/**
