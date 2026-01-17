@@ -1,11 +1,12 @@
 {
 	"name": "titanium",
-	"version": "8.1.2",
+	"version": "8.1.3",
 	"author": "TiDev, Inc. <npm@tidev.io>",
 	"description": "Command line interface for building Titanium SDK apps",
 	"type": "module",
 	"keywords": [
 		"titanium",
+		"titanium-sdk",
 		"tidev",
 		"mobile",
 		"ios",

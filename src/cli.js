@@ -432,7 +432,8 @@ export class CLI {
 		this.command.skipRun = false;
 		this.logger.banner();
 
-		if (sdkCommands[this.command.name()]) {
+		const commandName = this.command.name();
+		if (sdkCommands[commandName] || commandName === 'info') {
 			// the SDK still uses the `colors` package, so we need to add the
 			// colors to the string prototype
 			const assignColors = proto => Object.defineProperties(proto, {
