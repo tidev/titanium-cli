@@ -1,3 +1,7 @@
+8.1.3 (1/17/2026)
+-------------------
+ * fix: Define `colors` shim for `info` command
+
 8.1.2 (10/28/2025)
 -------------------
  * fix: Add support for SDK `main` branch builds
