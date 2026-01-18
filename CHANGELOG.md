@@ -1,6 +1,11 @@
+8.1.4 (1/18/2026)
+-------------------
+ * fix: Allow `colors` shim methods to be redefined by the real `colors`
+
 8.1.3 (1/17/2026)
 -------------------
  * fix: Define `colors` shim for `info` command
+ * fix: Default value ignored when getting an empty config value
 
 8.1.2 (10/28/2025)
 -------------------

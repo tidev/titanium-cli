@@ -437,15 +437,15 @@ export class CLI {
 			// the SDK still uses the `colors` package, so we need to add the
 			// colors to the string prototype
 			const assignColors = proto => Object.defineProperties(proto, {
-				blue: { get() { return blue(`${this}`); } },
-				bold: { get() { return bold(`${this}`); } },
-				cyan: { get() { return cyan(`${this}`); } },
-				gray: { get() { return gray(`${this}`); } },
-				green: { get() { return green(`${this}`); } },
-				grey: { get() { return gray(`${this}`); } },
-				magenta: { get() { return magenta(`${this}`); } },
-				red: { get() { return red(`${this}`); } },
-				yellow: { get() { return yellow(`${this}`); } }
+				blue: { get() { return blue(`${this}`); }, configurable: true },
+				bold: { get() { return bold(`${this}`); }, configurable: true },
+				cyan: { get() { return cyan(`${this}`); }, configurable: true },
+				gray: { get() { return gray(`${this}`); }, configurable: true },
+				green: { get() { return green(`${this}`); }, configurable: true },
+				grey: { get() { return gray(`${this}`); }, configurable: true },
+				magenta: { get() { return magenta(`${this}`); }, configurable: true },
+				red: { get() { return red(`${this}`); }, configurable: true },
+				yellow: { get() { return yellow(`${this}`); }, configurable: true }
 			});
 
 			assignColors(String.prototype);
