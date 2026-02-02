@@ -1,3 +1,7 @@
+8.1.5 (2/2/2026)
+-------------------
+ * fix: Scan custom hooks path after loading the Titanium SDK
+
 8.1.4 (1/18/2026)
 -------------------
  * fix: Allow `colors` shim methods to be redefined by the real `colors`

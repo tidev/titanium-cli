@@ -816,13 +816,6 @@ export class CLI {
 				this.argv['project-dir'] = cwd;
 			}
 
-			// load hooks
-			const hooks = ticonfig.paths?.hooks;
-			if (hooks) {
-				const paths = arrayify(hooks, true);
-				await Promise.all(paths.map(p => this.scanHooks(p)));
-			}
-
 			try {
 				await this.loadSDK({ cmdName, cwd });
 			} catch (err) {
@@ -831,6 +824,14 @@ export class CLI {
 				}
 				// if it's not a `sdk` command, then it's ok if the SDK failed to load
 			}
+
+			// load hooks
+			const hooks = ticonfig.paths?.hooks;
+			if (hooks) {
+				const paths = arrayify(hooks, true);
+				await Promise.all(paths.map(p => this.scanHooks(p)));
+			}
+
 			await this.loadCommand(cmd);
 		});
 
@@ -1329,6 +1330,7 @@ export class CLI {
 							this.hooks.loadedFilenames.push(file);
 							this.debugLogger.trace(`Loaded CLI hook: ${file} (${Date.now() - startTime} ms)`);
 						} else {
+							this.debugLogger.trace(`Incompatible CLI hook: ${file}`);
 							this.hooks.incompatibleFilenames.push(file);
 						}
 					}
