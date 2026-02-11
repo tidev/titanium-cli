@@ -28,9 +28,9 @@
 		"fs-extra": "11.3.3",
 		"pretty-bytes": "7.1.0",
 		"prompts": "2.4.2",
-		"semver": "7.7.3",
-		"undici": "7.20.0",
-		"which": "6.0.0",
+		"semver": "7.7.4",
+		"undici": "7.21.0",
+		"which": "6.0.1",
 		"wrap-ansi": "9.0.2",
 		"xpath": "0.0.34",
 		"yauzl": "3.2.0"
