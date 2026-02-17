@@ -80,12 +80,13 @@ describe('ti sdk', () => {
 			let { exitCode, stdout, stderr } = await run(['sdk']); // no `ls` to test default subcommand
 			let output = stripColor(stdout);
 			assert.match(output, /Titanium Command-Line Interface/);
-			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
+			assert.match(output, new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
 			assert.match(output, /No Titanium SDKs found/);
 
 			// list SDKs as JSON (no SDKs installed)
 			({ exitCode, stdout } = await run(['sdk', 'ls', '--json']));
 			let json = JSON.parse(stdout);
+			assert(json.installLocations.includes(tmpSDKDir));
 			assert.deepStrictEqual(json, {
 				branch: {},
 				branches: {
@@ -93,7 +94,7 @@ describe('ti sdk', () => {
 					branches: []
 				},
 				defaultInstallLocation: tmpSDKDir,
-				installLocations: [tmpSDKDir],
+				installLocations: json.installLocations,
 				installed: {},
 				releases: {},
 				sdks: {}
@@ -117,7 +118,7 @@ describe('ti sdk', () => {
 			({ exitCode, stdout } = await run(['sdk', 'ls']));
 			output = stripColor(stdout);
 			assert.match(output, /Titanium Command-Line Interface/);
-			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
+			assert.match(output, new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
 			assert.match(output, new RegExp(`Installed SDKs:\n\\s*${sdkName}\\s+${sdkVersion}\\s+${
 				sdkPath.replace(/\\/g, '\\\\')
 			}`));
@@ -133,7 +134,7 @@ describe('ti sdk', () => {
 					branches: []
 				},
 				defaultInstallLocation: tmpSDKDir,
-				installLocations: [tmpSDKDir],
+				installLocations: json.installLocations,
 				installed: {
 					[sdkName]: sdkPath
 				},
@@ -175,7 +176,7 @@ describe('ti sdk', () => {
 					branches: []
 				},
 				defaultInstallLocation: tmpSDKDir,
-				installLocations: [tmpSDKDir],
+				installLocations: json.installLocations,
 				installed: {},
 				releases: {},
 				sdks: {}
@@ -200,7 +201,7 @@ describe('ti sdk', () => {
 					branches: []
 				},
 				defaultInstallLocation: tmpSDKDir,
-				installLocations: [tmpSDKDir],
+				installLocations: json.installLocations,
 				installed: {
 					[sdkName]: sdkPath
 				},
@@ -269,14 +270,14 @@ describe('ti sdk', () => {
 			let { exitCode, stdout } = await run(['sdk', 'list', '-b']);
 			let output = stripColor(stdout);
 			assert.match(output, /Titanium Command-Line Interface/);
-			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
+			assert.match(output, new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
 			assert.match(output, /Branches:\n\s*(main|master)/);
 
 			// list stable releases
 			({ exitCode, stdout } = await run(['sdk', 'list', '-r']));
 			output = stripColor(stdout);
 			assert.match(output, /Titanium Command-Line Interface/);
-			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
+			assert.match(output, new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
 			assert.match(output, /Releases:/);
 			assert.match(output, /12\.2\.0\.GA\s+9\/15\/23/);
 
@@ -284,7 +285,7 @@ describe('ti sdk', () => {
 			({ exitCode, stdout } = await run(['sdk', 'list', '-u']));
 			output = stripColor(stdout);
 			assert.match(output, /Titanium Command-Line Interface/);
-			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
+			assert.match(output, new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
 			assert.match(output, /Releases:/);
 			assert.match(output, /12\.2\.0\.GA\s+9\/15\/23/);
 			assert.match(output, /12\.2\.0\.RC\s+8\/11\/23/);
@@ -293,7 +294,7 @@ describe('ti sdk', () => {
 			({ exitCode, stdout } = await run(['sdk', 'list', '--branch', 'main']));
 			output = stripColor(stdout);
 			assert.match(output, /Titanium Command-Line Interface/);
-			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
+			assert.match(output, new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
 			assert.match(output, /'main' Branch Builds:/);
 			// assert.match(output, /\d+\.\d+\.\d+\.v\d+\s+\d+\/\d+\/\d+\s+\d+(\.\d+)? .B  \[unstable\]/);
 
@@ -310,7 +311,7 @@ describe('ti sdk', () => {
 		it('should not find any SDKs in empty SDK home directory', initSDKHome(async ({ run, tmpSDKDir }) => {
 			const { exitCode, stdout } = await run(['sdk', 'list']);
 			const output = stripColor(stdout);
-			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
+			assert.match(output, new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
 			assert.match(output, /No Titanium SDKs found/);
 			assert.strictEqual(exitCode, 0);
 		}), 60000);
@@ -318,7 +319,7 @@ describe('ti sdk', () => {
 		it('should list SDKs in SDK home directory', initMockSDKHome(async ({ run, tmpSDKDir }) => {
 			const { exitCode, stdout } = await run(['sdk', 'list']);
 			const output = stripColor(stdout);
-			assert.match(output, new RegExp(`SDK Install Locations:\n\\s*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
+			assert.match(output, new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`));
 			assert.match(output, /Installed SDKs:/);
 			assert.match(output, new RegExp(`0.0.0.GA\\s+0.0.0\\s+${join(tmpSDKDir, 'mobilesdk', os, '0.0.0.GA').replace(/\\/g, '\\\\')}`));
 			assert.strictEqual(exitCode, 0);

@@ -15,9 +15,7 @@ import { pipeline } from 'node:stream/promises';
 import { extractZip } from '../util/extract-zip.js';
 import { prompt } from '../util/prompt.js';
 import { request } from 'node-titanium-sdk/util';
-import { getTitaniumReleases } from 'node-titanium-sdk/titanium';
-import { getTitaniumBranches } from 'node-titanium-sdk/titanium';
-import { getTitaniumBranchBuilds } from 'node-titanium-sdk/titanium';
+import { getTitaniumBranchBuilds, getTitaniumBranches, getTitaniumReleases } from 'node-titanium-sdk/titanium';
 import prettyBytes from 'pretty-bytes';
 import wrapAnsi from 'wrap-ansi';
 
@@ -525,7 +523,7 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 		// try to find the release by name
 		let release = null;
 
-		const releases = await getReleases(true);
+		const releases = await getTitaniumReleases(true);
 		if (uri === 'latest') {
 			release = releases.find(r => r.type === 'ga');
 		} else if (uri === 'latest-rc') {
@@ -708,7 +706,7 @@ async function checkSDKFile({ force, logger, _filename, name, noPrompt, _osName,
 	}
 
 	// already installed
-	const releases = await getReleases(false);
+	const releases = await getTitaniumReleases(false);
 	const latest = releases[0];
 	const tip = `Run '${cyan(`titanium sdk install ${latest.name} --force`)}' to re-install`;
 

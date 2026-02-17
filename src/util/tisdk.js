@@ -93,7 +93,7 @@ export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabl
 	}
 
 	return {
-		installPath,
+		installPath: config.get('sdk.defaultInstallLocation') || installPath,
 		sdk,
 		sdkPaths,
 		sdks: sdks.reduce((obj, sdk) => {
