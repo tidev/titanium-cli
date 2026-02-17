@@ -5,9 +5,8 @@ import { expand } from './expand.js';
 import { existsSync, unlinkSync, utimesSync, writeFileSync } from 'node:fs';
 import { BusyIndicator } from './busyindicator.js';
 import { detect } from './detect.js';
-import { request } from './request.js';
-import * as version from './version.js';
-import { detectTitaniumSDKs, getReleases } from './tisdk.js';
+import { request, version } from 'node-titanium-sdk/util';
+import { detectTitaniumSDKs, getTitaniumReleases } from 'node-titanium-sdk/titanium';
 import dns from 'node:dns/promises';
 import os from 'node:os';
 import { join } from 'node:path';
@@ -217,7 +216,7 @@ export class SetupScreens {
 
 			data.titaniumSDK = {
 				installed: await detectTitaniumSDKs(this.config),
-				latest: online && (await getReleases())?.[0] || null
+				latest: online && (await getTitaniumReleases())?.[0] || null
 			};
 
 			data.network = {

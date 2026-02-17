@@ -2,7 +2,6 @@ import chalk from 'chalk';
 import { TiError } from '../util/tierror.js';
 import { expand } from '../util/expand.js';
 import * as version from '../util/version.js';
-import { request } from '../util/request.js';
 import { BusyIndicator } from '../util/busyindicator.js';
 import fs from 'fs-extra';
 import { mkdir } from 'node:fs/promises';
@@ -15,7 +14,10 @@ import { Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { extractZip } from '../util/extract-zip.js';
 import { prompt } from '../util/prompt.js';
-import { getReleases } from '../util/tisdk.js';
+import { request } from 'node-titanium-sdk/util';
+import { getTitaniumReleases } from 'node-titanium-sdk/titanium';
+import { getTitaniumBranches } from 'node-titanium-sdk/titanium';
+import { getTitaniumBranchBuilds } from 'node-titanium-sdk/titanium';
 import prettyBytes from 'pretty-bytes';
 import wrapAnsi from 'wrap-ansi';
 
@@ -141,9 +143,9 @@ SdkSubcommands.list = {
 		const os = cli.env.os.name;
 
 		const [releases, branches, branchBuilds] = (await Promise.allSettled([
-			(cli.argv.releases || cli.argv.unstable) && getReleases(cli.argv.unstable),
-			cli.argv.branches && getBranches(),
-			cli.argv.branch && getBranchBuilds(cli.argv.branch, os)
+			(cli.argv.releases || cli.argv.unstable) && getTitaniumReleases(cli.argv.unstable),
+			cli.argv.branches && getTitaniumBranches(),
+			cli.argv.branch && getTitaniumBranchBuilds(cli.argv.branch, os)
 		])).map(r => {
 			return r.status === 'fulfilled' ? r.value : new TiError(r.reason);
 		});
@@ -891,34 +893,3 @@ SdkSubcommands.uninstall = {
 		}
 	}
 };
-
-/**
- * Retrieves the list of branches.
- * @returns {Promise<Branches>}
- */
-async function getBranches() {
-	const res = await request('https://downloads.titaniumsdk.com/registry/branches.json', {
-		responseType: 'json'
-	});
-	return Object
-		.entries(await res.body.json())
-		.filter(([, count]) => count)
-		.map(([name]) => name);
-}
-
-/**
- * Retrieves the list of builds for a given branch.
- * @param {String} branch - The name of the branch
- * @param {String} os - The name of the current OS (osx, linux, win32)
- * @returns {Promise<BranchBuild[]>}
- */
-async function getBranchBuilds(branch, os) {
-	const res = await request(`https://downloads.titaniumsdk.com/registry/${branch}.json`, {
-		responseType: 'json'
-	});
-	const now = Date.now();
-	const results = await res.body.json();
-	return results.filter(b => {
-		return (!b.expires || Date.parse(b.expires) > now) && b.assets.some(a => a.os === os);
-	});
-}

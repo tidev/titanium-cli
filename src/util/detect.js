@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import os from 'node:os';
 import { detect as jdkInfo } from './jdk.js';
-import { detectTitaniumSDKs } from './tisdk.js';
+import { detectTitaniumSDKs } from 'node-titanium-sdk/titanium';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import chalk from 'chalk';
