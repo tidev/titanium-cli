@@ -36,7 +36,8 @@ const sdkCommands = {
 	build:   'builds a project',
 	clean:   'removes previous build directories',
 	create:  'creates a new project',
-	project: 'get and set tiapp.xml settings'
+	project: 'get and set tiapp.xml settings',
+	serve:   'serves a project through the Titanium Vite runtime',
 };
 
 /**
@@ -416,12 +417,19 @@ export class CLI {
 		const cmd = args.pop();
 		args.pop(); // discard argv
 
-		// remove any trailing undefined args
-		while (args.length && args[args.length - 1] === undefined) {
-			args.pop();
+		// Commander keeps excess/positional args on the command context.
+		// Prefer that source so shorthand invocations like `ti serve ios` work
+		// even when commands do not declare explicit positional arguments.
+		const positionalArgs = Array.isArray(cmd?.args) ? cmd.args.slice() : [];
+		if (positionalArgs.length) {
+			this.argv._ = positionalArgs;
+		} else {
+			// Fallback for command handlers that pass positional args directly.
+			while (args.length && args[args.length - 1] === undefined) {
+				args.pop();
+			}
+			this.argv._ = args;
 		}
-
-		this.argv._ = args;
 		this.applyArgv(cmd);
 
 		if (!this.ready) {
@@ -621,26 +629,35 @@ export class CLI {
 	}
 
 	/**
-	 * If the current command is the "build" command, this function will check
-	 * if the "build" command has a `--platform` option (which is should), then
-	 * prompt for the platform is not explicitly passed in.
+	 * If the current command supports platform-specific config, this function
+	 * checks for the `--platform` option and prompts when missing.
 	 *
-	 * Finally, the platform specific options and flags are added to the
-	 * Commander.js "build" command context so that the second parse will
-	 * pick up the newly defined options/flags.
+	 * Finally, the platform specific options and flags are added to the command
+	 * context so that the second parse picks up the newly defined options/flags.
 	 *
 	 * @returns {Promise}
 	 * @access private
 	 */
 	async initBuildPlatform() {
 		const cmdName = this.command.name();
-		if (cmdName !== 'build') {
+		// Commands with build-style platform branches.
+		if (cmdName !== 'build' && cmdName !== 'serve') {
 			return;
 		}
 
 		const platformOption = this.command.conf?.options?.platform;
 		if (!platformOption) {
 			return;
+		}
+
+		// Support shorthand positional platform syntax, e.g. `ti serve ios`.
+		const positionalPlatform = this.argv._[0];
+		if (!this.argv.platform && typeof positionalPlatform === 'string' && platformOption.values.includes(positionalPlatform)) {
+			this.debugLogger.trace(`Converting positional platform shortcut "${positionalPlatform}" to --platform`);
+			this.argv.platform = positionalPlatform;
+			if (this.argv._[0] === positionalPlatform) {
+				this.argv._.shift();
+			}
 		}
 
 		// when specifying `--platform ios`, the SDK's option callback converts
