@@ -417,9 +417,7 @@ export class CLI {
 		const cmd = args.pop();
 		args.pop(); // discard argv
 
-		// Commander keeps excess/positional args on the command context.
-		// Prefer that source so shorthand invocations like `ti serve ios` work
-		// even when commands do not declare explicit positional arguments.
+		// Commander keeps declared and excess positional args on the command.
 		const positionalArgs = Array.isArray(cmd?.args) ? cmd.args.slice() : [];
 		if (positionalArgs.length) {
 			this.argv._ = positionalArgs;
@@ -651,13 +649,12 @@ export class CLI {
 		}
 
 		// Support shorthand positional platform syntax, e.g. `ti serve ios`.
-		const positionalPlatform = this.argv._[0];
-		if (!this.argv.platform && typeof positionalPlatform === 'string' && platformOption.values.includes(positionalPlatform)) {
-			this.debugLogger.trace(`Converting positional platform shortcut "${positionalPlatform}" to --platform`);
+		// Commander parses this into processedArgs via the [platform] argument
+		// declared in loadCommand().
+		const positionalPlatform = this.command.processedArgs?.[0];
+		if (!this.argv.platform && positionalPlatform && platformOption.values.includes(positionalPlatform)) {
+			this.debugLogger.trace(`Converting positional platform argument "${positionalPlatform}" to --platform`);
 			this.argv.platform = positionalPlatform;
-			if (this.argv._[0] === positionalPlatform) {
-				this.argv._.shift();
-			}
 		}
 
 		// when specifying `--platform ios`, the SDK's option callback converts
@@ -1000,6 +997,8 @@ export class CLI {
 				this.command.createHelp = () => {
 					return Object.assign(new TiHelp(this, conf.platforms), this.command.configureHelp());
 				};
+
+				cmd.argument('[platform]', 'target platform');
 			}
 
 			applyCommandConfig(this, cmdName, cmd, conf);
