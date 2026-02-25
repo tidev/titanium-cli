@@ -9,7 +9,7 @@ describe('ti build', () => {
 
 		const output = stripColor(stdout);
 		assert.match(output, /Titanium Command-Line Interface/);
-		assert.match(output, /Usage: titanium build \[options\]/);
+		assert.match(output, /Usage: titanium build \[options\] \[platform\]/);
 		assert.match(output, /Builds an existing app or module project./);
 		assert.match(output, /Build Options:/);
 		assert.match(output, /Global Options:/);
