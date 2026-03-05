@@ -10,7 +10,9 @@ export class BusyIndicator {
 	}
 
 	render() {
-		this.stream.cursorTo && this.stream.cursorTo(0);
+		if (this.stream.cursorTo) {
+			this.stream.cursorTo(0);
+		}
 		this.stream.write(this.margin + this.sprites[this.current++]);
 		if (this.current >= this.sprites.length) {
 			this.current = 0;
@@ -35,9 +37,13 @@ export class BusyIndicator {
 		clearTimeout(this.timer);
 		if (this.running) {
 			this.running = false;
-			this.stream.cursorTo && this.stream.cursorTo(0);
+			if (this.stream.cursorTo) {
+				this.stream.cursorTo(0);
+			}
 			this.stream.write(' '.repeat(this.margin.length + 2));
-			this.stream.cursorTo && this.stream.cursorTo(0);
+			if (this.stream.cursorTo) {
+				this.stream.cursorTo(0);
+			}
 		}
 	}
 }

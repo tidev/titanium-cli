@@ -5,7 +5,15 @@ import { basename } from 'node:path';
 import wrapAnsi from 'wrap-ansi';
 
 const { bold, cyan, gray, magenta, red, yellow } = chalk;
-const typesList = ['all', 'os', 'nodejs', 'titanium', 'jdk', 'android', 'ios'];
+const typesList = ['all', 'os', 'nodejs', 'titanium', 'java', 'android', 'ios'];
+
+export const extendedDesc = `Display development environment information.
+
+You may specify one or more types to filter the information.
+Available types: ${typesList.map((t) => cyan(t)).join(', ')}
+
+For example, to show Node.js and Java information only, run:
+  __titanium info nodejs java__`;
 
 /**
  * Returns the configuration for the info command.
@@ -18,6 +26,13 @@ export function config(_logger, _config, _cli) {
 	return {
 		title: 'Info',
 		skipBanner: true,
+		args: [
+			{
+				desc: `one or more types to display ${gray('(default: "all")')}`,
+				name: 'types',
+				variadic: true,
+			},
+		],
 		flags: {
 			json: {
 				desc: 'display info as JSON',
@@ -32,9 +47,8 @@ export function config(_logger, _config, _cli) {
 			},
 			types: {
 				abbr: 't',
-				default: 'all',
 				desc: 'information types to display; you may select one or more',
-				values: typesList.filter((t) => t !== 'ios' || process.platform === 'darwin'),
+				hidden: true,
 			},
 		},
 	};
@@ -63,9 +77,15 @@ export async function run(logger, config, cli) {
 	// determine the types to display
 	const types = {};
 	let i = 0;
-	const specifiedTypes = (cli.argv.types || 'all').toLowerCase().split(',');
+	const specifiedTypes = cli.argv._[0]?.length ? cli.argv._[0] : (cli.argv.types || 'all').toLowerCase().split(',');
 	for (let type of specifiedTypes) {
 		type = type.trim();
+
+		// legacy support for "jdk" type
+		if (type === 'jdk') {
+			type = 'java';
+		}
+
 		if (typesList.includes(type)) {
 			types[type] = ++i;
 		}
@@ -156,18 +176,20 @@ export async function run(logger, config, cli) {
 		);
 	}
 
-	if (types.all || types.jdk) {
+	if (types.all || types.java) {
 		sections.push(
 			new Section({
-				name: 'jdk',
-				title: 'Java Development Kit',
+				name: 'java',
+				title: 'Java',
 				render() {
 					logger.log(bold(this.title));
-					if (data.jdk.version) {
-						logger.log(
-							`  ${'Version'.padEnd(indent)} = ${magenta(`${data.jdk.version}_${data.jdk.build}`)}`
-						);
-						logger.log(`  ${'Java Home'.padEnd(indent)} = ${magenta(data.jdk.home)}\n`);
+					logger.log(`  ${'JAVA_HOME'.padEnd(indent)} = ${magenta(data.java.home || 'not set')}`);
+					if (Object.keys(data.java.jdks).length) {
+						for (const { path, version} of Object.values(data.java.jdks)) {
+							logger.log(`  ${cyan(version)}`);
+							logger.log(`  ${'  Path'.padEnd(indent)} = ${magenta(path)}`);
+						}
+						logger.log();
 					} else {
 						logger.log(`  ${gray('Not found')}\n`);
 					}
@@ -231,7 +253,8 @@ export async function run(logger, config, cli) {
 			logger.log(bold(`${section.title} Issues`));
 
 			for (const issue of info.issues) {
-				const msg = issue.message
+				const msg = (issue.details || issue.message)
+					.trim()
 					.split('\n\n')
 					.map((chunk) => {
 						return (

@@ -1,13 +1,13 @@
 import { initCLI } from '../helpers/init-cli.js';
 import { stripColor } from '../helpers/strip-color.js';
-import fs from 'fs-extra';
 import assert from 'node:assert';
+import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const pkgJson = fs.readJsonSync(join(__dirname, '../../package.json'));
+const pkgJson = JSON.parse(readFileSync(join(__dirname, '../../package.json'), 'utf8'));
 
 describe('ti', () => {
 	it(

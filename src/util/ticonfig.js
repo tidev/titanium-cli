@@ -1,7 +1,7 @@
-import { expand } from './expand.js';
+import { existsSync, expand, isFile } from 'node-titanium-sdk/util';
 import { TiError } from './tierror.js';
-import fs from 'fs-extra';
 import { join } from 'node:path';
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 
 export class TiConfig {
 	#configFile = '';
@@ -122,7 +122,7 @@ export class TiConfig {
 	load(file) {
 		if (file) {
 			file = expand(file);
-			if (!fs.existsSync(file)) {
+			if (!existsSync(file)) {
 				throw new Error(`Unable to open config file "${file}"`);
 			}
 		} else {
@@ -133,9 +133,9 @@ export class TiConfig {
 		this.apply(this.#defaults);
 
 		// if the config file exists, then we load it
-		if (fs.existsSync(file)) {
+		if (isFile(file)) {
 			try {
-				this.apply(fs.readJsonSync(file));
+				this.apply(JSON.parse(readFileSync(file, 'utf8')));
 				this.#configFile = file;
 			} catch {
 				throw new Error(`Unable to parse config file "${file}"`);
@@ -152,11 +152,11 @@ export class TiConfig {
 	 */
 	save() {
 		try {
-			fs.ensureDirSync(this.#titaniumConfigFolder);
+			mkdirSync(this.#titaniumConfigFolder, { recursive: true });
 
 			const tmpFile = `${this.#configFile}.${Date.now()}.tmp`;
-			fs.writeFileSync(tmpFile, JSON.stringify(this, null, 2));
-			fs.renameSync(tmpFile, this.#configFile);
+			writeFileSync(tmpFile, JSON.stringify(this, null, 2));
+			renameSync(tmpFile, this.#configFile);
 		} catch {
 			throw new TiError(`Unable to write config file ${this.#configFile}`, {
 				after: 'Please ensure the Titanium CLI has access to modify this file',
@@ -186,11 +186,18 @@ export class TiConfig {
 		// if not an array, try to cast to null, true, false, int or leave as string
 		if (!Array.isArray(value)) {
 			value = value === undefined ? '' : String(value).trim();
-			value === 'null' && (value = null);
-			value === 'true' && (value = true);
-			value === 'false' && (value = false);
-			if (String(~~value) === value) {
-				value = ~~value;
+			if (value === 'null') {
+				value = null;
+			}
+			if (value === 'true') {
+				value = true;
+			}
+			if (value === 'false') {
+				value = false;
+			}
+			const num = Number.parseInt(value);
+			if (!isNaN(num) && String(num) === value) {
+				value = num;
 			}
 		}
 

@@ -1,6 +1,6 @@
 import { TiConfig } from '../../src/util/ticonfig.js';
 import assert from 'node:assert';
-import { copyFile, mkdir, readFile, rmdir, unlink } from 'node:fs/promises';
+import { cp, mkdir, readFile, rmdir, unlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
@@ -117,7 +117,7 @@ describe('TiConfig', () => {
 
 	it('should save the config', async () => {
 		const tmpFile = join(tmpdir(), 'ticonfig.json');
-		await copyFile(join(fixturesDir, 'good.json'), tmpFile);
+		await cp(join(fixturesDir, 'good.json'), tmpFile);
 
 		try {
 			const cfg = new TiConfig(tmpFile);

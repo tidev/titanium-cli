@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 
-import { expand } from '../util/expand.js';
+import { expand } from 'node-titanium-sdk/util';
 import { ticonfig } from '../util/ticonfig.js';
 import { TiError } from '../util/tierror.js';
 import chalk from 'chalk';

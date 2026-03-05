@@ -1,13 +1,13 @@
 import { initCLI } from '../helpers/init-cli.js';
 import { stripColor } from '../helpers/strip-color.js';
-import fs from 'fs-extra';
 import assert from 'node:assert';
+import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const pkgJson = fs.readJsonSync(join(__dirname, '../../package.json'));
+const pkgJson = JSON.parse(readFileSync(join(__dirname, '../../package.json'), 'utf8'));
 
 describe('ti info', () => {
 	it(
@@ -39,7 +39,7 @@ describe('ti info', () => {
 			);
 			assert.match(output, new RegExp(`Titanium CLI\n\\s*CLI Version\\s*= ${pkgJson.version}`));
 			assert.match(output, /Titanium SDKs/);
-			assert.match(output, /Java Development Kit/);
+			assert.match(output, /Java/);
 			assert.match(output, /Issues/);
 
 			assert.strictEqual(exitCode, 0);
@@ -58,7 +58,7 @@ describe('ti info', () => {
 			assert(Object.hasOwn(json, 'npm'));
 			assert(Object.hasOwn(json, 'titanium'));
 			assert(Object.hasOwn(json, 'titaniumCLI'));
-			assert(Object.hasOwn(json, 'jdk'));
+			assert(Object.hasOwn(json, 'java'));
 
 			// legacy
 			({ exitCode, stdout } = await run(['info', '--output', 'json']));
@@ -69,7 +69,7 @@ describe('ti info', () => {
 			assert(Object.hasOwn(json, 'npm'));
 			assert(Object.hasOwn(json, 'titanium'));
 			assert(Object.hasOwn(json, 'titaniumCLI'));
-			assert(Object.hasOwn(json, 'jdk'));
+			assert(Object.hasOwn(json, 'java'));
 
 			assert.strictEqual(exitCode, 0);
 		}),
@@ -202,7 +202,7 @@ describe('ti info', () => {
 				new RegExp(`Titanium CLI\n\\s*CLI Version\\s*= ${pkgJson.version}`)
 			);
 			assert.doesNotMatch(output, /Titanium SDKs/);
-			assert.match(output, /Java Development Kit/);
+			assert.match(output, /Java/);
 			assert.match(output, /Issues/);
 
 			assert.strictEqual(exitCode, 0);

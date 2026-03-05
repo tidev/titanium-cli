@@ -9,7 +9,7 @@ import { initSDK, typeLabels } from './util/tisdk.js';
 import { unique } from './util/unique.js';
 import chalk from 'chalk';
 import { program, Command, Option } from 'commander';
-import { capitalize, expand, isDir, version } from 'node-titanium-sdk/util';
+import { capitalize, expand, isDir, isFile, version } from 'node-titanium-sdk/util';
 import { readdirSync, readFileSync } from 'node:fs';
 import { readdir } from 'node:fs/promises';
 import { basename, dirname, join } from 'node:path';
@@ -401,7 +401,11 @@ export class CLI {
 						new Promise((resolve, reject) => {
 							const hook = this.createHook(name, data);
 							hook((err, result) => {
-								err ? reject(err) : resolve(result);
+								if (err) {
+									reject(err);
+								} else {
+									resolve(result);
+								}
 							});
 						})
 				),
@@ -1067,10 +1071,10 @@ export class CLI {
 
 				try {
 					p = expand(p);
-					const isDir = isDir(p);
-					const files = isDir ? readdirSync(p) : [p];
+					const dir = isDir(p);
+					const files = dir ? readdirSync(p) : [p];
 					for (const filename of files) {
-						const file = isDir ? join(p, filename) : filename;
+						const file = dir ? join(p, filename) : filename;
 						if (!ignoreRE.test(filename) && isFile(file) && jsRE.test(file)) {
 							const name = basename(file).replace(jsRE, '');
 							this.debugLogger.trace(`Found custom command "${name}"`);
@@ -1082,7 +1086,7 @@ export class CLI {
 								.action((...args) => this.executeCommand(args));
 						}
 					}
-				} catch {
+				} catch (e) {
 					// squelch
 				}
 			}
@@ -1520,7 +1524,9 @@ export class CLI {
 										opt.validated = true;
 										if (opt.callback) {
 											var val = opt.callback(this.argv[name] || '');
-											val !== undefined && (this.argv[name] = val);
+											if (val !== undefined) {
+												this.argv[name] = val;
+											}
 											delete opt.callback;
 										}
 									}

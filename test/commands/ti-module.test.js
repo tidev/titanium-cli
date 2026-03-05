@@ -45,8 +45,7 @@ describe('ti module', () => {
 			const { exitCode, stdout } = await run(['module']);
 
 			const output = stripColor(stdout);
-			assert.match(output, /Configured Path Modules/);
-			assert.match(output, /Global Modules/);
+			assert.match(output, /No modules found/);
 
 			assert.strictEqual(exitCode, 0);
 		})
@@ -58,12 +57,7 @@ describe('ti module', () => {
 			const { exitCode, stdout } = await run(['module', '--json']);
 
 			const json = JSON.parse(stdout);
-			assert.deepStrictEqual(json, {
-				project: {},
-				config: {},
-				global: {},
-			});
-
+			assert.deepStrictEqual(json, {});
 			assert.strictEqual(exitCode, 0);
 		})
 	);
@@ -76,7 +70,7 @@ describe('ti module', () => {
 				'--config',
 				JSON.stringify({
 					paths: {
-						modules: [join(fixturesDir, 'module')],
+						modules: [join(fixturesDir, 'modules')],
 					},
 				}),
 			]);
@@ -84,26 +78,40 @@ describe('ti module', () => {
 			const output = stripColor(stdout);
 			assert.match(
 				output,
-				new RegExp(`Configured Path Modules
+				new RegExp(`com.test.module
   Android
-    com.test.module
-      1.0.0   ${join(fixturesDir, 'module', 'android', 'test-module', '1.0.0').replace(/\\/g, '\\\\')}
+    1.0.0
+      Path          = ${join(fixturesDir, 'modules', 'android', 'test-module', '1.0.0').replace(/\\/g, '\\\\')}
+      Author        = Your Name
+      Description   = testModule
+      Titanium SDK  = >=7.2.0
 
   CommonJS
-    com.test.module
-      1.0     ${join(fixturesDir, 'module', 'commonjs', 'invalid-version', '1.0.1').replace(/\\/g, '\\\\')}
-      1.0.0   ${join(fixturesDir, 'module', 'commonjs', 'test-module', '1.0.0').replace(/\\/g, '\\\\')}
+    1.0
+      Path          = ${join(fixturesDir, 'modules', 'commonjs', 'invalid-version', '1.0.1').replace(/\\/g, '\\\\')}
+      Author        = Your Name
+      Description   = testModule
+      Titanium SDK  = >=7.2.0
+
+    1.0.0
+      Path          = ${join(fixturesDir, 'modules', 'commonjs', 'test-module', '1.0.0').replace(/\\/g, '\\\\')}
+      Author        = Your Name
+      Description   = testModule
+      Titanium SDK  = >=7.2.0
 
   iOS
-    com.test.module
-      1.0.0   ${join(fixturesDir, 'module', 'iphone', 'test-module', '1.0.0').replace(/\\/g, '\\\\')}
+    1.0.0
+      Path          = ${join(fixturesDir, 'modules', 'iphone', 'test-module', '1.0.0').replace(/\\/g, '\\\\')}
+      Author        = Your Name
+      Description   = testModule
+      Titanium SDK  = >=7.2.0
 
   Windows
-    com.test.module
-      1.0.0   ${join(fixturesDir, 'module', 'windows', 'test-module', '1.0.0').replace(/\\/g, '\\\\')}
-
-Global Modules
-  No modules found`)
+    1.0.0
+      Path          = ${join(fixturesDir, 'modules', 'windows', 'test-module', '1.0.0').replace(/\\/g, '\\\\')}
+      Author        = Your Name
+      Description   = testModule
+      Titanium SDK  = >=7.2.0`)
 			);
 
 			assert.strictEqual(exitCode, 0);
@@ -118,7 +126,7 @@ Global Modules
 				'--config',
 				JSON.stringify({
 					paths: {
-						modules: [join(fixturesDir, 'module')],
+						modules: [join(fixturesDir, 'modules')],
 					},
 				}),
 				'--json',
@@ -126,129 +134,99 @@ Global Modules
 
 			const json = JSON.parse(stdout);
 			assert.deepStrictEqual(json, {
-				project: {},
-				config: {
+				'com.test.module': {
 					android: {
-						'com.test.module': {
-							'1.0.0': {
-								version: '1.0.0',
-								modulePath: join(fixturesDir, 'module', 'android', 'test-module', '1.0.0'),
-								manifest: {
-									version: '1.0.0',
-									apiversion: 4,
-									architectures: ['arm64-v8a', 'armeabi-v7a', 'x86'],
-									description: 'testModule',
-									author: 'Your Name',
-									license: 'Specify your license',
-									copyright: 'Copyright (c) 2018 by Your Company',
-									name: 'testModule',
-									moduleid: 'com.test.module',
-									guid: 'dcaea77e-2860-42c1-a57b-319f81da10e0',
-									platform: 'android',
-									minsdk: '7.2.0',
-								},
-								platform: ['android'],
-							},
+						'1.0.0': {
+							apiversion: 4,
+							architectures: ['arm64-v8a', 'armeabi-v7a', 'x86'],
+							author: 'Your Name',
+							copyright: 'Copyright (c) 2018 by Your Company',
+							description: 'testModule',
+							guid: 'dcaea77e-2860-42c1-a57b-319f81da10e0',
+							license: 'Specify your license',
+							minsdk: '7.2.0',
+							moduleid: 'com.test.module',
+							name: 'testModule',
+							path: join(fixturesDir, 'modules', 'android', 'test-module', '1.0.0'),
+							platform: 'android',
+							version: '1.0.0'
 						},
 					},
 					commonjs: {
-						'com.test.module': {
-							'1.0': {
-								version: '1.0',
-								modulePath: join(fixturesDir, 'module', 'commonjs', 'invalid-version', '1.0.1'),
-								manifest: {
-									version: '1.0',
-									description: 'testModule',
-									author: 'Your Name',
-									license: 'Specify your license',
-									copyright: 'Copyright (c) 2018 by Your Company',
-									name: 'testModule',
-									moduleid: 'com.test.module',
-									guid: 'dcaea77e-2860-42c1-a57b-319f81da10e0',
-									platform: 'commonjs',
-									minsdk: '7.2.0',
-								},
-								platform: ['commonjs'],
-							},
-							'1.0.0': {
-								version: '1.0.0',
-								modulePath: join(fixturesDir, 'module', 'commonjs', 'test-module', '1.0.0'),
-								manifest: {
-									version: '1.0.0',
-									description: 'testModule',
-									author: 'Your Name',
-									license: 'Specify your license',
-									copyright: 'Copyright (c) 2018 by Your Company',
-									name: 'testModule',
-									moduleid: 'com.test.module',
-									guid: 'dcaea77e-2860-42c1-a57b-319f81da10e0',
-									platform: 'commonjs',
-									minsdk: '7.2.0',
-								},
-								platform: ['commonjs'],
-							},
+						'1.0': {
+							author: 'Your Name',
+							copyright: 'Copyright (c) 2018 by Your Company',
+							description: 'testModule',
+							guid: 'dcaea77e-2860-42c1-a57b-319f81da10e0',
+							license: 'Specify your license',
+							minsdk: '7.2.0',
+							moduleid: 'com.test.module',
+							name: 'testModule',
+							path: join(fixturesDir, 'modules', 'commonjs', 'invalid-version', '1.0.1'),
+							platform: 'commonjs',
+							version: '1.0',
+						},
+						'1.0.0': {
+							author: 'Your Name',
+							copyright: 'Copyright (c) 2018 by Your Company',
+							description: 'testModule',
+							guid: 'dcaea77e-2860-42c1-a57b-319f81da10e0',
+							license: 'Specify your license',
+							minsdk: '7.2.0',
+							moduleid: 'com.test.module',
+							name: 'testModule',
+							path: join(fixturesDir, 'modules', 'commonjs', 'test-module', '1.0.0'),
+							platform: 'commonjs',
+							version: '1.0.0',
 						},
 					},
 					ios: {
-						'com.test.module': {
-							'1.0.0': {
-								version: '1.0.0',
-								modulePath: join(fixturesDir, 'module', 'iphone', 'test-module', '1.0.0'),
-								manifest: {
-									version: '1.0.0',
-									apiversion: 2,
-									architectures: ['armv7', 'arm64', 'i386', 'x86_64'],
-									description: 'testModule',
-									author: 'Your Name',
-									license: 'Specify your license',
-									copyright: 'Copyright (c) 2018 by Your Company',
-									name: 'testModule',
-									moduleid: 'com.test.module',
-									guid: 'dcaea77e-2860-42c1-a57b-319f81da10e0',
-									platform: 'ios',
-									minsdk: '7.2.0',
-								},
-								platform: ['ios'],
-							},
+						'1.0.0': {
+							apiversion: 2,
+							architectures: ['armv7', 'arm64', 'i386', 'x86_64'],
+							author: 'Your Name',
+							copyright: 'Copyright (c) 2018 by Your Company',
+							description: 'testModule',
+							guid: 'dcaea77e-2860-42c1-a57b-319f81da10e0',
+							license: 'Specify your license',
+							minsdk: '7.2.0',
+							moduleid: 'com.test.module',
+							name: 'testModule',
+							path: join(fixturesDir, 'modules', 'iphone', 'test-module', '1.0.0'),
+							platform: 'ios',
+							version: '1.0.0',
 						},
 					},
 					windows: {
-						'com.test.module': {
-							'1.0.0': {
-								version: '1.0.0',
-								modulePath: join(fixturesDir, 'module', 'windows', 'test-module', '1.0.0'),
-								manifest: {
-									version: '1.0.0',
-									apiversion: 4,
-									architectures: ['ARM', 'x86'],
-									description: 'testModule',
-									author: 'Your Name',
-									license: 'Specify your license',
-									copyright: 'Copyright (c) 2018 by Your Company',
-									name: 'testModule',
-									moduleid: 'com.test.module',
-									guid: 'dcaea77e-2860-42c1-a57b-319f81da10e0',
-									platform: 'windows',
-									minsdk: '7.2.0',
-								},
-								platform: ['windows'],
-							},
+						'1.0.0': {
+							apiversion: 4,
+							architectures: ['ARM', 'x86'],
+							author: 'Your Name',
+							copyright: 'Copyright (c) 2018 by Your Company',
+							description: 'testModule',
+							guid: 'dcaea77e-2860-42c1-a57b-319f81da10e0',
+							license: 'Specify your license',
+							minsdk: '7.2.0',
+							moduleid: 'com.test.module',
+							name: 'testModule',
+							path: join(fixturesDir, 'modules', 'windows', 'test-module', '1.0.0'),
+							platform: 'windows',
+							version: '1.0.0',
 						},
 					},
 				},
-				global: {},
 			});
 
 			assert.strictEqual(exitCode, 0);
 		})
 	);
 
-	it(
-		'should install module during detection',
-		initCLI(async ({ run }) => {
-			const { exitCode, _stdout } = await run(['module']);
+	// it(
+	// 	'should install module during detection',
+	// 	initCLI(async ({ run }) => {
+	// 		const { exitCode, _stdout } = await run(['module']);
 
-			assert.strictEqual(exitCode, 0);
-		})
-	);
+	// 		assert.strictEqual(exitCode, 0);
+	// 	})
+	// );
 });

@@ -1,17 +1,22 @@
+import { rm } from 'node:fs/promises';
 import { initCLI } from './init-cli.js';
 import { tmpDirName } from './tmp-dir-name.js';
-import fs from 'fs-extra';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { cpSync, mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
 
 export function initSDKHome(fn, mock) {
 	const tmpSDKDir = tmpDirName();
 
 	if (mock) {
 		const os = process.platform === 'darwin' ? 'osx' : process.platform;
-		fs.copySync(
+		const dest = join(tmpSDKDir, 'mobilesdk', os, '0.0.0.GA');
+		mkdirSync(dirname(dest), { recursive: true });
+		cpSync(
 			join(fileURLToPath(import.meta.url), '../../mock-sdk'),
-			join(tmpSDKDir, 'mobilesdk', os, '0.0.0.GA')
+			dest,
+			{ recursive: true }
 		);
 	}
 
@@ -25,7 +30,7 @@ export function initSDKHome(fn, mock) {
 				tmpSDKDir,
 			});
 		} finally {
-			await fs.remove(tmpSDKDir);
+			await rm(tmpSDKDir, { force: true, recursive: true });
 		}
 	});
 }

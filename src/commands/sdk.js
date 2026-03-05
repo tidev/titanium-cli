@@ -19,7 +19,7 @@ import {
 	version,
 } from 'node-titanium-sdk/util';
 import { createWriteStream } from 'node:fs';
-import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import { basename, dirname, join } from 'node:path';
 import { Transform } from 'node:stream';
@@ -432,6 +432,7 @@ SdkSubcommands.install = {
 		logger.log(`\nInstalling SDK files to ${cyan(dest)}`);
 		await mkdir(dest, { recursive: true });
 		await rm(dest, { force: true, recursive: true });
+		await mkdir(dest, { recursive: true });
 		await rename(src, dest);
 
 		// step 5: install the modules
@@ -460,7 +461,7 @@ SdkSubcommands.install = {
 						}
 
 						const destDir = join(modulesDest, platform, moduleName, ver);
-						if (!forceModules && exists(destDir)) {
+						if (!forceModules && await exists(destDir)) {
 							trace(`Module ${cyan(`${moduleName}@${ver}`)} already installed`);
 							continue;
 						}
@@ -473,9 +474,11 @@ SdkSubcommands.install = {
 
 		if (Object.keys(modules).length) {
 			trace(`Installing ${cyan(Object.keys(modules).length)} modules:`);
+			console.log(modules);
 			for (const [name, { src, dest }] of Object.entries(modules)) {
 				trace(`   ${cyan(name)}`);
 				await rm(dest, { force: true, recursive: true });
+				await mkdir(dest, { recursive: true });
 				await rename(src, dest);
 			}
 		} else {
@@ -499,14 +502,14 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 
 	if (uriMatch && uriMatch[2]) {
 		file = uriMatch[2];
-	} else if (subject && exists(subject)) {
+	} else if (subject && await exists(subject)) {
 		file = subject;
 	}
 
 	if (file) {
 		file = expand(file);
 
-		if (!exists(file)) {
+		if (!(await exists(file))) {
 			throw new TiError('Specified file does not exist');
 		}
 
@@ -653,6 +656,7 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 	if (filename) {
 		file = join(downloadDir, filename);
 		await rm(file, { force: true });
+		await mkdir(dirname(file), { recursive: true });
 		await rename(downloadedFile, file);
 		downloadedFile = file;
 	} else {
@@ -681,15 +685,15 @@ async function extractSDK({
 	let renameTo;
 	let forceModules = force;
 
-	const onEntry = async (filename, _idx, total) => {
+	const onEntry = async (entry, _idx, total) => {
 		if (total > 1) {
-			const m = !name && filename.match(sdkDestRegExp);
+			const m = !name && entry.fileName.match(sdkDestRegExp);
 			if (m) {
 				name = m[1];
 				const result = await checkSDKFile({
 					force,
 					logger,
-					filename,
+					filename: entry.fileName,
 					name,
 					noPrompt,
 					osName,
@@ -713,31 +717,24 @@ async function extractSDK({
 
 			bar?.tick();
 		} else {
-			artifact = filename;
+			artifact = entry.fileName;
 		}
 	};
 
 	debugLogger.trace(`Extracting ${file} -> ${tempDir}`);
-	await extractZip({
-		dest: tempDir,
-		file,
-		onEntry,
-	});
+	await extractZip(file, tempDir, { onEntry });
 
 	if (!artifact) {
 		return { forceModules, name, renameTo, tempDir };
 	}
 
+	// GitHub artifacts are zips containing the SDK zip file
 	debugLogger.trace(`Detected artifact: ${artifact}`);
 	const tempDir2 = join(os.tmpdir(), `titanium-cli-${Math.floor(Math.random() * 1e6)}`);
 	file = join(tempDir, artifact);
 
 	debugLogger.trace(`Extracting ${file} -> ${tempDir2}`);
-	await extractZip({
-		dest: tempDir2,
-		file,
-		onEntry,
-	});
+	await extractZip(file, tempDir2, { onEntry });
 
 	await rm(tempDir, { force: true, recursive: true });
 	return { forceModules, name, renameTo, tempDir: tempDir2 };

@@ -1,8 +1,9 @@
 import { initCLI } from '../helpers/init-cli.js';
 import { initSDKHome, initMockSDKHome } from '../helpers/init-sdk-home.js';
 import { stripColor } from '../helpers/strip-color.js';
-import fs from 'fs-extra';
+import { exists } from 'node-titanium-sdk/util';
 import assert from 'node:assert';
+import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -131,8 +132,8 @@ describe('ti sdk', () => {
 
 				// find the downloaded file and move it to the tmp dir for subsequent tests
 				const src = join(tmpHome, '.titanium', 'downloads', sdkFilename);
-				if (fs.existsSync(src)) {
-					await fs.remove(src);
+				if (await exists(src)) {
+					await rm(src, { force: true, recursive: true });
 				} else {
 					throw new Error(`SDK file does not exist: ${src}`);
 				}

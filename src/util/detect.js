@@ -1,4 +1,4 @@
-import { detect as jdkInfo } from './jdk.js';
+import { detectJDKs } from 'node-titanium-sdk/jdk';
 import chalk from 'chalk';
 import { detectTitaniumSDKs } from 'node-titanium-sdk/titanium';
 import { existsSync } from 'node:fs';
@@ -10,13 +10,15 @@ import { pathToFileURL } from 'node:url';
 const { cyan } = chalk;
 
 export async function detect(logger, config, cli, types = { all: true }) {
-	const [os, node, npm, titanium, titaniumCLI, jdk, ...platformData] = await Promise.all([
+	const [os, node, npm, titanium, titaniumCLI, java, ...platformData] = await Promise.all([
 		(types.all || types.os) && osInfo(),
 		(types.all || types.nodejs) && nodeInfo(),
 		(types.all || types.nodejs) && npmInfo(),
 		(types.all || types.titanium) && titaniumSDKInfo(config),
 		(types.all || types.titanium) && titaniumCLIInfo(cli),
-		(types.all || types.jdk) && jdkInfo(config),
+		(types.all || types.java) && detectJDKs({
+			javaHome: config.get('java.home'),
+		}),
 		...Object.keys(cli.sdk?.platforms || {})
 			.sort()
 			.map(async (name) => {
@@ -33,7 +35,7 @@ export async function detect(logger, config, cli, types = { all: true }) {
 		npm,
 		titanium,
 		titaniumCLI,
-		jdk,
+		java,
 	};
 
 	const platformInfo = [];
@@ -162,7 +164,7 @@ async function titaniumSDKInfo(config) {
 	const { sdks } = await detectTitaniumSDKs(config);
 	const results = {};
 
-	for (const sdk of sdks) {
+	for (const sdk of Object.values(sdks)) {
 		results[sdk.name] = {
 			version: sdk.version,
 			path: sdk.path,

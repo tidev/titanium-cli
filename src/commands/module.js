@@ -1,13 +1,11 @@
 import { arrayify } from '../util/arrayify.js';
-import { capitalize } from '../util/capitalize.js';
-import { expand } from '../util/expand.js';
+import { capitalize, expand, isDir, isFile } from 'node-titanium-sdk/util';
 import { TiError } from '../util/tierror.js';
 import chalk from 'chalk';
 import { detectTiModules } from 'node-titanium-sdk/titanium';
-import { existsSync } from 'node:fs';
 import { dirname, join, parse } from 'node:path';
 
-const { bold, cyan, gray } = chalk;
+const { cyan, gray, magenta } = chalk;
 
 // if a platform is not in this map, then we just print the capitalized platform name
 const platformNames = {
@@ -100,106 +98,50 @@ ModuleSubcommands.list = {
 	},
 	async fn(logger, config, cli) {
 		const isJson = cli.argv.json || cli.argv.output === 'json';
-		let projectDir;
 		let p = expand(cli.argv['project-dir'] || '.');
-		const searchPaths = {
-			project: [],
-			config: [],
-			global: [],
-		};
-		const scopeLabels = {
-			project: 'Project Modules',
-			config: 'Configured Path Modules',
-			global: 'Global Modules',
-		};
-		const confPaths = arrayify(config.get('paths.modules'), true);
-		const defaultInstallLocation = cli.env.installPath;
-		const sdkLocations = cli.env.os.sdkPaths.map((p) => expand(p));
+		const searchPaths = arrayify(config.get('paths.modules'), true);
 
 		// attempt to detect if we're in a project folder by scanning for a tiapp.xml
 		// until we hit the root
-		if (existsSync(p)) {
+		if (isDir(p)) {
 			for (const { root } = parse(p); p !== root; p = dirname(p)) {
-				if (existsSync(join(p, 'tiapp.xml'))) {
-					p = join(p, 'modules');
-					projectDir = p;
-					if (existsSync(p)) {
-						searchPaths.project.push(p);
-					}
+				if (isFile(join(p, 'tiapp.xml'))) {
+					searchPaths.push(p);
 					break;
 				}
 			}
 		}
 
-		// set our paths from the config file
-		for (let path of confPaths) {
-			path = expand(path);
-			if (
-				existsSync(path) &&
-				!searchPaths.project.includes(path) &&
-				!searchPaths.config.includes(path)
-			) {
-				searchPaths.config.push(path);
-			}
-		}
-
-		// add any modules from various SDK locations
-		if (defaultInstallLocation && !sdkLocations.includes(defaultInstallLocation)) {
-			sdkLocations.push(defaultInstallLocation);
-		}
-		if (cli.sdk?.path) {
-			sdkLocations.push(expand(cli.sdk.path, '..', '..', '..'));
-		}
-		for (let path of sdkLocations) {
-			path = expand(path, 'modules');
-			if (
-				existsSync(path) &&
-				!searchPaths.project.includes(path) &&
-				!searchPaths.config.includes(path) &&
-				!searchPaths.global.includes(path)
-			) {
-				searchPaths.global.push(path);
-			}
-		}
-
-		const results = await detect(searchPaths, config, cli.debugLogger);
+		const { modules } = await detectTiModules({
+			searchPaths
+		});
 
 		if (isJson) {
-			logger.log(JSON.stringify(results, null, '\t'));
+			logger.log(JSON.stringify(modules, null, '\t'));
 			return;
 		}
 
 		logger.skipBanner(false);
 		logger.banner();
 
-		for (const [scope, modules] of Object.entries(results)) {
-			const platforms = Object.keys(modules);
-			if (scope === 'project' && projectDir === undefined && !platforms.length) {
-				// no sense printing project modules if there aren't any and the
-				// user never asked to see them
-				continue;
-			}
-
-			logger.log(bold(scopeLabels[scope]));
-			if (platforms.length) {
-				let i = 0;
-				for (const platform of platforms) {
-					if (i++) {
-						logger.log();
-					}
-
+		if (Object.keys(modules).length) {
+			for (const [name, platforms] of Object.entries(modules)) {
+				logger.log(name);
+				for (const [platform, versions] of Object.entries(platforms)) {
 					const platformName = platformNames[platform.toLowerCase()] || capitalize(platform);
 					logger.log(`  ${gray(platformName)}`);
-					for (const [name, versions] of Object.entries(modules[platform])) {
-						logger.log(`    ${name}`);
-						for (const [ver, mod] of Object.entries(versions)) {
-							logger.log(`      ${cyan(ver.padEnd(7))} ${mod.modulePath}`);
-						}
+					for (const [version, mod] of Object.entries(versions)) {
+						logger.log(`    ${cyan(version)}`);
+						logger.log(`      Path          = ${magenta(mod.path)}`);
+						logger.log(`      Author        = ${magenta(mod.author || '')}`);
+						logger.log(`      Description   = ${magenta(mod.description || '')}`);
+						logger.log(`      Titanium SDK  = ${magenta(mod.minsdk ? `>=${mod.minsdk}` : 'any')}`);
+						logger.log();
 					}
 				}
-			} else {
-				logger.log(gray('  No modules found'));
 			}
+		} else {
+			logger.log(gray('No modules found'));
 			logger.log();
 		}
 	},

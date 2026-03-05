@@ -1,6 +1,6 @@
 import { initHome } from './init-home.js';
 import { execaNode } from 'execa';
-import fs from 'fs-extra';
+import { rm } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -38,7 +38,7 @@ export function initCLI(fixture, fn, sharedOpts = {}) {
 				tmpHome,
 			});
 		} finally {
-			await fs.remove(tmpHome);
+			await rm(tmpHome, { recursive: true });
 		}
 	};
 }

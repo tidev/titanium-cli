@@ -1,11 +1,10 @@
 import { BusyIndicator } from './busyindicator.js';
 import { detect } from './detect.js';
-import { expand } from './expand.js';
 import { prompt } from './prompt.js';
 import { detect as proxyDetect } from './proxy.js';
 import chalk from 'chalk';
 import { detectTitaniumSDKs, getTitaniumReleases } from 'node-titanium-sdk/titanium';
-import { request, version } from 'node-titanium-sdk/util';
+import { expand, request, version } from 'node-titanium-sdk/util';
 import dns from 'node:dns/promises';
 import { existsSync, unlinkSync, utimesSync, writeFileSync } from 'node:fs';
 import os from 'node:os';

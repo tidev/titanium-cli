@@ -1,5 +1,5 @@
 import { applyCommandConfig } from './apply-command-config.js';
-import { capitalize } from './capitalize.js';
+import { capitalize } from 'node-titanium-sdk/util';
 import chalk from 'chalk';
 import { Command, Help } from 'commander';
 
