@@ -59,9 +59,7 @@ export async function initSDK({
 			sdkVersion = latest;
 		}
 
-		console.log(sdkVersion);
 		sdk = sdks[sdkVersion];
-		console.log(sdk);
 
 		if (promptingEnabled && ((selectedSdk && !sdk) || showSDKPrompt)) {
 			logger.banner();
