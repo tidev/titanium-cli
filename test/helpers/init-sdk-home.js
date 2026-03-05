@@ -1,10 +1,10 @@
-import { rm } from 'node:fs/promises';
 import { initCLI } from './init-cli.js';
 import { tmpDirName } from './tmp-dir-name.js';
-import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { cpSync, mkdirSync } from 'node:fs';
+import { rm } from 'node:fs/promises';
+import { join } from 'node:path';
 import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 export function initSDKHome(fn, mock) {
 	const tmpSDKDir = tmpDirName();
@@ -13,11 +13,7 @@ export function initSDKHome(fn, mock) {
 		const os = process.platform === 'darwin' ? 'osx' : process.platform;
 		const dest = join(tmpSDKDir, 'mobilesdk', os, '0.0.0.GA');
 		mkdirSync(dirname(dest), { recursive: true });
-		cpSync(
-			join(fileURLToPath(import.meta.url), '../../mock-sdk'),
-			dest,
-			{ recursive: true }
-		);
+		cpSync(join(fileURLToPath(import.meta.url), '../../mock-sdk'), dest, { recursive: true });
 	}
 
 	return initCLI(async (opts) => {

@@ -1,8 +1,8 @@
 import { arrayify } from '../util/arrayify.js';
-import { capitalize, expand, isDir, isFile } from 'node-titanium-sdk/util';
 import { TiError } from '../util/tierror.js';
 import chalk from 'chalk';
 import { detectTiModules } from 'node-titanium-sdk/titanium';
+import { capitalize, expand, isDir, isFile } from 'node-titanium-sdk/util';
 import { dirname, join, parse } from 'node:path';
 
 const { cyan, gray, magenta } = chalk;
@@ -113,7 +113,7 @@ ModuleSubcommands.list = {
 		}
 
 		const { modules } = await detectTiModules({
-			searchPaths
+			searchPaths,
 		});
 
 		if (isJson) {

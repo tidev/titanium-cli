@@ -1,7 +1,7 @@
-import { existsSync, expand, isFile } from 'node-titanium-sdk/util';
 import { TiError } from './tierror.js';
-import { join } from 'node:path';
+import { existsSync, expand, isFile } from 'node-titanium-sdk/util';
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 export class TiConfig {
 	#configFile = '';

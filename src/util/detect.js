@@ -1,5 +1,5 @@
-import { detectJDKs } from 'node-titanium-sdk/jdk';
 import chalk from 'chalk';
+import { detectJDKs } from 'node-titanium-sdk/jdk';
 import { detectTitaniumSDKs } from 'node-titanium-sdk/titanium';
 import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
@@ -16,9 +16,10 @@ export async function detect(logger, config, cli, types = { all: true }) {
 		(types.all || types.nodejs) && npmInfo(),
 		(types.all || types.titanium) && titaniumSDKInfo(config),
 		(types.all || types.titanium) && titaniumCLIInfo(cli),
-		(types.all || types.java) && detectJDKs({
-			javaHome: config.get('java.home'),
-		}),
+		(types.all || types.java) &&
+			detectJDKs({
+				javaHome: config.get('java.home'),
+			}),
 		...Object.keys(cli.sdk?.platforms || {})
 			.sort()
 			.map(async (name) => {

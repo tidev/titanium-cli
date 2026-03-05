@@ -77,7 +77,9 @@ export async function run(logger, config, cli) {
 	// determine the types to display
 	const types = {};
 	let i = 0;
-	const specifiedTypes = cli.argv._[0]?.length ? cli.argv._[0] : (cli.argv.types || 'all').toLowerCase().split(',');
+	const specifiedTypes = cli.argv._[0]?.length
+		? cli.argv._[0]
+		: (cli.argv.types || 'all').toLowerCase().split(',');
 	for (let type of specifiedTypes) {
 		type = type.trim();
 
@@ -185,7 +187,7 @@ export async function run(logger, config, cli) {
 					logger.log(bold(this.title));
 					logger.log(`  ${'JAVA_HOME'.padEnd(indent)} = ${magenta(data.java.home || 'not set')}`);
 					if (Object.keys(data.java.jdks).length) {
-						for (const { path, version} of Object.values(data.java.jdks)) {
+						for (const { path, version } of Object.values(data.java.jdks)) {
 							logger.log(`  ${cyan(version)}`);
 							logger.log(`  ${'  Path'.padEnd(indent)} = ${magenta(path)}`);
 						}

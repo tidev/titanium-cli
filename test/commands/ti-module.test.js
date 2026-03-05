@@ -149,7 +149,7 @@ describe('ti module', () => {
 							name: 'testModule',
 							path: join(fixturesDir, 'modules', 'android', 'test-module', '1.0.0'),
 							platform: 'android',
-							version: '1.0.0'
+							version: '1.0.0',
 						},
 					},
 					commonjs: {

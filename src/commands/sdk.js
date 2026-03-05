@@ -461,7 +461,7 @@ SdkSubcommands.install = {
 						}
 
 						const destDir = join(modulesDest, platform, moduleName, ver);
-						if (!forceModules && await exists(destDir)) {
+						if (!forceModules && (await exists(destDir))) {
 							trace(`Module ${cyan(`${moduleName}@${ver}`)} already installed`);
 							continue;
 						}
@@ -502,7 +502,7 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 
 	if (uriMatch && uriMatch[2]) {
 		file = uriMatch[2];
-	} else if (subject && await exists(subject)) {
+	} else if (subject && (await exists(subject))) {
 		file = subject;
 	}
 

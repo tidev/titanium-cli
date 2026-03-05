@@ -31,7 +31,8 @@ export async function initSDK({
 		const tiappFile = join(cwd, 'tiapp.xml');
 		await tiapp.load(tiappFile);
 		debugLogger.trace(`Loaded ${tiappFile}`);
-		sdkVersion = tiappSdkVersion = await tiapp.select1('//sdk-version', 'latest');
+		const data = tiapp.data();
+		sdkVersion = tiappSdkVersion = data.sdkVersion || 'latest';
 		debugLogger.trace(
 			`<sdk-version> is ${tiappSdkVersion ? `set to ${tiappSdkVersion}` : 'undefined'}`
 		);
@@ -58,7 +59,9 @@ export async function initSDK({
 			sdkVersion = latest;
 		}
 
+		console.log(sdkVersion);
 		sdk = sdks[sdkVersion];
+		console.log(sdk);
 
 		if (promptingEnabled && ((selectedSdk && !sdk) || showSDKPrompt)) {
 			logger.banner();
