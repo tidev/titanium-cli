@@ -1,16 +1,13 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
 import { suggest } from '../../src/util/suggest.js';
 import { stripColor } from '../helpers/strip-color.js';
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
 
 const cmds = ['build', 'clean', 'config', 'create', 'info'];
 
 describe('suggest', () => {
 	it('should suggest a value', () => {
-		assert.strictEqual(
-			stripColor(suggest('buid', cmds)),
-			'Did you mean this?\n    build\n\n'
-		);
+		assert.strictEqual(stripColor(suggest('buid', cmds)), 'Did you mean this?\n    build\n\n');
 	});
 
 	it('should suggest multiple values', () => {
@@ -33,9 +30,6 @@ describe('suggest', () => {
 	});
 
 	it('should not find any suggestions', () => {
-		assert.strictEqual(
-			stripColor(suggest('zzz', cmds)),
-			''
-		);
+		assert.strictEqual(stripColor(suggest('zzz', cmds)), '');
 	});
 });

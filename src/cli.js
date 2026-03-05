@@ -1,22 +1,21 @@
+import { applyCommandConfig } from './util/apply-command-config.js';
+import { arrayify } from './util/arrayify.js';
+import { Logger } from './util/logger.js';
+import { prompt } from './util/prompt.js';
+import { ticonfig } from './util/ticonfig.js';
+import { TiError } from './util/tierror.js';
+import { TiHelp } from './util/tihelp.js';
+import { initSDK, typeLabels } from './util/tisdk.js';
+import { unique } from './util/unique.js';
 import chalk from 'chalk';
-import fs from 'fs-extra';
 import { program, Command, Option } from 'commander';
+import { capitalize, expand, isDir, version } from 'node-titanium-sdk/util';
+import { readdirSync, readFileSync } from 'node:fs';
+import { readdir } from 'node:fs/promises';
 import { basename, dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { unique } from './util/unique.js';
-import { ticonfig } from './util/ticonfig.js';
-import { initSDK, typeLabels } from './util/tisdk.js';
-import { expand } from './util/expand.js';
-import { arrayify } from './util/arrayify.js';
-import * as version from './util/version.js';
-import { Logger } from './util/logger.js';
-import { capitalize } from './util/capitalize.js';
-import wrapAnsi from 'wrap-ansi';
-import { TiError } from './util/tierror.js';
-import { prompt } from './util/prompt.js';
-import { applyCommandConfig } from './util/apply-command-config.js';
-import { TiHelp } from './util/tihelp.js';
 import semver from 'semver';
+import wrapAnsi from 'wrap-ansi';
 
 const { blue, bold, cyan, gray, green, magenta, red, yellow } = chalk;
 
@@ -25,18 +24,18 @@ const { blue, bold, cyan, gray, green, magenta, red, yellow } = chalk;
  * Titanium SDK. These are hard coded for speed.
  */
 const commands = {
-	config:  'get and set config options',
-	info:    'display development environment information',
-	module:  'displays installed Titanium modules',
-	sdk:     'manages installed Titanium SDKs',
-	setup:   'sets up the Titanium CLI'
+	config: 'get and set config options',
+	info: 'display development environment information',
+	module: 'displays installed Titanium modules',
+	sdk: 'manages installed Titanium SDKs',
+	setup: 'sets up the Titanium CLI',
 };
 
 const sdkCommands = {
-	build:   'builds a project',
-	clean:   'removes previous build directories',
-	create:  'creates a new project',
-	project: 'get and set tiapp.xml settings'
+	build: 'builds a project',
+	clean: 'removes previous build directories',
+	create: 'creates a new project',
+	project: 'get and set tiapp.xml settings',
 };
 
 /**
@@ -75,7 +74,7 @@ export class CLI {
 		_: [], // parsed arguments (reset each time the context's parse() is called)
 		$: 'titanium', // resolved node script path
 		$_: process.argv.slice(), // original arguments
-		$0: process.argv.slice(0, 2).join(' ') // node process and original node script path
+		$0: process.argv.slice(0, 2).join(' '), // node process and original node script path
 	};
 
 	/**
@@ -105,7 +104,7 @@ export class CLI {
 		os: {
 			name: process.platform === 'darwin' ? 'osx' : process.platform,
 			sdkPaths: [],
-			sdks: {}
+			sdks: {},
 		},
 		getOSInfo: async (callback) => {
 			const { detect } = await import('./util/detect.js');
@@ -120,10 +119,10 @@ export class CLI {
 					oscpu: os.numcpus,
 					memory: os.memory,
 					node: node.version,
-					npm: npm.version
+					npm: npm.version,
 				});
 			}
-		}
+		},
 	};
 
 	/**
@@ -138,7 +137,7 @@ export class CLI {
 		loadedFilenames: [],
 		post: {},
 		pre: {},
-		scannedPaths: {}
+		scannedPaths: {},
 	};
 
 	/**
@@ -168,7 +167,7 @@ export class CLI {
 
 	constructor() {
 		const pkgJsonFile = join(dirname(fileURLToPath(import.meta.url)), '../package.json');
-		const { engines, version } = fs.readJsonSync(pkgJsonFile);
+		const { engines, version } = JSON.parse(readFileSync(pkgJsonFile, 'utf8'));
 
 		this.name = 'Titanium Command-Line Interface';
 		this.copyright = 'Copyright TiDev, Inc. 4/7/2022-Present. All Rights Reserved.';
@@ -177,7 +176,7 @@ export class CLI {
 		this.logger.setBanner({
 			name: this.name,
 			copyright: this.copyright,
-			version: this.version
+			version: this.version,
 		});
 		this.debugLogger.timestampEnabled(true);
 
@@ -228,7 +227,9 @@ export class CLI {
 			if (opt.negate) {
 				name = name.replace(/^no-/, '');
 			}
-			this.debugLogger.trace(`  Setting ${name} = ${cargv[opt.attributeName()]} (prev: ${argv[name]})`);
+			this.debugLogger.trace(
+				`  Setting ${name} = ${cargv[opt.attributeName()]} (prev: ${argv[name]})`
+			);
 			argv[name] = cargv[opt.attributeName()];
 		}
 	}
@@ -251,7 +252,9 @@ export class CLI {
 		applyCommandConfig(this, cmdName, cmd, conf);
 
 		if (conf.platforms) {
-			this.debugLogger.trace(`Detected conf.platforms applying config for "${cmd.name()}", overriding createHelp()`);
+			this.debugLogger.trace(
+				`Detected conf.platforms applying config for "${cmd.name()}", overriding createHelp()`
+			);
 			this.command.createHelp = () => {
 				return Object.assign(new TiHelp(this, conf.platforms), this.command.configureHelp());
 			};
@@ -287,70 +290,74 @@ export class CLI {
 				type: name,
 				args,
 				fn,
-				ctx
+				ctx,
 			});
 			const callback = data.args.pop();
 			const pres = this.hooks.pre[name] || [];
 			const posts = this.hooks.post[name] || [];
 
-			this.debugLogger.trace(`Firing ${hookType} hook "${name}" pres=${pres.length}, posts=${posts.length}`);
+			this.debugLogger.trace(
+				`Firing ${hookType} hook "${name}" pres=${pres.length}, posts=${posts.length}`
+			);
 
 			(async () => {
 				// call all pre filters
-				await pres
-					.reduce((promise, pre) => promise.then(async () => {
-						if (pre.length >= 2) {
-							await new Promise((resolve, reject) => {
-								pre.call(ctx, data, (err, newData) => {
-									if (err) {
-										return reject(err);
-									}
-									if (newData && typeof newData === 'object' && newData.type) {
-										data = newData;
-									}
-									resolve();
+				await pres.reduce(
+					(promise, pre) =>
+						promise.then(async () => {
+							if (pre.length >= 2) {
+								await new Promise((resolve, reject) => {
+									pre.call(ctx, data, (err, newData) => {
+										if (err) {
+											return reject(err);
+										}
+										if (newData && typeof newData === 'object' && newData.type) {
+											data = newData;
+										}
+										resolve();
+									});
 								});
-							});
-						} else {
-							await pre.call(ctx, data);
-						}
-					}), Promise.resolve());
+							} else {
+								await pre.call(ctx, data);
+							}
+						}),
+					Promise.resolve()
+				);
 
 				if (data.fn) {
-					data.result = await new Promise(resolve => {
+					data.result = await new Promise((resolve) => {
 						// call the hooked function
-						data.fn.call(
-							data.ctx,
-							...data.args,
-							(...args) => resolve(args)
-						);
+						data.fn.call(data.ctx, ...data.args, (...args) => resolve(args));
 					});
 				}
 
 				// call all post filters
-				await posts
-					.reduce((promise, post) => promise.then(async () => {
-						if (post.length >= 2) {
-							await new Promise((resolve, reject) => {
-								post.call(ctx, data, (err, newData) => {
-									if (err) {
-										return reject(err);
-									}
-									if (newData && typeof newData === 'object' && newData.type) {
-										data = newData;
-									}
-									resolve();
+				await posts.reduce(
+					(promise, post) =>
+						promise.then(async () => {
+							if (post.length >= 2) {
+								await new Promise((resolve, reject) => {
+									post.call(ctx, data, (err, newData) => {
+										if (err) {
+											return reject(err);
+										}
+										if (newData && typeof newData === 'object' && newData.type) {
+											data = newData;
+										}
+										resolve();
+									});
 								});
-							});
-						} else {
-							await post.call(ctx, data);
-						}
-					}), Promise.resolve());
+							} else {
+								await post.call(ctx, data);
+							}
+						}),
+					Promise.resolve()
+				);
 
 				if (typeof callback === 'function') {
 					callback.apply(data, data.result);
 				}
-			})().catch(err => {
+			})().catch((err) => {
 				// this is the primary error handler
 				if (typeof callback === 'function') {
 					callback(err);
@@ -383,21 +390,29 @@ export class CLI {
 		// create each hook and immediately fire them
 		const events = unique(arrayify(name, true));
 
-		this.debugLogger.trace(`Emitting "${name}" (${events.length} listener${events.length !== 1 ? 's' : ''})`);
+		this.debugLogger.trace(
+			`Emitting "${name}" (${events.length} listener${events.length !== 1 ? 's' : ''})`
+		);
 
-		const promise = events
-			.reduce((promise, name) => promise.then(() => new Promise((resolve, reject) => {
-				const hook = this.createHook(name, data);
-				hook((err, result) => {
-					err ? reject(err) : resolve(result);
-				});
-			})), Promise.resolve(this));
+		const promise = events.reduce(
+			(promise, name) =>
+				promise.then(
+					() =>
+						new Promise((resolve, reject) => {
+							const hook = this.createHook(name, data);
+							hook((err, result) => {
+								err ? reject(err) : resolve(result);
+							});
+						})
+				),
+			Promise.resolve(this)
+		);
 
 		if (typeof callback !== 'function') {
 			return promise;
 		}
 
-		promise.then(result => callback(null, result), callback);
+		promise.then((result) => callback(null, result), callback);
 
 		return this;
 	}
@@ -436,17 +451,63 @@ export class CLI {
 		if (sdkCommands[commandName] || commandName === 'info') {
 			// the SDK still uses the `colors` package, so we need to add the
 			// colors to the string prototype
-			const assignColors = proto => Object.defineProperties(proto, {
-				blue: { get() { return blue(`${this}`); }, configurable: true },
-				bold: { get() { return bold(`${this}`); }, configurable: true },
-				cyan: { get() { return cyan(`${this}`); }, configurable: true },
-				gray: { get() { return gray(`${this}`); }, configurable: true },
-				green: { get() { return green(`${this}`); }, configurable: true },
-				grey: { get() { return gray(`${this}`); }, configurable: true },
-				magenta: { get() { return magenta(`${this}`); }, configurable: true },
-				red: { get() { return red(`${this}`); }, configurable: true },
-				yellow: { get() { return yellow(`${this}`); }, configurable: true }
-			});
+			const assignColors = (proto) =>
+				Object.defineProperties(proto, {
+					blue: {
+						get() {
+							return blue(`${this}`);
+						},
+						configurable: true,
+					},
+					bold: {
+						get() {
+							return bold(`${this}`);
+						},
+						configurable: true,
+					},
+					cyan: {
+						get() {
+							return cyan(`${this}`);
+						},
+						configurable: true,
+					},
+					gray: {
+						get() {
+							return gray(`${this}`);
+						},
+						configurable: true,
+					},
+					green: {
+						get() {
+							return green(`${this}`);
+						},
+						configurable: true,
+					},
+					grey: {
+						get() {
+							return gray(`${this}`);
+						},
+						configurable: true,
+					},
+					magenta: {
+						get() {
+							return magenta(`${this}`);
+						},
+						configurable: true,
+					},
+					red: {
+						get() {
+							return red(`${this}`);
+						},
+						configurable: true,
+					},
+					yellow: {
+						get() {
+							return yellow(`${this}`);
+						},
+						configurable: true,
+					},
+				});
 
 			assignColors(String.prototype);
 			assignColors(Number.prototype);
@@ -522,7 +583,9 @@ export class CLI {
 	 */
 	async go() {
 		if (this.nodeVersion && !semver.satisfies(process.version, this.nodeVersion)) {
-			throw new TiError(`Node.js version ${this.nodeVersion} required, current version is ${process.version}`);
+			throw new TiError(
+				`Node.js version ${this.nodeVersion} required, current version is ${process.version}`
+			);
 		}
 
 		Command.prototype.createHelp = () => {
@@ -550,8 +613,8 @@ export class CLI {
 		// wire up the event listeners
 		program
 			.on('option:no-banner', () => this.logger.bannerEnabled(false))
-			.on('option:no-color', () => chalk.level = 0)
-			.on('option:no-colors', () => chalk.level = 0)
+			.on('option:no-color', () => (chalk.level = 0))
+			.on('option:no-colors', () => (chalk.level = 0))
 			.on('option:quiet', () => this.debugLogger.silence())
 			.on('option:version', () => {
 				this.logger.log(this.version);
@@ -583,7 +646,8 @@ export class CLI {
 
 					if (!this.promptingEnabled || !option.prompt || !option.values) {
 						throw new TiError(`Missing required option "--${name}"`, {
-							after: option.values && `Allowed values:\n${option.values.map(v => `   ${cyan(v)}`)}`
+							after:
+								option.values && `Allowed values:\n${option.values.map((v) => `   ${cyan(v)}`)}`,
 						});
 					}
 
@@ -596,7 +660,7 @@ export class CLI {
 					Object.assign(conf.options, src?.options);
 					applyCommandConfig(this, cmdName, this.command, {
 						flags: src?.flags,
-						options: src?.options
+						options: src?.options,
 					});
 				}
 			}
@@ -605,7 +669,7 @@ export class CLI {
 			if (conf.options) {
 				for (const name of Object.keys(conf.options)) {
 					if (!Object.hasOwn(this.argv, name) && conf.options[name].default !== undefined) {
-						cmd.setOptionValue(name, this.argv[name] = conf.options[name].default);
+						cmd.setOptionValue(name, (this.argv[name] = conf.options[name].default));
 					}
 				}
 			}
@@ -650,20 +714,23 @@ export class CLI {
 			this.argv.platform = 'ios';
 		}
 
-		this.debugLogger.trace(`Processing --platform option: ${this.argv.platform || 'not specified'}`);
+		this.debugLogger.trace(
+			`Processing --platform option: ${this.argv.platform || 'not specified'}`
+		);
 		try {
 			if (!this.argv.platform) {
 				throw new TiError('Missing required option: --platform <name>', {
-					after: `Available Platforms:\n${
-						platformOption.values
-							.map(v => `   ${cyan(v)}`)
-							.join('\n')
-					}`
+					after: `Available Platforms:\n${platformOption.values
+						.map((v) => `   ${cyan(v)}`)
+						.join('\n')}`,
 				});
 			} else if (!platformOption.values.includes(this.argv.platform)) {
-				throw new TiError(`Invalid platform "${this.argv.$originalPlatform || this.argv.platform}"`, {
-					code: 'INVALID_PLATFORM'
-				});
+				throw new TiError(
+					`Invalid platform "${this.argv.$originalPlatform || this.argv.platform}"`,
+					{
+						code: 'INVALID_PLATFORM',
+					}
+				);
 			}
 		} catch (e) {
 			if (!this.promptingEnabled) {
@@ -680,7 +747,7 @@ export class CLI {
 				this.argv.platform = await prompt({
 					type: 'select',
 					message: 'Please select a valid platform:',
-					choices: platformOption.values.map(v => ({ label: v, value: v }))
+					choices: platformOption.values.map((v) => ({ label: v, value: v })),
 				});
 				this.debugLogger.trace(`Selecting platform "${this.argv.platform}"`);
 			} else {
@@ -697,7 +764,7 @@ export class CLI {
 
 		// set platform context
 		this.command.platform = {
-			conf: platformConf
+			conf: platformConf,
 		};
 
 		this.debugLogger.trace('Applying platform config...');
@@ -727,42 +794,32 @@ export class CLI {
 			.configureHelp({
 				helpWidth: ticonfig.get('cli.width', 80),
 				showGlobalOptions: true,
-				sortSubcommands: true
+				sortSubcommands: true,
 			})
 			.configureOutput({
 				outputError(msg) {
 					throw new TiError(msg.replace(/^error:\s*/, ''));
-				}
+				},
 			})
 			.option('--no-banner', 'disable Titanium version banner')
 			.addOption(
 				// completely ignored, we just need the parser to not choke
-				new Option('--color')
-					.hideHelp()
+				new Option('--color').hideHelp()
 			)
-			.addOption(
-				new Option('--colors')
-					.hideHelp()
-			)
+			.addOption(new Option('--colors').hideHelp())
 			.option('--no-color', 'disable colors')
-			.addOption(
-				new Option('--no-colors')
-					.hideHelp()
-			)
+			.addOption(new Option('--no-colors').hideHelp())
 			.option('--no-progress-bars', 'disable progress bars')
 			.option('--no-prompt', 'disable interactive prompting')
 			.option('--config [json]', 'serialized JSON string to mix into the CLI config')
 			.option('--config-file [file]', 'path to CLI config file')
 			.option('--debug', 'display CLI debug log messages')
-			.addOption(
-				new Option('--debug-no-run')
-					.hideHelp()
-			)
+			.addOption(new Option('--debug-no-run').hideHelp())
 			.option('-d, --project-dir <path>', 'the directory containing the project')
 			.option('-q, --quiet', 'suppress all output')
 			.option('-v, --version', 'displays the current version')
 			.option('-s, --sdk [version]', `Titanium SDK version to use ${gray('(default: "latest")')}`)
-			.on('option:config', cfg => {
+			.on('option:config', (cfg) => {
 				try {
 					const json = (0, eval)(`(${cfg})`);
 					this.debugLogger.trace('Applying --config:', json);
@@ -775,16 +832,13 @@ export class CLI {
 					throw new Error(`Failed to parse --config: ${e.message}`);
 				}
 			})
-			.on('option:config-file', file => {
+			.on('option:config-file', (file) => {
 				this.config.load(file);
 				this.loadCustomCommands();
 			})
-			.on('option:project-dir', dir => program.setOptionValue('projectDir', expand(dir)));
+			.on('option:project-dir', (dir) => program.setOptionValue('projectDir', expand(dir)));
 
-		const allCommands = [
-			...Object.entries(commands),
-			...Object.entries(sdkCommands)
-		];
+		const allCommands = [...Object.entries(commands), ...Object.entries(sdkCommands)];
 		for (const [name, summary] of allCommands) {
 			program
 				.command(name)
@@ -807,7 +861,8 @@ export class CLI {
 			this.command = cmd;
 
 			this.applyArgv(program);
-			this.promptingEnabled = this.argv.prompt && !this.argv.$_.includes('-h') && !this.argv.$_.includes('--help');
+			this.promptingEnabled =
+				this.argv.prompt && !this.argv.$_.includes('-h') && !this.argv.$_.includes('--help');
 
 			// if `--project-dir` was not set, default to the current working directory
 			const cwd = expand(this.argv['project-dir'] || '.');
@@ -829,7 +884,7 @@ export class CLI {
 			const hooks = ticonfig.paths?.hooks;
 			if (hooks) {
 				const paths = arrayify(hooks, true);
-				await Promise.all(paths.map(p => this.scanHooks(p)));
+				await Promise.all(paths.map((p) => this.scanHooks(p)));
 			}
 
 			await this.loadCommand(cmd);
@@ -864,7 +919,7 @@ export class CLI {
 		// that changes the available flags/options
 		const skipRegExp = /^(flags|options|args|subcommands)$/;
 		const optionBranches = Object.keys(conf)
-			.filter(name => conf.options?.[name] && !skipRegExp.test(name))
+			.filter((name) => conf.options?.[name] && !skipRegExp.test(name))
 			.sort((a, b) => {
 				// if we have multiple option groups, then try to process them in order
 				if (!conf.options[a]?.order) {
@@ -892,7 +947,7 @@ export class CLI {
 					Object.assign(conf.options, src?.options);
 					applyCommandConfig(this, cmdName, this.command, {
 						flags: src?.flags,
-						options: src?.options
+						options: src?.options,
 					});
 					optionBranches.splice(i--, 1);
 				}
@@ -917,7 +972,9 @@ export class CLI {
 
 		if (commands[cmdName]) {
 			desc = commands[cmdName];
-			commandFile = pathToFileURL(join(fileURLToPath(import.meta.url), `../commands/${cmdName}.js`));
+			commandFile = pathToFileURL(
+				join(fileURLToPath(import.meta.url), `../commands/${cmdName}.js`)
+			);
 		} else if (sdkCommands[cmdName]) {
 			desc = sdkCommands[cmdName];
 			commandFile = pathToFileURL(join(this.sdk.path, `cli/commands/${cmdName}.js`));
@@ -935,7 +992,7 @@ export class CLI {
 		// check if this command is compatible with this version of the CLI
 		if (cmd.module.cliVersion && !version.satisfies(this.version, cmd.module.cliVersion)) {
 			throw new TiError(`Command "${cmdName}" incompatible with this version of the CLI`, {
-				after: `Requires version ${cmd.module.cliVersion}, currently ${this.version}`
+				after: `Requires version ${cmd.module.cliVersion}, currently ${this.version}`,
 			});
 		}
 
@@ -950,9 +1007,8 @@ export class CLI {
 		// load the command's config
 		if (typeof cmd.module.config === 'function') {
 			const fn = await cmd.module.config(this.logger, this.config, this);
-			const conf = (typeof fn === 'function'
-				? await new Promise(resolve => fn(resolve))
-				: fn) || {};
+			const conf =
+				(typeof fn === 'function' ? await new Promise((resolve) => fn(resolve)) : fn) || {};
 
 			cmd.conf = conf;
 
@@ -965,7 +1021,7 @@ export class CLI {
 				// if `--alloy` is not defined, define it
 				if (!conf.flags.alloy) {
 					conf.flags.alloy = {
-						desc: 'initialize new project as an Alloy project'
+						desc: 'initialize new project as an Alloy project',
 					};
 				}
 			}
@@ -979,7 +1035,9 @@ export class CLI {
 					delete conf.platforms.iphone;
 				}
 
-				this.debugLogger.trace(`Detected conf.platforms loading "${cmdName}", overriding createHelp()`);
+				this.debugLogger.trace(
+					`Detected conf.platforms loading "${cmdName}", overriding createHelp()`
+				);
 				this.command.createHelp = () => {
 					return Object.assign(new TiHelp(this, conf.platforms), this.command.configureHelp());
 				};
@@ -1009,11 +1067,11 @@ export class CLI {
 
 				try {
 					p = expand(p);
-					const isDir = fs.statSync(p).isDirectory();
-					const files = isDir ? fs.readdirSync(p) : [p];
+					const isDir = isDir(p);
+					const files = isDir ? readdirSync(p) : [p];
 					for (const filename of files) {
 						const file = isDir ? join(p, filename) : filename;
-						if (!ignoreRE.test(filename) && fs.existsSync(file) && (fs.statSync(file)).isFile() && jsRE.test(file)) {
+						if (!ignoreRE.test(filename) && isFile(file) && jsRE.test(file)) {
 							const name = basename(file).replace(jsRE, '');
 							this.debugLogger.trace(`Found custom command "${name}"`);
 							this.customCommands[name] = file;
@@ -1048,37 +1106,35 @@ export class CLI {
 		// including the Titanium SDK version
 		let showSDKPrompt = false;
 		const createOpts = ['-p', '--platforms', '-n', '--name', '-t', '--type'];
-		if (cmdName === 'create' && !this.argv.sdk && !createOpts.some(f => this.argv.$_.includes(f))) {
+		if (
+			cmdName === 'create' &&
+			!this.argv.sdk &&
+			!createOpts.some((f) => this.argv.$_.includes(f))
+		) {
 			showSDKPrompt = true;
 		}
 
 		// load the SDK and its hooks
-		const {
-			installPath,
-			sdk,
-			sdkPaths,
-			sdks,
-			tiappSdkVersion
-		} = await initSDK({
+		const { installPath, sdk, sdkPaths, sdks, tiappSdkVersion } = await initSDK({
 			config: this.config,
 			cwd,
 			debugLogger: this.debugLogger,
 			logger: this.logger,
 			promptingEnabled: this.promptingEnabled,
 			selectedSdk: this.argv.sdk,
-			showSDKPrompt
+			showSDKPrompt,
 		});
 		this.env.installPath = installPath;
 		this.env.os.sdkPaths = sdkPaths;
 		this.env.sdks = sdks;
-		this.env.getSDK = version => {
+		this.env.getSDK = (version) => {
 			if (!version || version === 'latest') {
 				return sdk;
 			}
 			const values = Object.values(sdks);
-			return values.find(s => s.name === version) ||
-				values.find(s => s.version === version) ||
-				null;
+			return (
+				values.find((s) => s.name === version) || values.find((s) => s.version === version) || null
+			);
 		};
 		this.sdk = sdk;
 		this.argv.sdk = sdk?.name;
@@ -1087,19 +1143,24 @@ export class CLI {
 			const hasSDKs = Object.keys(sdks).length > 0;
 			if (!hasSDKs || !sdk) {
 				if (hasSDKs && tiappSdkVersion) {
-					throw new TiError(`The <sdk-version> in the tiapp.xml is set to "${tiappSdkVersion}", but this version is not installed`, {
-						after: `Available SDKs:\n${Object.values(sdks).map(sdk => `  ${cyan(sdk.name.padEnd(24))} ${gray(typeLabels[sdk.type])}`).join('\n')}`
-					});
+					throw new TiError(
+						`The <sdk-version> in the tiapp.xml is set to "${tiappSdkVersion}", but this version is not installed`,
+						{
+							after: `Available SDKs:\n${Object.values(sdks)
+								.map((sdk) => `  ${cyan(sdk.name.padEnd(24))} ${gray(typeLabels[sdk.type])}`)
+								.join('\n')}`,
+						}
+					);
 				}
 
 				throw new TiError('No Titanium SDKs found', {
-					after: `You can download the latest Titanium SDK by running: ${cyan('titanium sdk install')}`
+					after: `You can download the latest Titanium SDK by running: ${cyan('titanium sdk install')}`,
 				});
 			}
 
 			try {
 				// check if the SDK is compatible with our version of node
-				sdk.packageJson = await fs.readJson(join(sdk.path, 'package.json'));
+				sdk.packageJson = JSON.parse(await readFile(join(sdk.path, 'package.json'), 'utf8'));
 
 				const current = process.versions.node;
 				const required = sdk.packageJson.vendorDependencies.node;
@@ -1107,7 +1168,7 @@ export class CLI {
 
 				if (supported === false) {
 					throw new TiError(`Titanium SDK v${sdk.name} is incompatible with Node.js v${current}`, {
-						after: `Please install Node.js ${version.parseMax(required)} in order to use this version of the Titanium SDK.`
+						after: `Please install Node.js ${version.parseMax(required)} in order to use this version of the Titanium SDK.`,
 					});
 				}
 			} catch {
@@ -1120,7 +1181,7 @@ export class CLI {
 			name: this.name,
 			copyright: this.copyright,
 			version: this.version,
-			sdkVersion: this.sdk?.name
+			sdkVersion: this.sdk?.name,
 		});
 
 		// if we're running a `sdk` command, then scan the SDK for hooks
@@ -1180,7 +1241,7 @@ export class CLI {
 
 		if (typeof opt.prompt === 'function') {
 			// option has it's own prompt handler which probably uses `fields`
-			const field = await new Promise(resolve => opt.prompt(resolve));
+			const field = await new Promise((resolve) => opt.prompt(resolve));
 			if (!field) {
 				return;
 			}
@@ -1189,7 +1250,7 @@ export class CLI {
 				field.autoSelectOne = false;
 			}
 
-			value = await new Promise(resolve => {
+			value = await new Promise((resolve) => {
 				field.prompt((err, value) => {
 					if (err) {
 						process.exit(1);
@@ -1209,28 +1270,30 @@ export class CLI {
 				def = def.join(',');
 			}
 
-			const validate = pr.validate || (value => {
-				if (pr.validator) {
-					try {
-						pr.validator(value);
-					} catch (ex) {
-						return ex.toString();
+			const validate =
+				pr.validate ||
+				((value) => {
+					if (pr.validator) {
+						try {
+							pr.validator(value);
+						} catch (ex) {
+							return ex.toString();
+						}
+					} else if (!value.length || (pr.pattern && !pr.pattern.test(value))) {
+						return pr.error;
 					}
-				} else if (!value.length || (pr.pattern && !pr.pattern.test(value))) {
-					return pr.error;
-				}
-				return true;
-			});
+					return true;
+				});
 
 			if (Array.isArray(opt.values)) {
 				if (opt.values.length > 1) {
-					const choices = opt.values.map(v => ({ label: v, value: v }));
+					const choices = opt.values.map((v) => ({ label: v, value: v }));
 					value = await prompt({
 						type: 'select',
 						message: p,
-						initial: def && choices.find(c => c.value === def) || undefined,
+						initial: (def && choices.find((c) => c.value === def)) || undefined,
 						validate,
-						choices
+						choices,
 					});
 				} else {
 					value = opt.values[0];
@@ -1240,7 +1303,7 @@ export class CLI {
 					type: opt.password ? 'password' : 'text',
 					message: p,
 					initial: def || undefined,
-					validate
+					validate,
 				});
 			}
 
@@ -1252,7 +1315,7 @@ export class CLI {
 
 		this.debugLogger.trace(`Selected value = ${value}`);
 		this.command.setOptionValue(opt.name, value);
-		return this.argv[opt.name] = value;
+		return (this.argv[opt.name] = value);
 	}
 
 	/**
@@ -1268,7 +1331,7 @@ export class CLI {
 		ctx._lifeCycleHooks = {};
 		ctx._savedState = null;
 
-		const optionEvents = ctx.eventNames().filter(name => name.startsWith('option:'));
+		const optionEvents = ctx.eventNames().filter((name) => name.startsWith('option:'));
 		for (const name of optionEvents) {
 			ctx.removeAllListeners(name);
 		}
@@ -1295,12 +1358,12 @@ export class CLI {
 		try {
 			const jsfile = /\.js$/;
 			const ignore = /^[._]/;
-			const files = fs.statSync(dir).isDirectory() ? fs.readdirSync(dir).map(n => join(dir, n)) : [dir];
+			const files = isDir(dir) ? (await readdir(dir)).map((n) => join(dir, n)) : [dir];
 			let appc;
 
 			for (const file of files) {
 				try {
-					if (fs.statSync(file).isFile() && jsfile.test(file) && !ignore.test(basename(dirname(file)))) {
+					if (isFile(file) && jsfile.test(file) && !ignore.test(basename(dirname(file)))) {
 						const startTime = Date.now();
 						const mod = await import(pathToFileURL(file));
 						if (mod.id) {
@@ -1309,7 +1372,7 @@ export class CLI {
 							}
 							this.hooks.ids[mod.id].push({
 								file: file,
-								version: mod.version || null
+								version: mod.version || null,
 							});
 
 							// don't load duplicate ids
@@ -1318,10 +1381,17 @@ export class CLI {
 							}
 						}
 
-						if (this.sdk && (!this.version || !mod.cliVersion || version.satisfies(this.version, mod.cliVersion))) {
+						if (
+							this.sdk &&
+							(!this.version || !mod.cliVersion || version.satisfies(this.version, mod.cliVersion))
+						) {
 							if (!appc) {
-								const nodeAppc = pathToFileURL(join(this.sdk.path, 'node_modules', 'node-appc', 'index.js'));
-								this.debugLogger.trace(`Importing: ${join(this.sdk.path, 'node_modules', 'node-appc', 'index.js')}`);
+								const nodeAppc = pathToFileURL(
+									join(this.sdk.path, 'node_modules', 'node-appc', 'index.js')
+								);
+								this.debugLogger.trace(
+									`Importing: ${join(this.sdk.path, 'node_modules', 'node-appc', 'index.js')}`
+								);
 								appc = (await import(nodeAppc)).default;
 							}
 							if (typeof mod.init === 'function') {
@@ -1416,8 +1486,8 @@ export class CLI {
 							this.debugLogger.trace(`--${name} required, but undefined`);
 
 							if (typeof opt.verifyIfRequired === 'function') {
-								await new Promise(resolve => {
-									opt.verifyIfRequired(stillRequired => {
+								await new Promise((resolve) => {
+									opt.verifyIfRequired((stillRequired) => {
 										if (stillRequired) {
 											missing[name] = obj;
 											missingCount++;
@@ -1430,12 +1500,16 @@ export class CLI {
 							missing[name] = obj;
 							missingCount++;
 						}
-					} else if (Array.isArray(opt.values) && !opt.skipValueCheck && opt.values.indexOf(this.argv[name]) === -1) {
+					} else if (
+						Array.isArray(opt.values) &&
+						!opt.skipValueCheck &&
+						opt.values.indexOf(this.argv[name]) === -1
+					) {
 						invalid[name] = obj;
 						invalidCount++;
 					} else if (!opt.validated && typeof opt.validate === 'function') {
 						try {
-							await new Promise(resolve => {
+							await new Promise((resolve) => {
 								opt.validate(this.argv[name], (err, value) => {
 									if (err) {
 										obj._err = err;
@@ -1531,7 +1605,7 @@ export class CLI {
 
 					if (!opt.prompt) {
 						// option doesn't have a prompt, so let's make a generic one
-						opt.prompt = async callback => {
+						opt.prompt = async (callback) => {
 							// if the option has values, then display a pretty list
 							if (Array.isArray(opt.values)) {
 								return callback({
@@ -1539,10 +1613,10 @@ export class CLI {
 										const value = await prompt({
 											type: 'select',
 											message: `Please select a valid ${cyan(name)} value:`,
-											choices: opt.values.map(v => ({ label: v, value: v }))
+											choices: opt.values.map((v) => ({ label: v, value: v })),
 										});
 										callback(null, value);
-									}
+									},
 								});
 							}
 
@@ -1552,25 +1626,27 @@ export class CLI {
 									const value = await prompt({
 										type: opt.password ? 'password' : 'text',
 										message: `Please enter a valid ${cyan(name)}`,
-										validate: opt.validate || (value => {
-											if (pr.validator) {
-												try {
-													pr.validator(value);
-												} catch (ex) {
-													return ex.toString();
+										validate:
+											opt.validate ||
+											((value) => {
+												if (pr.validator) {
+													try {
+														pr.validator(value);
+													} catch (ex) {
+														return ex.toString();
+													}
+												} else if (!value.length || (pr.pattern && !pr.pattern.test(value))) {
+													return pr.error;
 												}
-											} else if (!value.length || (pr.pattern && !pr.pattern.test(value))) {
-												return pr.error;
-											}
-											return true;
-										})
+												return true;
+											}),
 									});
 									if (value === undefined) {
 										// sigint
 										process.exit(0);
 									}
 									callback(null, value);
-								}
+								},
 							});
 						};
 					}
@@ -1613,7 +1689,7 @@ export class CLI {
 
 			// fn should always be a function for `build` and `clean` commands
 			if (typeof result === 'function') {
-				await new Promise(resolve => result(resolve));
+				await new Promise((resolve) => result(resolve));
 			} else if (result === false) {
 				this.command.skipRun = true;
 			}
@@ -1653,36 +1729,42 @@ export class CLI {
 	 */
 	validateHooks() {
 		if (this.hooks.incompatibleFilenames.length) {
-			this.logger.warn(`Incompatible plugin hooks:\n${
-				this.hooks.incompatibleFilenames.map(file => `  ${file}`).join('\n')
-			}\n`);
+			this.logger.warn(
+				`Incompatible plugin hooks:\n${this.hooks.incompatibleFilenames
+					.map((file) => `  ${file}`)
+					.join('\n')}\n`
+			);
 		}
 
 		if (Object.keys(this.hooks.errors).length) {
-			this.logger.warn(`Bad plugin hooks that failed to load:\n${
-				Object.values(this.hooks.errors)
-					.map(e => (e.stack || e.toString())
-						.trim()
-						.split('\n')
-						.map(line => `  ${line}`)
-						.join('\n')
+			this.logger.warn(
+				`Bad plugin hooks that failed to load:\n${Object.values(this.hooks.errors)
+					.map((e) =>
+						(e.stack || e.toString())
+							.trim()
+							.split('\n')
+							.map((line) => `  ${line}`)
+							.join('\n')
 					)
-					.join('\n')
-			}\n`);
+					.join('\n')}\n`
+			);
 		}
 
-		if (Object.keys(this.hooks.ids).some(id => this.hooks.ids[id].length > 1)) {
-			this.logger.warn(`Conflicting plugins that were not loaded:\n${
-				Object.entries(this.hooks.ids)
-					.map(([id, conflicting]) => `  Hook ID: ${cyan(id)}\n${
-						conflicting.map((c, i) => {
-							return i === 0
-								? `    Loaded: ${c.file} ${c.version ? `(version ${version})` : ''}`
-								: `    Didn't load: ${c.file} ${c.version ? `(version ${version})` : ''}`;
-						}).join('\n')
-					}`)
-					.join('\n')
-			}\n`);
+		if (Object.keys(this.hooks.ids).some((id) => this.hooks.ids[id].length > 1)) {
+			this.logger.warn(
+				`Conflicting plugins that were not loaded:\n${Object.entries(this.hooks.ids)
+					.map(
+						([id, conflicting]) =>
+							`  Hook ID: ${cyan(id)}\n${conflicting
+								.map((c, i) => {
+									return i === 0
+										? `    Loaded: ${c.file} ${c.version ? `(version ${version})` : ''}`
+										: `    Didn't load: ${c.file} ${c.version ? `(version ${version})` : ''}`;
+								})
+								.join('\n')}`
+					)
+					.join('\n')}\n`
+			);
 		}
 	}
 }

@@ -1,8 +1,8 @@
+import { initHome } from './init-home.js';
 import { execaNode } from 'execa';
+import fs from 'fs-extra';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { initHome } from './init-home.js';
-import fs from 'fs-extra';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ti = join(__dirname, '../../src/main.js');
@@ -28,14 +28,14 @@ export function initCLI(fixture, fn, sharedOpts = {}) {
 								...process.env,
 								...sharedOpts.env,
 								...opts.env,
-								HOME: tmpHome
-							}
+								HOME: tmpHome,
+							},
 						});
 					} catch (e) {
 						return e;
 					}
 				},
-				tmpHome
+				tmpHome,
 			});
 		} finally {
 			await fs.remove(tmpHome);

@@ -7,7 +7,7 @@ let only = false;
 
 const argv = process.argv
 	.slice(2)
-	.map(arg => {
+	.map((arg) => {
 		if (arg === '--coverage') {
 			cover = true;
 		} else if (arg === '--only') {
@@ -21,20 +21,15 @@ const argv = process.argv
 const args = [];
 
 if (cover) {
-	args.push(
-		join('node_modules', 'c8', 'bin', 'c8.js'),
-		process.execPath
-	);
+	args.push(join('node_modules', 'c8', 'bin', 'c8.js'), process.execPath);
 }
 
-let tests = await glob([
-	'./test/**/*.test.js'
-]);
+let tests = await glob(['./test/**/*.test.js']);
 tests.sort();
 if (argv.length) {
-	tests = tests.filter(file => {
+	tests = tests.filter((file) => {
 		const filename = basename(file);
-		return argv.some(filter => filename.includes(filter));
+		return argv.some((filter) => filename.includes(filter));
 	});
 }
 
@@ -54,13 +49,9 @@ args.push(
 
 console.log(`\n> ${process.execPath} ${args.join(' ')}\n\n`);
 
-await execa(
-	process.execPath,
-	args,
-	{
-		env: {
-			TI_CLI_SKIP_ENV_PATHS: 1
-		},
-		stdio: 'inherit'
-	}
-);
+await execa(process.execPath, args, {
+	env: {
+		TI_CLI_SKIP_ENV_PATHS: 1,
+	},
+	stdio: 'inherit',
+});

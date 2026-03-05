@@ -1,14 +1,14 @@
-import { join } from 'node:path';
-import fs from 'fs-extra';
 import { expand } from './expand.js';
 import { TiError } from './tierror.js';
+import fs from 'fs-extra';
+import { join } from 'node:path';
 
 export class TiConfig {
 	#configFile = '';
 
 	#defaults = {
 		app: {
-			workspace: '.'
+			workspace: '.',
 		},
 
 		cli: {
@@ -16,12 +16,13 @@ export class TiConfig {
 			completion: false,
 			httpProxyServer: '',
 			ignoreDirs: '^(\\.svn|_svn|\\.git|\\.hg|\\.?[Cc][Vv][Ss]|\\.bzr|\\$RECYCLE\\.BIN)$',
-			ignoreFiles: '^(\\.gitignore|\\.npmignore|\\.cvsignore|\\.DS_Store|\\._.*|[Tt]humbs.db|\\.vspscc|\\.vssscc|\\.sublime-project|\\.sublime-workspace|\\.project|\\.tmproj)$',
+			ignoreFiles:
+				'^(\\.gitignore|\\.npmignore|\\.cvsignore|\\.DS_Store|\\._.*|[Tt]humbs.db|\\.vspscc|\\.vssscc|\\.sublime-project|\\.sublime-workspace|\\.project|\\.tmproj)$',
 			logLevel: 'trace',
 			progressBars: true,
 			prompt: true,
 			rejectUnauthorized: true,
-			width: 80
+			width: 80,
 		},
 
 		// additional search paths for commands and hooks
@@ -29,10 +30,10 @@ export class TiConfig {
 			hooks: [],
 			modules: [],
 			sdks: [],
-			templates: []
+			templates: [],
 		},
 
-		user: {}
+		user: {},
 	};
 
 	#titaniumConfigFolder = '';
@@ -158,7 +159,7 @@ export class TiConfig {
 			fs.renameSync(tmpFile, this.#configFile);
 		} catch {
 			throw new TiError(`Unable to write config file ${this.#configFile}`, {
-				after: 'Please ensure the Titanium CLI has access to modify this file'
+				after: 'Please ensure the Titanium CLI has access to modify this file',
 			});
 		}
 	}

@@ -1,7 +1,7 @@
-import { Command, Help } from 'commander';
 import { applyCommandConfig } from './apply-command-config.js';
-import chalk from 'chalk';
 import { capitalize } from './capitalize.js';
+import chalk from 'chalk';
+import { Command, Help } from 'commander';
 
 const { cyan, gray } = chalk;
 
@@ -26,7 +26,8 @@ export class TiHelp extends Help {
 				const cmd = new Command(type);
 				cmd.helpOption(false);
 				applyCommandConfig(cli, type, cmd, conf);
-				const title = `${cli.command.conf.title || cli.command.module?.title || ''} --type=${type}`.trim();
+				const title =
+					`${cli.command.conf.title || cli.command.module?.title || ''} --type=${type}`.trim();
 				this.typeCmds[title] = cmd;
 			}
 		}
@@ -35,7 +36,7 @@ export class TiHelp extends Help {
 	padWidth(cmd, helper) {
 		return Math.max(
 			helper.longestOptionTermLength(cmd, helper),
-			...Object.values(this.platformCmds).map(cmd => helper.longestOptionTermLength(cmd, helper)),
+			...Object.values(this.platformCmds).map((cmd) => helper.longestOptionTermLength(cmd, helper)),
 			helper.longestGlobalOptionTermLength(cmd, helper),
 			helper.longestSubcommandTermLength(cmd, helper),
 			helper.longestArgumentTermLength(cmd, helper)
@@ -45,10 +46,14 @@ export class TiHelp extends Help {
 	argumentDescription(argument) {
 		const extraInfo = [];
 		if (argument.argChoices) {
-			extraInfo.push(`choices: ${argument.argChoices.map((choice) => JSON.stringify(choice)).join(', ')}`);
+			extraInfo.push(
+				`choices: ${argument.argChoices.map((choice) => JSON.stringify(choice)).join(', ')}`
+			);
 		}
 		if (argument.defaultValue !== undefined) {
-			extraInfo.push(`default: ${argument.defaultValueDescription || JSON.stringify(argument.defaultValue)}`);
+			extraInfo.push(
+				`default: ${argument.defaultValueDescription || JSON.stringify(argument.defaultValue)}`
+			);
 		}
 		if (extraInfo.length > 0) {
 			const extraDescription = gray(`(${extraInfo.join(', ')})`);
@@ -64,13 +69,19 @@ export class TiHelp extends Help {
 		const extraInfo = [];
 
 		if (option.argChoices) {
-			extraInfo.push(`choices: ${option.argChoices.map((choice) => JSON.stringify(choice)).join(', ')}`);
+			extraInfo.push(
+				`choices: ${option.argChoices.map((choice) => JSON.stringify(choice)).join(', ')}`
+			);
 		}
 		if (option.defaultValue !== undefined) {
-			const showDefault = option.required || option.optional ||
+			const showDefault =
+				option.required ||
+				option.optional ||
 				(option.isBoolean() && typeof option.defaultValue === 'boolean');
 			if (showDefault) {
-				extraInfo.push(`default: ${option.defaultValueDescription || JSON.stringify(option.defaultValue)}`);
+				extraInfo.push(
+					`default: ${option.defaultValueDescription || JSON.stringify(option.defaultValue)}`
+				);
 			}
 		}
 		if (option.presetArg !== undefined && option.optional) {
@@ -95,7 +106,11 @@ export class TiHelp extends Help {
 		function formatItem(term, description) {
 			if (description) {
 				const fullText = `${cyan(term.padEnd(termWidth + itemSeparatorWidth))}${description}`;
-				return helper.boxWrap(fullText, helpWidth - itemIndentWidth, termWidth + itemSeparatorWidth);
+				return helper.boxWrap(
+					fullText,
+					helpWidth - itemIndentWidth,
+					termWidth + itemSeparatorWidth
+				);
 			}
 			return cyan(term);
 		}
@@ -126,7 +141,11 @@ export class TiHelp extends Help {
 			return formatItem(helper.argumentTerm(argument), helper.argumentDescription(argument));
 		});
 		if (argumentList.length > 0) {
-			output = output.concat([`${cmd.title || capitalize(cmd.name())} Arguments:`, formatList(argumentList), '']);
+			output = output.concat([
+				`${cmd.title || capitalize(cmd.name())} Arguments:`,
+				formatList(argumentList),
+				'',
+			]);
 		}
 
 		// Options
@@ -134,7 +153,11 @@ export class TiHelp extends Help {
 			return formatItem(helper.optionTerm(option), helper.optionDescription(option));
 		});
 		if (optionList.length > 0) {
-			output = output.concat([`${cmd.title || capitalize(cmd.name())} Options:`, formatList(optionList), '']);
+			output = output.concat([
+				`${cmd.title || capitalize(cmd.name())} Options:`,
+				formatList(optionList),
+				'',
+			]);
 		}
 
 		for (const [title, platformCmd] of Object.entries(this.platformCmds)) {

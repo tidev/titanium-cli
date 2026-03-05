@@ -1,14 +1,14 @@
-import { afterEach, beforeEach, describe, it } from 'node:test';
-import assert from 'node:assert';
 import { expand } from '../../src/util/expand.js';
+import assert from 'node:assert';
+import { afterEach, beforeEach, describe, it } from 'node:test';
 
 const backup = {};
 
 describe('expand', () => {
 	beforeEach(() => {
-		backup.HOME        = process.env.HOME;
+		backup.HOME = process.env.HOME;
 		backup.USERPROFILE = process.env.USERPROFILE;
-		backup.SystemRoot  = process.env.SystemRoot;
+		backup.SystemRoot = process.env.SystemRoot;
 	});
 
 	afterEach(() => {

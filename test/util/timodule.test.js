@@ -1,11 +1,11 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
-import { detect } from '../../src/util/timodule.js';
-import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { TiConfig } from '../../src/util/ticonfig.js';
-import fs from 'fs-extra';
+import { detect } from '../../src/util/timodule.js';
 import { tmpDirName } from '../helpers/tmp-dir-name.js';
+import fs from 'fs-extra';
+import assert from 'node:assert';
+import { join } from 'node:path';
+import { describe, it } from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 const fixturesDir = join(fileURLToPath(import.meta.url), '../fixtures/timodule');
 const goodConfig = join(fileURLToPath(import.meta.url), '../fixtures/ticonfig/good.json');
@@ -21,22 +21,16 @@ describe('timodule', () => {
 		results = await detect({});
 		assert.deepStrictEqual(results, {});
 
-		results = await detect(
-			{ global: null },
-			new TiConfig(goodConfig)
-		);
+		results = await detect({ global: null }, new TiConfig(goodConfig));
 		assert.deepStrictEqual(results, {
-			global: {}
+			global: {},
 		});
 	});
 
 	it('should find nothing if search path is empty', async () => {
-		const results = await detect(
-			{ empty: join(fixturesDir, 'empty') },
-			new TiConfig(goodConfig)
-		);
+		const results = await detect({ empty: join(fixturesDir, 'empty') }, new TiConfig(goodConfig));
 		assert.deepStrictEqual(results, {
-			empty: {}
+			empty: {},
 		});
 	});
 
@@ -45,10 +39,7 @@ describe('timodule', () => {
 		try {
 			await fs.copy(join(fixturesDir, 'modules'), tmpModulesDir);
 
-			const results = await detect(
-				{ global: tmpModulesDir },
-				new TiConfig(goodConfig)
-			);
+			const results = await detect({ global: tmpModulesDir }, new TiConfig(goodConfig));
 
 			assert(Object.hasOwn(results, 'global'));
 			assert(Object.hasOwn(results.global, 'android'));
@@ -75,7 +66,7 @@ describe('timodule', () => {
 				moduleid: 'com.test.module',
 				guid: 'dcaea77e-2860-42c1-a57b-319f81da10e0',
 				platform: 'android',
-				minsdk: '7.2.0'
+				minsdk: '7.2.0',
 			});
 
 			assert(Object.hasOwn(results.global.commonjs, 'com.test.module'));
@@ -96,7 +87,7 @@ describe('timodule', () => {
 				moduleid: 'com.test.module',
 				guid: 'dcaea77e-2860-42c1-a57b-319f81da10e0',
 				platform: 'commonjs',
-				minsdk: '7.2.0'
+				minsdk: '7.2.0',
 			});
 
 			assert(Object.hasOwn(mod, '1.0'));
@@ -115,7 +106,7 @@ describe('timodule', () => {
 				moduleid: 'com.test.module',
 				guid: 'dcaea77e-2860-42c1-a57b-319f81da10e0',
 				platform: 'commonjs',
-				minsdk: '7.2.0'
+				minsdk: '7.2.0',
 			});
 
 			assert(Object.hasOwn(results.global.ios, 'com.test.module'));
@@ -138,7 +129,7 @@ describe('timodule', () => {
 				moduleid: 'com.test.module',
 				guid: 'dcaea77e-2860-42c1-a57b-319f81da10e0',
 				platform: 'ios',
-				minsdk: '7.2.0'
+				minsdk: '7.2.0',
 			});
 		} finally {
 			await fs.remove(tmpModulesDir);

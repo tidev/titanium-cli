@@ -1,6 +1,6 @@
-import { afterEach, describe, it } from 'node:test';
-import assert from 'node:assert';
 import { detect } from '../../src/util/proxy.js';
+import assert from 'node:assert';
+import { afterEach, describe, it } from 'node:test';
 
 describe('proxy', () => {
 	afterEach(() => {

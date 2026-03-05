@@ -44,7 +44,9 @@ Creator.prototype.configOptionId = function configOptionId(order) {
 			logger.error('The App ID must consist of letters, numbers, dashes, and underscores.');
 			logger.error('Note: Android does not allow dashes and iOS does not allow underscores.');
 			logger.error('The first character must be a letter or underscore.');
-			logger.error('Usually the App ID is your company\'s reversed Internet domain name. (e.g. com.example.myapp)\n');
+			logger.error(
+				"Usually the App ID is your company's reversed Internet domain name. (e.g. com.example.myapp)\n"
+			);
 			return callback(true);
 		}
 
@@ -57,13 +59,17 @@ Creator.prototype.configOptionId = function configOptionId(order) {
 
 			if (!/^([a-zA-Z_]{1}[a-zA-Z0-9_]*(\.[a-zA-Z_]{1}[a-zA-Z0-9_]*)*)$/.test(value)) {
 				logger.error(`Invalid App ID "${value}"`);
-				logger.error(`Numbers are not allowed directly after periods when targeting ${'Android'.cyan}.\n`);
+				logger.error(
+					`Numbers are not allowed directly after periods when targeting ${'Android'.cyan}.\n`
+				);
 				return callback(true);
 			}
 
 			if (!ti.validAppId(value)) {
 				logger.error(`Invalid App ID "${value}"`);
-				logger.error(`The app must not contain Java reserved words when targeting ${'Android'.cyan}.\n`);
+				logger.error(
+					`The app must not contain Java reserved words when targeting ${'Android'.cyan}.\n`
+				);
 				return callback(true);
 			}
 		} else {
@@ -88,18 +94,28 @@ Creator.prototype.configOptionId = function configOptionId(order) {
 				counter++;
 			}
 
-			counter && logger.warn('If you wish to add Android support, you will need to fix the <id> in the tiapp.xml.\n');
+			counter &&
+				logger.warn(
+					'If you wish to add Android support, you will need to fix the <id> in the tiapp.xml.\n'
+				);
 		}
 
 		if (value.indexOf('_') !== -1) {
-			if (cli.argv.type !== 'app' && (cli.argv.platforms.indexOf('ios') !== -1 || cli.argv.platforms.indexOf('iphone') !== -1 || cli.argv.platforms.indexOf('ipad') !== -1)) {
+			if (
+				cli.argv.type !== 'app' &&
+				(cli.argv.platforms.indexOf('ios') !== -1 ||
+					cli.argv.platforms.indexOf('iphone') !== -1 ||
+					cli.argv.platforms.indexOf('ipad') !== -1)
+			) {
 				logger.error(`Invalid App ID "${value}"`);
 				logger.error(`Underscores are not allowed in the App ID when targeting ${'iOS'.cyan}.\n`);
 				return callback(true);
 			} else {
 				logger.warn('The specified App ID is not compatible with the iOS platform.');
 				logger.warn('iOS does not allow underscores in the App ID.');
-				logger.warn('If you wish to add iOS support, you will need to fix the <id> in the tiapp.xml.\n');
+				logger.warn(
+					'If you wish to add iOS support, you will need to fix the <id> in the tiapp.xml.\n'
+				);
 			}
 		}
 
@@ -107,23 +123,32 @@ Creator.prototype.configOptionId = function configOptionId(order) {
 	}
 
 	return {
-		desc: 'the App ID in the format \'com.companyname.appname\'',
+		desc: "the App ID in the format 'com.companyname.appname'",
 		order: order,
 		prompt(callback) {
 			let defaultValue;
 			const name = cli.argv.name.replace(/[^a-zA-Z0-9]/g, '');
 			if (idPrefix) {
-				defaultValue = idPrefix.replace(/\.$/, '') + '.' + (/^[a-zA-Z]/.test(name) || (cli.argv.type === 'app' && cli.argv.platforms.indexOf('android') === -1) ? '' : 'my') + name;
+				defaultValue =
+					idPrefix.replace(/\.$/, '') +
+					'.' +
+					(/^[a-zA-Z]/.test(name) ||
+					(cli.argv.type === 'app' && cli.argv.platforms.indexOf('android') === -1)
+						? ''
+						: 'my') +
+					name;
 			}
 
-			callback(fields.text({
-				default: defaultValue,
-				promptLabel: 'App ID',
-				validate: validate
-			}));
+			callback(
+				fields.text({
+					default: defaultValue,
+					promptLabel: 'App ID',
+					validate: validate,
+				})
+			);
 		},
 		required: true,
-		validate: validate
+		validate: validate,
 	};
 };
 
@@ -148,7 +173,7 @@ Creator.prototype.configOptionCodeBase = function configCodeBase(order) {
 		required: false,
 		validate: validate,
 		values: validTypes,
-		hidden: true
+		hidden: true,
 	};
 };
 
@@ -163,17 +188,38 @@ Creator.prototype.configOptionName = function configOptionName(order) {
 			return callback(true);
 		}
 
-		if ((cli.argv.type !== 'app' || cli.argv.platforms.indexOf('android') !== -1) && value.indexOf('&') !== -1) {
+		if (
+			(cli.argv.type !== 'app' || cli.argv.platforms.indexOf('android') !== -1) &&
+			value.indexOf('&') !== -1
+		) {
 			if (config.get('android.allowAppNameAmpersands', false)) {
-				logger.warn('The project name contains an ampersand (&) which will most likely cause problems.');
-				logger.warn('It is recommended that you change the app name in the tiapp.xml or define the app name using i18n strings.');
-				logger.warn('Refer to %s for more information.', 'https://titaniumsdk.com/guide/Titanium_SDK/Titanium_SDK_How-tos/Cross-Platform_Mobile_Development_In_Titanium/Internationalization.html'.cyan);
+				logger.warn(
+					'The project name contains an ampersand (&) which will most likely cause problems.'
+				);
+				logger.warn(
+					'It is recommended that you change the app name in the tiapp.xml or define the app name using i18n strings.'
+				);
+				logger.warn(
+					'Refer to %s for more information.',
+					'https://titaniumsdk.com/guide/Titanium_SDK/Titanium_SDK_How-tos/Cross-Platform_Mobile_Development_In_Titanium/Internationalization.html'
+						.cyan
+				);
 			} else {
-				logger.error('The project name contains an ampersand (&) which will most likely cause problems.');
-				logger.error('It is recommended that you change the app name in the tiapp.xml or define the app name using i18n strings.');
-				logger.error('Refer to %s for more information.', 'https://titaniumsdk.com/guide/Titanium_SDK/Titanium_SDK_How-tos/Cross-Platform_Mobile_Development_In_Titanium/Internationalization.html');
+				logger.error(
+					'The project name contains an ampersand (&) which will most likely cause problems.'
+				);
+				logger.error(
+					'It is recommended that you change the app name in the tiapp.xml or define the app name using i18n strings.'
+				);
+				logger.error(
+					'Refer to %s for more information.',
+					'https://titaniumsdk.com/guide/Titanium_SDK/Titanium_SDK_How-tos/Cross-Platform_Mobile_Development_In_Titanium/Internationalization.html'
+				);
 				logger.error('To allow ampersands in the app name, run:');
-				logger.error('    %sti config android.allowAppNameAmpersands true\n', process.env.APPC_ENV ? 'appc ' : '');
+				logger.error(
+					'    %sti config android.allowAppNameAmpersands true\n',
+					process.env.APPC_ENV ? 'appc ' : ''
+				);
 				return callback(true);
 			}
 		}
@@ -186,13 +232,15 @@ Creator.prototype.configOptionName = function configOptionName(order) {
 		desc: 'the name of the project',
 		order: order,
 		prompt(callback) {
-			callback(fields.text({
-				promptLabel: 'Project name',
-				validate: validate
-			}));
+			callback(
+				fields.text({
+					promptLabel: 'Project name',
+					validate: validate,
+				})
+			);
 		},
 		required: true,
-		validate: validate
+		validate: validate,
 	};
 };
 
@@ -211,15 +259,19 @@ Creator.prototype.configOptionPlatforms = function configOptionPlatforms(order) 
 
 		let goodValues = {};
 		const badValues = {};
-		value.trim().toLowerCase().split(',').forEach(function (s) {
-			if (s = s.trim()) {
-				if (validPlatforms[s]) {
-					goodValues[s] = 1;
-				} else {
-					badValues[s] = 1;
+		value
+			.trim()
+			.toLowerCase()
+			.split(',')
+			.forEach(function (s) {
+				if ((s = s.trim())) {
+					if (validPlatforms[s]) {
+						goodValues[s] = 1;
+					} else {
+						badValues[s] = 1;
+					}
 				}
-			}
-		}, this);
+			}, this);
 
 		const badLen = Object.keys(badValues).length;
 		if (badLen) {
@@ -251,16 +303,18 @@ Creator.prototype.configOptionPlatforms = function configOptionPlatforms(order) 
 		desc: 'one or more target platforms.',
 		order: order,
 		prompt(callback) {
-			callback(fields.text({
-				promptLabel: `Target platform (${availablePlatforms.join('|')})`,
-				default: 'all',
-				validate: validate
-			}));
+			callback(
+				fields.text({
+					promptLabel: `Target platform (${availablePlatforms.join('|')})`,
+					default: 'all',
+					validate: validate,
+				})
+			);
 		},
 		required: true,
 		skipValueCheck: true,
 		validate: validate,
-		values: availablePlatforms
+		values: availablePlatforms,
 	};
 };
 
@@ -269,7 +323,7 @@ Creator.prototype.configOptionTemplate = function configOptionTemplate(order, de
 		desc: 'the name of the project template, path to template dir, path to zip file, or URL to zip file',
 		default: defaultValue || 'default',
 		order: order,
-		required: true
+		required: true,
 	};
 };
 
@@ -306,7 +360,9 @@ Creator.prototype.configOptionWorkspaceDir = function configOptionWorkspaceDir(o
 			const projectDir = path.join(dir, cli.argv.name);
 			if (fs.existsSync(projectDir)) {
 				logger.error(`Project already exists: ${projectDir}`);
-				logger.error('Either change the project name, workspace directory, or re-run this command with the --force flag.\n');
+				logger.error(
+					'Either change the project name, workspace directory, or re-run this command with the --force flag.\n'
+				);
 				process.exit(1);
 			}
 		}
@@ -316,21 +372,23 @@ Creator.prototype.configOptionWorkspaceDir = function configOptionWorkspaceDir(o
 
 	return {
 		abbr: 'd',
-		default: !cli.argv.prompt && workspaceDir || undefined,
+		default: (!cli.argv.prompt && workspaceDir) || undefined,
 		desc: 'the directory to place the project in',
 		order: order,
 		prompt(callback) {
-			callback(fields.file({
-				complete: true,
-				default: workspaceDir || '.',
-				ignoreDirs: new RegExp(config.get('cli.ignoreDirs')),
-				ignoreFiles: new RegExp(config.get('cli.ignoreFiles')),
-				promptLabel: 'Directory to place project',
-				showHidden: true,
-				validate: validate
-			}));
+			callback(
+				fields.file({
+					complete: true,
+					default: workspaceDir || '.',
+					ignoreDirs: new RegExp(config.get('cli.ignoreDirs')),
+					ignoreFiles: new RegExp(config.get('cli.ignoreFiles')),
+					promptLabel: 'Directory to place project',
+					showHidden: true,
+					validate: validate,
+				})
+			);
 		},
 		required: true,
-		validate: validate
+		validate: validate,
 	};
 };

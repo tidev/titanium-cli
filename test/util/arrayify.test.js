@@ -1,6 +1,6 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
 import { arrayify } from '../../src/util/arrayify.js';
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
 
 describe('arrayify', () => {
 	it('should init undefined array', () => {
@@ -15,30 +15,15 @@ describe('arrayify', () => {
 	});
 
 	it('should arrayify a set', () => {
-		assert.deepStrictEqual(
-			arrayify(new Set([1, 'a', true])),
-			[1, 'a', true]
-		);
+		assert.deepStrictEqual(arrayify(new Set([1, 'a', true])), [1, 'a', true]);
 	});
 
 	it('should remove falsey values', () => {
-		assert.deepStrictEqual(
-			arrayify([
-				0,
-				1,
-				null,
-				undefined,
-				'',
-				'a',
-				true,
-				false
-			], true),
-			[
-				0,
-				1,
-				'a',
-				true
-			]
-		);
+		assert.deepStrictEqual(arrayify([0, 1, null, undefined, '', 'a', true, false], true), [
+			0,
+			1,
+			'a',
+			true,
+		]);
 	});
 });

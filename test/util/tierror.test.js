@@ -1,6 +1,6 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
 import { TiError } from '../../src/util/tierror.js';
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
 
 describe('TiError', () => {
 	it('should support no meta info', () => {

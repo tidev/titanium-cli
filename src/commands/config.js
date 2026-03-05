@@ -1,9 +1,9 @@
 /* eslint-disable max-len */
 
-import chalk from 'chalk';
+import { expand } from '../util/expand.js';
 import { ticonfig } from '../util/ticonfig.js';
 import { TiError } from '../util/tierror.js';
-import { expand } from '../util/expand.js';
+import chalk from 'chalk';
 
 const { cyan } = chalk;
 
@@ -38,34 +38,34 @@ export function config(_logger, _config, _cli) {
 		flags: {
 			append: {
 				abbr: 'a',
-				desc: 'appends a value to a key containing a list of values'
+				desc: 'appends a value to a key containing a list of values',
 			},
 			json: {
-				desc: 'output config as JSON'
+				desc: 'output config as JSON',
 			},
 			remove: {
 				abbr: 'r',
-				desc: 'removes all values and all its descendants or a specific value from a list of values'
-			}
+				desc: 'removes all values and all its descendants or a specific value from a list of values',
+			},
 		},
 		options: {
 			output: {
 				abbr: 'o',
 				default: 'report',
 				hidden: true,
-				values: ['report', 'json']
-			}
+				values: ['report', 'json'],
+			},
 		},
 		args: [
 			{
 				name: 'key',
-				desc: 'the key to get or set'
+				desc: 'the key to get or set',
 			},
 			{
 				name: 'value',
-				desc: 'the value to set the specified key'
-			}
-		]
+				desc: 'the value to set the specified key',
+			},
+		],
 	};
 }
 
@@ -78,14 +78,17 @@ export function config(_logger, _config, _cli) {
 export function validate(_logger, _config, cli) {
 	const [key, value] = cli.argv._;
 
-	if (key !== undefined && !/^([A-Za-z_]{1}[A-Za-z0-9-_]*(\.[A-Za-z-_]{1}[A-Za-z0-9-_]*)*)$/.test(key)) {
+	if (
+		key !== undefined &&
+		!/^([A-Za-z_]{1}[A-Za-z0-9-_]*(\.[A-Za-z-_]{1}[A-Za-z0-9-_]*)*)$/.test(key)
+	) {
 		throw new TiError(`Invalid key "${key}"`);
 	}
 
 	if (cli.argv.remove) {
 		if (key === undefined) {
 			throw new TiError('Missing key of the config setting to remove', {
-				after: `Run ${cyan('titanium config --remove <key>')} to remove the config setting.`
+				after: `Run ${cyan('titanium config --remove <key>')} to remove the config setting.`,
 			});
 		}
 
@@ -94,7 +97,7 @@ export function validate(_logger, _config, cli) {
 			throw new TiError('Too many arguments for "--remove" flag', {
 				after: `Run ${cyan(
 					`titanium config --remove ${key.includes(' ') ? `"${key}"` : key}`
-				)} to remove the config setting.`
+				)} to remove the config setting.`,
 			});
 		}
 	}
@@ -148,13 +151,7 @@ export async function run(logger, config, cli) {
 				if (listMatch) {
 					const subPath = listMatch[1];
 
-					const validKeys = [
-						'hooks',
-						'modules',
-						'sdks',
-						'templates',
-						'xcode'
-					];
+					const validKeys = ['hooks', 'modules', 'sdks', 'templates', 'xcode'];
 					if (!validKeys.includes(subPath)) {
 						throw new TiError(`Unsupported key "${key}"\n`);
 					}

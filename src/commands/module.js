@@ -1,11 +1,11 @@
 import { arrayify } from '../util/arrayify.js';
+import { capitalize } from '../util/capitalize.js';
 import { expand } from '../util/expand.js';
 import { TiError } from '../util/tierror.js';
+import chalk from 'chalk';
+import { detectTiModules } from 'node-titanium-sdk/titanium';
 import { existsSync } from 'node:fs';
 import { dirname, join, parse } from 'node:path';
-import chalk from 'chalk';
-import { detect } from '../util/timodule.js';
-import { capitalize } from '../util/capitalize.js';
 
 const { bold, cyan, gray } = chalk;
 
@@ -14,7 +14,7 @@ const platformNames = {
 	android: 'Android',
 	commonjs: 'CommonJS',
 	iphone: 'iPhone',
-	ios: 'iOS'
+	ios: 'iOS',
 };
 
 const ModuleSubcommands = {};
@@ -38,7 +38,7 @@ export function config(logger, config, cli) {
 		title: 'Module',
 		defaultSubcommand: 'list',
 		skipBanner: true,
-		subcommands
+		subcommands,
 	};
 }
 
@@ -82,20 +82,20 @@ ModuleSubcommands.list = {
 			desc: 'print a list of installed modules',
 			flags: {
 				json: {
-					desc: 'display installed modules as JSON'
-				}
+					desc: 'display installed modules as JSON',
+				},
 			},
 			options: {
 				output: {
 					abbr: 'o',
 					default: 'report',
 					hidden: true,
-					values: ['report', 'json']
+					values: ['report', 'json'],
 				},
 				'project-dir': {
-					desc: 'the directory of the project to search'
-				}
-			}
+					desc: 'the directory of the project to search',
+				},
+			},
 		};
 	},
 	async fn(logger, config, cli) {
@@ -105,16 +105,16 @@ ModuleSubcommands.list = {
 		const searchPaths = {
 			project: [],
 			config: [],
-			global: []
+			global: [],
 		};
 		const scopeLabels = {
 			project: 'Project Modules',
 			config: 'Configured Path Modules',
-			global: 'Global Modules'
+			global: 'Global Modules',
 		};
 		const confPaths = arrayify(config.get('paths.modules'), true);
 		const defaultInstallLocation = cli.env.installPath;
-		const sdkLocations = cli.env.os.sdkPaths.map(p => expand(p));
+		const sdkLocations = cli.env.os.sdkPaths.map((p) => expand(p));
 
 		// attempt to detect if we're in a project folder by scanning for a tiapp.xml
 		// until we hit the root
@@ -134,7 +134,11 @@ ModuleSubcommands.list = {
 		// set our paths from the config file
 		for (let path of confPaths) {
 			path = expand(path);
-			if (existsSync(path) && !searchPaths.project.includes(path) && !searchPaths.config.includes(path)) {
+			if (
+				existsSync(path) &&
+				!searchPaths.project.includes(path) &&
+				!searchPaths.config.includes(path)
+			) {
 				searchPaths.config.push(path);
 			}
 		}
@@ -148,7 +152,12 @@ ModuleSubcommands.list = {
 		}
 		for (let path of sdkLocations) {
 			path = expand(path, 'modules');
-			if (existsSync(path) && !searchPaths.project.includes(path) && !searchPaths.config.includes(path) && !searchPaths.global.includes(path)) {
+			if (
+				existsSync(path) &&
+				!searchPaths.project.includes(path) &&
+				!searchPaths.config.includes(path) &&
+				!searchPaths.global.includes(path)
+			) {
 				searchPaths.global.push(path);
 			}
 		}
@@ -193,5 +202,5 @@ ModuleSubcommands.list = {
 			}
 			logger.log();
 		}
-	}
+	},
 };

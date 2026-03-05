@@ -1,6 +1,6 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
 import { capitalize } from '../../src/util/capitalize.js';
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
 
 describe('capitalize', () => {
 	it('should capitalize a string', () => {

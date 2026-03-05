@@ -17,7 +17,7 @@ function AppCreator(_logger, _config, _cli) {
 	const availablePlatforms = {};
 	const validPlatforms = {};
 
-	ti.platforms.forEach(platform => {
+	ti.platforms.forEach((platform) => {
 		if (/^iphone|ios|ipad$/.test(platform)) {
 			validPlatforms['iphone'] = availablePlatforms['iphone'] = 1;
 			validPlatforms['ipad'] = availablePlatforms['ipad'] = 1;
@@ -39,12 +39,12 @@ util.inherits(AppCreator, Creator);
 AppCreator.prototype.init = function init() {
 	return {
 		options: {
-			id:            this.configOptionId(150),
-			name:          this.configOptionName(140),
-			platforms:     this.configOptionPlatforms(120),
-			template:      this.configOptionTemplate(110),
-			'workspace-dir': this.configOptionWorkspaceDir(170)
-		}
+			id: this.configOptionId(150),
+			name: this.configOptionName(140),
+			platforms: this.configOptionPlatforms(120),
+			template: this.configOptionTemplate(110),
+			'workspace-dir': this.configOptionWorkspaceDir(170),
+		},
 	};
 };
 

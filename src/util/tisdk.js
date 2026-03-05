@@ -1,9 +1,7 @@
-import { join } from 'node:path';
 import { arrayify } from './arrayify.js';
 import { prompt } from './prompt.js';
 import { detectTitaniumSDKs, TiappXML } from 'node-titanium-sdk/titanium';
-
-const os = process.platform === 'darwin' ? 'osx' : process.platform;
+import { join } from 'node:path';
 
 const sortTypes = ['local', 'nightly', 'beta', 'rc', 'ga'];
 
@@ -12,10 +10,18 @@ export const typeLabels = {
 	nightly: 'Nightly Build',
 	beta: 'Beta',
 	rc: 'Release Candidate',
-	ga: 'Production Stable'
+	ga: 'Production Stable',
 };
 
-export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabled, selectedSdk, showSDKPrompt }) {
+export async function initSDK({
+	config,
+	cwd,
+	debugLogger,
+	logger,
+	promptingEnabled,
+	selectedSdk,
+	showSDKPrompt,
+}) {
 	let sdkVersion;
 	let tiappSdkVersion;
 
@@ -26,7 +32,9 @@ export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabl
 		await tiapp.load(tiappFile);
 		debugLogger.trace(`Loaded ${tiappFile}`);
 		sdkVersion = tiappSdkVersion = await tiapp.select1('//sdk-version', 'latest');
-		debugLogger.trace(`<sdk-version> is ${tiappSdkVersion ? `set to ${tiappSdkVersion}` : 'undefined'}`);
+		debugLogger.trace(
+			`<sdk-version> is ${tiappSdkVersion ? `set to ${tiappSdkVersion}` : 'undefined'}`
+		);
 	} catch {
 		// might not be a project dir or bad tiapp.xml
 	}
@@ -34,33 +42,29 @@ export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabl
 	const configSdkPaths = config.get('paths.sdks');
 
 	// detect SDKs
-	const {
-		installPath,
-		latest,
-		sdks,
-		sdkPaths
-	} = await detectTitaniumSDKs({
+	const { installPath, latest, sdks, sdkPaths } = await detectTitaniumSDKs({
 		searchPaths: [
 			config.get('sdk.defaultInstallLocation'),
-			...(Array.isArray(configSdkPaths) ? arrayify(configSdkPaths, true) : [])
-		]
+			...(Array.isArray(configSdkPaths) ? arrayify(configSdkPaths, true) : []),
+		],
 	});
 	let sdk = null;
 
-	if (sdks.length) {
+	if (Object.keys(sdks).length) {
 		// determine version to use
-		sdkVersion = (Boolean(selectedSdk) === selectedSdk ? null : selectedSdk) || sdkVersion || 'latest';
+		sdkVersion =
+			(Boolean(selectedSdk) === selectedSdk ? null : selectedSdk) || sdkVersion || 'latest';
 		if (sdkVersion === 'latest') {
 			sdkVersion = latest;
 		}
 
-		sdk = sdks.find(s => s.name === sdkVersion);
+		sdk = sdks[sdkVersion];
 
 		if (promptingEnabled && ((selectedSdk && !sdk) || showSDKPrompt)) {
 			logger.banner();
 
 			const sdkTypes = {};
-			for (const s of sdks) {
+			for (const s of Object.values(sdks)) {
 				if (!sdkTypes[s.type]) {
 					sdkTypes[s.type] = [];
 				}
@@ -68,7 +72,9 @@ export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabl
 			}
 
 			const choices = [];
-			for (const t of Object.keys(sdkTypes).sort((a, b) => sortTypes.indexOf(b) - sortTypes.indexOf(a))) {
+			for (const t of Object.keys(sdkTypes)
+				.sort((a, b) => sortTypes.indexOf(b) - sortTypes.indexOf(a))
+				.reverse()) {
 				for (const s of sdkTypes[t]) {
 					choices.push({ label: s, value: s, description: typeLabels[t] });
 				}
@@ -77,8 +83,8 @@ export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabl
 			sdkVersion = await prompt({
 				type: 'select',
 				message: 'Which Titanium SDK would you like to use?',
-				initial: sdk ? choices.find(s => s.name === sdk.name)?.name : undefined,
-				choices
+				initial: sdk ? choices.find((s) => s.value === sdk.name)?.value : undefined,
+				choices,
 			});
 
 			if (sdkVersion === undefined) {
@@ -88,7 +94,7 @@ export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabl
 
 			logger.log();
 
-			sdk = sdks.find(s => s.name === sdkVersion);
+			sdk = sdks[sdkVersion];
 		}
 	}
 
@@ -96,10 +102,10 @@ export async function initSDK({ config, cwd, debugLogger, logger, promptingEnabl
 		installPath: config.get('sdk.defaultInstallLocation') || installPath,
 		sdk,
 		sdkPaths,
-		sdks: sdks.reduce((obj, sdk) => {
+		sdks: Object.values(sdks).reduce((obj, sdk) => {
 			obj[sdk.name] = sdk;
 			return obj;
 		}, {}),
-		tiappSdkVersion
+		tiappSdkVersion,
 	};
 }

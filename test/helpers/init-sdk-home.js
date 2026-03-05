@@ -1,8 +1,8 @@
 import { initCLI } from './init-cli.js';
 import { tmpDirName } from './tmp-dir-name.js';
 import fs from 'fs-extra';
-import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 export function initSDKHome(fn, mock) {
 	const tmpSDKDir = tmpDirName();
@@ -22,7 +22,7 @@ export function initSDKHome(fn, mock) {
 			await run(['config', 'sdk.defaultInstallLocation', tmpSDKDir]);
 			await fn({
 				...opts,
-				tmpSDKDir
+				tmpSDKDir,
 			});
 		} finally {
 			await fs.remove(tmpSDKDir);

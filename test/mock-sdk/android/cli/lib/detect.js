@@ -61,11 +61,20 @@ exports.detectDevices = function detectDevices(config, finished) {
 			return finished(err);
 		}
 
-		finished(null, devices.filter(function (d) {
-			return !d.emulator;
-		}).map(function (d) {
-			d.name = d.model || d.manufacturer || d.name || (d.release ? __('Android %s Device', d.release) : __('Android Device'));
-			return d;
-		}));
+		finished(
+			null,
+			devices
+				.filter(function (d) {
+					return !d.emulator;
+				})
+				.map(function (d) {
+					d.name =
+						d.model ||
+						d.manufacturer ||
+						d.name ||
+						(d.release ? __('Android %s Device', d.release) : __('Android Device'));
+					return d;
+				})
+		);
 	});
 };
