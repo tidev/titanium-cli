@@ -151,7 +151,6 @@ export async function run(logger, config, cli) {
 					const validKeys = [
 						'hooks',
 						'modules',
-						'plugins',
 						'sdks',
 						'templates',
 						'xcode'

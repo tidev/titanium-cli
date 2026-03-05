@@ -28,7 +28,6 @@ export class TiConfig {
 		paths: {
 			hooks: [],
 			modules: [],
-			plugins: [],
 			sdks: [],
 			templates: []
 		},
