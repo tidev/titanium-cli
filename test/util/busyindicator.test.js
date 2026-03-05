@@ -1,8 +1,8 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
 import { BusyIndicator } from '../../src/util/busyindicator.js';
-import { setTimeout } from 'node:timers/promises';
 import { MockStream } from '../helpers/mock-stream.js';
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
+import { setTimeout } from 'node:timers/promises';
 
 describe('BusyIndicator', () => {
 	it('should render a busy indicator', async () => {

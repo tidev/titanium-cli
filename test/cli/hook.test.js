@@ -1,6 +1,6 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
 import { CLI } from '../../src/cli.js';
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
 import { setTimeout } from 'timers/promises';
 
 describe('CLI hooks', () => {
@@ -11,7 +11,7 @@ describe('CLI hooks', () => {
 		let bazPreCounter = 0;
 		let bazPostCounter = 0;
 
-		cli.on('foo', data => {
+		cli.on('foo', (data) => {
 			fooCounter += data.count;
 		});
 
@@ -25,7 +25,7 @@ describe('CLI hooks', () => {
 			},
 			post() {
 				bazPostCounter++;
-			}
+			},
 		});
 
 		await cli.emit('foo', { count: 2 });
@@ -44,7 +44,7 @@ describe('CLI hooks', () => {
 
 		let fooCounter = 0;
 
-		cli.on('foo', async data => {
+		cli.on('foo', async (data) => {
 			await setTimeout(1);
 			fooCounter += data.count;
 		});
@@ -67,7 +67,7 @@ describe('CLI hooks', () => {
 		const cli = new CLI();
 		let fooCounter = 0;
 
-		cli.on('foo', data => {
+		cli.on('foo', (data) => {
 			fooCounter += data.ctx.count;
 		});
 
@@ -76,7 +76,7 @@ describe('CLI hooks', () => {
 			fooCounter += this.count;
 			cb();
 		});
-		await new Promise(resolve => foo(3, resolve));
+		await new Promise((resolve) => foo(3, resolve));
 		assert.strictEqual(fooCounter, 7);
 
 		let barCounter = 0;
@@ -87,21 +87,21 @@ describe('CLI hooks', () => {
 			},
 			post(data) {
 				barCounter += data.result[0];
-			}
+			},
 		});
 
-		const bar = cli.createHook('bar', cb => {
+		const bar = cli.createHook('bar', (cb) => {
 			barCounter += 3;
 			cb(9);
 		});
-		await new Promise(resolve => bar(resolve));
+		await new Promise((resolve) => bar(resolve));
 		assert.strictEqual(barCounter, 13);
 	});
 
 	it('should fire event hook with a data payload', async () => {
 		const cli = new CLI();
 		let foo = {
-			counter: 0
+			counter: 0,
 		};
 
 		cli.on('foo', {
@@ -109,11 +109,11 @@ describe('CLI hooks', () => {
 			post: async (data, callback) => {
 				data.counter++;
 				callback();
-			}
+			},
 		});
 
 		await new Promise((resolve, reject) => {
-			cli.emit('foo', foo, err => {
+			cli.emit('foo', foo, (err) => {
 				if (err) {
 					reject(err);
 				} else {

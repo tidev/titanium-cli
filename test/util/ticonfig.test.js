@@ -1,10 +1,10 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
 import { TiConfig } from '../../src/util/ticonfig.js';
-import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import assert from 'node:assert';
+import { cp, mkdir, readFile, rmdir, unlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { copyFile, mkdir, readFile, rmdir, unlink } from 'node:fs/promises';
+import { join } from 'node:path';
+import { describe, it } from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 const fixturesDir = join(fileURLToPath(import.meta.url), '../fixtures/ticonfig');
 
@@ -20,7 +20,7 @@ describe('TiConfig', () => {
 			},
 			{
 				name: 'Error',
-				message: /^Unable to parse config file/
+				message: /^Unable to parse config file/,
 			}
 		);
 	});
@@ -32,7 +32,7 @@ describe('TiConfig', () => {
 			},
 			{
 				name: 'Error',
-				message: /^Unable to open config file/
+				message: /^Unable to open config file/,
 			}
 		);
 	});
@@ -60,7 +60,7 @@ describe('TiConfig', () => {
 			falsey: 'false',
 			undef: undefined,
 			nil: 'null',
-			empty: ''
+			empty: '',
 		});
 		assert.strictEqual(cfg.get('truthy'), true);
 		assert.strictEqual(cfg.get('falsey'), false);
@@ -117,10 +117,7 @@ describe('TiConfig', () => {
 
 	it('should save the config', async () => {
 		const tmpFile = join(tmpdir(), 'ticonfig.json');
-		await copyFile(
-			join(fixturesDir, 'good.json'),
-			tmpFile
-		);
+		await cp(join(fixturesDir, 'good.json'), tmpFile);
 
 		try {
 			const cfg = new TiConfig(tmpFile);
@@ -153,7 +150,7 @@ describe('TiConfig', () => {
 				},
 				{
 					name: 'Error',
-					message: /Unable to write config file/
+					message: /Unable to write config file/,
 				}
 			);
 		} finally {
@@ -170,7 +167,7 @@ describe('TiConfig', () => {
 			},
 			{
 				name: 'Error',
-				message: /Unable to write config file/
+				message: /Unable to write config file/,
 			}
 		);
 	});

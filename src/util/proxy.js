@@ -22,11 +22,9 @@ export async function detect() {
 				}
 			} catch {}
 		}
-
 	} else if (process.env.https_proxy !== undefined) {
 		// if both configured, https proxy is preferentially returned
 		return parseEnv(process.env.https_proxy);
-
 	} else if (process.env.http_proxy !== undefined) {
 		return parseEnv(process.env.http_proxy);
 	}
@@ -35,13 +33,17 @@ export async function detect() {
 }
 
 function parseNetSetup(str) {
-	const m = str.replace(/\n/g, '').match(/Enabled: YesServer: ((?:http|https)+:\/\/.*)Port: (\d*)Authenticated Proxy Enabled: (\S*)/);
+	const m = str
+		.replace(/\n/g, '')
+		.match(
+			/Enabled: YesServer: ((?:http|https)+:\/\/.*)Port: (\d*)Authenticated Proxy Enabled: (\S*)/
+		);
 	return {
 		valid: !!m,
 		server: m?.[1] || '',
 		port: m?.[2] || '',
 		fullAddress: `${m?.[1] || ''}${m?.[2] ? `:${m[2]}` : ''}`,
-		authenticated: m?.[3] || ''
+		authenticated: m?.[3] || '',
 	};
 }
 
@@ -53,7 +55,7 @@ function parseEnv(env) {
 			server: url.hostname,
 			port: url.port,
 			fullAddress: url.href,
-			authenticated: false
+			authenticated: false,
 		};
 	} catch {}
 }

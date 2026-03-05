@@ -1,14 +1,12 @@
-import { detect as proxyDetect } from './proxy.js';
-import { prompt } from './prompt.js';
-import chalk from 'chalk';
-import { expand } from './expand.js';
-import { existsSync, unlinkSync, utimesSync, writeFileSync } from 'node:fs';
 import { BusyIndicator } from './busyindicator.js';
 import { detect } from './detect.js';
-import { request } from './request.js';
-import * as version from './version.js';
-import { detectTitaniumSDKs, getReleases } from './tisdk.js';
+import { prompt } from './prompt.js';
+import { detect as proxyDetect } from './proxy.js';
+import chalk from 'chalk';
+import { detectTitaniumSDKs, getTitaniumReleases } from 'node-titanium-sdk/titanium';
+import { expand, request, version } from 'node-titanium-sdk/util';
 import dns from 'node:dns/promises';
+import { existsSync, unlinkSync, utimesSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import { join } from 'node:path';
 
@@ -20,36 +18,36 @@ export class SetupScreens {
 	screens = {
 		quick: {
 			label: '__q__uick',
-			desc: 'Quick Setup'
+			desc: 'Quick Setup',
 		},
 		check: {
 			label: 'chec__k__',
-			desc: 'Check Environment'
+			desc: 'Check Environment',
 		},
 		user: {
 			label: '__u__ser',
-			desc: 'User Information'
+			desc: 'User Information',
 		},
 		app: {
 			label: 'a__p__p',
-			desc: 'New App Defaults'
+			desc: 'New App Defaults',
 		},
 		network: {
 			label: '__n__etwork',
-			desc: 'Network Settings'
+			desc: 'Network Settings',
 		},
 		cli: {
 			label: '__c__li',
-			desc: 'Titanium CLI Settings'
+			desc: 'Titanium CLI Settings',
 		},
 		android: {
 			label: '__a__ndroid',
-			desc: 'Android Settings'
+			desc: 'Android Settings',
 		},
 		ios: {
 			label: '__i__os',
-			desc: 'iOS Settings'
-		}
+			desc: 'iOS Settings',
+		},
 	};
 
 	constructor(logger, config, cli) {
@@ -74,39 +72,41 @@ export class SetupScreens {
 	}
 
 	async mainmenuScreen() {
-		const screens = Object.keys(this.screens).filter(name => name !== 'ios' || process.platform === 'darwin');
+		const screens = Object.keys(this.screens).filter(
+			(name) => name !== 'ios' || process.platform === 'darwin'
+		);
 
 		const lookup = {
 			[screens.length + 1]: 'exit',
 			exit: 'exit',
-			x: 'exit'
+			x: 'exit',
 		};
 
 		this.logger.log(
-			screenTitle('Main Menu') + '\n' +
-			screens
-				.map((name, i) => {
-					const { label, desc } = this.screens[name];
-					const padding = 7 - (label.length - 4);
-					const title = cyan(
-						label.replace(/__(.+)__/, (_s, char) => {
-							lookup[char] = name;
-							return bold(char);
-						}) +
-						(padding > 0 ? ' '.repeat(padding) : '')
-					);
-					lookup[name] = lookup[i + 1] = name;
-					return `${String(i + 1).padStart(4)})  ${title}  ${desc}`;
-				})
-				.join('\n') +
-			`\n${String(screens.length + 1).padStart(4)})  ${cyan(
-				'e__x__it'.replace(/__(.+)__/, (_s, char) => bold(char)))
-			}     Exit`
+			screenTitle('Main Menu') +
+				'\n' +
+				screens
+					.map((name, i) => {
+						const { label, desc } = this.screens[name];
+						const padding = 7 - (label.length - 4);
+						const title = cyan(
+							label.replace(/__(.+)__/, (_s, char) => {
+								lookup[char] = name;
+								return bold(char);
+							}) + (padding > 0 ? ' '.repeat(padding) : '')
+						);
+						lookup[name] = lookup[i + 1] = name;
+						return `${String(i + 1).padStart(4)})  ${title}  ${desc}`;
+					})
+					.join('\n') +
+				`\n${String(screens.length + 1).padStart(4)})  ${cyan(
+					'e__x__it'.replace(/__(.+)__/, (_s, char) => bold(char))
+				)}     Exit`
 		);
 
 		const value = await prompt({
 			type: 'text',
-			message: 'Where do you want to go?'
+			message: 'Where do you want to go?',
 		});
 
 		const next = lookup[value];
@@ -134,14 +134,14 @@ export class SetupScreens {
 				type: 'text',
 				message: 'What do you want as your "author" name?',
 				initial: this.config.get('user.name', ''),
-				name: 'name'
+				name: 'name',
 			},
 			{
 				type: 'text',
 				message: 'Path to your workspace where your projects should be created:',
 				initial: this.config.get('app.workspace', ''),
 				name: 'workspace',
-				validate: value => {
+				validate: (value) => {
 					if (!value) {
 						return 'Please specify a workspace directory';
 					}
@@ -150,7 +150,7 @@ export class SetupScreens {
 						return 'Specified workspace directory does not exist';
 					}
 					return true;
-				}
+				},
 			},
 			{
 				type: 'toggle',
@@ -158,14 +158,14 @@ export class SetupScreens {
 				initial: true,
 				name: 'usingAndroid',
 				active: 'yes',
-				inactive: 'no'
+				inactive: 'no',
 			},
 			{
-				type: prev => prev ? 'text' : null,
+				type: (prev) => (prev ? 'text' : null),
 				message: 'Path to the Android SDK',
 				initial: this.config.get('android.sdkPath', data?.android?.sdk?.path),
 				name: 'androidSdkPath',
-				validate: value => {
+				validate: (value) => {
 					if (!value) {
 						return 'Please specify the Android SDK directory';
 					}
@@ -176,13 +176,17 @@ export class SetupScreens {
 					if (process.platform === 'win32' && value.includes('&')) {
 						return 'The Android SDK path must not contain ampersands (&) on Windows';
 					}
-					const adbExecutable = join(value, 'platform-tools', 'adb' + (process.platform === 'win32' ? '.exe' : ''));
+					const adbExecutable = join(
+						value,
+						'platform-tools',
+						'adb' + (process.platform === 'win32' ? '.exe' : '')
+					);
 					if (!existsSync(adbExecutable)) {
 						return 'Invalid Android SDK path: adb not found';
 					}
 					return true;
-				}
-			}
+				},
+			},
 		]);
 
 		this.config.set('user.name', values.name);
@@ -211,19 +215,21 @@ export class SetupScreens {
 		try {
 			({ data } = await detect(this.cli.debugLogger, this.config, this.cli, { all: true }));
 
-			data.titaniumCLI.latest = await request('https://registry.npmjs.org/-/package/titanium/dist-tags')
-				.then(res => res.body.json())
-				.then(r => r.latest);
+			data.titaniumCLI.latest = await request(
+				'https://registry.npmjs.org/-/package/titanium/dist-tags'
+			)
+				.then((res) => res.body.json())
+				.then((r) => r.latest);
 
 			data.titaniumSDK = {
 				installed: await detectTitaniumSDKs(this.config),
-				latest: online && (await getReleases())?.[0] || null
+				latest: (online && (await getTitaniumReleases())?.[0]) || null,
 			};
 
 			data.network = {
 				online,
 				proxy: this.config.get('cli.httpProxyServer'),
-				test: !!data.titaniumSDK.latest?.name
+				test: !!data.titaniumSDK.latest?.name,
 			};
 		} finally {
 			busy.stop();
@@ -235,19 +241,29 @@ export class SetupScreens {
 		const starmark = '\u2605';
 		const xmark = '\u2715';
 		const ok = (label, status, extra) => {
-			log(`  ${green(checkmark)}  ${label.padEnd(labelPadding)} ${status ? green(status) : ''}${extra ? gray(` ${extra}`) : ''}`);
+			log(
+				`  ${green(checkmark)}  ${label.padEnd(labelPadding)} ${status ? green(status) : ''}${extra ? gray(` ${extra}`) : ''}`
+			);
 		};
 		const warn = (label, status, extra) => {
-			log(`  ${bold(yellow('!'))}  ${label.padEnd(labelPadding)} ${status ? yellow(status) : ''}${extra ? gray(` ${extra}`) : ''}`);
+			log(
+				`  ${bold(yellow('!'))}  ${label.padEnd(labelPadding)} ${status ? yellow(status) : ''}${extra ? gray(` ${extra}`) : ''}`
+			);
 		};
 		const bad = (label, status, extra) => {
-			log(`  ${red(xmark)}  ${label.padEnd(labelPadding)} ${status ? red(status) : ''}${extra ? gray(` ${extra}`) : ''}`);
+			log(
+				`  ${red(xmark)}  ${label.padEnd(labelPadding)} ${status ? red(status) : ''}${extra ? gray(` ${extra}`) : ''}`
+			);
 		};
 		const update = (label, status, extra) => {
-			log(`  ${magenta(starmark)}  ${label.padEnd(labelPadding)} ${status ? magenta(status) : ''}${extra ? gray(` ${extra}`) : ''}`);
+			log(
+				`  ${magenta(starmark)}  ${label.padEnd(labelPadding)} ${status ? magenta(status) : ''}${extra ? gray(` ${extra}`) : ''}`
+			);
 		};
 		const note = (label, status, extra) => {
-			log(`  ${bold(gray('-'))}  ${label.padEnd(labelPadding)} ${status ? gray(status) : ''}${extra ? gray(` ${extra}`) : ''}`);
+			log(
+				`  ${bold(gray('-'))}  ${label.padEnd(labelPadding)} ${status ? gray(status) : ''}${extra ? gray(` ${extra}`) : ''}`
+			);
 		};
 
 		log('Node.js');
@@ -263,7 +279,11 @@ export class SetupScreens {
 		} else if (version.gt(data.titaniumCLI.version, data.titaniumCLI.latest)) {
 			ok('cli', 'bleeding edge', `(v${data.titaniumCLI.version})`);
 		} else {
-			update('cli', `new version v${data.titaniumCLI.latest} available`, `(currently v${data.titaniumCLI.version})`);
+			update(
+				'cli',
+				`new version v${data.titaniumCLI.latest} available`,
+				`(currently v${data.titaniumCLI.version})`
+			);
 		}
 		log();
 
@@ -272,7 +292,9 @@ export class SetupScreens {
 			note('latest sdk', 'unknown (offline)');
 		} else if (!data.titaniumSDK.installed.sdks.length) {
 			bad('latest sdk', 'no Titanium SDKs found');
-		} else if (data.titaniumSDK.installed.sdks.find(s => s.name === data.titaniumSDK.latest.name)) {
+		} else if (
+			data.titaniumSDK.installed.sdks.find((s) => s.name === data.titaniumSDK.latest.name)
+		) {
 			ok('latest sdk', 'installed', `(v${data.titaniumSDK.latest.name})`);
 		} else {
 			update('latest sdk', `new version v${data.titaniumSDK.latest.name} available!`);
@@ -297,14 +319,15 @@ export class SetupScreens {
 				const len = distPPLabel.length;
 
 				if (Object.keys(data.ios.xcode).length) {
-					ok('Xcode'.padEnd(len), 'installed', `(${
-						Object
-							.keys(data.ios.xcode)
-							.filter(ver => ver !== '__selected__')
-							.map(ver => data.ios.xcode[ver].version)
+					ok(
+						'Xcode'.padEnd(len),
+						'installed',
+						`(${Object.keys(data.ios.xcode)
+							.filter((ver) => ver !== '__selected__')
+							.map((ver) => data.ios.xcode[ver].version)
 							.sort()
-							.join(', ')
-					})`);
+							.join(', ')})`
+					);
 
 					const iosSdks = {};
 					for (const ver of Object.keys(data.ios.xcode)) {
@@ -362,7 +385,7 @@ export class SetupScreens {
 					warn('distribution cert'.padEnd(len), 'not found');
 				}
 
-				const devPP = data.ios.provisioning.development.filter(i => {
+				const devPP = data.ios.provisioning.development.filter((i) => {
 					return !Object.hasOwn(i, 'expired') || i.expired === false;
 				}).length;
 				if (devPP) {
@@ -371,13 +394,16 @@ export class SetupScreens {
 					warn('dev provisioning'.padEnd(len), 'not found');
 				}
 
-				const distPP = data.ios.provisioning.distribution.filter(i => {
-					return !Object.hasOwn(i, 'expired') || i.expired === false;
-				}).length + data.ios.provisioning.adhoc.filter(i => {
-					return !Object.hasOwn(i, 'expired') || i.expired === false;
-				}).length + data.ios.provisioning.enterprise.filter(i => {
-					return !Object.hasOwn(i, 'expired') || i.expired === false;
-				}).length;
+				const distPP =
+					data.ios.provisioning.distribution.filter((i) => {
+						return !Object.hasOwn(i, 'expired') || i.expired === false;
+					}).length +
+					data.ios.provisioning.adhoc.filter((i) => {
+						return !Object.hasOwn(i, 'expired') || i.expired === false;
+					}).length +
+					data.ios.provisioning.enterprise.filter((i) => {
+						return !Object.hasOwn(i, 'expired') || i.expired === false;
+					}).length;
 				if (distPP) {
 					ok(distPPLabel, 'installed', `(${distPP} found)`);
 				} else {
@@ -397,7 +423,10 @@ export class SetupScreens {
 
 				if (data.android.sdk.platformTools && data.android.sdk.platformTools.path) {
 					if (data.android.sdk.platformTools.supported === 'maybe') {
-						warn('platform tools', `untested version ${data.android.sdk.platformTools.version}; may or may not work`);
+						warn(
+							'platform tools',
+							`untested version ${data.android.sdk.platformTools.version}; may or may not work`
+						);
 					} else if (data.android.sdk.platformTools.supported) {
 						ok('platform tools', 'installed', `(v${data.android.sdk.platformTools.version})`);
 					} else {
@@ -407,7 +436,10 @@ export class SetupScreens {
 
 				if (data.android.sdk.buildTools && data.android.sdk.buildTools.path) {
 					if (data.android.sdk.buildTools.supported === 'maybe') {
-						warn('build tools', `untested version ${data.android.sdk.buildTools.version}; may or may not work`);
+						warn(
+							'build tools',
+							`untested version ${data.android.sdk.buildTools.version}; may or may not work`
+						);
 					} else if (data.android.sdk.buildTools.supported) {
 						ok('build tools', 'installed', `(v${data.android.sdk.buildTools.version})`);
 					} else {
@@ -511,7 +543,7 @@ export class SetupScreens {
 			['~/.titanium', 'titanium config directory'],
 			[this.cli.env.installPath, 'titanium sdk install directory'],
 			[this.config.get('app.workspace'), 'workspace directory'],
-			[os.tmpdir(), 'temp directory']
+			[os.tmpdir(), 'temp directory'],
 		];
 		for (let [dir, desc] of dirs) {
 			if (dir) {
@@ -536,7 +568,7 @@ export class SetupScreens {
 			type: 'text',
 			message: 'What do you want as your "author" name?',
 			initial: this.config.get('user.name', ''),
-			name: 'name'
+			name: 'name',
 		});
 
 		if (name) {
@@ -555,7 +587,7 @@ export class SetupScreens {
 				message: 'Path to your workspace where your projects should be created:',
 				initial: this.config.get('app.workspace', ''),
 				name: 'workspace',
-				validate: value => {
+				validate: (value) => {
 					if (!value) {
 						return 'Please specify a workspace directory';
 					}
@@ -564,26 +596,26 @@ export class SetupScreens {
 						return 'Specified workspace directory does not exist';
 					}
 					return true;
-				}
+				},
 			},
 			{
 				type: 'text',
 				message: 'What is your prefix for application IDs? (example: com.mycompany)',
 				initial: this.config.get('app.idprefix'),
-				name: 'idprefix'
+				name: 'idprefix',
 			},
 			{
 				type: 'text',
 				message: 'What is the name of your organization to use as the "publisher"?',
 				initial: this.config.get('app.publisher'),
-				name: 'publisher'
+				name: 'publisher',
 			},
 			{
 				type: 'text',
 				message: 'What is the URL of your organization?',
 				initial: this.config.get('app.url'),
-				name: 'url'
-			}
+				name: 'url',
+			},
 		]);
 
 		this.config.set('app.workspace', values.workspace);
@@ -614,14 +646,14 @@ export class SetupScreens {
 				initial: !!this.config.get('cli.httpProxyServer'),
 				name: 'hasProxy',
 				active: 'yes',
-				inactive: 'no'
+				inactive: 'no',
 			},
 			{
-				type: prev => prev ? 'text' : null,
+				type: (prev) => (prev ? 'text' : null),
 				message: 'Proxy server URL',
 				initial: defaultProxy,
 				name: 'httpProxyServer',
-				validate: value => {
+				validate: (value) => {
 					try {
 						const u = new URL(value);
 						if (!/^https?:$/.test(u.protocol)) {
@@ -634,7 +666,7 @@ export class SetupScreens {
 					} catch (e) {
 						return e.message;
 					}
-				}
+				},
 			},
 			{
 				type: 'toggle',
@@ -642,8 +674,8 @@ export class SetupScreens {
 				initial: !!this.config.get('cli.rejectUnauthorized'),
 				name: 'rejectUnauthorized',
 				active: 'yes',
-				inactive: 'no'
-			}
+				inactive: 'no',
+			},
 		]);
 
 		this.config.set('cli.httpProxyServer', values.hasProxy ? values.httpProxyServer : '');
@@ -664,7 +696,7 @@ export class SetupScreens {
 				initial: this.config.get('cli.colors', true),
 				name: 'colors',
 				active: 'yes',
-				inactive: 'no'
+				inactive: 'no',
 			},
 			{
 				type: 'toggle',
@@ -672,7 +704,7 @@ export class SetupScreens {
 				initial: this.config.get('cli.prompt', true),
 				name: 'prompt',
 				active: 'yes',
-				inactive: 'no'
+				inactive: 'no',
 			},
 			{
 				type: 'toggle',
@@ -680,29 +712,32 @@ export class SetupScreens {
 				initial: this.config.get('cli.progressBars', true),
 				name: 'progressBars',
 				active: 'yes',
-				inactive: 'no'
+				inactive: 'no',
 			},
 			{
 				type: 'select',
 				message: 'Output log level',
 				initial: logLevels.indexOf(this.config.get('cli.logLevel', 'info')),
 				name: 'logLevel',
-				choices: this.logger.getLevels().reverse().map(level => {
-					return {
-						title: level,
-						value: level
-					};
-				})
+				choices: this.logger
+					.getLevels()
+					.reverse()
+					.map((level) => {
+						return {
+							title: level,
+							value: level,
+						};
+					}),
 			},
 			{
 				type: 'number',
 				message: 'What is the width of the Titanium CLI output?',
 				initial: this.config.get('cli.width', 80),
 				name: 'width',
-				validate: value => {
+				validate: (value) => {
 					return value !== '' && value < 1 ? 'Please enter a positive number' : true;
-				}
-			}
+				},
+			},
 		]);
 
 		this.logger.setLevel(values.logLevel);
@@ -735,7 +770,7 @@ export class SetupScreens {
 				message: 'Path to the Android SDK',
 				initial: this.config.get('android.sdkPath', data?.android?.sdk?.path),
 				name: 'androidSdkPath',
-				validate: value => {
+				validate: (value) => {
 					if (!value) {
 						return 'Please specify the Android SDK directory';
 					}
@@ -746,12 +781,16 @@ export class SetupScreens {
 					if (process.platform === 'win32' && value.includes('&')) {
 						return 'The Android SDK path must not contain ampersands (&) on Windows';
 					}
-					const adbExecutable = join(value, 'platform-tools', `adb${process.platform === 'win32' ? '.exe' : ''}`);
+					const adbExecutable = join(
+						value,
+						'platform-tools',
+						`adb${process.platform === 'win32' ? '.exe' : ''}`
+					);
 					if (!existsSync(adbExecutable)) {
 						return 'Invalid Android SDK path: adb not found';
 					}
 					return true;
-				}
+				},
 			},
 			{
 				type: 'toggle',
@@ -759,14 +798,14 @@ export class SetupScreens {
 				initial: false,
 				name: 'modules',
 				active: 'yes',
-				inactive: 'no'
+				inactive: 'no',
 			},
 			{
-				type: prev => prev ? 'text' : null,
+				type: (prev) => (prev ? 'text' : null),
 				message: 'Path to the Android NDK',
 				initial: this.config.get('android.ndkPath', data?.android?.ndk?.path),
 				name: 'androidNdkPath',
-				validate: value => {
+				validate: (value) => {
 					if (!value) {
 						return 'Please specify the Android NDK directory';
 					}
@@ -774,13 +813,16 @@ export class SetupScreens {
 					if (!existsSync(value)) {
 						return 'Specified Android NDK directory does not exist';
 					}
-					const ndkbuildExecutable = join(value, `ndk-build${process.platform === 'win32' ? '.cmd' : ''}`);
+					const ndkbuildExecutable = join(
+						value,
+						`ndk-build${process.platform === 'win32' ? '.cmd' : ''}`
+					);
 					if (!existsSync(ndkbuildExecutable)) {
 						return 'Invalid Android NDK path: ndk-build not found';
 					}
 					return true;
-				}
-			}
+				},
+			},
 		]);
 
 		if (values.androidSdkPath !== undefined) {
@@ -850,33 +892,30 @@ export class SetupScreens {
 				initial: currentDevName,
 				choices: devList
 					.sort((a, b) => a.name.localeCompare(b.name))
-					.map(dev => ({
-						title: `${dev.name}${
-							dev.expired ? ` ${red('**EXPIRED**')}` : ''
-						}${
+					.map((dev) => ({
+						title: `${dev.name}${dev.expired ? ` ${red('**EXPIRED**')}` : ''}${
 							dev.invalid ? ` ${red('**NOT VALID**')}` : ''
 						}`,
-						value: dev.name
-					}))
+						value: dev.name,
+					})),
 			});
 		}
 
 		if (distList.length) {
 			questions.push({
 				type: 'select',
-				message: 'What do you want to be your default iOS distribution cert for App Store and Ad Hoc builds?',
+				message:
+					'What do you want to be your default iOS distribution cert for App Store and Ad Hoc builds?',
 				name: 'distributionName',
 				initial: currentDistName,
 				choices: devList
 					.sort((a, b) => a.name.localeCompare(b.name))
-					.map(dev => ({
-						title: `${dev.name}${
-							dev.expired ? ` ${red('**EXPIRED**')}` : ''
-						}${
+					.map((dev) => ({
+						title: `${dev.name}${dev.expired ? ` ${red('**EXPIRED**')}` : ''}${
 							dev.invalid ? ` ${red('**NOT VALID**')}` : ''
 						}`,
-						value: dev.name
-					}))
+						value: dev.name,
+					})),
 			});
 		}
 
@@ -923,11 +962,7 @@ function screenTitle(title) {
 	const margin = width - title.length + 4;
 	const pad = Math.floor(margin / 2);
 
-	return `\n${
-		gray('┤ '.padStart(pad + 1, '─'))
-	}${
-		bold(title)
-	}${
-		gray(' ├'.padEnd(margin - pad + 1, '─'))
-	}\n`;
+	return `\n${gray('┤ '.padStart(pad + 1, '─'))}${bold(title)}${gray(
+		' ├'.padEnd(margin - pad + 1, '─')
+	)}\n`;
 }

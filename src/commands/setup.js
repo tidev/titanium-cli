@@ -29,9 +29,9 @@ export async function config(logger, config, cli) {
 				name: 'screen',
 				default: 'mainmenu',
 				desc: 'initial screen',
-				values: Object.keys(screens.screens).sort()
-			}
-		]
+				values: Object.keys(screens.screens).sort(),
+			},
+		],
 	};
 }
 

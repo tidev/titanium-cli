@@ -16,16 +16,19 @@ exports.init = function (logger, config, cli) {
 			if (builder.target === 'emulator') {
 				cli.createHook('build.android.startEmulator', function (_deviceId, _opts, cb) {
 					setTimeout(() => cb(), 100);
-				})(builder.deviceId, {
-					logger: logger
-				}, finished);
-
+				})(
+					builder.deviceId,
+					{
+						logger: logger,
+					},
+					finished
+				);
 			} else if (builder.target === 'device') {
 				setTimeout(() => finished(), 100);
 			} else {
 				finished();
 			}
-		}
+		},
 	});
 
 	cli.on('build.post.compile', {
@@ -40,7 +43,6 @@ exports.init = function (logger, config, cli) {
 			}
 
 			cli.emit('build.post.install', builder, finished);
-		}
+		},
 	});
-
 };

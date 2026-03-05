@@ -1,8 +1,8 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
 import { Logger } from '../../src/util/logger.js';
-import { WritableStream } from 'memory-streams';
 import { stripColor } from '../helpers/strip-color.js';
+import { WritableStream } from 'memory-streams';
+import assert from 'node:assert';
+import { describe, it } from 'node:test';
 
 describe('Logger', () => {
 	it('should log using all log levels', () => {
@@ -10,7 +10,7 @@ describe('Logger', () => {
 		const stdout = new WritableStream();
 		const logger = new Logger('trace', {
 			stdout,
-			stderr
+			stderr,
 		});
 
 		logger.log('log test');
@@ -24,13 +24,7 @@ describe('Logger', () => {
 
 		assert.strictEqual(
 			stripColor(stdout.toString()),
-			[
-				'log test',
-				'log test',
-				'log test',
-				'[INFO]  info test',
-				''
-			].join('\n')
+			['log test', 'log test', 'log test', '[INFO]  info test', ''].join('\n')
 		);
 
 		assert.strictEqual(
@@ -40,7 +34,7 @@ describe('Logger', () => {
 				'[DEBUG] debug test',
 				'[ERROR] error test',
 				'[WARN]  warn test',
-				''
+				'',
 			].join('\n')
 		);
 	});
@@ -50,7 +44,7 @@ describe('Logger', () => {
 		const stdout = new WritableStream();
 		const logger = new Logger('warn', {
 			stdout,
-			stderr
+			stderr,
 		});
 
 		logger.log('log test');
@@ -64,21 +58,12 @@ describe('Logger', () => {
 
 		assert.strictEqual(
 			stripColor(stdout.toString()),
-			[
-				'log test',
-				'log test',
-				'log test',
-				''
-			].join('\n')
+			['log test', 'log test', 'log test', ''].join('\n')
 		);
 
 		assert.strictEqual(
 			stripColor(stderr.toString()),
-			[
-				'[ERROR] error test',
-				'[WARN]  warn test',
-				''
-			].join('\n')
+			['[ERROR] error test', '[WARN]  warn test', ''].join('\n')
 		);
 	});
 
@@ -87,49 +72,27 @@ describe('Logger', () => {
 		const stdout = new WritableStream();
 		const logger = new Logger('info', {
 			stdout,
-			stderr
+			stderr,
 		});
 
 		logger.debug('debug test');
 		logger.info('info test');
 		logger.warn('warn test');
 
-		assert.strictEqual(
-			stripColor(stdout.toString()),
-			[
-				'[INFO]  info test',
-				''
-			].join('\n')
-		);
+		assert.strictEqual(stripColor(stdout.toString()), ['[INFO]  info test', ''].join('\n'));
 
-		assert.strictEqual(
-			stripColor(stderr.toString()),
-			[
-				'[WARN]  warn test',
-				''
-			].join('\n')
-		);
+		assert.strictEqual(stripColor(stderr.toString()), ['[WARN]  warn test', ''].join('\n'));
 
 		logger.setLevel('warn');
 		logger.debug('debug test');
 		logger.info('info test');
 		logger.warn('warn test');
 
-		assert.strictEqual(
-			stripColor(stdout.toString()),
-			[
-				'[INFO]  info test',
-				''
-			].join('\n')
-		);
+		assert.strictEqual(stripColor(stdout.toString()), ['[INFO]  info test', ''].join('\n'));
 
 		assert.strictEqual(
 			stripColor(stderr.toString()),
-			[
-				'[WARN]  warn test',
-				'[WARN]  warn test',
-				''
-			].join('\n')
+			['[WARN]  warn test', '[WARN]  warn test', ''].join('\n')
 		);
 
 		logger.setLevel(2); // debug
@@ -139,11 +102,7 @@ describe('Logger', () => {
 
 		assert.strictEqual(
 			stripColor(stdout.toString()),
-			[
-				'[INFO]  info test',
-				'[INFO]  info test',
-				''
-			].join('\n')
+			['[INFO]  info test', '[INFO]  info test', ''].join('\n')
 		);
 
 		assert.strictEqual(
@@ -153,7 +112,7 @@ describe('Logger', () => {
 				'[WARN]  warn test',
 				'[DEBUG] debug test',
 				'[WARN]  warn test',
-				''
+				'',
 			].join('\n')
 		);
 	});
@@ -163,7 +122,7 @@ describe('Logger', () => {
 		const stdout = new WritableStream();
 		const logger = new Logger('info', {
 			stdout,
-			stderr
+			stderr,
 		});
 		logger.silence();
 
@@ -185,19 +144,17 @@ describe('Logger', () => {
 		const stdout = new WritableStream();
 		const logger = new Logger('info', {
 			stdout,
-			stderr
+			stderr,
 		});
 		let emittedCount = 0;
 		logger.on('cli:logger-banner', () => {
 			emittedCount++;
 		});
 
-		const expected = new RegExp([
-			'foo v1.2.3 SDK v4.5.6',
-			'bar',
-			'',
-			'Please star us on GitHub!'
-		].join('\n'), 's');
+		const expected = new RegExp(
+			['foo v1.2.3 SDK v4.5.6', 'bar', '', 'Please star us on GitHub!'].join('\n'),
+			's'
+		);
 
 		logger.setBanner({ name: 'foo', copyright: 'bar', version: '1.2.3', sdkVersion: '4.5.6' });
 		assert.match(stripColor(logger.getBanner()), expected);
@@ -224,7 +181,7 @@ describe('Logger', () => {
 		const stdout = new WritableStream();
 		const logger = new Logger('info', {
 			stdout,
-			stderr
+			stderr,
 		});
 		let emittedCount = 0;
 		logger.on('cli:logger-banner', () => {
@@ -250,7 +207,7 @@ describe('Logger', () => {
 		const stdout = new WritableStream();
 		const logger = new Logger('info', {
 			stdout,
-			stderr
+			stderr,
 		});
 		let emittedCount = 0;
 		logger.on('cli:logger-banner', () => {
@@ -274,7 +231,7 @@ describe('Logger', () => {
 		const stdout = new WritableStream();
 		const logger = new Logger('info', {
 			stdout,
-			stderr
+			stderr,
 		});
 
 		assert.strictEqual(logger.timestampEnabled(), false);

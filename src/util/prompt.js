@@ -13,7 +13,7 @@ export async function prompt(opts) {
 
 	const { value } = await prompt({
 		...opts,
-		name: 'value'
+		name: 'value',
 	});
 	if (value === undefined) {
 		// sigint

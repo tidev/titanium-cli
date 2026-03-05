@@ -18,36 +18,46 @@ exports.name = 'miscinfo';
 exports.title = 'Misc Info';
 
 exports.detect = function (types, config, callback) {
-	const results = this.data = {},
-		tisdk = path.basename((function scan(dir) {
-			const file = path.join(dir, 'manifest.json');
-			if (fs.existsSync(file)) {
-				return dir;
-			}
-			dir = path.dirname(dir);
-			return dir !== '/' && scan(dir);
-		}(__dirname)));
-
-	appc.async.parallel(this, [
-		function (next) {
-			genymotion.detect(config, null, function (err, genymotionInfo) {
-				if (err) {
-					return next(err);
+	const results = (this.data = {}),
+		tisdk = path.basename(
+			(function scan(dir) {
+				const file = path.join(dir, 'manifest.json');
+				if (fs.existsSync(file)) {
+					return dir;
 				}
+				dir = path.dirname(dir);
+				return dir !== '/' && scan(dir);
+			})(__dirname)
+		);
 
-				genymotionInfo.tisdk = tisdk;
-				results.genymotion = genymotionInfo;
+	appc.async.parallel(
+		this,
+		[
+			function (next) {
+				genymotion.detect(
+					config,
+					null,
+					function (err, genymotionInfo) {
+						if (err) {
+							return next(err);
+						}
 
-				if (genymotionInfo.issues.length) {
-					this.issues = this.issues.concat(genymotionInfo.issues);
-				}
+						genymotionInfo.tisdk = tisdk;
+						results.genymotion = genymotionInfo;
 
-				next();
-			}.bind(this));
+						if (genymotionInfo.issues.length) {
+							this.issues = this.issues.concat(genymotionInfo.issues);
+						}
+
+						next();
+					}.bind(this)
+				);
+			},
+		],
+		function (err) {
+			callback(err, results);
 		}
-	], function (err) {
-		callback(err, results);
-	});
+	);
 };
 
 exports.render = function (logger, config, rpad, styleHeading, styleValue) {
@@ -56,15 +66,49 @@ exports.render = function (logger, config, rpad, styleHeading, styleValue) {
 		return;
 	}
 
-	logger.log(styleHeading(__('Genymotion')) + '\n'
-		+ '  ' + rpad(__('Path'))                  + ' = ' + styleValue(data.genymotion.path || __('not found')) + '\n'
-		+ '  ' + rpad(__('Genymotion Executable')) + ' = ' + styleValue(data.genymotion.executables && data.genymotion.executables.genymotion || __('not found')) + '\n'
-		+ '  ' + rpad(__('Genymotion Player'))     + ' = ' + styleValue(data.genymotion.executables && data.genymotion.executables.player || __('not found')) + '\n'
-		+ '  ' + rpad(__('Home'))                  + ' = ' + styleValue(data.genymotion.home || __('not found')) + '\n'
+	logger.log(
+		styleHeading(__('Genymotion')) +
+			'\n' +
+			'  ' +
+			rpad(__('Path')) +
+			' = ' +
+			styleValue(data.genymotion.path || __('not found')) +
+			'\n' +
+			'  ' +
+			rpad(__('Genymotion Executable')) +
+			' = ' +
+			styleValue(
+				(data.genymotion.executables && data.genymotion.executables.genymotion) || __('not found')
+			) +
+			'\n' +
+			'  ' +
+			rpad(__('Genymotion Player')) +
+			' = ' +
+			styleValue(
+				(data.genymotion.executables && data.genymotion.executables.player) || __('not found')
+			) +
+			'\n' +
+			'  ' +
+			rpad(__('Home')) +
+			' = ' +
+			styleValue(data.genymotion.home || __('not found')) +
+			'\n'
 	);
 
-	logger.log(styleHeading(__('VirtualBox')) + '\n'
-		+ '  ' + rpad(__('Executable')) + ' = ' + styleValue(data.genymotion.executables && data.genymotion.executables.vboxmanage || __('not found')) + '\n'
-		+ '  ' + rpad(__('Version'))    + ' = ' + styleValue(data.genymotion.virtualbox || __('unknown')) + '\n'
+	logger.log(
+		styleHeading(__('VirtualBox')) +
+			'\n' +
+			'  ' +
+			rpad(__('Executable')) +
+			' = ' +
+			styleValue(
+				(data.genymotion.executables && data.genymotion.executables.vboxmanage) || __('not found')
+			) +
+			'\n' +
+			'  ' +
+			rpad(__('Version')) +
+			' = ' +
+			styleValue(data.genymotion.virtualbox || __('unknown')) +
+			'\n'
 	);
 };
