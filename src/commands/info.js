@@ -1,6 +1,7 @@
 import { BusyIndicator } from '../util/busyindicator.js';
 import { detect } from '../util/detect.js';
 import chalk from 'chalk';
+import { realpathSync } from 'node:fs';
 import { basename } from 'node:path';
 import wrapAnsi from 'wrap-ansi';
 
@@ -185,10 +186,13 @@ export async function run(logger, config, cli) {
 				title: 'Java',
 				render() {
 					logger.log(bold(this.title));
-					logger.log(`  ${'JAVA_HOME'.padEnd(indent)} = ${magenta(data.java.home || 'not set')}`);
 					if (Object.keys(data.java.jdks).length) {
+						let javaHome = config.get('java.home', data.java.home);
+						if (javaHome) {
+							javaHome = realpathSync(javaHome);
+						}
 						for (const { path, version } of Object.values(data.java.jdks)) {
-							logger.log(`  ${cyan(version)}`);
+							logger.log(`  ${cyan(version)}${javaHome === realpathSync(path) ? ' (selected)' : ''}`);
 							logger.log(`  ${'  Path'.padEnd(indent)} = ${magenta(path)}`);
 						}
 						logger.log();
@@ -255,7 +259,11 @@ export async function run(logger, config, cli) {
 			logger.log(bold(`${section.title} Issues`));
 
 			for (const issue of info.issues) {
-				const msg = (issue.details || issue.message)
+				let msg = issue.details || issue.message;
+				if (issue.id === 'JDK_NOT_FOUND') {
+					msg = msg.slice(0, -1) + ' or configure the path by running: __titanium config java.home /path/to/jdk__';
+				}
+				msg = msg
 					.trim()
 					.split('\n\n')
 					.map((chunk) => {
