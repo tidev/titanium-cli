@@ -192,7 +192,9 @@ export async function run(logger, config, cli) {
 							javaHome = realpathSync(javaHome);
 						}
 						for (const { path, version } of Object.values(data.java.jdks)) {
-							logger.log(`  ${cyan(version)}${javaHome === realpathSync(path) ? ' (selected)' : ''}`);
+							logger.log(
+								`  ${cyan(version)}${javaHome === realpathSync(path) ? ' (selected)' : ''}`
+							);
 							logger.log(`  ${'  Path'.padEnd(indent)} = ${magenta(path)}`);
 						}
 						logger.log();
@@ -261,7 +263,9 @@ export async function run(logger, config, cli) {
 			for (const issue of info.issues) {
 				let msg = issue.details || issue.message;
 				if (issue.id === 'JDK_NOT_FOUND') {
-					msg = msg.slice(0, -1) + ' or configure the path by running: __titanium config java.home /path/to/jdk__';
+					msg =
+						msg.slice(0, -1) +
+						' or configure the path by running: __titanium config java.home /path/to/jdk__';
 				}
 				msg = msg
 					.trim()
