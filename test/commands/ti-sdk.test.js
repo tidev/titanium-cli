@@ -126,7 +126,12 @@ describe('ti sdk', () => {
 					'--no-progress-bars',
 					'--keep-files',
 				]));
-				expect(stdout).toMatch(/successfully installed/);
+				try {
+					expect(stdout).toMatch(/successfully installed/);
+				} catch (error) {
+					console.error(stderr);
+					throw error;
+				}
 				expect(exitCode).toBe(0);
 
 				// find the downloaded file and move it to the tmp dir for subsequent tests

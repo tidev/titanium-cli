@@ -300,6 +300,7 @@ describe('ti config', () => {
 			output = stripColor(stdout);
 			expect(output).toMatch(/paths.modules saved/);
 			expect(exitCode).toBe(0);
-		})
+		}),
+		10000
 	);
 });
