@@ -1,10 +1,9 @@
 import { initCLI } from '../helpers/init-cli.js';
 import { stripColor } from '../helpers/strip-color.js';
-import assert from 'node:assert';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { describe, expect, it } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkgJson = JSON.parse(readFileSync(join(__dirname, '../../package.json'), 'utf8'));
@@ -14,8 +13,8 @@ describe('ti', () => {
 		'should display the version using short flag',
 		initCLI(async ({ run }) => {
 			const { exitCode, stdout } = await run(['-v']);
-			assert.strictEqual(stdout, pkgJson.version);
-			assert.strictEqual(exitCode, 0);
+			expect(stdout).toBe(pkgJson.version);
+			expect(exitCode).toBe(0);
 		})
 	);
 
@@ -23,8 +22,8 @@ describe('ti', () => {
 		'should display the version using long flag',
 		initCLI(async ({ run }) => {
 			const { exitCode, stdout } = await run(['--version']);
-			assert.strictEqual(stdout, pkgJson.version);
-			assert.strictEqual(exitCode, 0);
+			expect(stdout).toBe(pkgJson.version);
+			expect(exitCode).toBe(0);
 		})
 	);
 
@@ -34,13 +33,13 @@ describe('ti', () => {
 			const { exitCode, stdout } = await run();
 
 			const output = stripColor(stdout);
-			assert.match(output, /Titanium Command-Line Interface/);
-			assert.match(output, /Usage: titanium/);
-			assert.match(output, /Commands:/);
-			assert.match(output, /Global Options:/);
-			assert.match(output, /-h, --help/);
+			expect(output).toMatch(/Titanium Command-Line Interface/);
+			expect(output).toMatch(/Usage: titanium/);
+			expect(output).toMatch(/Commands:/);
+			expect(output).toMatch(/Global Options:/);
+			expect(output).toMatch(/-h, --help/);
 
-			assert.strictEqual(exitCode, 0);
+			expect(exitCode).toBe(0);
 		})
 	);
 });

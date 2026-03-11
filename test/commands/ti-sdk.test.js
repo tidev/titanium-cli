@@ -2,11 +2,10 @@ import { initCLI } from '../helpers/init-cli.js';
 import { initSDKHome, initMockSDKHome } from '../helpers/init-sdk-home.js';
 import { stripColor } from '../helpers/strip-color.js';
 import { exists } from 'node-titanium-sdk/util';
-import assert from 'node:assert';
 import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import { describe, it } from 'node:test';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { describe, expect, it } from 'vitest';
 
 const fixturesDir = join(fileURLToPath(import.meta.url), '../fixtures/sdk');
 const sdkName = '12.2.0.GA';
@@ -26,13 +25,13 @@ describe('ti sdk', () => {
 				const { exitCode, stdout } = await run(['sdk', '-h']);
 
 				const output = stripColor(stdout);
-				assert.match(output, /Titanium Command-Line Interface/);
-				assert.match(output, /Usage: titanium sdk/);
-				assert.match(output, /Commands:/);
-				assert.match(output, /SDK Options:/);
-				assert.match(output, /Global Options:/);
+				expect(output).toMatch(/Titanium Command-Line Interface/);
+				expect(output).toMatch(/Usage: titanium sdk/);
+				expect(output).toMatch(/Commands:/);
+				expect(output).toMatch(/SDK Options:/);
+				expect(output).toMatch(/Global Options:/);
 
-				assert.strictEqual(exitCode, 0);
+				expect(exitCode).toBe(0);
 			})
 		);
 
@@ -42,13 +41,13 @@ describe('ti sdk', () => {
 				const { exitCode, stdout } = await run(['sdk', 'install', '-h']);
 
 				const output = stripColor(stdout);
-				assert.match(output, /Titanium Command-Line Interface/);
-				assert.match(output, /Usage: titanium sdk install|i/);
-				assert.match(output, /Install Arguments:/);
-				assert.match(output, /Install Options:/);
-				assert.match(output, /Global Options:/);
+				expect(output).toMatch(/Titanium Command-Line Interface/);
+				expect(output).toMatch(/Usage: titanium sdk install|i/);
+				expect(output).toMatch(/Install Arguments:/);
+				expect(output).toMatch(/Install Options:/);
+				expect(output).toMatch(/Global Options:/);
 
-				assert.strictEqual(exitCode, 0);
+				expect(exitCode).toBe(0);
 			})
 		);
 
@@ -58,12 +57,12 @@ describe('ti sdk', () => {
 				const { exitCode, stdout } = await run(['sdk', 'list', '-h']);
 
 				const output = stripColor(stdout);
-				assert.match(output, /Titanium Command-Line Interface/);
-				assert.match(output, /Usage: titanium sdk list|ls/);
-				assert.match(output, /List Options:/);
-				assert.match(output, /Global Options:/);
+				expect(output).toMatch(/Titanium Command-Line Interface/);
+				expect(output).toMatch(/Usage: titanium sdk list|ls/);
+				expect(output).toMatch(/List Options:/);
+				expect(output).toMatch(/Global Options:/);
 
-				assert.strictEqual(exitCode, 0);
+				expect(exitCode).toBe(0);
 			})
 		);
 
@@ -73,13 +72,13 @@ describe('ti sdk', () => {
 				const { exitCode, stdout } = await run(['sdk', 'uninstall', '-h']);
 
 				const output = stripColor(stdout);
-				assert.match(output, /Titanium Command-Line Interface/);
-				assert.match(output, /Usage: titanium sdk uninstall|rm/);
-				assert.match(output, /Uninstall Arguments:/);
-				assert.match(output, /Uninstall Options:/);
-				assert.match(output, /Global Options:/);
+				expect(output).toMatch(/Titanium Command-Line Interface/);
+				expect(output).toMatch(/Usage: titanium sdk uninstall|rm/);
+				expect(output).toMatch(/Uninstall Arguments:/);
+				expect(output).toMatch(/Uninstall Options:/);
+				expect(output).toMatch(/Global Options:/);
 
-				assert.strictEqual(exitCode, 0);
+				expect(exitCode).toBe(0);
 			})
 		);
 	});
@@ -94,18 +93,18 @@ describe('ti sdk', () => {
 				// eslint-disable-next-line no-unused-vars
 				let { exitCode, stdout, stderr } = await run(['sdk']); // no `ls` to test default subcommand
 				let output = stripColor(stdout);
-				assert.match(output, /Titanium Command-Line Interface/);
-				assert.match(
+				expect(output).toMatch(/Titanium Command-Line Interface/);
+				expect(output).toMatch(
 					output,
 					new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`)
 				);
-				assert.match(output, /No Titanium SDKs found/);
+				expect(output).toMatch(/No Titanium SDKs found/);
 
 				// list SDKs as JSON (no SDKs installed)
 				({ exitCode, stdout } = await run(['sdk', 'ls', '--json']));
 				let json = JSON.parse(stdout);
-				assert(json.installLocations.includes(tmpSDKDir));
-				assert.deepStrictEqual(json, {
+				expect(json.installLocations.includes(tmpSDKDir)).toBe(true);
+				expect(json).toEqual({
 					branch: {},
 					branches: {
 						defaultBranch: 'main',
@@ -117,7 +116,7 @@ describe('ti sdk', () => {
 					releases: {},
 					sdks: {},
 				});
-				assert.strictEqual(exitCode, 0);
+				expect(exitCode).toBe(0);
 
 				// install an SDK
 				({ exitCode, stdout, stderr } = await run([
@@ -127,8 +126,8 @@ describe('ti sdk', () => {
 					'--no-progress-bars',
 					'--keep-files',
 				]));
-				assert.match(stdout, /successfully installed/);
-				assert.strictEqual(exitCode, 0);
+				expect(stdout).toMatch(/successfully installed/);
+				expect(exitCode).toBe(0);
 
 				// find the downloaded file and move it to the tmp dir for subsequent tests
 				const src = join(tmpHome, '.titanium', 'downloads', sdkFilename);
@@ -141,23 +140,23 @@ describe('ti sdk', () => {
 				// list SDKs
 				({ exitCode, stdout } = await run(['sdk', 'ls']));
 				output = stripColor(stdout);
-				assert.match(output, /Titanium Command-Line Interface/);
-				assert.match(
+				expect(output).toMatch(/Titanium Command-Line Interface/);
+				expect(output).toMatch(
 					output,
 					new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`)
 				);
-				assert.match(
+				expect(output).toMatch(
 					output,
 					new RegExp(
 						`Installed SDKs:\n\\s*${sdkName}\\s+${sdkVersion}\\s+${sdkPath.replace(/\\/g, '\\\\')}`
 					)
 				);
-				assert.strictEqual(exitCode, 0);
+				expect(exitCode).toBe(0);
 
 				// list SDKs as JSON
 				({ exitCode, stdout } = await run(['sdk', 'ls', '--json']));
 				json = JSON.parse(stdout);
-				assert.deepStrictEqual(json, {
+				expect(json).toEqual({
 					branch: {},
 					branches: {
 						defaultBranch: 'main',
@@ -189,17 +188,17 @@ describe('ti sdk', () => {
 						},
 					},
 				});
-				assert.strictEqual(exitCode, 0);
+				expect(exitCode).toBe(0);
 
 				// remove the SDK
 				({ exitCode, stdout } = await run(['sdk', 'uninstall', sdkName, '--force']));
-				assert.match(stdout, /removed/);
-				assert.strictEqual(exitCode, 0);
+				expect(stdout).toMatch(/removed/);
+				expect(exitCode).toBe(0);
 
 				// verify removed
 				({ exitCode, stdout } = await run(['sdk', 'ls', '--json']));
 				json = JSON.parse(stdout);
-				assert.deepStrictEqual(json, {
+				expect(json).toEqual({
 					branch: {},
 					branches: {
 						defaultBranch: 'main',
@@ -211,7 +210,7 @@ describe('ti sdk', () => {
 					releases: {},
 					sdks: {},
 				});
-				assert.strictEqual(exitCode, 0);
+				expect(exitCode).toBe(0);
 			}),
 			240000
 		);
@@ -223,12 +222,12 @@ describe('ti sdk', () => {
 				const sdkName = '0.0.0.GA';
 				const sdkPath = join(tmpSDKDir, 'mobilesdk', os, sdkName);
 				let { exitCode, stdout } = await run(['sdk', 'install', sdkZipFile, '--no-progress-bars']);
-				assert.match(stdout, /successfully installed/);
-				assert.strictEqual(exitCode, 0);
+				expect(stdout).toMatch(/successfully installed/);
+				expect(exitCode).toBe(0);
 
 				({ exitCode, stdout } = await run(['sdk', 'ls', '--json']));
 				const json = JSON.parse(stdout);
-				assert.deepStrictEqual(json, {
+				expect(json).toEqual({
 					branch: {},
 					branches: {
 						defaultBranch: 'main',
@@ -260,7 +259,7 @@ describe('ti sdk', () => {
 						},
 					},
 				});
-				assert.strictEqual(exitCode, 0);
+				expect(exitCode).toBe(0);
 			}),
 			120000
 		);
@@ -275,8 +274,8 @@ describe('ti sdk', () => {
 					'--no-progress-bars',
 				]);
 				const { exitCode, stderr } = result;
-				assert.match(stderr, /Specified file does not exist/);
-				assert.strictEqual(exitCode, 1);
+				expect(stderr).toMatch(/Specified file does not exist/);
+				expect(exitCode).toBe(1);
 			})
 		);
 
@@ -289,8 +288,8 @@ describe('ti sdk', () => {
 					join(fixturesDir, 'not_a_zip'),
 					'--no-progress-bars',
 				]);
-				assert.match(stderr, /Specified file is not a zip file/);
-				assert.strictEqual(exitCode, 1);
+				expect(stderr).toMatch(/Specified file is not a zip file/);
+				expect(exitCode).toBe(1);
 			})
 		);
 
@@ -298,8 +297,8 @@ describe('ti sdk', () => {
 			'should install an SDK from a URL',
 			initSDKHome(async ({ _run }) => {
 				// const { exitCode, stderr } = await run(['sdk', 'install', 'https://titaniumsdk.com/', '--no-progress-bars']);
-				// assert.match(stderr, /Specified file does not exist/);
-				// assert.strictEqual(exitCode, 1);
+				// expect(stderr).toMatch(/Specified file does not exist/);
+				// expect(exitCode).toBe(1);
 			})
 		);
 
@@ -314,11 +313,11 @@ describe('ti sdk', () => {
 			'should error if SDK release not found',
 			initSDKHome(async ({ run }) => {
 				const { exitCode, stderr } = await run(['sdk', 'install', 'foo', '--no-progress-bars']);
-				assert.match(
+				expect(stderr).toMatch(
 					stderr,
 					/Unable to find any Titanium SDK releases or CI builds that match "foo"/
 				);
-				assert.strictEqual(exitCode, 1);
+				expect(exitCode).toBe(1);
 			})
 		);
 	});
@@ -330,57 +329,53 @@ describe('ti sdk', () => {
 				// list branches
 				let { exitCode, stdout } = await run(['sdk', 'list', '-b']);
 				let output = stripColor(stdout);
-				assert.match(output, /Titanium Command-Line Interface/);
-				assert.match(
-					output,
+				expect(output).toMatch(/Titanium Command-Line Interface/);
+				expect(output).toMatch(
 					new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`)
 				);
-				assert.match(output, /Branches:\n\s*(main|master)/);
+				expect(output).toMatch(/Branches:\n\s*(main|master)/);
 
 				// list stable releases
 				({ exitCode, stdout } = await run(['sdk', 'list', '-r']));
 				output = stripColor(stdout);
-				assert.match(output, /Titanium Command-Line Interface/);
-				assert.match(
-					output,
+				expect(output).toMatch(/Titanium Command-Line Interface/);
+				expect(output).toMatch(
 					new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`)
 				);
-				assert.match(output, /Releases:/);
-				assert.match(output, /12\.2\.0\.GA\s+9\/15\/23/);
+				expect(output).toMatch(/Releases:/);
+				expect(output).toMatch(/12\.2\.0\.GA\s+9\/15\/23/);
 
 				// list stable and unstable releases
 				({ exitCode, stdout } = await run(['sdk', 'list', '-u']));
 				output = stripColor(stdout);
-				assert.match(output, /Titanium Command-Line Interface/);
-				assert.match(
-					output,
+				expect(output).toMatch(/Titanium Command-Line Interface/);
+				expect(output).toMatch(
 					new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`)
 				);
-				assert.match(output, /Releases:/);
-				assert.match(output, /12\.2\.0\.GA\s+9\/15\/23/);
-				assert.match(output, /12\.2\.0\.RC\s+8\/11\/23/);
+				expect(output).toMatch(/Releases:/);
+				expect(output).toMatch(/12\.2\.0\.GA\s+9\/15\/23/);
+				expect(output).toMatch(/12\.2\.0\.RC\s+8\/11\/23/);
 
 				// list branch builds
 				({ exitCode, stdout } = await run(['sdk', 'list', '--branch', 'main']));
 				output = stripColor(stdout);
-				assert.match(output, /Titanium Command-Line Interface/);
-				assert.match(
-					output,
+				expect(output).toMatch(/Titanium Command-Line Interface/);
+				expect(output).toMatch(
 					new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`)
 				);
-				assert.match(output, /'main' Branch Builds:/);
-				// assert.match(output, /\d+\.\d+\.\d+\.v\d+\s+\d+\/\d+\/\d+\s+\d+(\.\d+)? .B  \[unstable\]/);
+				expect(output).toMatch(/'main' Branch Builds:/);
+				// expect(output).toMatch(/\d+\.\d+\.\d+\.v\d+\s+\d+\/\d+\/\d+\s+\d+(\.\d+)? .B  \[unstable\]/);
 
 				// list branches, stable, and unstable releases as JSON
 				({ exitCode, stdout } = await run(['sdk', 'ls', '-bu', '--json']));
 				const json = JSON.parse(stdout);
-				assert(
+				expect(
 					json.branches.branches.includes('main') || json.branches.branches.includes('master')
-				);
-				assert(json.branches.branches.includes('12_6_X'));
-				assert(json.releases[sdkName]);
+				).toBe(true);
+				expect(json.branches.branches).toContain('12_6_X');
+				expect(json.releases[sdkName]).toBeDefined();
 
-				assert.strictEqual(exitCode, 0);
+				expect(exitCode).toBe(0);
 			}),
 			60000
 		);
@@ -390,12 +385,11 @@ describe('ti sdk', () => {
 			initSDKHome(async ({ run, tmpSDKDir }) => {
 				const { exitCode, stdout } = await run(['sdk', 'list']);
 				const output = stripColor(stdout);
-				assert.match(
-					output,
+				expect(output).toMatch(
 					new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`)
 				);
-				assert.match(output, /No Titanium SDKs found/);
-				assert.strictEqual(exitCode, 0);
+				expect(output).toMatch(/No Titanium SDKs found/);
+				expect(exitCode).toBe(0);
 			}),
 			60000
 		);
@@ -405,18 +399,18 @@ describe('ti sdk', () => {
 			initMockSDKHome(async ({ run, tmpSDKDir }) => {
 				const { exitCode, stdout } = await run(['sdk', 'list']);
 				const output = stripColor(stdout);
-				assert.match(
+				expect(output).toMatch(
 					output,
 					new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`)
 				);
-				assert.match(output, /Installed SDKs:/);
-				assert.match(
+				expect(output).toMatch(/Installed SDKs:/);
+				expect(output).toMatch(
 					output,
 					new RegExp(
 						`0.0.0.GA\\s+0.0.0\\s+${join(tmpSDKDir, 'mobilesdk', os, '0.0.0.GA').replace(/\\/g, '\\\\')}`
 					)
 				);
-				assert.strictEqual(exitCode, 0);
+				expect(exitCode).toBe(0);
 			}),
 			60000
 		);
@@ -429,10 +423,10 @@ describe('ti sdk', () => {
 				const { exitCode, stdout } = await run(['sdk', 'select']);
 
 				const output = stripColor(stdout);
-				assert.match(output, /Titanium Command-Line Interface/);
-				assert.match(output, /The "select" subcommand is no longer required./);
+				expect(output).toMatch(/Titanium Command-Line Interface/);
+				expect(output).toMatch(/The "select" subcommand is no longer required./);
 
-				assert.strictEqual(exitCode, 0);
+				expect(exitCode).toBe(0);
 			})
 		);
 	});

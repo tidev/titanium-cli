@@ -1,6 +1,5 @@
 import { detect } from '../../src/util/proxy.js';
-import assert from 'node:assert';
-import { afterEach, describe, it } from 'node:test';
+import { afterEach, describe, expect, it } from 'vitest';
 
 describe('proxy', () => {
 	afterEach(() => {
@@ -11,26 +10,26 @@ describe('proxy', () => {
 	it('should detect if proxy is present', async () => {
 		let result = await detect();
 		if (typeof result === 'object') {
-			assert(Object.hasOwn(result, 'valid'));
+			expect(Object.hasOwn(result, 'valid')).toBe(true);
 		} else {
-			assert.strictEqual(result, false);
+			expect(result).toBe(false);
 		}
 
 		process.env.http_proxy = 'https://user:pass@localhost:8888';
 		result = await detect();
 		if (typeof result === 'object') {
-			assert(Object.hasOwn(result, 'valid'));
+			expect(Object.hasOwn(result, 'valid')).toBe(true);
 		} else {
-			assert.strictEqual(result, false);
+			expect(result).toBe(false);
 		}
 		delete process.env.http_proxy;
 
 		process.env.https_proxy = 'https://user:pass@localhost:8888';
 		result = await detect();
 		if (typeof result === 'object') {
-			assert(Object.hasOwn(result, 'valid'));
+			expect(Object.hasOwn(result, 'valid')).toBe(true);
 		} else {
-			assert.strictEqual(result, false);
+			expect(result).toBe(false);
 		}
 		delete process.env.https_proxy;
 	});

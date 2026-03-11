@@ -1,9 +1,8 @@
 import { initCLI } from '../helpers/init-cli.js';
 import { stripColor } from '../helpers/strip-color.js';
-import assert from 'node:assert';
 import { join } from 'node:path';
-import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { describe, expect, it } from 'vitest';
 
 const fixturesDir = join(fileURLToPath(import.meta.url), '../fixtures');
 
@@ -14,13 +13,13 @@ describe('ti module', () => {
 			const { exitCode, stdout } = await run(['module', '-h']);
 
 			const output = stripColor(stdout);
-			assert.match(output, /Titanium Command-Line Interface/);
-			assert.match(output, /Usage: titanium module \[options\] \[command\]/);
-			assert.match(output, /Commands:/);
-			assert.match(output, /Module Options:/);
-			assert.match(output, /Global Options:/);
+			expect(output).toMatch(/Titanium Command-Line Interface/);
+			expect(output).toMatch(/Usage: titanium module \[options\] \[command\]/);
+			expect(output).toMatch(/Commands:/);
+			expect(output).toMatch(/Module Options:/);
+			expect(output).toMatch(/Global Options:/);
 
-			assert.strictEqual(exitCode, 0);
+			expect(exitCode).toBe(0);
 		})
 	);
 
@@ -30,12 +29,12 @@ describe('ti module', () => {
 			const { exitCode, stdout } = await run(['module', 'list', '-h']);
 
 			const output = stripColor(stdout);
-			assert.match(output, /Titanium Command-Line Interface/);
-			assert.match(output, /Usage: titanium module list|ls/);
-			assert.match(output, /List Options:/);
-			assert.match(output, /Global Options:/);
+			expect(output).toMatch(/Titanium Command-Line Interface/);
+			expect(output).toMatch(/Usage: titanium module list|ls/);
+			expect(output).toMatch(/List Options:/);
+			expect(output).toMatch(/Global Options:/);
 
-			assert.strictEqual(exitCode, 0);
+			expect(exitCode).toBe(0);
 		})
 	);
 
@@ -45,9 +44,9 @@ describe('ti module', () => {
 			const { exitCode, stdout } = await run(['module']);
 
 			const output = stripColor(stdout);
-			assert.match(output, /No modules found/);
+			expect(output).toMatch(/No modules found/);
 
-			assert.strictEqual(exitCode, 0);
+			expect(exitCode).toBe(0);
 		})
 	);
 
@@ -57,8 +56,8 @@ describe('ti module', () => {
 			const { exitCode, stdout } = await run(['module', '--json']);
 
 			const json = JSON.parse(stdout);
-			assert.deepStrictEqual(json, {});
-			assert.strictEqual(exitCode, 0);
+			expect(json).toEqual({});
+			expect(exitCode).toBe(0);
 		})
 	);
 
@@ -76,7 +75,7 @@ describe('ti module', () => {
 			]);
 
 			const output = stripColor(stdout);
-			assert.match(
+			expect(output).toMatch(
 				output,
 				new RegExp(`com.test.module
   Android
@@ -114,7 +113,7 @@ describe('ti module', () => {
       Titanium SDK  = >=7.2.0`)
 			);
 
-			assert.strictEqual(exitCode, 0);
+			expect(exitCode).toBe(0);
 		})
 	);
 
@@ -133,7 +132,7 @@ describe('ti module', () => {
 			]);
 
 			const json = JSON.parse(stdout);
-			assert.deepStrictEqual(json, {
+			expect(json).toEqual({
 				'com.test.module': {
 					android: {
 						'1.0.0': {
@@ -217,7 +216,7 @@ describe('ti module', () => {
 				},
 			});
 
-			assert.strictEqual(exitCode, 0);
+			expect(exitCode).toBe(0);
 		})
 	);
 

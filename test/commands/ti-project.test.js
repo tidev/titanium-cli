@@ -1,23 +1,22 @@
 import { initMockSDKHome } from '../helpers/init-sdk-home.js';
 import { stripColor } from '../helpers/strip-color.js';
-import assert from 'node:assert';
-import { describe, it } from 'node:test';
+import { describe, expect, it } from 'vitest';
 
 describe('ti project', () => {
 	it(
 		'should show help',
-		initMockSDKHome(async ({ run, _tmpSDKDir }) => {
+		initMockSDKHome(async ({ run }) => {
 			const { exitCode, stdout } = await run(['project', '-h']);
 
 			const output = stripColor(stdout);
-			assert.match(output, /Titanium Command-Line Interface/);
-			assert.match(output, /Usage: titanium project \[options\]/);
-			assert.match(output, /Get and set tiapp.xml settings./);
-			assert.match(output, /Project Arguments:/);
-			assert.match(output, /Project Options:/);
-			assert.match(output, /Global Options:/);
+			expect(output).toMatch(/Titanium Command-Line Interface/);
+			expect(output).toMatch(/Usage: titanium project \[options\]/);
+			expect(output).toMatch(/Get and set tiapp.xml settings./);
+			expect(output).toMatch(/Project Arguments:/);
+			expect(output).toMatch(/Project Options:/);
+			expect(output).toMatch(/Global Options:/);
 
-			assert.strictEqual(exitCode, 0);
+			expect(exitCode).toBe(0);
 		})
 	);
 });

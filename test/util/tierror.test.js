@@ -1,21 +1,20 @@
 import { TiError } from '../../src/util/tierror.js';
-import assert from 'node:assert';
-import { describe, it } from 'node:test';
+import { describe, expect, it } from 'vitest';
 
 describe('TiError', () => {
 	it('should support no meta info', () => {
 		const e = new TiError('oh no');
-		assert.strictEqual(e.toString(), 'Error: oh no');
+		expect(e.toString()).toBe('Error: oh no');
 	});
 
 	it('should mix in meta info', () => {
 		const e = new TiError('oh no', { reason: 'something' });
-		assert.strictEqual(e.toString(), 'Error: oh no');
-		assert.strictEqual(e.reason, 'something');
+		expect(e.toString()).toBe('Error: oh no');
+		expect(e.reason).toBe('something');
 	});
 
 	it('should also be an error', () => {
 		const e = new TiError('oh no');
-		assert(e instanceof Error);
+		expect(e instanceof Error).toBe(true);
 	});
 });

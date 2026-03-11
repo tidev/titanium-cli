@@ -1,7 +1,6 @@
 import { ProgressBar } from '../../src/util/progress.js';
 import { MockStream } from '../helpers/mock-stream.js';
-import assert from 'node:assert';
-import { describe, it } from 'node:test';
+import { describe, expect, it } from 'vitest';
 
 describe('progress', () => {
 	it('should render a progress bar', async () => {
@@ -24,8 +23,7 @@ describe('progress', () => {
 			}, 100);
 		});
 
-		assert.strictEqual(
-			stream.buffer,
+		expect(stream.buffer).toBe(
 			' 10%  [====....................................] 1 of 10 (10%)\n' +
 				' 20%  [========................................] 2 of 10 (20%)\n' +
 				' 30%  [============............................] 3 of 10 (30%)\n' +
@@ -59,8 +57,7 @@ describe('progress', () => {
 			}, 100);
 		});
 
-		assert.strictEqual(
-			stream.buffer,
+		expect(stream.buffer).toBe(
 			' 10%  [====....................................] 1 of 10 (10%)\n' +
 				' 20%  [========................................] 2 of 10 (20%)\n' +
 				' 30%  [============............................] 3 of 10 (30%)\n' +
@@ -96,8 +93,7 @@ describe('progress', () => {
 			}, 100);
 		});
 
-		assert.strictEqual(
-			stream.buffer,
+		expect(stream.buffer).toBe(
 			' 10%  [====....................................] 0.1\n' +
 				' 20%  [========................................] 0.2\n' +
 				' 30%  [============............................] 0.3\n' +

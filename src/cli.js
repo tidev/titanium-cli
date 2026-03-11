@@ -1086,7 +1086,7 @@ export class CLI {
 								.action((...args) => this.executeCommand(args));
 						}
 					}
-				} catch (e) {
+				} catch {
 					// squelch
 				}
 			}

@@ -1,7 +1,6 @@
 import { initMockSDKHome } from '../helpers/init-sdk-home.js';
 import { stripColor } from '../helpers/strip-color.js';
-import assert from 'node:assert';
-import { describe, it } from 'node:test';
+import { describe, expect, it } from 'vitest';
 
 describe('ti build', () => {
 	it(
@@ -10,13 +9,13 @@ describe('ti build', () => {
 			const { exitCode, stdout } = await run(['build', '-h']);
 
 			const output = stripColor(stdout);
-			assert.match(output, /Titanium Command-Line Interface/);
-			assert.match(output, /Usage: titanium build \[options\]/);
-			assert.match(output, /Builds an existing app or module project./);
-			assert.match(output, /Build Options:/);
-			assert.match(output, /Global Options:/);
+			expect(output).toMatch(/Titanium Command-Line Interface/);
+			expect(output).toMatch(/Usage: titanium build \[options\]/);
+			expect(output).toMatch(/Builds an existing app or module project./);
+			expect(output).toMatch(/Build Options:/);
+			expect(output).toMatch(/Global Options:/);
 
-			assert.strictEqual(exitCode, 0);
+			expect(exitCode).toBe(0);
 		})
 	);
 });

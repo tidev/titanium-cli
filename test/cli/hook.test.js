@@ -1,7 +1,6 @@
 import { CLI } from '../../src/cli.js';
-import assert from 'node:assert';
-import { describe, it } from 'node:test';
-import { setTimeout } from 'timers/promises';
+import { setTimeout } from 'node:timers/promises';
+import { describe, expect, it } from 'vitest';
 
 describe('CLI hooks', () => {
 	it('should fire sync event hooks', async () => {
@@ -29,14 +28,14 @@ describe('CLI hooks', () => {
 		});
 
 		await cli.emit('foo', { count: 2 });
-		assert.strictEqual(fooCounter, 2);
+		expect(fooCounter).toBe(2);
 
 		await cli.emit('bar');
-		assert.strictEqual(barCounter, 1);
+		expect(barCounter).toBe(1);
 
 		await cli.emit('baz');
-		assert.strictEqual(bazPreCounter, 1);
-		assert.strictEqual(bazPostCounter, 1);
+		expect(bazPreCounter).toBe(1);
+		expect(bazPostCounter).toBe(1);
 	});
 
 	it('should fire async event hooks', async () => {
@@ -50,7 +49,7 @@ describe('CLI hooks', () => {
 		});
 
 		await cli.emit('foo', { count: 2 });
-		assert.strictEqual(fooCounter, 2);
+		expect(fooCounter).toBe(2);
 
 		let barCounter = 0;
 
@@ -60,7 +59,7 @@ describe('CLI hooks', () => {
 		});
 
 		await cli.emit('bar');
-		assert.strictEqual(barCounter, 1);
+		expect(barCounter).toBe(1);
 	});
 
 	it('should fire function hooks', async () => {
@@ -77,7 +76,7 @@ describe('CLI hooks', () => {
 			cb();
 		});
 		await new Promise((resolve) => foo(3, resolve));
-		assert.strictEqual(fooCounter, 7);
+		expect(fooCounter).toBe(7);
 
 		let barCounter = 0;
 
@@ -95,7 +94,7 @@ describe('CLI hooks', () => {
 			cb(9);
 		});
 		await new Promise((resolve) => bar(resolve));
-		assert.strictEqual(barCounter, 13);
+		expect(barCounter).toBe(13);
 	});
 
 	it('should fire event hook with a data payload', async () => {
@@ -122,6 +121,6 @@ describe('CLI hooks', () => {
 			});
 		});
 
-		assert.strictEqual(foo.counter, 1);
+		expect(foo.counter).toBe(1);
 	});
 });
