@@ -32,6 +32,7 @@
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "lint": "oxlint",
+    "postinstall": "node scripts/build-node-titanium-sdk.js",
     "test": "node scripts/test.js",
     "test-only": "node scripts/test.js --only"
   },
@@ -40,7 +41,7 @@
     "chalk": "5.6.2",
     "commander": "14.0.3",
     "execa": "9.6.1",
-    "node-titanium-sdk": "github:tidev/node-titaniumsdk#v7",
+    "node-titanium-sdk": "https://github.com/tidev/node-titanium-sdk/archive/refs/heads/v7.tar.gz",
     "pretty-bytes": "7.1.0",
     "prompts": "2.4.2",
     "semver": "7.7.4",
