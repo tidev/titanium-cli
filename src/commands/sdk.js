@@ -19,7 +19,7 @@ import {
 	version,
 } from 'node-titanium-sdk/util';
 import { createWriteStream } from 'node:fs';
-import { mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import { basename, dirname, join } from 'node:path';
 import { Transform } from 'node:stream';
@@ -433,7 +433,7 @@ SdkSubcommands.install = {
 		await mkdir(dest, { recursive: true });
 		await rm(dest, { force: true, recursive: true });
 		await mkdir(dest, { recursive: true });
-		await rename(src, dest);
+		await moveDir(src, dest);
 
 		// step 5: install the modules
 
@@ -479,7 +479,7 @@ SdkSubcommands.install = {
 				trace(`   ${cyan(name)}`);
 				await rm(dest, { force: true, recursive: true });
 				await mkdir(dest, { recursive: true });
-				await rename(src, dest);
+				await moveDir(src, dest);
 			}
 		} else {
 			trace('SDK has new modules to install');
@@ -664,6 +664,25 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 	}
 
 	return { downloadedFile, file };
+}
+
+/**
+ * Move a directory. Uses rename for performance; falls back to copy+remove on
+ * Windows where rename() fails with EPERM for directories with contents.
+ * @param {string} src - Source directory path
+ * @param {string} dest - Destination directory path
+ */
+async function moveDir(src, dest) {
+	try {
+		await rename(src, dest);
+	} catch (err) {
+		if (err.code === 'EPERM' || err.code === 'EXDEV') {
+			await cp(src, dest, { recursive: true });
+			await rm(src, { force: true, recursive: true });
+		} else {
+			throw err;
+		}
+	}
 }
 
 async function extractSDK({

@@ -218,8 +218,13 @@ describe('ti sdk', () => {
 				const sdkZipFile = join(fixturesDir, 'mock-sdk.zip');
 				const sdkName = '0.0.0.GA';
 				const sdkPath = join(tmpSDKDir, 'mobilesdk', os, sdkName);
-				let { exitCode, stdout } = await run(['sdk', 'install', sdkZipFile, '--no-progress-bars']);
-				expect(stdout).toMatch(/successfully installed/);
+				let { exitCode, stdout, stderr } = await run([
+					'sdk',
+					'install',
+					sdkZipFile,
+					'--no-progress-bars',
+				]);
+				expect(`${stdout}\n${stderr}`).toMatch(/successfully installed/);
 				expect(exitCode).toBe(0);
 
 				({ exitCode, stdout } = await run(['sdk', 'ls', '--json']));
