@@ -92,10 +92,9 @@ describe('ti sdk', () => {
 				// list SDKs (no SDKs installed)
 				// eslint-disable-next-line no-unused-vars
 				let { exitCode, stdout, stderr } = await run(['sdk']); // no `ls` to test default subcommand
-				let output = stripColor(stdout);
+				let output = stripColor(`${stdout}\n${stderr}`);
 				expect(output).toMatch(/Titanium Command-Line Interface/);
 				expect(output).toMatch(
-					output,
 					new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`)
 				);
 				expect(output).toMatch(/No Titanium SDKs found/);
@@ -126,12 +125,7 @@ describe('ti sdk', () => {
 					'--no-progress-bars',
 					'--keep-files',
 				]));
-				try {
-					expect(stdout).toMatch(/successfully installed/);
-				} catch (error) {
-					console.error(stderr);
-					throw error;
-				}
+				expect(`${stdout}\n${stderr}`).toMatch(/successfully installed/);
 				expect(exitCode).toBe(0);
 
 				// find the downloaded file and move it to the tmp dir for subsequent tests
@@ -143,15 +137,13 @@ describe('ti sdk', () => {
 				}
 
 				// list SDKs
-				({ exitCode, stdout } = await run(['sdk', 'ls']));
-				output = stripColor(stdout);
+				({ exitCode, stdout, stderr } = await run(['sdk', 'ls']));
+				output = stripColor(`${stdout}\n${stderr}`);
 				expect(output).toMatch(/Titanium Command-Line Interface/);
 				expect(output).toMatch(
-					output,
 					new RegExp(`SDK Install Locations:\n[\\s\\S]*${tmpSDKDir.replace(/\\/g, '\\\\')}`)
 				);
 				expect(output).toMatch(
-					output,
 					new RegExp(
 						`Installed SDKs:\n\\s*${sdkName}\\s+${sdkVersion}\\s+${sdkPath.replace(/\\/g, '\\\\')}`
 					)
