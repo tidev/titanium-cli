@@ -1,36 +1,33 @@
+import chalk from 'chalk';
+import { detectJDKs } from 'node-titanium-sdk/jdk';
+import { detectTitaniumSDKs } from 'node-titanium-sdk/titanium';
 import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import os from 'node:os';
-import { detect as jdkInfo } from './jdk.js';
-import { detectTitaniumSDKs } from './tisdk.js';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import chalk from 'chalk';
-import { readFile } from 'node:fs/promises';
 
 const { cyan } = chalk;
 
 export async function detect(logger, config, cli, types = { all: true }) {
-	const [
-		os,
-		node,
-		npm,
-		titanium,
-		titaniumCLI,
-		jdk,
-		...platformData
-	] = await Promise.all([
+	const [os, node, npm, titanium, titaniumCLI, java, ...platformData] = await Promise.all([
 		(types.all || types.os) && osInfo(),
 		(types.all || types.nodejs) && nodeInfo(),
 		(types.all || types.nodejs) && npmInfo(),
 		(types.all || types.titanium) && titaniumSDKInfo(config),
 		(types.all || types.titanium) && titaniumCLIInfo(cli),
-		(types.all || types.jdk) && jdkInfo(config),
-		...Object.keys(cli.sdk?.platforms || {}).sort().map(async name => {
-			const type = name === 'iphone' ? 'ios' : name;
-			if (types.all || types[type]) {
-				return await loadPlatformInfo(logger, cli.sdk.platforms[name], config);
-			}
-		})
+		(types.all || types.java) &&
+			detectJDKs({
+				javaHome: config.get('java.home'),
+			}),
+		...Object.keys(cli.sdk?.platforms || {})
+			.sort()
+			.map(async (name) => {
+				const type = name === 'iphone' ? 'ios' : name;
+				if (types.all || types[type]) {
+					return await loadPlatformInfo(logger, cli.sdk.platforms[name], config);
+				}
+			}),
 	]);
 
 	const data = {
@@ -39,7 +36,7 @@ export async function detect(logger, config, cli, types = { all: true }) {
 		npm,
 		titanium,
 		titaniumCLI,
-		jdk
+		java,
 	};
 
 	const platformInfo = [];
@@ -53,7 +50,7 @@ export async function detect(logger, config, cli, types = { all: true }) {
 
 	return {
 		data,
-		platformInfo
+		platformInfo,
 	};
 }
 
@@ -69,7 +66,7 @@ async function loadPlatformInfo(logger, platform, config) {
 		const mod = await import(fileUrl);
 		const dummy = {
 			data: null,
-			issues: []
+			issues: [],
 		};
 
 		return await new Promise((resolve, reject) => {
@@ -83,7 +80,7 @@ async function loadPlatformInfo(logger, platform, config) {
 							title: mod.title,
 							render: mod.render,
 						},
-						data
+						data,
 					});
 				}
 			});
@@ -102,11 +99,11 @@ async function osInfo() {
 
 	if (name === 'darwin') {
 		const { stdout } = await $`sw_vers`;
-		m = stdout.match(/ProductName:\s+(.+)/i)
+		m = stdout.match(/ProductName:\s+(.+)/i);
 		if (m) {
 			name = m[1];
 		}
-		m = stdout.match(/ProductVersion:\s+(.+)/i)
+		m = stdout.match(/ProductVersion:\s+(.+)/i);
 		if (m) {
 			version = m[1];
 		}
@@ -114,11 +111,11 @@ async function osInfo() {
 		name = 'GNU/Linux';
 		if (existsSync('/etc/lsb-release')) {
 			const s = await readFile('/etc/lsb-release', 'utf-8');
-			m = s.match(/DISTRIB_DESCRIPTION=(.+)/i)
+			m = s.match(/DISTRIB_DESCRIPTION=(.+)/i);
 			if (m) {
 				name = m[1].replaceAll('"', '');
 			}
-			m = s.match(/DISTRIB_RELEASE=(.+)/i)
+			m = s.match(/DISTRIB_RELEASE=(.+)/i);
 			if (m) {
 				name = m[1].replaceAll('"', '');
 			}
@@ -133,7 +130,10 @@ async function osInfo() {
 		}
 	} else {
 		try {
-			const { stdout } = await $('powershell', ['-Command', 'Get-CimInstance Win32_OperatingSystem | Select-Object Caption, Version | ConvertTo-Json']);
+			const { stdout } = await $('powershell', [
+				'-Command',
+				'Get-CimInstance Win32_OperatingSystem | Select-Object Caption, Version | ConvertTo-Json',
+			]);
 			({ Caption: name, Version: version } = JSON.parse(stdout));
 		} catch {}
 	}
@@ -143,13 +143,13 @@ async function osInfo() {
 		version,
 		architecture: `${process.arch.includes('64') ? 64 : 32}-bit`,
 		numcpus: os.cpus().length,
-		memory: os.totalmem()
+		memory: os.totalmem(),
 	};
 }
 
 async function nodeInfo() {
 	return {
-		version: process.versions.node
+		version: process.versions.node,
 	};
 }
 
@@ -157,7 +157,7 @@ async function npmInfo() {
 	const { $ } = await import('execa');
 	const { stdout: version } = await $`npm --version`;
 	return {
-		version
+		version,
 	};
 }
 
@@ -165,13 +165,13 @@ async function titaniumSDKInfo(config) {
 	const { sdks } = await detectTitaniumSDKs(config);
 	const results = {};
 
-	for (const sdk of sdks) {
+	for (const sdk of Object.values(sdks)) {
 		results[sdk.name] = {
 			version: sdk.version,
 			path: sdk.path,
 			platforms: Object.keys(sdk.platforms),
 			githash: sdk.githash,
-			timestamp: sdk.timestamp
+			timestamp: sdk.timestamp,
 		};
 	}
 
@@ -180,6 +180,6 @@ async function titaniumSDKInfo(config) {
 
 async function titaniumCLIInfo(cli) {
 	return {
-		version: cli.version
+		version: cli.version,
 	};
 }

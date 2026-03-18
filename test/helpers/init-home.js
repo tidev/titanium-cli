@@ -1,12 +1,12 @@
 import { tmpDirName } from '../helpers/tmp-dir-name.js';
-import fs from 'fs-extra';
+import { cp, mkdir } from 'node:fs/promises';
 
 export async function initHome(fixture) {
 	const tmpHome = tmpDirName();
 	if (fixture) {
-		await fs.copy(fixture, tmpHome);
+		await cp(fixture, tmpHome);
 	} else {
-		await fs.mkdirp(tmpHome);
+		await mkdir(tmpHome, { recursive: true });
 	}
 
 	return tmpHome;

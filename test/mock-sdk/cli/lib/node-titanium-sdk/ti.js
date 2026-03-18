@@ -3,12 +3,12 @@ const path = require('path');
 
 const manifest = {
 	platforms: ['android'],
-	sdkVersion: '0.0.0.GA'
+	sdkVersion: '0.0.0.GA',
 };
 const platformAliases = {
 	// add additional aliases here for new platforms
 	ipad: 'iphone',
-	ios: 'iphone'
+	ios: 'iphone',
 };
 
 exports.manifest = manifest;
@@ -16,7 +16,16 @@ exports.platforms = manifest.platforms;
 exports.targetPlatforms = ['android'];
 exports.availablePlatforms = ['android'];
 exports.availablePlatformsNames = ['Android'];
-exports.allPlatformNames = ['android', 'ios', 'iphone', 'ipad', 'mobileweb', 'blackberry', 'windows', 'tizen'];
+exports.allPlatformNames = [
+	'android',
+	'ios',
+	'iphone',
+	'ipad',
+	'mobileweb',
+	'blackberry',
+	'windows',
+	'tizen',
+];
 
 function commonOptions(logger, config) {
 	return {
@@ -28,8 +37,8 @@ function commonOptions(logger, config) {
 			desc: 'minimum logging level',
 			default: config.cli.logLevel || 'trace',
 			hint: 'level',
-			values: logger.getLevels()
-		}
+			values: logger.getLevels(),
+		},
 	};
 }
 
@@ -37,24 +46,35 @@ function loadPlugins(_logger, config, cli, projectDir, finished, silent, compact
 	let searchPaths = {
 		project: [path.join(projectDir, 'plugins')],
 		config: [],
-		global: []
+		global: [],
 	};
 	let confPaths = config.get('paths.plugins');
 	let defaultInstallLocation = cli.env.installPath;
-	let sdkLocations = cli.env.os.sdkPaths.map(function (p) { return path.resolve(p); });
+	let sdkLocations = cli.env.os.sdkPaths.map(function (p) {
+		return path.resolve(p);
+	});
 
 	// set our paths from the config file
-	Array.isArray(confPaths) || (confPaths = [ confPaths ]);
+	Array.isArray(confPaths) || (confPaths = [confPaths]);
 	confPaths.forEach(function (p) {
-		p && fs.existsSync(p = path.resolve(p)) && searchPaths.project.indexOf(p) === -1 && searchPaths.config.indexOf(p) === -1 && (searchPaths.config.push(p));
+		p &&
+			fs.existsSync((p = path.resolve(p))) &&
+			searchPaths.project.indexOf(p) === -1 &&
+			searchPaths.config.indexOf(p) === -1 &&
+			searchPaths.config.push(p);
 	});
 
 	// add any plugins from various SDK locations
 	sdkLocations.indexOf(defaultInstallLocation) === -1 && sdkLocations.push(defaultInstallLocation);
 	cli.sdk && sdkLocations.push(path.resolve(cli.sdk.path, '..', '..', '..'));
-	sdkLocations.forEach(p => {
+	sdkLocations.forEach((p) => {
 		p = path.resolve(p, 'plugins');
-		if (fs.existsSync(p) && searchPaths.project.indexOf(p) === -1 && searchPaths.config.indexOf(p) === -1 && searchPaths.global.indexOf(p) === -1) {
+		if (
+			fs.existsSync(p) &&
+			searchPaths.project.indexOf(p) === -1 &&
+			searchPaths.config.indexOf(p) === -1 &&
+			searchPaths.global.indexOf(p) === -1
+		) {
 			searchPaths.global.push(p);
 		}
 	});
@@ -77,12 +97,13 @@ function platformOptions(logger, config, cli, commandName, finished) {
 
 	function set(obj, title, platform) {
 		// add the platform and title to the options and flags
-		['options', 'flags'].forEach(type => {
+		['options', 'flags'].forEach((type) => {
 			if (obj && obj[type]) {
-				result[platform] || (result[platform] = {
-					platform: platform,
-					title: title || platform
-				});
+				result[platform] ||
+					(result[platform] = {
+						platform: platform,
+						title: title || platform,
+					});
 				result[platform][type] = obj[type];
 			}
 		});
@@ -92,49 +113,58 @@ function platformOptions(logger, config, cli, commandName, finished) {
 	targetPlatform = platformAliases[targetPlatform] || targetPlatform;
 
 	// for each platform, fetch their specific flags/options
-	manifest.platforms.reduce((promise, platform) => {
-		return promise.then(() => new Promise(resolve => {
-			// only configure target platform
-			if (targetPlatform && platform !== targetPlatform) {
-				return resolve();
-			}
+	manifest.platforms
+		.reduce((promise, platform) => {
+			return promise.then(
+				() =>
+					new Promise((resolve) => {
+						// only configure target platform
+						if (targetPlatform && platform !== targetPlatform) {
+							return resolve();
+						}
 
-			let platformDir = path.join(path.dirname(module.filename), '..', '..', '..', platform);
-			let platformCommand = path.join(platformDir, 'cli', 'commands', '_' + commandName + '.js');
-			let command;
-			let conf;
-			let title;
+						let platformDir = path.join(path.dirname(module.filename), '..', '..', '..', platform);
+						let platformCommand = path.join(
+							platformDir,
+							'cli',
+							'commands',
+							'_' + commandName + '.js'
+						);
+						let command;
+						let conf;
+						let title;
 
-			if (!fs.existsSync(platformCommand)) {
-				return resolve();
-			}
+						if (!fs.existsSync(platformCommand)) {
+							return resolve();
+						}
 
-			command = require(platformCommand);
-			if (!command || !command.config) {
-				return resolve();
-			}
+						command = require(platformCommand);
+						if (!command || !command.config) {
+							return resolve();
+						}
 
-			// try to get the platform specific configuration
-			conf = command.config(logger, config, cli);
+						// try to get the platform specific configuration
+						conf = command.config(logger, config, cli);
 
-			try {
-				// try to read a title from the platform's package.json
-				title = JSON.parse(fs.readFileSync(path.join(platformDir, 'package.json'))).title;
-			} catch (e) {}
+						try {
+							// try to read a title from the platform's package.json
+							title = JSON.parse(fs.readFileSync(path.join(platformDir, 'package.json'))).title;
+						} catch (e) {}
 
-			if (typeof conf === 'function') {
-				// async callback
-				conf(function (obj) {
-					set(obj, title, platform);
-					resolve();
-				});
-				return;
-			}
+						if (typeof conf === 'function') {
+							// async callback
+							conf(function (obj) {
+								set(obj, title, platform);
+								resolve();
+							});
+							return;
+						}
 
-			set(conf, title, platform);
-			resolve();
-		}));
-	}, Promise.resolve())
+						set(conf, title, platform);
+						resolve();
+					})
+			);
+		}, Promise.resolve())
 		.then(() => finished(result))
 		.catch(() => finished(result));
 }
@@ -148,23 +178,26 @@ function scrubPlatforms(platforms) {
 	const original = {};
 	const bad = {};
 
-	platforms.toLowerCase().split(',').forEach(platform => {
-		const name = platformAliases[platform] || platform;
-		// if name is falsey, then it's invalid anyways
-		if (name) {
-			if (manifest.platforms.indexOf(name) === -1) {
-				bad[platform] = 1;
-			} else {
-				scrubbed[name] = 1;
-				original[platform] = 1;
+	platforms
+		.toLowerCase()
+		.split(',')
+		.forEach((platform) => {
+			const name = platformAliases[platform] || platform;
+			// if name is falsey, then it's invalid anyways
+			if (name) {
+				if (manifest.platforms.indexOf(name) === -1) {
+					bad[platform] = 1;
+				} else {
+					scrubbed[name] = 1;
+					original[platform] = 1;
+				}
 			}
-		}
-	});
+		});
 
 	return {
 		scrubbed: Object.keys(scrubbed).sort(), // distinct list of un-aliased platforms
 		original: Object.keys(original).sort(),
-		bad: Object.keys(bad).sort()
+		bad: Object.keys(bad).sort(),
 	};
 }
 
@@ -222,7 +255,7 @@ function validAppId(id) {
 		try: 1,
 		void: 1,
 		volatile: 1,
-		while: 1
+		while: 1,
 	};
 	const parts = id.split('.');
 	const l = parts.length;
@@ -247,7 +280,7 @@ function validateModuleManifest(logger, cli, manifest) {
 		'copyright',
 		'platform',
 		'minsdk',
-		'architectures'
+		'architectures',
 	];
 
 	// check if all the required module keys are in the list
@@ -268,16 +301,27 @@ function validateModuleManifest(logger, cli, manifest) {
 
 function validatePlatformOptions(logger, config, cli, commandName) {
 	const platform = exports.resolvePlatform(cli.argv.platform),
-		platformCommand = path.join(path.dirname(module.filename), '..', '..', '..', manifest.platforms[manifest.platforms.indexOf(platform)], 'cli', 'commands', '_' + commandName + '.js');
+		platformCommand = path.join(
+			path.dirname(module.filename),
+			'..',
+			'..',
+			'..',
+			manifest.platforms[manifest.platforms.indexOf(platform)],
+			'cli',
+			'commands',
+			'_' + commandName + '.js'
+		);
 	if (fs.existsSync(platformCommand)) {
 		const command = require(platformCommand);
-		return command && typeof command.validate === 'function' ? command.validate(logger, config, cli) : null;
+		return command && typeof command.validate === 'function'
+			? command.validate(logger, config, cli)
+			: null;
 	}
 }
 
 function validateProjectDir(logger, cli, argv, name) {
 	const dir = argv[name] || '.';
-	let projectDir = argv[name] = path.resolve(dir);
+	let projectDir = (argv[name] = path.resolve(dir));
 
 	if (!fs.existsSync(projectDir)) {
 		logger.banner();
@@ -294,7 +338,8 @@ function validateProjectDir(logger, cli, argv, name) {
 	if (tiapp.split(path.sep).length === 2) {
 		logger.banner();
 		logger.error(`Invalid project directory "${dir}"\n`);
-		dir === '.' && logger.log(`Use the ${'--project-dir'.cyan} property to specify the project's directory\n`);
+		dir === '.' &&
+			logger.log(`Use the ${'--project-dir'.cyan} property to specify the project's directory\n`);
 		process.exit(1);
 	}
 

@@ -1,6 +1,6 @@
-import { Argument, Command, Option } from 'commander';
 import { ticonfig } from './ticonfig.js';
 import { TiError } from './tierror.js';
+import { Argument, Command, Option } from 'commander';
 
 /**
  * Takes a Titanium CLI command config with flags, options, args, and
@@ -22,7 +22,9 @@ export function applyCommandConfig(cli, cmdName, cmd, conf) {
 
 	if (conf.flags) {
 		for (const [name, meta] of Object.entries(conf.flags)) {
-			cli.debugLogger.trace(`Adding "${cmdName}" flag: ${meta.abbr ? `-${meta.abbr}, ` : ''}--${name}`);
+			cli.debugLogger.trace(
+				`Adding "${cmdName}" flag: ${meta.abbr ? `-${meta.abbr}, ` : ''}--${name}`
+			);
 			const opt = new Option(`${meta.abbr ? `-${meta.abbr}, ` : ''}--${name}`, meta.desc);
 			if (meta.default) {
 				opt.default(meta.default);
@@ -56,11 +58,13 @@ export function applyCommandConfig(cli, cmdName, cmd, conf) {
 				continue;
 			}
 
-			cli.debugLogger.trace(`Adding "${cmdName}" option: ${meta.abbr ? `-${meta.abbr}, ` : ''}${long} [value]`);
+			cli.debugLogger.trace(
+				`Adding "${cmdName}" option: ${meta.abbr ? `-${meta.abbr}, ` : ''}${long} [value]`
+			);
 			cmd.addOption(opt);
 
 			if (typeof meta.callback === 'function') {
-				cmd.on(`option:${opt.attributeName()}`, value => {
+				cmd.on(`option:${opt.attributeName()}`, (value) => {
 					cli.debugLogger.trace(`Firing --${name} option callback: ${value ?? opt.defaultValue}`);
 					const result = meta.callback(value ?? opt.defaultValue);
 					cmd.setOptionValue(opt.name(), result ?? value ?? opt.defaultValue);
@@ -78,7 +82,7 @@ export function applyCommandConfig(cli, cmdName, cmd, conf) {
 					}
 
 					return true;
-				}
+				},
 			});
 		}
 
@@ -127,15 +131,15 @@ export function applyCommandConfig(cli, cmdName, cmd, conf) {
 				.configureHelp({
 					helpWidth: ticonfig.get('cli.width', 80),
 					showGlobalOptions: true,
-					sortSubcommands: true
+					sortSubcommands: true,
 				})
 				.configureOutput({
-					outputError: msg => {
+					outputError: (msg) => {
 						// explicitly set the subcommand so the global error
 						// handler can print the correct help screen
 						cli.command = subcmd;
 						throw new TiError(msg.replace(/^error:\s*/, ''));
-					}
+					},
 				})
 				.action((...args) => cli.executeCommand(args));
 
@@ -148,14 +152,14 @@ export function applyCommandConfig(cli, cmdName, cmd, conf) {
 
 			cmd.addCommand(subcmd, {
 				isDefault: conf.defaultSubcommand === name,
-				hidden: !!subconf.hidden
+				hidden: !!subconf.hidden,
 			});
 		}
 	}
 }
 
 function optionExists(ctx, name) {
-	const exists = ctx.options.find(o => o.name() === name);
+	const exists = ctx.options.find((o) => o.name() === name);
 	if (exists) {
 		return true;
 	}

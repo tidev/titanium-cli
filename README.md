@@ -45,7 +45,6 @@ To show help or help for a specific command.
 
 Visit https://titaniumsdk.com for more info.
 
-
 ## Commands
 
 - [`ti build`](#build) - build a project

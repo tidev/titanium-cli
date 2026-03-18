@@ -1,44 +1,28 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
 import { arrayify } from '../../src/util/arrayify.js';
+import { describe, expect, it } from 'vitest';
 
 describe('arrayify', () => {
 	it('should init undefined array', () => {
-		assert.deepStrictEqual(arrayify(), []);
+		expect(arrayify()).toEqual([]);
 	});
 
 	it('should arrayify a non-array', () => {
-		assert.deepStrictEqual(arrayify(1), [1]);
-		assert.deepStrictEqual(arrayify('a'), ['a']);
-		assert.deepStrictEqual(arrayify(true), [true]);
-		assert.deepStrictEqual(arrayify(false), [false]);
+		expect(arrayify(1)).toEqual([1]);
+		expect(arrayify('a')).toEqual(['a']);
+		expect(arrayify(true)).toEqual([true]);
+		expect(arrayify(false)).toEqual([false]);
 	});
 
 	it('should arrayify a set', () => {
-		assert.deepStrictEqual(
-			arrayify(new Set([1, 'a', true])),
-			[1, 'a', true]
-		);
+		expect(arrayify(new Set([1, 'a', true]))).toEqual([1, 'a', true]);
 	});
 
 	it('should remove falsey values', () => {
-		assert.deepStrictEqual(
-			arrayify([
-				0,
-				1,
-				null,
-				undefined,
-				'',
-				'a',
-				true,
-				false
-			], true),
-			[
-				0,
-				1,
-				'a',
-				true
-			]
-		);
+		expect(arrayify([0, 1, null, undefined, '', 'a', true, false], true)).toEqual([
+			0,
+			1,
+			'a',
+			true,
+		]);
 	});
 });

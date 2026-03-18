@@ -1,19 +1,21 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
-import { stripColor } from '../helpers/strip-color.js';
 import { initMockSDKHome } from '../helpers/init-sdk-home.js';
+import { stripColor } from '../helpers/strip-color.js';
+import { describe, expect, it } from 'vitest';
 
 describe('ti clean', () => {
-	it('should show help', initMockSDKHome(async ({ run }) => {
-		const { exitCode, stdout } = await run(['clean', '-h']);
+	it(
+		'should show help',
+		initMockSDKHome(async ({ run }) => {
+			const { exitCode, stdout } = await run(['clean', '-h']);
 
-		const output = stripColor(stdout);
-		assert.match(output, /Titanium Command-Line Interface/);
-		assert.match(output, /Usage: titanium clean \[options\]/);
-		assert.match(output, /Removes previous build directories./);
-		assert.match(output, /Clean Options:/);
-		assert.match(output, /Global Options:/);
+			const output = stripColor(stdout);
+			expect(output).toMatch(/Titanium Command-Line Interface/);
+			expect(output).toMatch(/Usage: titanium clean \[options\]/);
+			expect(output).toMatch(/Removes previous build directories./);
+			expect(output).toMatch(/Clean Options:/);
+			expect(output).toMatch(/Global Options:/);
 
-		assert.strictEqual(exitCode, 0);
-	}));
+			expect(exitCode).toBe(0);
+		})
+	);
 });

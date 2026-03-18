@@ -20,7 +20,7 @@ export class Logger extends EventEmitter {
 		debug: 2,
 		info: 3,
 		warn: 4,
-		error: 5
+		error: 5,
 		// log: 9
 		// silent: 10
 	};
@@ -52,7 +52,11 @@ export class Logger extends EventEmitter {
 		};
 
 		this.warn = (msg = '', ...args) => {
-			this.render(4, this.stderr, `${yellow(`[WARN]  ${format(msg, ...args).replace(ansiRE, '')}`)}`);
+			this.render(
+				4,
+				this.stderr,
+				`${yellow(`[WARN]  ${format(msg, ...args).replace(ansiRE, '')}`)}`
+			);
 		};
 
 		this.error = (msg = '', ...args) => {
@@ -104,9 +108,7 @@ export class Logger extends EventEmitter {
 	}
 
 	setBanner({ name, copyright, version, sdkVersion }) {
-		this.#banner = `${bold(cyan(name))} v${version}${
-			sdkVersion ? ` SDK v${sdkVersion}` : ''
-		}
+		this.#banner = `${bold(cyan(name))} v${version}${sdkVersion ? ` SDK v${sdkVersion}` : ''}
 ${copyright}
 
 Please star us on GitHub! ${cyan('https://github.com/tidev/titanium-cli')}
