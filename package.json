@@ -21,7 +21,7 @@
 	},
 	"preferGlobal": true,
 	"dependencies": {
-		"@xmldom/xmldom": "0.9.8",
+		"@xmldom/xmldom": "0.9.9",
 		"chalk": "5.6.2",
 		"commander": "14.0.3",
 		"execa": "9.6.1",
@@ -29,11 +29,11 @@
 		"pretty-bytes": "7.1.0",
 		"prompts": "2.4.2",
 		"semver": "7.7.4",
-		"undici": "7.24.5",
+		"undici": "7.24.6",
 		"which": "6.0.1",
 		"wrap-ansi": "10.0.0",
 		"xpath": "0.0.34",
-		"yauzl": "3.2.1"
+		"yauzl": "3.3.0"
 	},
 	"devDependencies": {
 		"@reporters/github": "1.12.0",
