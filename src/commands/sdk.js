@@ -5,6 +5,7 @@ import { prompt } from '../util/prompt.js';
 import { TiError } from '../util/tierror.js';
 import chalk from 'chalk';
 import {
+	getDownloadsPath,
 	getTitaniumBranchBuilds,
 	getTitaniumBranches,
 	getTitaniumReleases,
@@ -587,12 +588,7 @@ async function getInstallFile({ branch, config, logger, osName, showProgress, su
 
 	// step 1.5: download the file
 
-	let downloadedFile = expand(
-		'~',
-		'.titanium',
-		'downloads',
-		`titanium-sdk-${Math.floor(Math.random(1e6))}.zip`
-	);
+	let downloadedFile = join(getDownloadsPath(), `titanium-sdk-${Math.floor(Math.random(1e6))}.zip`);
 	const downloadDir = dirname(downloadedFile);
 	await mkdir(downloadDir, { recursive: true });
 
