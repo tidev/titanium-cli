@@ -1,35 +1,15 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
 import { unique } from '../../src/util/unique.js';
+import { describe, expect, it } from 'vitest';
 
 describe('unique', () => {
 	it('should return empty array if no elements', () => {
-		assert.deepStrictEqual(unique(), []);
-		assert.deepStrictEqual(unique([]), []);
+		expect(unique()).toEqual([]);
+		expect(unique([])).toEqual([]);
 	});
 
 	it('should remove duplicates, null, and undefined values', () => {
-		assert.deepStrictEqual(
-			unique([
-				1,
-				'1',
-				'a',
-				true,
-				null,
-				undefined,
-				1,
-				'1',
-				'a',
-				true,
-				null,
-				undefined
-			]),
-			[
-				1,
-				'1',
-				'a',
-				true
-			]
-		);
+		expect(
+			unique([1, '1', 'a', true, null, undefined, 1, '1', 'a', true, null, undefined])
+		).toEqual([1, '1', 'a', true]);
 	});
 });

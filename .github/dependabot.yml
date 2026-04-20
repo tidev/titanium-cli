@@ -1,32 +1,32 @@
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
+  - package-ecosystem: 'npm'
+    directory: '/'
     labels:
-      - "dependencies"
+      - 'dependencies'
     schedule:
-      interval: "weekly"
-      day: "wednesday"
-      time: "02:34"
+      interval: 'weekly'
+      day: 'wednesday'
+      time: '02:34'
     groups:
       production:
-        dependency-type: "production"
+        dependency-type: 'production'
         patterns:
-          - "*"
+          - '*'
         update-types:
-          - "major"
-          - "minor"
-          - "patch"
+          - 'major'
+          - 'minor'
+          - 'patch'
       development:
-        dependency-type: "development"
+        dependency-type: 'development'
         patterns:
-          - "*"
+          - '*'
         update-types:
-          - "major"
-          - "minor"
-          - "patch"
+          - 'major'
+          - 'minor'
+          - 'patch'
     commit-message:
-      include: "scope"
-      prefix: "chore(deps): "
+      include: 'scope'
+      prefix: 'chore(deps): '
     allow:
-      - dependency-type: "all"
+      - dependency-type: 'all'

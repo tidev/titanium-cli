@@ -12,8 +12,12 @@ function AndroidModuleBuilder() {
 	this.requiredArchitectures = this.packageJson.architectures;
 	this.compileSdkVersion = this.packageJson.compileSDKVersion; // this should always be >= maxSupportedApiLevel
 	this.minSupportedApiLevel = parseInt(this.packageJson.minSDKVersion);
-	this.minTargetApiLevel = parseInt(version.parseMin(this.packageJson.vendorDependencies['android sdk']));
-	this.maxSupportedApiLevel = parseInt(version.parseMax(this.packageJson.vendorDependencies['android sdk']));
+	this.minTargetApiLevel = parseInt(
+		version.parseMin(this.packageJson.vendorDependencies['android sdk'])
+	);
+	this.maxSupportedApiLevel = parseInt(
+		version.parseMax(this.packageJson.vendorDependencies['android sdk'])
+	);
 }
 
 util.inherits(AndroidModuleBuilder, Builder);
@@ -22,7 +26,7 @@ AndroidModuleBuilder.prototype.validate = function validate(logger, config, cli)
 	Builder.prototype.config.apply(this, arguments);
 	Builder.prototype.validate.apply(this, arguments);
 
-	return finished => {
+	return (finished) => {
 		this.projectDir = cli.argv['project-dir'];
 		this.buildOnly = cli.argv['build-only'];
 		this.target = cli.argv['target'];
@@ -35,15 +39,14 @@ AndroidModuleBuilder.prototype.validate = function validate(logger, config, cli)
 		this.manifest = this.cli.manifest;
 
 		// detect Android environment
-		androidDetect(config, { packageJson: this.packageJson }, androidInfo => {
+		androidDetect(config, { packageJson: this.packageJson }, (androidInfo) => {
 			this.androidInfo = androidInfo;
 
 			const targetSDKMap = {
-
 				// placeholder for gradle to use
 				[this.compileSdkVersion]: {
-					sdk: this.compileSdkVersion
-				}
+					sdk: this.compileSdkVersion,
+				},
 			};
 			Object.keys(this.androidInfo.targets).forEach(function (id) {
 				var t = this.androidInfo.targets[id];
@@ -63,7 +66,7 @@ AndroidModuleBuilder.prototype.validate = function validate(logger, config, cli)
 
 			if (!this.androidTargetSDK) {
 				this.androidTargetSDK = {
-					sdk: this.targetSDK
+					sdk: this.targetSDK,
 				};
 			}
 
@@ -73,25 +76,37 @@ AndroidModuleBuilder.prototype.validate = function validate(logger, config, cli)
 			}
 
 			if (this.maxSDK && this.maxSDK < this.targetSDK) {
-				logger.error(`Maximum Android SDK version must be greater than or equal to the target SDK ${this.targetSDK}, but is currently set to ${this.maxSDK}\n`);
+				logger.error(
+					`Maximum Android SDK version must be greater than or equal to the target SDK ${this.targetSDK}, but is currently set to ${this.maxSDK}\n`
+				);
 				process.exit(1);
 			}
 
 			if (this.maxSupportedApiLevel && this.targetSDK > this.maxSupportedApiLevel) {
 				// print warning that version this.targetSDK is not tested
-				logger.warn(`Building with Android SDK ${('' + this.targetSDK).cyan} which hasn't been tested against Titanium SDK ${this.titaniumSdkVersion}`);
+				logger.warn(
+					`Building with Android SDK ${('' + this.targetSDK).cyan} which hasn't been tested against Titanium SDK ${this.titaniumSdkVersion}`
+				);
 			}
 
 			// get javac params
 			this.javacMaxMemory = config.get('android.javac.maxMemory', '3072M');
 
 			// TODO remove in the next SDK
-			if (cli.timodule.properties['android.javac.maxmemory'] && cli.timodule.properties['android.javac.maxmemory'].value) {
-				logger.error('android.javac.maxmemory is deprecated and will be removed in the next version. Please use android.javac.maxMemory\n');
+			if (
+				cli.timodule.properties['android.javac.maxmemory'] &&
+				cli.timodule.properties['android.javac.maxmemory'].value
+			) {
+				logger.error(
+					'android.javac.maxmemory is deprecated and will be removed in the next version. Please use android.javac.maxMemory\n'
+				);
 				this.javacMaxMemory = cli.timodule.properties['android.javac.maxmemory'].value;
 			}
 
-			if (cli.timodule.properties['android.javac.maxMemory'] && cli.timodule.properties['android.javac.maxMemory'].value) {
+			if (
+				cli.timodule.properties['android.javac.maxMemory'] &&
+				cli.timodule.properties['android.javac.maxMemory'].value
+			) {
 				this.javacMaxMemory = cli.timodule.properties['android.javac.maxMemory'].value;
 			}
 
@@ -111,7 +126,7 @@ AndroidModuleBuilder.prototype.run = function run(_logger, _config, _cli, finish
 
 // create the builder instance and expose the public API
 (function (androidModuleBuilder) {
-	exports.config   = androidModuleBuilder.config.bind(androidModuleBuilder);
+	exports.config = androidModuleBuilder.config.bind(androidModuleBuilder);
 	exports.validate = androidModuleBuilder.validate.bind(androidModuleBuilder);
-	exports.run      = androidModuleBuilder.run.bind(androidModuleBuilder);
-}(new AndroidModuleBuilder(module)));
+	exports.run = androidModuleBuilder.run.bind(androidModuleBuilder);
+})(new AndroidModuleBuilder(module));

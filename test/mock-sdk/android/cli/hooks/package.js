@@ -7,6 +7,6 @@ exports.init = function (_logger, _config, cli) {
 		priority: 10000,
 		post(_builder, finished) {
 			finished();
-		}
+		},
 	});
 };

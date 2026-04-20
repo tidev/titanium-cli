@@ -14,7 +14,7 @@ function Builder(buildModule) {
 		}
 		dir = path.dirname(dir);
 		return dir !== '/' && scan(dir);
-	}(__dirname));
+	})(__dirname);
 
 	this.titaniumSdkName = path.basename(this.titaniumSdkPath);
 
@@ -27,7 +27,7 @@ function Builder(buildModule) {
 		}
 		dir = path.dirname(dir);
 		return dir !== '/' && scan(dir);
-	}(path.dirname(buildModule.filename)));
+	})(path.dirname(buildModule.filename));
 
 	this.platformName = path.basename(this.platformPath);
 
@@ -60,13 +60,16 @@ Builder.prototype.validate = function validate(logger, config, cli) {
 
 	this.defaultIcons = [
 		path.join(this.projectDir, 'DefaultIcon-' + this.platformName + '.png'),
-		path.join(this.projectDir, 'DefaultIcon.png')
+		path.join(this.projectDir, 'DefaultIcon.png'),
 	];
 };
 
-Builder.prototype.run = function run(_logger, _config, _cli, _finished) {
-};
+Builder.prototype.run = function run(_logger, _config, _cli, _finished) {};
 
-Builder.prototype.validateTiModules = function validateTiModules(_platformName, _deployType, callback) {
+Builder.prototype.validateTiModules = function validateTiModules(
+	_platformName,
+	_deployType,
+	callback
+) {
 	callback(null, []);
 };

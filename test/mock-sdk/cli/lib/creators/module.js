@@ -18,7 +18,7 @@ function ModuleCreator(_logger, _config, _cli) {
 	const availablePlatforms = {};
 	const validPlatforms = {};
 
-	ti.platforms.forEach(platform => {
+	ti.platforms.forEach((platform) => {
 		if (/^iphone|ios|ipad$/.test(platform)) {
 			validPlatforms['iphone'] = 1;
 			validPlatforms['ipad'] = 1;
@@ -40,16 +40,15 @@ util.inherits(ModuleCreator, Creator);
 ModuleCreator.prototype.init = function init() {
 	return {
 		options: {
-			id:              this.configOptionId(150),
-			name:            this.configOptionName(140),
-			platforms:       this.configOptionPlatforms(120),
-			template:        this.configOptionTemplate(110),
+			id: this.configOptionId(150),
+			name: this.configOptionName(140),
+			platforms: this.configOptionPlatforms(120),
+			template: this.configOptionTemplate(110),
 			'workspace-dir': this.configOptionWorkspaceDir(170),
-			'code-base':	 this.configOptionCodeBase(150),
+			'code-base': this.configOptionCodeBase(150),
 			'android-code-base': this.configOptionAndroidCodeBase(150),
-			'ios-code-base': this.configOptionIosCodeBase(140)
-
-		}
+			'ios-code-base': this.configOptionIosCodeBase(140),
+		},
 	};
 };
 
@@ -71,11 +70,13 @@ ModuleCreator.prototype.configOptionAndroidCodeBase = function configAndroidCode
 		order: order,
 		default: !cli.argv.prompt ? 'java' : undefined,
 		prompt(callback) {
-			callback(fields.text({
-				promptLabel: `Android code base (${validTypes.join('|')})`,
-				default: 'java',
-				validate: validate
-			}));
+			callback(
+				fields.text({
+					promptLabel: `Android code base (${validTypes.join('|')})`,
+					default: 'java',
+					validate: validate,
+				})
+			);
 		},
 		required: true,
 		validate: validate,
@@ -85,7 +86,7 @@ ModuleCreator.prototype.configOptionAndroidCodeBase = function configAndroidCode
 				return callback(true);
 			}
 			return callback();
-		}
+		},
 	};
 };
 
@@ -107,21 +108,27 @@ ModuleCreator.prototype.configOptionIosCodeBase = function configIosCodeBase(ord
 		order: order,
 		default: !cli.argv.prompt ? 'objc' : undefined, // if we're prompting, then force the platforms to be prompted for, otherwise force 'all'
 		prompt(callback) {
-			callback(fields.text({
-				promptLabel: `iOS code base (${validTypes.join('|')})`,
-				default: 'objc',
-				validate: validate
-			}));
+			callback(
+				fields.text({
+					promptLabel: `iOS code base (${validTypes.join('|')})`,
+					default: 'objc',
+					validate: validate,
+				})
+			);
 		},
 		required: true,
 		validate: validate,
 		values: validTypes,
 		verifyIfRequired(callback) {
-			if (cli.argv.platforms.includes('ios') || cli.argv.platforms.includes('iphone') || cli.argv.platforms.includes('ipad')) {
+			if (
+				cli.argv.platforms.includes('ios') ||
+				cli.argv.platforms.includes('iphone') ||
+				cli.argv.platforms.includes('ipad')
+			) {
 				return callback(true);
 			}
 			return callback();
-		}
+		},
 	};
 };
 

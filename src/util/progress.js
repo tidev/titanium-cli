@@ -9,7 +9,7 @@ export class ProgressBar {
 
 		this.chars = {
 			complete: opts.complete || '=',
-			incomplete: opts.incomplete || '-'
+			incomplete: opts.incomplete || '-',
 		};
 	}
 
@@ -35,7 +35,7 @@ export class ProgressBar {
 			return;
 		}
 
-		const percent = this.curr / this.total * 100;
+		const percent = (this.curr / this.total) * 100;
 		let complete = Math.round(this.width * (this.curr / this.total));
 		let incomplete = this.width - complete;
 		const elapsed = new Date() - this.start;

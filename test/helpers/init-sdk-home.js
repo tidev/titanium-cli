@@ -1,18 +1,19 @@
 import { initCLI } from './init-cli.js';
 import { tmpDirName } from './tmp-dir-name.js';
-import fs from 'fs-extra';
-import { fileURLToPath } from 'node:url';
+import { cpSync, mkdirSync } from 'node:fs';
+import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 export function initSDKHome(fn, mock) {
 	const tmpSDKDir = tmpDirName();
 
 	if (mock) {
 		const os = process.platform === 'darwin' ? 'osx' : process.platform;
-		fs.copySync(
-			join(fileURLToPath(import.meta.url), '../../mock-sdk'),
-			join(tmpSDKDir, 'mobilesdk', os, '0.0.0.GA')
-		);
+		const dest = join(tmpSDKDir, 'mobilesdk', os, '0.0.0.GA');
+		mkdirSync(dirname(dest), { recursive: true });
+		cpSync(join(fileURLToPath(import.meta.url), '../../mock-sdk'), dest, { recursive: true });
 	}
 
 	return initCLI(async (opts) => {
@@ -22,10 +23,10 @@ export function initSDKHome(fn, mock) {
 			await run(['config', 'sdk.defaultInstallLocation', tmpSDKDir]);
 			await fn({
 				...opts,
-				tmpSDKDir
+				tmpSDKDir,
 			});
 		} finally {
-			await fs.remove(tmpSDKDir);
+			await rm(tmpSDKDir, { force: true, recursive: true });
 		}
 	});
 }

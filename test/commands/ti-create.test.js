@@ -1,21 +1,25 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
-import { stripColor } from '../helpers/strip-color.js';
 import { initMockSDKHome } from '../helpers/init-sdk-home.js';
+import { stripColor } from '../helpers/strip-color.js';
+import { describe, expect, it } from 'vitest';
 
 describe('ti create', () => {
-	it('should show help', initMockSDKHome(async ({ run }) => {
-		const { exitCode, stdout } = await run(['create', '-h']);
+	it(
+		'should show help',
+		initMockSDKHome(async ({ run }) => {
+			const { exitCode, stdout } = await run(['create', '-h']);
 
-		const output = stripColor(stdout);
-		assert.match(output, /Titanium Command-Line Interface/);
-		assert.match(output, /Usage: titanium create \[options\]/);
-		assert.match(output, /Creates a new Titanium application, native module, or Apple Watch™ app./);
-		assert.match(output, /Create Options:/);
-		assert.match(output, /Create --type=app Options:/);
-		assert.match(output, /Create --type=module Options:/);
-		assert.match(output, /Global Options:/);
+			const output = stripColor(stdout);
+			expect(output).toMatch(/Titanium Command-Line Interface/);
+			expect(output).toMatch(/Usage: titanium create \[options\]/);
+			expect(output).toMatch(
+				/Creates a new Titanium application, native module, or Apple Watch™ app./
+			);
+			expect(output).toMatch(/Create Options:/);
+			expect(output).toMatch(/Create --type=app Options:/);
+			expect(output).toMatch(/Create --type=module Options:/);
+			expect(output).toMatch(/Global Options:/);
 
-		assert.strictEqual(exitCode, 0);
-	}));
+			expect(exitCode).toBe(0);
+		})
+	);
 });

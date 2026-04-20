@@ -1,6 +1,3 @@
 {
-	"ignorePatterns": [
-		"test/commands/fixtures/**",
-		"test/mock-sdk/**"
-	]
+  "ignorePatterns": ["test/commands/fixtures/**", "test/mock-sdk/**"]
 }
