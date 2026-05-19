@@ -999,6 +999,7 @@ export class CLI {
 				};
 
 				cmd.argument('[platform]', 'target platform');
+				cmd.usage('[platform] [options]');
 			}
 
 			applyCommandConfig(this, cmdName, cmd, conf);
