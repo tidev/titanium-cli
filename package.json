@@ -1,6 +1,7 @@
 {
 	"name": "titanium",
 	"version": "8.2.0",
+	"packageManager": "pnpm@10.33.3",
 	"author": "TiDev, Inc. <npm@tidev.io>",
 	"description": "Command line interface for building Titanium SDK apps",
 	"type": "module",
