@@ -417,17 +417,18 @@ export class CLI {
 		const cmd = args.pop();
 		args.pop(); // discard argv
 
-		// Commander keeps declared and excess positional args on the command.
-		const positionalArgs = Array.isArray(cmd?.args) ? cmd.args.slice() : [];
-		if (positionalArgs.length) {
-			this.argv._ = positionalArgs;
-		} else {
-			// Fallback for command handlers that pass positional args directly.
-			while (args.length && args[args.length - 1] === undefined) {
-				args.pop();
-			}
-			this.argv._ = args;
+		// `args` are Commander's action-handler arguments, one entry per declared
+		// positional in order. Variadic positionals (e.g. `sdk uninstall
+		// [versions...]`) arrive as a nested array, which consumers like
+		// `sdk.js` rely on (`cli.argv._[0]` is the versions array). Flattening to
+		// `cmd.args` here would collapse that array into a string and break them.
+		// The `serve`/`build` positional platform is handled separately in
+		// `initBuildPlatform()` via `command.processedArgs`, not `argv._`.
+		while (args.length && args[args.length - 1] === undefined) {
+			args.pop();
 		}
+
+		this.argv._ = args;
 		this.applyArgv(cmd);
 
 		if (!this.ready) {

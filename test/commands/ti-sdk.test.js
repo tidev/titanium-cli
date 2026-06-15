@@ -336,4 +336,29 @@ describe('ti sdk', () => {
 			assert.strictEqual(exitCode, 0);
 		}));
 	});
+
+	// Regression guard: `sdk uninstall` takes a variadic `[versions...]`
+	// positional, which `sdk.js` reads as the array `cli.argv._[0]`. A parsing
+	// change once flattened variadic positionals into individual strings, so
+	// `versions.filter()` threw and the command printed usage instead of running.
+	// These cases reproduce that without network by uninstalling versions that
+	// are not installed, exercising single and multi-version parsing.
+	describe('uninstall', () => {
+		it('should parse a single version positional and report not found', initSDKHome(async ({ run }) => {
+			const { exitCode, stdout } = await run(['sdk', 'uninstall', '99.99.99.GA', '--force']);
+
+			const output = stripColor(stdout);
+			assert.match(output, /99\.99\.99\.GA\s+not found/);
+			assert.strictEqual(exitCode, 0);
+		}));
+
+		it('should parse multiple version positionals and report each not found', initSDKHome(async ({ run }) => {
+			const { exitCode, stdout } = await run(['sdk', 'uninstall', '98.0.0.GA', '99.0.0.GA', '--force']);
+
+			const output = stripColor(stdout);
+			assert.match(output, /98\.0\.0\.GA\s+not found/);
+			assert.match(output, /99\.0\.0\.GA\s+not found/);
+			assert.strictEqual(exitCode, 0);
+		}));
+	});
 });
