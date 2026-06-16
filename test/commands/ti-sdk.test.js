@@ -301,7 +301,9 @@ describe('ti sdk', () => {
 			({ exitCode, stdout } = await run(['sdk', 'ls', '-bu', '--json']));
 			const json = JSON.parse(stdout);
 			assert(json.branches.branches.includes('main') || json.branches.branches.includes('master'));
-			assert(json.branches.branches.includes('12_6_X'));
+			// Assert a version-line branch exists rather than a specific one; the
+			// live branch list changes as the SDK release line advances.
+			assert(json.branches.branches.some(branch => /^\d+_\d+_X$/.test(branch)));
 			assert(json.releases[sdkName]);
 
 			assert.strictEqual(exitCode, 0);
