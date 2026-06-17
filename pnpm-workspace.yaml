@@ -1,0 +1,5 @@
+allowBuilds:
+  esbuild: set this to true or false
+  lefthook: set this to true or false
+overrides:
+  node-titanium-sdk: link:../../../.local/share/pnpm/global/5/node_modules/node-titanium-sdk
