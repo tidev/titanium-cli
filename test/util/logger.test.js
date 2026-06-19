@@ -1,5 +1,4 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
+import { describe, it, expect } from 'vitest';
 import { Logger } from '../../src/util/logger.js';
 import { WritableStream } from 'memory-streams';
 import { stripColor } from '../helpers/strip-color.js';
@@ -22,27 +21,21 @@ describe('Logger', () => {
 		logger.info('info test');
 		logger.warn('warn test');
 
-		assert.strictEqual(
-			stripColor(stdout.toString()),
-			[
+		expect(stripColor(stdout.toString())).toBe([
 				'log test',
 				'log test',
 				'log test',
 				'[INFO]  info test',
 				''
-			].join('\n')
-		);
+			].join('\n'));
 
-		assert.strictEqual(
-			stripColor(stderr.toString()),
-			[
+		expect(stripColor(stderr.toString())).toBe([
 				'[TRACE] trace test',
 				'[DEBUG] debug test',
 				'[ERROR] error test',
 				'[WARN]  warn test',
 				''
-			].join('\n')
-		);
+			].join('\n'));
 	});
 
 	it('should only log warnings and above', () => {
@@ -62,24 +55,18 @@ describe('Logger', () => {
 		logger.info('info test');
 		logger.warn('warn test');
 
-		assert.strictEqual(
-			stripColor(stdout.toString()),
-			[
+		expect(stripColor(stdout.toString())).toBe([
 				'log test',
 				'log test',
 				'log test',
 				''
-			].join('\n')
-		);
+			].join('\n'));
 
-		assert.strictEqual(
-			stripColor(stderr.toString()),
-			[
+		expect(stripColor(stderr.toString())).toBe([
 				'[ERROR] error test',
 				'[WARN]  warn test',
 				''
-			].join('\n')
-		);
+			].join('\n'));
 	});
 
 	it('should allow the level to be dynamically changed', () => {
@@ -94,68 +81,50 @@ describe('Logger', () => {
 		logger.info('info test');
 		logger.warn('warn test');
 
-		assert.strictEqual(
-			stripColor(stdout.toString()),
-			[
+		expect(stripColor(stdout.toString())).toBe([
 				'[INFO]  info test',
 				''
-			].join('\n')
-		);
+			].join('\n'));
 
-		assert.strictEqual(
-			stripColor(stderr.toString()),
-			[
+		expect(stripColor(stderr.toString())).toBe([
 				'[WARN]  warn test',
 				''
-			].join('\n')
-		);
+			].join('\n'));
 
 		logger.setLevel('warn');
 		logger.debug('debug test');
 		logger.info('info test');
 		logger.warn('warn test');
 
-		assert.strictEqual(
-			stripColor(stdout.toString()),
-			[
+		expect(stripColor(stdout.toString())).toBe([
 				'[INFO]  info test',
 				''
-			].join('\n')
-		);
+			].join('\n'));
 
-		assert.strictEqual(
-			stripColor(stderr.toString()),
-			[
+		expect(stripColor(stderr.toString())).toBe([
 				'[WARN]  warn test',
 				'[WARN]  warn test',
 				''
-			].join('\n')
-		);
+			].join('\n'));
 
 		logger.setLevel(2); // debug
 		logger.debug('debug test');
 		logger.info('info test');
 		logger.warn('warn test');
 
-		assert.strictEqual(
-			stripColor(stdout.toString()),
-			[
+		expect(stripColor(stdout.toString())).toBe([
 				'[INFO]  info test',
 				'[INFO]  info test',
 				''
-			].join('\n')
-		);
+			].join('\n'));
 
-		assert.strictEqual(
-			stripColor(stderr.toString()),
-			[
+		expect(stripColor(stderr.toString())).toBe([
 				'[WARN]  warn test',
 				'[WARN]  warn test',
 				'[DEBUG] debug test',
 				'[WARN]  warn test',
 				''
-			].join('\n')
-		);
+			].join('\n'));
 	});
 
 	it('should be silent', () => {
@@ -171,13 +140,13 @@ describe('Logger', () => {
 		logger.info('info test');
 		logger.warn('warn test');
 
-		assert.strictEqual(stripColor(stdout.toString()), '');
-		assert.strictEqual(stripColor(stderr.toString()), '');
+		expect(stripColor(stdout.toString())).toBe('');
+		expect(stripColor(stderr.toString())).toBe('');
 	});
 
 	it('should get the levels', () => {
 		const logger = new Logger();
-		assert.deepStrictEqual(logger.getLevels(), ['trace', 'debug', 'info', 'warn', 'error']);
+		expect(logger.getLevels()).toEqual(['trace', 'debug', 'info', 'warn', 'error']);
 	});
 
 	it('should display the banner', () => {
@@ -200,23 +169,23 @@ describe('Logger', () => {
 		].join('\n'), 's');
 
 		logger.setBanner({ name: 'foo', copyright: 'bar', version: '1.2.3', sdkVersion: '4.5.6' });
-		assert.match(stripColor(logger.getBanner()), expected);
+		expect(stripColor(logger.getBanner())).toMatch(expected);
 
-		assert.strictEqual(logger.bannerEnabled(), true);
-		assert.strictEqual(logger.skipBanner(), false);
-		assert.strictEqual(logger.bannerWasRendered(), false);
-		assert.strictEqual(emittedCount, 0);
-
-		logger.banner();
-		assert.strictEqual(logger.bannerWasRendered(), true);
-		assert.strictEqual(emittedCount, 1);
-
-		assert.match(stripColor(stdout.toString()), expected);
+		expect(logger.bannerEnabled()).toBe(true);
+		expect(logger.skipBanner()).toBe(false);
+		expect(logger.bannerWasRendered()).toBe(false);
+		expect(emittedCount).toBe(0);
 
 		logger.banner();
-		assert.strictEqual(emittedCount, 1);
+		expect(logger.bannerWasRendered()).toBe(true);
+		expect(emittedCount).toBe(1);
 
-		assert.match(stripColor(stdout.toString()), expected);
+		expect(stripColor(stdout.toString())).toMatch(expected);
+
+		logger.banner();
+		expect(emittedCount).toBe(1);
+
+		expect(stripColor(stdout.toString())).toMatch(expected);
 	});
 
 	it('should not render banner if disabled', () => {
@@ -234,15 +203,15 @@ describe('Logger', () => {
 		logger.setBanner({ name: 'foo', copyright: 'bar', version: '1.2.3', sdkVersion: '4.5.6' });
 		logger.bannerEnabled(false);
 
-		assert.strictEqual(logger.bannerEnabled(), false);
-		assert.strictEqual(logger.skipBanner(), false);
-		assert.strictEqual(logger.bannerWasRendered(), false);
-		assert.strictEqual(emittedCount, 0);
+		expect(logger.bannerEnabled()).toBe(false);
+		expect(logger.skipBanner()).toBe(false);
+		expect(logger.bannerWasRendered()).toBe(false);
+		expect(emittedCount).toBe(0);
 
 		logger.banner();
-		assert.strictEqual(logger.bannerWasRendered(), false);
-		assert.strictEqual(emittedCount, 0);
-		assert.strictEqual(stripColor(stdout.toString()), '');
+		expect(logger.bannerWasRendered()).toBe(false);
+		expect(emittedCount).toBe(0);
+		expect(stripColor(stdout.toString())).toBe('');
 	});
 
 	it('should not render banner if skipped', () => {
@@ -259,14 +228,14 @@ describe('Logger', () => {
 
 		logger.setBanner({ name: 'foo', copyright: 'bar', version: '1.2.3', sdkVersion: '4.5.6' });
 
-		assert.strictEqual(logger.skipBanner(), false);
+		expect(logger.skipBanner()).toBe(false);
 		logger.skipBanner(true);
-		assert.strictEqual(logger.skipBanner(), true);
+		expect(logger.skipBanner()).toBe(true);
 
 		logger.banner();
-		assert.strictEqual(logger.bannerWasRendered(), false);
-		assert.strictEqual(emittedCount, 0);
-		assert.strictEqual(stripColor(stdout.toString()), '');
+		expect(logger.bannerWasRendered()).toBe(false);
+		expect(emittedCount).toBe(0);
+		expect(stripColor(stdout.toString())).toBe('');
 	});
 
 	it('should log with timestamps', () => {
@@ -277,11 +246,11 @@ describe('Logger', () => {
 			stderr
 		});
 
-		assert.strictEqual(logger.timestampEnabled(), false);
-		assert.strictEqual(logger.timestampEnabled(false), false);
-		assert.strictEqual(logger.timestampEnabled(true), true);
+		expect(logger.timestampEnabled()).toBe(false);
+		expect(logger.timestampEnabled(false)).toBe(false);
+		expect(logger.timestampEnabled(true)).toBe(true);
 
 		logger.info('- [INFO]  info test');
-		assert.match(stripColor(stdout.toString()), /\[INFO\]  info test/);
+		expect(stripColor(stdout.toString())).toMatch(/\[INFO\]  info test/);
 	});
 });

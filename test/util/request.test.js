@@ -1,5 +1,4 @@
-import { afterEach, beforeEach, describe, it } from 'node:test';
-import assert from 'node:assert';
+import { afterEach, beforeEach, describe, it, expect } from 'vitest';
 import { request } from '../../src/util/request.js';
 import { ticonfig } from '../../src/util/ticonfig.js';
 import { createServer } from 'node:http';
@@ -20,7 +19,7 @@ describe('request', () => {
 	it('should fetch TiDev page', async () => {
 		const res = await request('https://github.com');
 		await res.body.text();
-		assert.strictEqual(res.statusCode, 200);
+		expect(res.statusCode).toBe(200);
 	});
 
 	it('should fetch TiDev page via proxy', async () => {
@@ -40,7 +39,7 @@ describe('request', () => {
 
 			const res = await request('https://github.com');
 			await res.body.text();
-			assert.strictEqual(res.statusCode, 200);
+			expect(res.statusCode).toBe(200);
 		} finally {
 			for (const conn of Object.values(connections)) {
 				conn.destroy();
