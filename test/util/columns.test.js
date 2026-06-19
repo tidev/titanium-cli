@@ -1,5 +1,4 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
+import { describe, it, expect } from 'vitest';
 import { columns } from '../../src/util/columns.js';
 
 const data = [
@@ -33,21 +32,21 @@ const data = [
 
 describe('columns', () => {
 	it('should render columns with no wrapping', () => {
-		assert.strictEqual(columns([
+		expect(columns([
 			'foo',
 			'bar'
-		]), 'foo      bar');
+		])).toBe('foo      bar');
 	});
 
 	it('should render columns with margin', () => {
-		assert.strictEqual(columns([
+		expect(columns([
 			'foo',
 			'bar'
-		], '  '), '  foo      bar');
+		], '  ')).toBe('  foo      bar');
 	});
 
 	it('should render lots of data in columns with wrapping', () => {
-		assert.strictEqual(columns(data, '  ', 50), [
+		expect(columns(data, '  ', 50)).toBe([
 			'  aaaa      hhhh      oooo      vvvv',
 			'  bbbb      iiii      pppp      wwww',
 			'  cccc      jjjj      qqqq      xxxx',
@@ -59,7 +58,7 @@ describe('columns', () => {
 	});
 
 	it('should render lots of data with huge width', () => {
-		assert.strictEqual(columns(data, '  ', 1000), [
+		expect(columns(data, '  ', 1000)).toBe([
 			'  aaaa      eeee      iiii      mmmm      qqqq      uuuu      yyyy',
 			'  bbbb      ffff      jjjj      nnnn      rrrr      vvvv      zzzz',
 			'  cccc      gggg      kkkk      oooo      ssss      wwww',
@@ -68,7 +67,7 @@ describe('columns', () => {
 	});
 
 	it('should render lots of data with zero width', () => {
-		assert.strictEqual(columns(data, '  ', 0), [
+		expect(columns(data, '  ', 0)).toBe([
 			'  aaaa      eeee      iiii      mmmm      qqqq      uuuu      yyyy',
 			'  bbbb      ffff      jjjj      nnnn      rrrr      vvvv      zzzz',
 			'  cccc      gggg      kkkk      oooo      ssss      wwww',

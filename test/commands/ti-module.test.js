@@ -1,5 +1,4 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
+import { describe, it, expect } from 'vitest';
 import { initCLI } from '../helpers/init-cli.js';
 import { stripColor } from '../helpers/strip-color.js';
 import { fileURLToPath } from 'node:url';
@@ -12,48 +11,48 @@ describe('ti module', () => {
 		const { exitCode, stdout } = await run(['module', '-h']);
 
 		const output = stripColor(stdout);
-		assert.match(output, /Titanium Command-Line Interface/);
-		assert.match(output, /Usage: titanium module \[options\] \[command\]/);
-		assert.match(output, /Commands:/);
-		assert.match(output, /Module Options:/);
-		assert.match(output, /Global Options:/);
+		expect(output).toMatch(/Titanium Command-Line Interface/);
+		expect(output).toMatch(/Usage: titanium module \[options\] \[command\]/);
+		expect(output).toMatch(/Commands:/);
+		expect(output).toMatch(/Module Options:/);
+		expect(output).toMatch(/Global Options:/);
 
-		assert.strictEqual(exitCode, 0);
+		expect(exitCode).toBe(0);
 	}));
 
 	it('should show list help', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['module', 'list', '-h']);
 
 		const output = stripColor(stdout);
-		assert.match(output, /Titanium Command-Line Interface/);
-		assert.match(output, /Usage: titanium module list|ls/);
-		assert.match(output, /List Options:/);
-		assert.match(output, /Global Options:/);
+		expect(output).toMatch(/Titanium Command-Line Interface/);
+		expect(output).toMatch(/Usage: titanium module list|ls/);
+		expect(output).toMatch(/List Options:/);
+		expect(output).toMatch(/Global Options:/);
 
-		assert.strictEqual(exitCode, 0);
+		expect(exitCode).toBe(0);
 	}));
 
 	it('should list no installed modules', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['module']);
 
 		const output = stripColor(stdout);
-		assert.match(output, /Configured Path Modules/);
-		assert.match(output, /Global Modules/);
+		expect(output).toMatch(/Configured Path Modules/);
+		expect(output).toMatch(/Global Modules/);
 
-		assert.strictEqual(exitCode, 0);
+		expect(exitCode).toBe(0);
 	}));
 
 	it('should list no installed modules as JSON', initCLI(async ({ run }) => {
 		const { exitCode, stdout } = await run(['module', '--json']);
 
 		const json = JSON.parse(stdout);
-		assert.deepStrictEqual(json, {
+		expect(json).toEqual({
 			project: {},
 			config: {},
 			global: {}
 		});
 
-		assert.strictEqual(exitCode, 0);
+		expect(exitCode).toBe(0);
 	}));
 
 	it('should list installed modules', initCLI(async ({ run }) => {
@@ -70,7 +69,7 @@ describe('ti module', () => {
 		]);
 
 		const output = stripColor(stdout);
-		assert.match(output, new RegExp(`Configured Path Modules
+		expect(output).toMatch(new RegExp(`Configured Path Modules
   Android
     com.test.module
       1.0.0   ${join(fixturesDir, 'module', 'android', 'test-module', '1.0.0').replace(/\\/g, '\\\\')}
@@ -91,7 +90,7 @@ describe('ti module', () => {
 Global Modules
   No modules found`));
 
-		assert.strictEqual(exitCode, 0);
+		expect(exitCode).toBe(0);
 	}));
 
 	it('should list installed modules as JSON', initCLI(async ({ run }) => {
@@ -109,7 +108,7 @@ Global Modules
 		]);
 
 		const json = JSON.parse(stdout);
-		assert.deepStrictEqual(json, {
+		expect(json).toEqual({
 			project: {},
 			config: {
 				android: {
@@ -245,12 +244,12 @@ Global Modules
 			global: {}
 		});
 
-		assert.strictEqual(exitCode, 0);
+		expect(exitCode).toBe(0);
 	}));
 
 	it('should install module during detection', initCLI(async ({ run }) => {
 		const { exitCode, _stdout } = await run(['module']);
 
-		assert.strictEqual(exitCode, 0);
+		expect(exitCode).toBe(0);
 	}));
 });

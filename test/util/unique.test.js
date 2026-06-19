@@ -1,16 +1,14 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
+import { describe, it, expect } from 'vitest';
 import { unique } from '../../src/util/unique.js';
 
 describe('unique', () => {
 	it('should return empty array if no elements', () => {
-		assert.deepStrictEqual(unique(), []);
-		assert.deepStrictEqual(unique([]), []);
+		expect(unique()).toEqual([]);
+		expect(unique([])).toEqual([]);
 	});
 
 	it('should remove duplicates, null, and undefined values', () => {
-		assert.deepStrictEqual(
-			unique([
+		expect(unique([
 				1,
 				'1',
 				'a',
@@ -23,13 +21,11 @@ describe('unique', () => {
 				true,
 				null,
 				undefined
-			]),
-			[
+			])).toEqual([
 				1,
 				'1',
 				'a',
 				true
-			]
-		);
+			]);
 	});
 });

@@ -1,5 +1,4 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
+import { describe, it, expect } from 'vitest';
 import { getTitaniumSDKPaths } from '../../src/util/tisdk.js';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,7 +15,7 @@ describe('tisdk', () => {
 
 		try {
 			let result = await getTitaniumSDKPaths(config);
-			assert.deepStrictEqual(result, {
+			expect(result).toEqual({
 				defaultInstallLocation: undefined,
 				sdkPaths: []
 			});
@@ -25,7 +24,7 @@ describe('tisdk', () => {
 			config.set('sdk.defaultInstallLocation', tmpSDKDir);
 
 			result = await getTitaniumSDKPaths(config);
-			assert.deepStrictEqual(result, {
+			expect(result).toEqual({
 				defaultInstallLocation: tmpSDKDir,
 				sdkPaths: [tmpSDKDir]
 			});
