@@ -8,7 +8,7 @@ describe('ti build', () => {
 
 		const output = stripColor(stdout);
 		expect(output).toMatch(/Titanium Command-Line Interface/);
-		expect(output).toMatch(/Usage: titanium build \[options\]/);
+		expect(output).toMatch(/Usage: titanium build \[platform\] \[options\]/);
 		expect(output).toMatch(/Builds an existing app or module project./);
 		expect(output).toMatch(/Build Options:/);
 		expect(output).toMatch(/Global Options:/);
