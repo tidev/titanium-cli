@@ -20,14 +20,11 @@ jobs:
     - name: Setup node
       uses: actions/setup-node@v6
       with:
-        node-version: 24
+        node-version: 26
         registry-url: 'https://registry.npmjs.org/'
 
-    - name: Update npm
-      run: npm install -g npm@latest
-
     - name: Install pnpm
-      uses: pnpm/action-setup@v4
+      uses: pnpm/action-setup@v6
       with:
         version: latest
 
@@ -48,7 +45,7 @@ jobs:
         echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
     - name: Send Slack notification
-      uses: slackapi/slack-github-action@v2.1.1
+      uses: slackapi/slack-github-action@v3.0.3
       with:
         method: chat.postMessage
         token: ${{ secrets.SLACK_BOT_TOKEN }}

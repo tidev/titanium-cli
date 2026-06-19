@@ -1,11 +1,10 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert';
+import { describe, it, expect } from 'vitest';
 import { capitalize } from '../../src/util/capitalize.js';
 
 describe('capitalize', () => {
 	it('should capitalize a string', () => {
-		assert.strictEqual(capitalize('foo'), 'Foo');
-		assert.strictEqual(capitalize('123 foo'), '123 foo');
-		assert.strictEqual(capitalize(''), '');
+		expect(capitalize('foo')).toBe('Foo');
+		expect(capitalize('123 foo')).toBe('123 foo');
+		expect(capitalize('')).toBe('');
 	});
 });

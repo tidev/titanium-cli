@@ -28,7 +28,8 @@ export function initCLI(fixture, fn, sharedOpts = {}) {
 								...process.env,
 								...sharedOpts.env,
 								...opts.env,
-								HOME: tmpHome
+								HOME: tmpHome,
+								TI_CLI_SKIP_ENV_PATHS: '1'
 							}
 						});
 					} catch (e) {
