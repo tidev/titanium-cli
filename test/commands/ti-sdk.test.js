@@ -346,17 +346,17 @@ describe('ti sdk', () => {
 			const { exitCode, stdout } = await run(['sdk', 'uninstall', '99.99.99.GA', '--force']);
 
 			const output = stripColor(stdout);
-			assert.match(output, /99\.99\.99\.GA\s+not found/);
-			assert.strictEqual(exitCode, 0);
+			expect(output).toMatch(/99\.99\.99\.GA\s+not found/);
+			expect(exitCode).toBe(0);
 		}));
 
 		it('should parse multiple version positionals and report each not found', initSDKHome(async ({ run }) => {
 			const { exitCode, stdout } = await run(['sdk', 'uninstall', '98.0.0.GA', '99.0.0.GA', '--force']);
 
 			const output = stripColor(stdout);
-			assert.match(output, /98\.0\.0\.GA\s+not found/);
-			assert.match(output, /99\.0\.0\.GA\s+not found/);
-			assert.strictEqual(exitCode, 0);
+			expect(output).toMatch(/98\.0\.0\.GA\s+not found/);
+			expect(output).toMatch(/99\.0\.0\.GA\s+not found/);
+			expect(exitCode).toBe(0);
 		}));
 	});
 });
