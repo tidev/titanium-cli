@@ -1,4 +1,4 @@
-9.0.0 (6/19/2026)
+9.0.0-rc1 (6/19/2026)
 -------------------
  * BREAKING CHANGE: Require Node.js 22.19.0 or newer
  * chore: Updated dependencies
