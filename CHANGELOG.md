@@ -1,7 +1,8 @@
-9.0.0 (6/18/2026)
+9.0.0 (6/19/2026)
 -------------------
  * BREAKING CHANGE: Require Node.js 22.19.0 or newer
  * chore: Updated dependencies
+ * chore: Migrated tests to Vitest
 
 8.1.5 (2/2/2026)
 -------------------
