@@ -65,7 +65,7 @@ jobs:
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "${{ steps.get-package-info.outputs.homepage }}/releases/tag/v${{ steps.get-package-info.outputs.version }}"
+                  "text": "https://github.com/tidev/titanium-cli/releases/tag/v${{ steps.get-package-info.outputs.version }}"
                 }
               }
             ]
