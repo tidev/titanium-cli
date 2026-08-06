@@ -149,6 +149,7 @@ export async function run(logger, config, cli) {
 					const subPath = listMatch[1];
 
 					const validKeys = [
+						'commands',
 						'hooks',
 						'modules',
 						'sdks',
