@@ -36,7 +36,7 @@
 		"yauzl": "3.4.0"
 	},
 	"devDependencies": {
-		"@reporters/github": "2.0.1",
+		"@reporters/github": "2.1.2",
 		"@vitest/coverage-v8": "4.1.9",
 		"c8": "12.0.0",
 		"glob": "13.0.6",
