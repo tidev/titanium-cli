@@ -1,3 +1,9 @@
+9.1.0 (8/22/2026)
+-------------------
+ * feat: Support async command `validate()` functions #977
+ * fix: Add `commands` to config command validKeys - #968
+ * chore: Updated dependencies
+
 9.0.0 (6/19/2026)
 -------------------
  * BREAKING CHANGE: Require Node.js 22.19.0 or newer
