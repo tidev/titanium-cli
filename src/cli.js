@@ -112,18 +112,23 @@ export class CLI {
 			const { detect } = await import('./util/detect.js');
 			const { data } = await detect(this.debugLogger, ticonfig, this, { nodejs: true, os: true });
 			const { node, npm, os } = data;
+			const info = {
+				os: os.name,
+				platform: process.platform.replace('darwin', 'osx'),
+				osver: os.version,
+				ostype: os.architecture,
+				oscpu: os.numcpus,
+				memory: os.memory,
+				node: node.version,
+				npm: npm.version
+			};
+
+			// deprecated - used by SDK 13.x and older
 			if (typeof callback === 'function') {
-				callback({
-					os: os.name,
-					platform: process.platform.replace('darwin', 'osx'),
-					osver: os.version,
-					ostype: os.architecture,
-					oscpu: os.numcpus,
-					memory: os.memory,
-					node: node.version,
-					npm: npm.version
-				});
+				return callback(info);
 			}
+
+			return info;
 		}
 	};
 
@@ -1627,10 +1632,12 @@ export class CLI {
 		const fn = this.command.module?.validate;
 		if (fn && typeof fn === 'function') {
 			this.debugLogger.trace(`Executing command's validate: ${this.command.name()}`);
-			const result = fn(this.logger || this.debugLogger, this.config, this);
+			let result = fn(this.logger || this.debugLogger, this.config, this);
 
-			// fn should always be a function for `build` and `clean` commands
-			if (typeof result === 'function') {
+			if (result instanceof Promise) {
+				result = await result;
+			} else if (typeof result === 'function') {
+				// fn should always be a function for `build` and `clean` commands
 				await new Promise(resolve => result(resolve));
 			} else if (result === false) {
 				this.command.skipRun = true;
