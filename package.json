@@ -21,7 +21,7 @@
 	},
 	"preferGlobal": true,
 	"dependencies": {
-		"@xmldom/xmldom": "0.9.10",
+		"@xmldom/xmldom": "0.9.12",
 		"chalk": "6.0.0",
 		"commander": "15.0.0",
 		"execa": "10.0.1",
