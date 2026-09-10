@@ -70,3 +70,26 @@ jobs:
               }
             ]
           }
+
+  # titaniumsdk.com names the current CLI version on its landing page and on
+  # /downloads, and works out the minimum CLI for each SDK release from the same
+  # data. All three are statically generated, so a release changes nothing there
+  # until something tells the site to recapture.
+  #
+  # The dispatch itself lives in titaniumsdk.com, as it does for the seventeen
+  # repositories that notify it about API docs: the event name and the target
+  # are that site's to change, so a rename does not become a pull request here.
+  #
+  # `needs: publish` is load-bearing rather than tidy. The capture reads
+  # `engines.node` from the npm packument, and a release that reached the site
+  # before npm had the tarball would be recorded with a date and a URL but no
+  # Node range - which is exactly what the compatibility page reads.
+  notify-titaniumsdk:
+    name: Notify titaniumsdk.com
+    needs: publish
+    # Skipped in forks: they hold no dispatch token, so this could only ever
+    # produce a failing run.
+    if: github.repository_owner == 'tidev'
+    uses: tidev/titaniumsdk.com/.github/workflows/notify-cli-release.yml@main
+    secrets:
+      dispatch-token: ${{ secrets.REGEN_DOCS_GITHUB_TOKEN }}
