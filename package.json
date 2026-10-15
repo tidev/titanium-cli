@@ -32,7 +32,7 @@
 		"undici": "8.11.2",
 		"which": "7.0.0",
 		"wrap-ansi": "10.0.2",
-		"xpath": "0.0.34",
+		"xpath": "0.0.35",
 		"yauzl": "3.4.0"
 	},
 	"devDependencies": {
