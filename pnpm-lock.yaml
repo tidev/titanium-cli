@@ -469,8 +469,8 @@ packages:
     resolution: {integrity: sha512-faqwZqnWxbxn+F1d399ygeamQNy3lPp/H9H6rNrqYh4FSVCtcY+3cub1MxA8o9mDd55mM8Aghuu/kuyYA6VTsA==}
     engines: {node: '>=6'}
 
-  chai@6.2.2:
-    resolution: {integrity: sha512-NUPRluOfOiTKBKvWPtSD4PhFvWCqOi0BGStNWs57X9js7XGTprSmFoz5F0tWhR4WPjNeR9jXqdC7/UpSJTnlRg==}
+  chai@6.3.0:
+    resolution: {integrity: sha512-XWAtwJ6OHO+tj0EKCs0Y2UamnyOxseZWltU4x2U2wh8g4AigdjwvtUjvLP2tqkA/avxHEtzxNaqGq/YGNwckKg==}
     engines: {node: '>=18'}
 
   chalk@2.4.2:
@@ -1396,7 +1396,7 @@ snapshots:
 
   camelcase@5.0.0: {}
 
-  chai@6.2.2: {}
+  chai@6.3.0: {}
 
   chalk@2.4.2:
     dependencies:
@@ -1852,7 +1852,7 @@ snapshots:
     dependencies:
       '@types/chai': 5.2.3
       '@vitest/mocker': 5.0.3(vite@8.0.16)
-      chai: 6.2.2
+      chai: 6.3.0
       es-module-lexer: 2.3.2
       expect-type: 1.4.0
       magic-string: 1.4.3
