@@ -112,7 +112,7 @@ ${copyright}
 Please star us on GitHub! ${cyan('https://github.com/tidev/titanium-cli')}
 and ${cyan('https://github.com/tidev/titanium-sdk')}
 
-Want to help? ${cyan('https://tidev.io/donate')} or ${cyan('https://tidev.io/contribute')}
+Want to help? ${cyan('https://titaniumsdk.com/contribute')}
 `;
 	}
 

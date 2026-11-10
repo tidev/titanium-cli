@@ -897,7 +897,7 @@ SdkSubcommands.uninstall = {
  * @returns {Promise<Branches>}
  */
 async function getBranches() {
-	const res = await request('https://downloads.titaniumsdk.com/registry/branches.json', {
+	const res = await request('https://titaniumsdk.com/registry/branches.json', {
 		responseType: 'json'
 	});
 	return Object
@@ -913,7 +913,7 @@ async function getBranches() {
  * @returns {Promise<BranchBuild[]>}
  */
 async function getBranchBuilds(branch, os) {
-	const res = await request(`https://downloads.titaniumsdk.com/registry/${branch}.json`, {
+	const res = await request(`https://titaniumsdk.com/registry/${branch}.json`, {
 		responseType: 'json'
 	});
 	const now = Date.now();
