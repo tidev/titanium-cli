@@ -1,3 +1,8 @@
+9.2.0 (11/10/2026)
+-------------------
+ * fix: Update SDK registry URL to `https://titaniumsdk.com`
+ * chore: Updated dependencies
+
 9.1.0 (8/22/2026)
 -------------------
  * feat: Support async command `validate()` functions #977
