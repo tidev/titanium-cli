@@ -232,15 +232,15 @@ export async function getReleases(unstable) {
 	const releaseRE = /^(\d+)\.(\d+)\.(\d+)\.(\w+)$/;
 
 	const fetches = [
-		unstable && request('https://downloads.titaniumsdk.com/registry/beta.json', {
+		unstable && request('https://titaniumsdk.com/registry/beta.json', {
 			responseType: 'json'
 		}).then(async res => ({ type: 'beta', releases: await res.body.json() })),
 
-		unstable && request('https://downloads.titaniumsdk.com/registry/rc.json', {
+		unstable && request('https://titaniumsdk.com/registry/rc.json', {
 			responseType: 'json'
 		}).then(async res => ({ type: 'rc', releases: await res.body.json() })),
 
-		request('https://downloads.titaniumsdk.com/registry/ga.json', {
+		request('https://titaniumsdk.com/registry/ga.json', {
 			responseType: 'json'
 		}).then(async res => ({ type: 'ga', releases: await res.body.json() }))
 	];
