@@ -1110,8 +1110,10 @@ export class CLI {
 			const hasSDKs = Object.keys(sdks).length > 0;
 			if (!hasSDKs || !sdk) {
 				if (hasSDKs && tiappSdkVersion) {
+					const installedSDKs = Object.values(sdks);
+					const suggestedSDK = installedSDKs.find(sdk => sdk.type === 'ga') || installedSDKs[0];
 					throw new TiError(`The <sdk-version> in the tiapp.xml is set to "${tiappSdkVersion}", but this version is not installed`, {
-						after: `Available SDKs:\n${Object.values(sdks).map(sdk => `  ${cyan(sdk.name.padEnd(24))} ${gray(typeLabels[sdk.type])}`).join('\n')}`
+						after: `Available SDKs:\n${installedSDKs.map(sdk => `  ${cyan(sdk.name.padEnd(24))} ${gray(typeLabels[sdk.type])}`).join('\n')}\n\nOr use an installed SDK for this command:\n  ${cyan(`titanium ${cmdName} --sdk ${suggestedSDK.name}`)}`
 					});
 				}
 
