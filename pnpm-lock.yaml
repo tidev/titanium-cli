@@ -42,8 +42,8 @@ importers:
         specifier: 10.0.2
         version: 10.0.2
       xpath:
-        specifier: 0.0.36
-        version: 0.0.36
+        specifier: 0.1.0
+        version: 0.1.0
       yauzl:
         specifier: 3.4.0
         version: 3.4.0
@@ -1111,8 +1111,8 @@ packages:
     resolution: {integrity: sha512-42AtmgqjV+X1VpdOfyTGOYRi0/zsoLqtXQckTmqTeybT+BDIbM/Guxo7x3pE2vtpr1ok6xRqM9OpBe+Jyoqyww==}
     engines: {node: '>=18'}
 
-  xpath@0.0.36:
-    resolution: {integrity: sha512-HuqAnJx5YJoDeLub7hhcNoiRvnqqrgoSsI4kLrOtv6XkaUI0zY9ylL4+ULozB35JT1SVMfdexsMqRbTp7bkFGQ==}
+  xpath@0.1.0:
+    resolution: {integrity: sha512-p2A4mxd3/chYyTKQGCVqnP3Vuud95BU/9iVgnWk30asx6PRoloCwIpdoh+jQpkkr//uQeDr2O9S2iK6/hNlzYA==}
     engines: {node: '>=0.6.0'}
 
   y18n@5.0.8:
@@ -1941,7 +1941,7 @@ snapshots:
       string-width: 7.2.0
       strip-ansi: 7.2.0
 
-  xpath@0.0.36: {}
+  xpath@0.1.0: {}
 
   y18n@5.0.8: {}
 
